@@ -1,0 +1,3964 @@
+{
+  "_comment": "TEAL Laser Equipment Configurator — value store. Edit here or via the admin panel, then commit alongside index.html.",
+  "_updated": "2026-08-02",
+  "SRC": {
+    "fiber": {
+      "n": "Fiber (Q-switched)",
+      "wl": "1064 nm",
+      "um": 1.064,
+      "col": "#E0552B",
+      "m2": 1.3,
+      "dia": 14,
+      "mode": "pulsed",
+      "tau": 100,
+      "tauU": "ns",
+      "frep": [
+        20,
+        100
+      ],
+      "wpe": 0.3,
+      "prem": 1
+    },
+    "mopa": {
+      "n": "Fiber MOPA",
+      "wl": "1064 nm",
+      "um": 1.064,
+      "col": "#EE6B33",
+      "m2": 1.3,
+      "dia": 14,
+      "mode": "pulsed",
+      "tau": 2,
+      "tauU": "ns",
+      "frep": [
+        1,
+        4000
+      ],
+      "tauRange": [
+        2,
+        500
+      ],
+      "wpe": 0.27,
+      "prem": 1.12
+    },
+    "qcw": {
+      "n": "QCW fiber",
+      "wl": "1064 nm",
+      "um": 1.064,
+      "col": "#E8703A",
+      "m2": 1.1,
+      "dia": 12,
+      "mode": "pulsed",
+      "tau": 500000,
+      "tauU": "ns",
+      "frep": [
+        0.1,
+        1
+      ],
+      "wpe": 0.25,
+      "prem": 1.22
+    },
+    "smcw": {
+      "n": "CW single-mode fiber",
+      "wl": "1070 nm",
+      "um": 1.07,
+      "col": "#D94F26",
+      "m2": 1.05,
+      "dia": 12,
+      "mode": "cw",
+      "wpe": 0.35,
+      "prem": 1.28
+    },
+    "uv": {
+      "n": "UV DPSS (THG)",
+      "wl": "355 nm",
+      "um": 0.355,
+      "col": "#8A5CF0",
+      "m2": 1.2,
+      "dia": 10,
+      "mode": "pulsed",
+      "tau": 25,
+      "tauU": "ns",
+      "frep": [
+        20,
+        150
+      ],
+      "wpe": 0.03,
+      "prem": 1.55
+    },
+    "green": {
+      "n": "Green DPSS (SHG)",
+      "wl": "532 nm",
+      "um": 0.532,
+      "col": "#28C36A",
+      "m2": 1.2,
+      "dia": 10,
+      "mode": "pulsed",
+      "tau": 15,
+      "tauU": "ns",
+      "frep": [
+        10,
+        100
+      ],
+      "wpe": 0.07,
+      "prem": 1.4
+    },
+    "blue": {
+      "n": "Blue diode",
+      "wl": "450 nm",
+      "um": 0.45,
+      "col": "#2E7CE4",
+      "m2": 2,
+      "dia": 10,
+      "mode": "cw",
+      "wpe": 0.38,
+      "prem": 1.45
+    },
+    "co2": {
+      "n": "Sealed RF CO₂",
+      "wl": "10.6 µm",
+      "um": 10.6,
+      "col": "#C0392B",
+      "m2": 1.1,
+      "dia": 20,
+      "mode": "cw",
+      "wpe": 0.1,
+      "prem": 1
+    },
+    "co293": {
+      "n": "Sealed RF CO₂",
+      "wl": "9.3 µm",
+      "um": 9.3,
+      "col": "#AF3527",
+      "m2": 1.1,
+      "dia": 20,
+      "mode": "cw",
+      "wpe": 0.09,
+      "prem": 1.16
+    },
+    "pico": {
+      "n": "Picosecond",
+      "wl": "1030 nm",
+      "um": 1.03,
+      "col": "#F0A32E",
+      "m2": 1.2,
+      "dia": 12,
+      "mode": "pulsed",
+      "tau": 0.01,
+      "tauU": "ns",
+      "frep": [
+        200,
+        2000
+      ],
+      "wpe": 0.1,
+      "prem": 1.85
+    },
+    "femto": {
+      "n": "Femtosecond",
+      "wl": "1030 nm",
+      "um": 1.03,
+      "col": "#F5C542",
+      "m2": 1.2,
+      "dia": 12,
+      "mode": "pulsed",
+      "tau": 0.0003,
+      "tauU": "ns",
+      "frep": [
+        200,
+        1000
+      ],
+      "wpe": 0.08,
+      "prem": 2.4
+    },
+    "diode": {
+      "n": "Direct diode",
+      "wl": "915–980 nm",
+      "um": 0.94,
+      "col": "#D4483C",
+      "m2": 18,
+      "dia": 12,
+      "mode": "cw",
+      "wpe": 0.45,
+      "prem": 0.92
+    }
+  },
+  "LENS": {
+    "f100": {
+      "f": 100,
+      "fld": 70,
+      "n": "F100"
+    },
+    "f163": {
+      "f": 163,
+      "fld": 110,
+      "n": "F163"
+    },
+    "f230": {
+      "f": 230,
+      "fld": 160,
+      "n": "F230"
+    },
+    "f254": {
+      "f": 254,
+      "fld": 175,
+      "n": "F254"
+    },
+    "f420": {
+      "f": 420,
+      "fld": 300,
+      "n": "F420"
+    }
+  },
+  "MAT": {
+    "steel": {
+      "n": "Carbon steel",
+      "k": 50,
+      "tm": 1538,
+      "rho": 7850,
+      "cp": 490,
+      "a": {
+        "uv": 0.6,
+        "blue": 0.6,
+        "green": 0.55,
+        "ir": 0.35,
+        "co2": 0.1
+      }
+    },
+    "ss": {
+      "n": "Stainless 304",
+      "k": 16,
+      "tm": 1450,
+      "rho": 8000,
+      "cp": 500,
+      "a": {
+        "uv": 0.6,
+        "blue": 0.58,
+        "green": 0.55,
+        "ir": 0.35,
+        "co2": 0.1
+      }
+    },
+    "al": {
+      "n": "Aluminium",
+      "k": 237,
+      "tm": 660,
+      "rho": 2700,
+      "cp": 900,
+      "a": {
+        "uv": 0.25,
+        "blue": 0.16,
+        "green": 0.15,
+        "ir": 0.08,
+        "co2": 0.02
+      }
+    },
+    "cu": {
+      "n": "Copper",
+      "k": 401,
+      "tm": 1085,
+      "rho": 8960,
+      "cp": 385,
+      "a": {
+        "uv": 0.55,
+        "blue": 0.55,
+        "green": 0.4,
+        "ir": 0.04,
+        "co2": 0.015
+      }
+    },
+    "ti": {
+      "n": "Titanium",
+      "k": 22,
+      "tm": 1668,
+      "rho": 4510,
+      "cp": 520,
+      "a": {
+        "uv": 0.55,
+        "blue": 0.52,
+        "green": 0.5,
+        "ir": 0.42,
+        "co2": 0.12
+      }
+    },
+    "ni": {
+      "n": "Nickel",
+      "k": 91,
+      "tm": 1455,
+      "rho": 8900,
+      "cp": 440,
+      "a": {
+        "uv": 0.5,
+        "blue": 0.45,
+        "green": 0.42,
+        "ir": 0.28,
+        "co2": 0.05
+      }
+    },
+    "si": {
+      "n": "Silicon",
+      "k": 150,
+      "tm": 1414,
+      "rho": 2330,
+      "cp": 700,
+      "a": {
+        "uv": 0.65,
+        "blue": 0.62,
+        "green": 0.6,
+        "ir": 0.3,
+        "co2": 0.05
+      }
+    },
+    "sic": {
+      "n": "Silicon carbide",
+      "k": 370,
+      "tm": 2730,
+      "rho": 3210,
+      "cp": 690,
+      "a": {
+        "uv": 0.7,
+        "blue": 0.55,
+        "green": 0.35,
+        "ir": 0.15,
+        "co2": 0.08
+      }
+    },
+    "al2o3": {
+      "n": "Alumina",
+      "k": 30,
+      "tm": 2072,
+      "rho": 3950,
+      "cp": 880,
+      "a": {
+        "uv": 0.45,
+        "blue": 0.2,
+        "green": 0.15,
+        "ir": 0.12,
+        "co2": 0.9
+      }
+    },
+    "aln": {
+      "n": "Aluminium nitride",
+      "k": 170,
+      "tm": 2200,
+      "rho": 3260,
+      "cp": 740,
+      "a": {
+        "uv": 0.5,
+        "blue": 0.25,
+        "green": 0.18,
+        "ir": 0.14,
+        "co2": 0.88
+      }
+    },
+    "glass": {
+      "n": "Soda-lime glass",
+      "k": 1,
+      "tm": 1000,
+      "rho": 2500,
+      "cp": 840,
+      "a": {
+        "uv": 0.35,
+        "blue": 0.02,
+        "green": 0.01,
+        "ir": 0.02,
+        "co2": 0.92
+      }
+    },
+    "fr4": {
+      "n": "FR4 / solder mask",
+      "k": 0.3,
+      "tm": 300,
+      "rho": 1850,
+      "cp": 1100,
+      "a": {
+        "uv": 0.75,
+        "blue": 0.35,
+        "green": 0.3,
+        "ir": 0.15,
+        "co2": 0.92
+      },
+      "org": 1
+    },
+    "pi": {
+      "n": "Polyimide",
+      "k": 0.15,
+      "tm": 400,
+      "rho": 1420,
+      "cp": 1090,
+      "a": {
+        "uv": 0.85,
+        "blue": 0.45,
+        "green": 0.35,
+        "ir": 0.12,
+        "co2": 0.94
+      },
+      "org": 1
+    },
+    "poly": {
+      "n": "Engineering polymer",
+      "k": 0.2,
+      "tm": 250,
+      "rho": 1200,
+      "cp": 1500,
+      "a": {
+        "uv": 0.7,
+        "blue": 0.3,
+        "green": 0.25,
+        "ir": 0.1,
+        "co2": 0.93
+      },
+      "org": 1
+    },
+    "emc": {
+      "n": "Epoxy mould compound",
+      "k": 0.7,
+      "tm": 350,
+      "rho": 1900,
+      "cp": 1000,
+      "a": {
+        "uv": 0.72,
+        "blue": 0.4,
+        "green": 0.35,
+        "ir": 0.3,
+        "co2": 0.9
+      },
+      "org": 1
+    }
+  },
+  "IND": {
+    "ems": {
+      "n": "Electronics / EMS",
+      "d": "PCB assembly, connectors, enclosures"
+    },
+    "semi": {
+      "n": "Semiconductor / ATMP",
+      "d": "Wafer, package, substrate, test"
+    },
+    "battery": {
+      "n": "Battery & e-mobility",
+      "d": "Cell, module, pack, traction drive"
+    },
+    "auto": {
+      "n": "Automotive",
+      "d": "Powertrain, body, interior, sensors"
+    },
+    "medical": {
+      "n": "Medical devices",
+      "d": "Instruments, implants, UDI marking"
+    },
+    "aero": {
+      "n": "Aerospace & defence",
+      "d": "Structures, fasteners, traceability"
+    },
+    "genengg": {
+      "n": "General engineering",
+      "d": "Fabrication, tooling, job work"
+    },
+    "consumer": {
+      "n": "Consumer & jewellery",
+      "d": "Cosmetic marking, personalisation"
+    }
+  },
+  "STD": {
+    "iec60825_1": {
+      "n": "IEC 60825-1",
+      "d": "Safety of laser products — equipment classification and requirements",
+      "s": "Every enclosed system; defines the Class 1 condition"
+    },
+    "iec60825_4": {
+      "n": "IEC 60825-4",
+      "d": "Safety of laser products — laser guards",
+      "s": "Cabins and guarding around robot and gantry cells"
+    },
+    "iso12100": {
+      "n": "ISO 12100",
+      "d": "Safety of machinery — risk assessment and risk reduction",
+      "s": "Cell-level risk assessment and residual-risk file"
+    },
+    "iso13849": {
+      "n": "ISO 13849-1",
+      "d": "Safety-related parts of control systems",
+      "s": "Performance level of interlock and E-stop circuits"
+    },
+    "iso29158": {
+      "n": "ISO/IEC 29158",
+      "d": "Direct part mark quality guideline",
+      "s": "Grading of marked 2D codes (AIM DPM)"
+    },
+    "iso15415": {
+      "n": "ISO/IEC 15415",
+      "d": "2D symbol print quality test specification",
+      "s": "Grading of printed and label 2D codes"
+    },
+    "semi_t7": {
+      "n": "SEMI T7",
+      "d": "Back-surface marking of double-side polished wafers",
+      "s": "Wafer back-side identity"
+    },
+    "semi_m12": {
+      "n": "SEMI M12",
+      "d": "Serial alphanumeric marking of the front surface of wafers",
+      "s": "Wafer front-side identity"
+    },
+    "semi_m13": {
+      "n": "SEMI M13",
+      "d": "Alphanumeric marking of silicon wafers",
+      "s": "Wafer character set and placement"
+    },
+    "semi_e30": {
+      "n": "SEMI E30 / E37 / E40",
+      "d": "GEM, HSMS and processing management",
+      "s": "Fab and OSAT host communication"
+    },
+    "smema": {
+      "n": "IPC-SMEMA-9851",
+      "d": "Mechanical equipment interface standard",
+      "s": "Board handshake between inline machines"
+    },
+    "hermes": {
+      "n": "IPC-HERMES-9852",
+      "d": "Machine-to-machine communication in SMT",
+      "s": "Digital successor to SMEMA on SMT lines"
+    },
+    "iec61340": {
+      "n": "IEC 61340-5-1",
+      "d": "Protection of electronic devices from electrostatic phenomena",
+      "s": "ESD-safe build and dry-room handling"
+    },
+    "iso14644": {
+      "n": "ISO 14644-1",
+      "d": "Cleanrooms — classification of air cleanliness by particle concentration",
+      "s": "Cleanroom-compatible construction"
+    },
+    "cfr11": {
+      "n": "21 CFR Part 11",
+      "d": "Electronic records and electronic signatures",
+      "s": "Validated sites using audit-trailed software"
+    }
+  },
+  "LEX": {
+    "process": {
+      "mark": [
+        "mark",
+        "marking",
+        "engrav",
+        "etch",
+        "identif",
+        "serial",
+        "traceab",
+        "2d code",
+        "dmc",
+        "datamatrix",
+        "barcode",
+        "logo",
+        "part number",
+        "udi",
+        "anneal"
+      ],
+      "weld": [
+        "weld",
+        "join",
+        "joining",
+        "seam",
+        "spot weld",
+        "hermetic",
+        "seal",
+        "braze",
+        "stitch",
+        "hairpin"
+      ],
+      "clean": [
+        "clean",
+        "derust",
+        "rust",
+        "descal",
+        "strip",
+        "paint remov",
+        "degreas",
+        "oxide",
+        "surface prep",
+        "pre-treat",
+        "deflash"
+      ],
+      "cut": [
+        "cut",
+        "cutting",
+        "slit",
+        "singulat",
+        "profil",
+        "trim",
+        "kerf",
+        "drill",
+        "perforat",
+        "notch",
+        "scribe"
+      ],
+      "semi": [
+        "wafer",
+        "die ",
+        "semiconductor",
+        "atmp",
+        "osat",
+        "fab",
+        "lead frame",
+        "decap",
+        "interposer",
+        "package mark"
+      ],
+      "volt": [
+        "battery",
+        "cell ",
+        "busbar",
+        "tab weld",
+        "pouch",
+        "prismatic",
+        "18650",
+        "21700",
+        "4680",
+        "gigafactory",
+        "electrode"
+      ],
+      "auto": [
+        "automat",
+        "turnkey",
+        "integrat",
+        "production line",
+        "rotary table",
+        "pick and place",
+        "material handling"
+      ]
+    },
+    "material": {
+      "steel": [
+        "steel",
+        "mild steel",
+        "carbon steel",
+        "ms plate"
+      ],
+      "ss": [
+        "stainless",
+        "ss304",
+        "ss316",
+        "304",
+        "316",
+        "inox"
+      ],
+      "al": [
+        "alumin",
+        "anodis",
+        "anodiz",
+        "al alloy"
+      ],
+      "cu": [
+        "copper",
+        "brass",
+        "bronze",
+        "cu busbar"
+      ],
+      "ti": [
+        "titanium"
+      ],
+      "ni": [
+        "nickel",
+        "inconel",
+        "plated steel"
+      ],
+      "si": [
+        "silicon",
+        "wafer",
+        "sic",
+        "gan"
+      ],
+      "fr4": [
+        "pcb",
+        "fr4",
+        "solder mask",
+        "printed circuit",
+        "board",
+        "panel"
+      ],
+      "pi": [
+        "polyimide",
+        "flex circuit",
+        "kapton",
+        "coverlay",
+        "flexible circuit"
+      ],
+      "poly": [
+        "plastic",
+        "polymer",
+        "abs",
+        "polycarbonate",
+        "peek",
+        "nylon",
+        "acrylic",
+        "resin"
+      ],
+      "glass": [
+        "glass"
+      ],
+      "al2o3": [
+        "alumina",
+        "ceramic substrate"
+      ],
+      "aln": [
+        "aln",
+        "aluminium nitride",
+        "aluminum nitride"
+      ],
+      "emc": [
+        "mould compound",
+        "mold compound",
+        "epoxy",
+        "qfn",
+        "bga",
+        "qfp",
+        "soic",
+        "encapsulat"
+      ]
+    },
+    "need": {
+      "visfid": [
+        "accuracy",
+        "accurate",
+        "precise",
+        "placement",
+        "position",
+        "align",
+        "fiducial",
+        "tolerance"
+      ],
+      "visver": [
+        "verify",
+        "verificat",
+        "grade",
+        "grading",
+        "readab",
+        "ocv",
+        "29158",
+        "15415",
+        "quality check",
+        "inspect"
+      ],
+      "conveyor": [
+        "inline",
+        "in-line",
+        "conveyor",
+        "smema",
+        "hermes",
+        "continuous flow",
+        "existing line"
+      ],
+      "fume": [
+        "fume",
+        "extract",
+        "smoke",
+        "dust",
+        "ventilat",
+        "emission"
+      ],
+      "rotary": [
+        "cylindric",
+        "round part",
+        "tube",
+        "shaft",
+        "rotat",
+        "360",
+        "circumferen",
+        "ring"
+      ],
+      "scan3d": [
+        "curved",
+        "stepped",
+        "3d surface",
+        "uneven",
+        "contour",
+        "varying height"
+      ],
+      "robot6": [
+        "robot",
+        "six axis",
+        "6 axis",
+        "complex geometry",
+        "3d part",
+        "articulat"
+      ],
+      "cleanrm": [
+        "cleanroom",
+        "clean room",
+        "iso class",
+        "particulate",
+        "fab environment"
+      ],
+      "dryroom": [
+        "dry room",
+        "dew point",
+        "humidity control"
+      ],
+      "glovebx": [
+        "inert",
+        "nitrogen",
+        "argon",
+        "glovebox",
+        "controlled atmosphere",
+        "vacuum"
+      ],
+      "oct": [
+        "penetration",
+        "weld depth",
+        "depth control",
+        "oct"
+      ],
+      "magazine": [
+        "magazine",
+        "strip",
+        "jedec",
+        "tray",
+        "carrier"
+      ],
+      "rotoidx": [
+        "rotary index",
+        "dial",
+        "multi station",
+        "indexing"
+      ],
+      "reject": [
+        "reject",
+        "segregat",
+        "bad part",
+        "scrap",
+        "fail part"
+      ],
+      "cobotld": [
+        "cobot",
+        "collaborat",
+        "operator load"
+      ],
+      "r2r": [
+        "roll to roll",
+        "reel",
+        "web",
+        "continuous strip"
+      ],
+      "cepath": [
+        "ce mark",
+        "ce path",
+        "conformity",
+        "export to europe"
+      ],
+      "seamtrk": [
+        "seam track",
+        "gap",
+        "fit up",
+        "tolerance stack"
+      ],
+      "wobble": [
+        "gap",
+        "spatter",
+        "bridging"
+      ]
+    },
+    "scale": {
+      "high": [
+        "high volume",
+        "mass production",
+        "gigafactory",
+        "million",
+        "24/7",
+        "three shift",
+        "high throughput",
+        "ppm",
+        "parts per minute"
+      ],
+      "low": [
+        "low volume",
+        "prototype",
+        "job work",
+        "r&d",
+        "lab",
+        "pilot",
+        "small batch",
+        "one off"
+      ]
+    },
+    "care": {
+      "heat": [
+        "no heat",
+        "heat sensitive",
+        "cold",
+        "minimal haz",
+        "haz",
+        "low thermal",
+        "delicate",
+        "thin"
+      ],
+      "medical": [
+        "medical",
+        "implant",
+        "surgical",
+        "udi",
+        "fda",
+        "iso 13485",
+        "validated",
+        "regulated"
+      ],
+      "speed": [
+        "fast",
+        "cycle time",
+        "takt",
+        "seconds",
+        "throughput",
+        "speed"
+      ]
+    }
+  },
+  "FAM": {
+    "mark": {
+      "ch": "02",
+      "n": "TEAL Mark",
+      "s": "Marking & Traceability",
+      "d": "Permanent identification and traceability, at production speed."
+    },
+    "weld": {
+      "ch": "03",
+      "n": "TEAL Weld",
+      "s": "Welding & Joining",
+      "d": "Micron-level joining for electronics, e-mobility and medical."
+    },
+    "clean": {
+      "ch": "04",
+      "n": "TEAL Clean",
+      "s": "Cleaning & Surface Prep",
+      "d": "Non-contact, chemical-free surface preparation."
+    },
+    "cut": {
+      "ch": "05",
+      "n": "TEAL Cut",
+      "s": "Cutting & Micro-machining",
+      "d": "Precision profiling of foils, films, ceramics and metals."
+    },
+    "semi": {
+      "ch": "06",
+      "n": "TEAL Semi",
+      "s": "Semiconductor / ATMP",
+      "d": "Wafer-to-package marking, trimming and traceability."
+    },
+    "volt": {
+      "ch": "07",
+      "n": "TEAL Volt",
+      "s": "Battery Manufacturing",
+      "d": "Cell-to-pack laser processing for the gigafactory era."
+    },
+    "auto": {
+      "ch": "08",
+      "n": "TEAL Automate",
+      "s": "Customised Automation",
+      "d": "Turnkey cells, lines and Industry 4.0 integration."
+    }
+  },
+  "PLAT": {
+    "markf": {
+      "fam": "mark",
+      "ind": [
+        "genengg",
+        "ems",
+        "medical",
+        "auto",
+        "consumer"
+      ],
+      "lead": 26,
+      "warranty": 12,
+      "install": 3,
+      "code": "F",
+      "n": "Mark F-Series",
+      "t": "Fiber Laser Marking Workstation",
+      "tag": "The universal traceability workhorse — 20 to 100 W, desktop to inline, one software.",
+      "base": 1400000,
+      "deliv": "galvo",
+      "src": [
+        "fiber",
+        "mopa"
+      ],
+      "dsrc": "fiber",
+      "std": [],
+      "pw": [
+        20,
+        30,
+        50,
+        100
+      ],
+      "dpw": 30,
+      "lens": [
+        "f163",
+        "f254",
+        "f420"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Marking speed",
+          "up to 7,000 mm/s"
+        ],
+        [
+          "Scan repeatability",
+          "± 2.5 µm"
+        ],
+        [
+          "Placement accuracy",
+          "± 25 µm with vision"
+        ],
+        [
+          "Part envelope",
+          "600 × 400 × 300 mm"
+        ],
+        [
+          "Z-axis",
+          "300 mm motorised"
+        ],
+        [
+          "Safety",
+          "Class 1 per IEC 60825-1"
+        ]
+      ],
+      "apps": {
+        "metal": {
+          "n": "Metals — general traceability",
+          "d": "Steel, SS, Al, brass, Ti, Ni alloys",
+          "src": "fiber",
+          "pw": 30,
+          "mat": "steel",
+          "w": "Steels absorb 1064 nm gratefully. Annealing gives corrosion-safe marks for medical and food contact."
+        },
+        "anod": {
+          "n": "Anodised Al / colour",
+          "d": "Black on anodised, colour on SS/Ti",
+          "src": "mopa",
+          "pw": 30,
+          "mat": "al",
+          "w": "MOPA pulse control produces deep blacks on anodised aluminium without breaching the anodic layer."
+        },
+        "deep": {
+          "n": "Deep engraving",
+          "d": "Tooling, dies, VIN and plate marking",
+          "src": "fiber",
+          "pw": 100,
+          "mat": "steel",
+          "w": "Higher average power and multi-pass strategies drive depth; 100 W is the productive engraving point."
+        },
+        "plastic": {
+          "n": "Engineering plastics",
+          "d": "ABS, PC, PEEK — markable grades",
+          "src": "fiber",
+          "pw": 20,
+          "mat": "poly",
+          "w": "Polymer response is grade- and additive-dependent; TEAL validates against your actual resin."
+        },
+        "medical": {
+          "n": "Medical annealing",
+          "d": "Instruments, implant-adjacent, UDI",
+          "src": "fiber",
+          "pw": 20,
+          "mat": "ss",
+          "w": "Anneal marks leave the passive layer intact — the regime for corrosion-critical medical marking."
+        }
+      }
+    },
+    "markm": {
+      "fam": "mark",
+      "ind": [
+        "consumer",
+        "ems",
+        "medical",
+        "auto"
+      ],
+      "lead": 26,
+      "warranty": 12,
+      "install": 3,
+      "code": "M",
+      "n": "Mark M-Series",
+      "t": "MOPA Fiber Marking Workstation",
+      "tag": "Pulse-shaped marking for colour, contrast and heat-sensitive work.",
+      "base": 2200000,
+      "deliv": "galvo",
+      "src": [
+        "mopa"
+      ],
+      "dsrc": "mopa",
+      "std": [],
+      "pw": [
+        20,
+        30,
+        50,
+        100
+      ],
+      "dpw": 30,
+      "lens": [
+        "f163",
+        "f254",
+        "f420"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Pulse width",
+          "tunable, 2–500 ns"
+        ],
+        [
+          "Marking speed",
+          "up to 7,000 mm/s"
+        ],
+        [
+          "Scan repeatability",
+          "± 2.5 µm"
+        ],
+        [
+          "Safety",
+          "Class 1 per IEC 60825-1"
+        ]
+      ],
+      "apps": {
+        "colour": {
+          "n": "Colour marking on SS / Ti",
+          "d": "Oxide-layer colour control",
+          "src": "mopa",
+          "pw": 20,
+          "mat": "ss",
+          "w": "Tunable pulse duration controls oxide thickness — the mechanism behind repeatable colour on stainless and titanium."
+        },
+        "black": {
+          "n": "Black on anodised Al",
+          "d": "Consumer and enclosure cosmetics",
+          "src": "mopa",
+          "pw": 30,
+          "mat": "al",
+          "w": "Low-fluence, high-frequency MOPA parameter sets mark within the anodic layer without cracking it."
+        },
+        "foil": {
+          "n": "Thin foils & films",
+          "d": "Low heat input, no burn-through",
+          "src": "mopa",
+          "pw": 20,
+          "mat": "cu",
+          "w": "Short pulses limit heat penetration — the requirement on foils, plated layers and battery tabs."
+        },
+        "sensitive": {
+          "n": "Heat-sensitive plastics",
+          "d": "Light-toned and filled polymers",
+          "src": "mopa",
+          "pw": 20,
+          "mat": "poly",
+          "w": "Pulse tailoring produces contrast by foaming or carbonising selectively, without melt distortion."
+        }
+      }
+    },
+    "markc2i": {
+      "fam": "mark",
+      "ind": [
+        "ems"
+      ],
+      "lead": 30,
+      "warranty": 12,
+      "install": 5,
+      "code": "PCB-C2i",
+      "n": "Mark PCB C2i",
+      "t": "Dual-Head CO₂ Inline PCB Marking System",
+      "tag": "Simultaneous top-and-bottom PCB traceability — the board never flips, the line never waits.",
+      "base": 6560000,
+      "deliv": "galvo2",
+      "src": [
+        "co2",
+        "co293"
+      ],
+      "dsrc": "co2",
+      "std": [
+        "visfid",
+        "conveyor",
+        "fume",
+        "visver"
+      ],
+      "pw": [
+        30
+      ],
+      "dpw": 30,
+      "lens": [
+        "f254"
+      ],
+      "dlens": "f254",
+      "flag": "FLAGSHIP · PRODUCTRONICA INDIA 2026",
+      "specs": [
+        [
+          "Laser",
+          "2 × 30 W RF-excited sealed CO₂, air-cooled"
+        ],
+        [
+          "Field / speed",
+          "175 × 175 mm per head · 7,000 mm/s"
+        ],
+        [
+          "Code capability",
+          "DMC from 3 × 3 mm (ECC200), cell ≥ 0.25 mm"
+        ],
+        [
+          "Panel size",
+          "50 × 50 to 460 × 460 mm (600 mm option)"
+        ],
+        [
+          "Handling",
+          "SMEMA 1.2 both ends, ESD-safe edge belts"
+        ],
+        [
+          "Positioning",
+          "± 0.05 mm with fiducial correction"
+        ],
+        [
+          "Cycle time",
+          "≤ 3.5 s/board, both sides incl. transfer"
+        ],
+        [
+          "Changeover",
+          "< 60 s, fully recipe-driven"
+        ],
+        [
+          "Throughput",
+          "up to 1,000 boards/hour dual-side"
+        ],
+        [
+          "Mark grade",
+          "≥ ISO 29158 Grade B typical"
+        ],
+        [
+          "Utilities",
+          "230 V 1-ph, < 3 kVA · CDA 5 bar · 2 × 250 m³/h"
+        ],
+        [
+          "Footprint",
+          "1,250 × 1,450 × 1,650 mm · conveyor 900 ± 20 mm"
+        ]
+      ],
+      "apps": {
+        "dual": {
+          "n": "Dual-side board ID",
+          "d": "Top + bottom DMC and alphanumeric",
+          "src": "co2",
+          "pw": 30,
+          "mat": "fr4",
+          "w": "CO₂ at 10.6 µm ablates solder mask with high contrast without attacking the copper beneath — the industry-standard chemistry for PCB identity."
+        },
+        "panel": {
+          "n": "Panel & depanel marks",
+          "d": "Step-and-repeat, bad-board marking",
+          "src": "co2",
+          "pw": 30,
+          "mat": "fr4",
+          "w": "Panel maps with multi-board step-and-repeat; X-out logic suppresses marks on rejected boards."
+        },
+        "white": {
+          "n": "White / specialty mask",
+          "d": "Difficult mask chemistries",
+          "src": "co293",
+          "pw": 30,
+          "mat": "fr4",
+          "w": "9.3 µm is absorbed more strongly by some mask formulations, recovering contrast where 10.6 µm reads flat."
+        }
+      }
+    },
+    "marku": {
+      "fam": "mark",
+      "ind": [
+        "ems",
+        "semi",
+        "medical"
+      ],
+      "lead": 30,
+      "warranty": 12,
+      "install": 5,
+      "code": "PCB-U",
+      "n": "Mark PCB U-Series",
+      "t": "UV Inline PCB & Polymer Marking System",
+      "tag": "Cold marking at 355 nm — micro-codes on solder mask, flex and coverlay without a trace of heat damage.",
+      "base": 5400000,
+      "deliv": "galvo",
+      "src": [
+        "uv"
+      ],
+      "dsrc": "uv",
+      "std": [
+        "visfid",
+        "conveyor",
+        "fume"
+      ],
+      "pw": [
+        3,
+        5,
+        10
+      ],
+      "dpw": 5,
+      "lens": [
+        "f100",
+        "f163"
+      ],
+      "dlens": "f163",
+      "specs": [
+        [
+          "Laser",
+          "3 / 5 / 10 W 355 nm DPSS, < 25 ns, 20–150 kHz"
+        ],
+        [
+          "Field",
+          "110 × 110 mm"
+        ],
+        [
+          "Minimum feature",
+          "15 µm"
+        ],
+        [
+          "Crystal management",
+          "Automated THG spot-shift with health analytics"
+        ],
+        [
+          "Handling",
+          "SMEMA inline (shared with PCB C2i) or benchtop Class 1"
+        ]
+      ],
+      "apps": {
+        "micro": {
+          "n": "Micro DMC on rigid & flex",
+          "d": "Codes from 1 × 1 mm",
+          "src": "uv",
+          "pw": 5,
+          "mat": "fr4",
+          "w": "At 355 nm the mark forms by photochemical reaction rather than heat — fine, high-contrast codes with negligible thermal input."
+        },
+        "flex": {
+          "n": "Flex circuit & coverlay",
+          "d": "Polyimide, thin laminates",
+          "src": "uv",
+          "pw": 5,
+          "mat": "pi",
+          "w": "Flex and coverlay delaminate under thermal marking; UV keeps the substrate intact."
+        },
+        "comp": {
+          "n": "Component-level marking",
+          "d": "Populated assemblies, connectors",
+          "src": "uv",
+          "pw": 3,
+          "mat": "fr4",
+          "w": "Low pulse energy allows marking on populated boards without risk to adjacent devices."
+        },
+        "medpoly": {
+          "n": "Medical polymer UDI",
+          "d": "PEEK, PC, medical-grade resins",
+          "src": "uv",
+          "pw": 5,
+          "mat": "poly",
+          "w": "UV marking is validated for medical polymers where carbonisation is not acceptable."
+        }
+      }
+    },
+    "markit": {
+      "fam": "mark",
+      "ind": [
+        "auto",
+        "ems",
+        "genengg",
+        "battery"
+      ],
+      "lead": 30,
+      "warranty": 12,
+      "install": 5,
+      "code": "iT",
+      "n": "Mark iT-Series",
+      "t": "Inline & Marking-On-The-Fly Traceability",
+      "tag": "Serialisation at line speed — conveyor, rotary or on-the-fly, synchronised to your takt.",
+      "base": 4200000,
+      "deliv": "galvo",
+      "src": [
+        "fiber",
+        "mopa",
+        "uv",
+        "co2",
+        "green"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "visfid",
+        "conveyor"
+      ],
+      "pw": [
+        20,
+        30,
+        50,
+        100
+      ],
+      "dpw": 50,
+      "pwBySrc": {
+        "fiber": [
+          20,
+          30,
+          50,
+          100
+        ],
+        "mopa": [
+          20,
+          30,
+          50,
+          100
+        ],
+        "uv": [
+          3,
+          5,
+          10
+        ],
+        "green": [
+          5,
+          10,
+          20
+        ],
+        "co2": [
+          10,
+          30,
+          60
+        ]
+      },
+      "lens": [
+        "f163",
+        "f254",
+        "f420"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Throughput",
+          "up to 200 parts/min (part- and content-dependent)"
+        ],
+        [
+          "MOTF speed",
+          "product speed to 120 m/min, encoder-synchronised"
+        ],
+        [
+          "Rotary variants",
+          "4 / 6 / 8-station dials, load-while-mark"
+        ],
+        [
+          "Data",
+          "MES serial request → mark → verify → post, with store-and-forward"
+        ]
+      ],
+      "apps": {
+        "motf": {
+          "n": "Marking-on-the-fly",
+          "d": "Continuous conveyor, encoder-synced",
+          "src": "fiber",
+          "pw": 50,
+          "mat": "steel",
+          "w": "Queue-tracking handles multiple parts in field simultaneously; the beam chases the product rather than stopping it."
+        },
+        "indexed": {
+          "n": "Indexed conveyor marking",
+          "d": "Stop-and-mark at station",
+          "src": "fiber",
+          "pw": 30,
+          "mat": "steel",
+          "w": "Indexed presentation gives the tightest placement accuracy where takt allows a brief dwell."
+        },
+        "rotarym": {
+          "n": "Rotary-dial multi-station",
+          "d": "Load, mark, verify, unload",
+          "src": "fiber",
+          "pw": 30,
+          "mat": "steel",
+          "w": "Overlapping load and process on a dial collapses effective cycle time to the longest single station."
+        },
+        "cell": {
+          "n": "Cell & can marking",
+          "d": "18650 / 21700 / 4680, prismatic",
+          "src": "mopa",
+          "pw": 30,
+          "mat": "al",
+          "w": "MOPA parameter sets deliver dark codes on aluminium and nickel-plated steel with negligible heat into the cell."
+        }
+      }
+    },
+    "weldp": {
+      "fam": "weld",
+      "ind": [
+        "medical",
+        "ems",
+        "auto",
+        "aero"
+      ],
+      "lead": 32,
+      "warranty": 12,
+      "install": 5,
+      "code": "P",
+      "n": "Weld P-Series",
+      "t": "Precision Laser Welding Workstation",
+      "tag": "Micron-accurate spot and seam welding for components where heat is the enemy.",
+      "base": 5200000,
+      "deliv": "galvo",
+      "src": [
+        "qcw",
+        "smcw"
+      ],
+      "dsrc": "qcw",
+      "std": [
+        "weldmon",
+        "gascon"
+      ],
+      "pw": [
+        150,
+        300,
+        450
+      ],
+      "dpw": 150,
+      "pwBySrc": {
+        "qcw": [
+          150,
+          300,
+          450
+        ],
+        "smcw": [
+          500,
+          1000,
+          2000
+        ]
+      },
+      "lens": [
+        "f163",
+        "f230",
+        "f254"
+      ],
+      "dlens": "f230",
+      "specs": [
+        [
+          "Sources",
+          "QCW 150 W avg / 1.5 kW peak, or CW single-mode 500 W–2 kW"
+        ],
+        [
+          "Delivery",
+          "160 × 160 mm welding scan head or fixed optic"
+        ],
+        [
+          "Spot",
+          "30–600 µm"
+        ],
+        [
+          "Motion",
+          "CNC XY(Z) 300 × 300 mm, optional 4th-axis rotary"
+        ],
+        [
+          "Pulse control",
+          "0.2 ms shaping slices"
+        ],
+        [
+          "Monitoring",
+          "Photodiode plasma / temperature / back-reflection"
+        ]
+      ],
+      "apps": {
+        "microspot": {
+          "n": "Micro spot welds",
+          "d": "Sensors, relays, hybrids",
+          "src": "qcw",
+          "pw": 150,
+          "mat": "ss",
+          "w": "Shaped millisecond pulses put energy where resistance welding cannot reach, without electrode wear drift."
+        },
+        "seam": {
+          "n": "Continuous & stitch seams",
+          "d": "Enclosures, instruments",
+          "src": "smcw",
+          "pw": 500,
+          "mat": "ss",
+          "w": "CW single-mode with wobble gives continuous seams with controlled heat input on thin sections."
+        },
+        "wire": {
+          "n": "Wire-to-pad & terminals",
+          "d": "Connector and terminal joints",
+          "src": "qcw",
+          "pw": 150,
+          "mat": "cu",
+          "w": "Fine spots and per-weld energy monitoring make structural joints out of what used to be soldering."
+        },
+        "tool": {
+          "n": "Repair & tool welding",
+          "d": "Die and mould build-up",
+          "src": "qcw",
+          "pw": 150,
+          "mat": "steel",
+          "w": "Localised deposition with minimal HAZ preserves surrounding tool geometry and hardness."
+        }
+      }
+    },
+    "weldb": {
+      "fam": "weld",
+      "ind": [
+        "battery",
+        "auto"
+      ],
+      "lead": 38,
+      "warranty": 12,
+      "install": 10,
+      "code": "B",
+      "n": "Weld B-Series",
+      "t": "Battery Tab, Busbar & E-Mobility Welding",
+      "tag": "Copper and aluminium, joined at gigafactory speed — spatter suppressed, every weld measured.",
+      "base": 13500000,
+      "deliv": "galvo",
+      "src": [
+        "smcw",
+        "green"
+      ],
+      "dsrc": "smcw",
+      "std": [
+        "weldmon",
+        "wobble",
+        "gascon"
+      ],
+      "pw": [
+        1500,
+        2000,
+        3000,
+        6000
+      ],
+      "dpw": 2000,
+      "pwBySrc": {
+        "smcw": [
+          1500,
+          2000,
+          3000,
+          6000
+        ],
+        "green": [
+          500,
+          1000,
+          1500,
+          2000
+        ]
+      },
+      "lens": [
+        "f254",
+        "f420"
+      ],
+      "dlens": "f420",
+      "specs": [
+        [
+          "Sources",
+          "CW fiber 1.5 / 2 / 3 / 6 kW, ring-mode option"
+        ],
+        [
+          "Delivery",
+          "Remote scan head, 300 × 300 mm field"
+        ],
+        [
+          "Wobble",
+          "circle / figure-8 / linear, to 1 kHz"
+        ],
+        [
+          "Penetration control",
+          "± 50 µm with inline OCT option"
+        ],
+        [
+          "Environment",
+          "Dry-room builds to −40 °C dew point"
+        ]
+      ],
+      "apps": {
+        "tab": {
+          "n": "Cell tab-to-terminal",
+          "d": "Foil stacks to collectors",
+          "src": "green",
+          "pw": 1500,
+          "mat": "cu",
+          "w": "Green at 532 nm is strongly absorbed by copper, stabilising the melt where 1 µm reflects and stutters."
+        },
+        "busbar": {
+          "n": "Module & pack busbars",
+          "d": "2–6 mm Cu / Al sections",
+          "src": "smcw",
+          "pw": 3000,
+          "mat": "cu",
+          "w": "Ring-mode beam shaping plus wobble keeps the keyhole stable through thick section, suppressing spatter."
+        },
+        "hairpin": {
+          "n": "Hairpin stator pairs",
+          "d": "E-motor winding joints",
+          "src": "smcw",
+          "pw": 2000,
+          "mat": "cu",
+          "w": "Tight, repeatable joints at rate; monitoring turns each weld into inspectable data for the traction warranty."
+        },
+        "canseam": {
+          "n": "Cell can & lid seaming",
+          "d": "Hermetic cell closure",
+          "src": "smcw",
+          "pw": 1500,
+          "mat": "al",
+          "w": "Controlled heat input avoids damaging cell internals while achieving a continuous sealed seam."
+        }
+      }
+    },
+    "weldr": {
+      "fam": "weld",
+      "ind": [
+        "auto",
+        "genengg",
+        "aero"
+      ],
+      "lead": 40,
+      "warranty": 12,
+      "install": 12,
+      "code": "R",
+      "n": "Weld R-Cell",
+      "t": "Robotic Laser Welding Cell",
+      "tag": "Six axes, one beam — 3D seam welding in a turnkey Class 1 safety cell.",
+      "base": 16000000,
+      "deliv": "robot",
+      "src": [
+        "smcw"
+      ],
+      "dsrc": "smcw",
+      "std": [
+        "robot6",
+        "seamtrk",
+        "wobble",
+        "turntbl",
+        "gascon"
+      ],
+      "pw": [
+        2000,
+        3000,
+        6000
+      ],
+      "dpw": 3000,
+      "lens": [
+        "f420"
+      ],
+      "dlens": "f420",
+      "specs": [
+        [
+          "Robot",
+          "6-axis, 12–50 kg payload class"
+        ],
+        [
+          "Source",
+          "CW fiber 2–3 kW standard, to 6 kW"
+        ],
+        [
+          "Gap tolerance",
+          "to 0.3 mm with wobble module"
+        ],
+        [
+          "Seam tracking",
+          "Laser-line sensor with real-time correction"
+        ],
+        [
+          "Turntable",
+          "2-station servo, Ø 1,200 mm, 250 kg/side"
+        ],
+        [
+          "Safety",
+          "Class 1 cabin per IEC 60825-4, light curtains at load face"
+        ]
+      ],
+      "apps": {
+        "seam3d": {
+          "n": "3D continuous & stitch seams",
+          "d": "Housings, frames, brackets",
+          "src": "smcw",
+          "pw": 3000,
+          "mat": "steel",
+          "w": "When the seam moves in three dimensions the beam should follow, not the part — remote optics on six axes."
+        },
+        "corner": {
+          "n": "Corner & lap joints",
+          "d": "Sheet-metal assemblies",
+          "src": "smcw",
+          "pw": 2000,
+          "mat": "steel",
+          "w": "Low distortion versus TIG/MIG removes most post-weld straightening and finishing cost."
+        },
+        "edrive": {
+          "n": "E-drive components",
+          "d": "Motor housings, covers",
+          "src": "smcw",
+          "pw": 3000,
+          "mat": "al",
+          "w": "Cycle-repeatable robotic paths replace scarce skilled welders on cosmetic and structural seams."
+        }
+      }
+    },
+    "weldh": {
+      "fam": "weld",
+      "ind": [
+        "medical",
+        "aero",
+        "semi"
+      ],
+      "lead": 34,
+      "warranty": 12,
+      "install": 8,
+      "code": "H",
+      "n": "Weld H-Series",
+      "t": "Hermetic & Medical Micro-Welding",
+      "tag": "Leak-tight seams on packages, implants and sensors — with the documentation regulated industries demand.",
+      "base": 6800000,
+      "deliv": "galvo",
+      "src": [
+        "qcw"
+      ],
+      "dsrc": "qcw",
+      "std": [
+        "gascon"
+      ],
+      "pw": [
+        150,
+        300,
+        450
+      ],
+      "dpw": 300,
+      "lens": [
+        "f100",
+        "f163"
+      ],
+      "dlens": "f100",
+      "specs": [
+        [
+          "Source",
+          "QCW fiber 150–450 W peak class"
+        ],
+        [
+          "Pulse resolution",
+          "0.05 ms segment control"
+        ],
+        [
+          "Spot",
+          "50–300 µm"
+        ],
+        [
+          "Leak criterion",
+          "1 × 10⁻⁹ mbar·l/s helium, repeatable"
+        ],
+        [
+          "Vision",
+          "Coaxial microscope, 20–100× with weld replay"
+        ],
+        [
+          "Atmosphere",
+          "Air, N₂, Ar, He backfill or full glovebox"
+        ],
+        [
+          "Validation",
+          "IQ/OQ/PQ pathway built into delivery"
+        ]
+      ],
+      "apps": {
+        "tocan": {
+          "n": "TO-can & butterfly sealing",
+          "d": "Optoelectronic packages",
+          "src": "qcw",
+          "pw": 150,
+          "mat": "ni",
+          "w": "Ramp-shaped pulses seal without cracking glass-to-metal feedthroughs or disturbing internal optics."
+        },
+        "implant": {
+          "n": "Implant enclosure seams",
+          "d": "Titanium, long-term hermeticity",
+          "src": "qcw",
+          "pw": 300,
+          "mat": "ti",
+          "w": "Overlap-controlled seam generation with per-pulse energy logging produces the evidence a regulator expects."
+        },
+        "mems": {
+          "n": "Sensor & MEMS packages",
+          "d": "Vacuum and pressure references",
+          "src": "qcw",
+          "pw": 150,
+          "mat": "ss",
+          "w": "Fine spots and inert shielding hold vacuum integrity through the life of the device."
+        },
+        "feed": {
+          "n": "Feedthrough & bellows",
+          "d": "Instrument and aerospace details",
+          "src": "qcw",
+          "pw": 300,
+          "mat": "ss",
+          "w": "Circumferential seams on runout-compensating chucks keep penetration uniform around the joint."
+        }
+      }
+    },
+    "cleanp": {
+      "fam": "clean",
+      "ind": [
+        "genengg",
+        "auto",
+        "aero"
+      ],
+      "lead": 8,
+      "warranty": 12,
+      "install": 1,
+      "code": "CL-P",
+      "n": "Clean CL-P",
+      "t": "Portable Laser Cleaning System",
+      "tag": "A trolley, a hand-piece and 100–300 watts of pulsed light — surface preparation wherever the part is.",
+      "base": 900000,
+      "deliv": "handpiece",
+      "src": [
+        "fiber"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "fume"
+      ],
+      "pw": [
+        100,
+        200,
+        300
+      ],
+      "dpw": 200,
+      "lens": [
+        "f254"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Source",
+          "100 / 200 / 300 W pulsed fiber, air-cooled"
+        ],
+        [
+          "Format",
+          "Lockable industrial trolley"
+        ],
+        [
+          "Hand-piece",
+          "Adjustable scan width to 300 mm, interchangeable focus"
+        ],
+        [
+          "Recipes",
+          "Material/contaminant memory, two-touch recall"
+        ],
+        [
+          "Safety",
+          "Eyewear, beacons, key control, trigger interlock included"
+        ]
+      ],
+      "apps": {
+        "rust": {
+          "n": "Rust & oxide removal",
+          "d": "Ferrous de-rusting, spot work",
+          "src": "fiber",
+          "pw": 200,
+          "mat": "steel",
+          "w": "Pulsed ablation is self-limiting — oxide leaves, base metal stays. No media, no disposal stream."
+        },
+        "weldprep": {
+          "n": "Weld preparation",
+          "d": "Pre- and post-weld cleanup",
+          "src": "fiber",
+          "pw": 200,
+          "mat": "steel",
+          "w": "Clean joint faces immediately before welding, at the fixture, without moving the assembly."
+        },
+        "mould": {
+          "n": "Mould & die touch-up",
+          "d": "Tooling de-flash on the press",
+          "src": "fiber",
+          "pw": 100,
+          "mat": "steel",
+          "w": "Low average power lifts residue without dimensional attack on the tool surface."
+        },
+        "paint": {
+          "n": "Paint & coating removal",
+          "d": "Selective stripping, MRO",
+          "src": "fiber",
+          "pw": 300,
+          "mat": "steel",
+          "w": "Layer-by-layer removal with controlled fluence, stopping at the substrate."
+        }
+      }
+    },
+    "cleana": {
+      "fam": "clean",
+      "ind": [
+        "auto",
+        "battery",
+        "genengg"
+      ],
+      "lead": 32,
+      "warranty": 12,
+      "install": 6,
+      "code": "CL-A",
+      "n": "Clean CL-A",
+      "t": "Automated Laser Cleaning Cell",
+      "tag": "Robot- or gantry-guided cleaning stations — from busbar prep to mould plates, every cycle logged.",
+      "base": 5500000,
+      "deliv": "robot",
+      "src": [
+        "fiber"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "robot6",
+        "fume"
+      ],
+      "pw": [
+        200,
+        500,
+        1000,
+        2000
+      ],
+      "dpw": 500,
+      "lens": [
+        "f254",
+        "f420"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Source",
+          "200 W–2 kW pulsed, or hybrid pulsed/CW"
+        ],
+        [
+          "Motion",
+          "6-axis robot or 2–3 axis gantry, optional part rotary"
+        ],
+        [
+          "Enclosure",
+          "Class 1 with auto doors, high-capacity extraction"
+        ],
+        [
+          "Verification",
+          "Pre/post-clean vision with pass/fail records"
+        ],
+        [
+          "Integration",
+          "LaserSuite recipes per part, PLC handshake, MES logging"
+        ]
+      ],
+      "apps": {
+        "prebond": {
+          "n": "Pre-weld / pre-bond prep",
+          "d": "Busbars, tabs, hairpins",
+          "src": "fiber",
+          "pw": 500,
+          "mat": "cu",
+          "w": "Path-programmed optics deliver identical energy to the same area every cycle — cleanliness becomes an auditable parameter."
+        },
+        "mouldcell": {
+          "n": "Mould & tool cleaning",
+          "d": "Scheduled tooling stations",
+          "src": "fiber",
+          "pw": 1000,
+          "mat": "steel",
+          "w": "Replaces dry-ice and solvent cycles whose cost scales linearly with volume."
+        },
+        "celltray": {
+          "n": "Battery cell & tray",
+          "d": "Cell surfaces, trays, carriers",
+          "src": "fiber",
+          "pw": 500,
+          "mat": "al",
+          "w": "Dry, particulate-managed cleaning compatible with the electrode-area environment."
+        },
+        "coating": {
+          "n": "Selective coating removal",
+          "d": "Masked and patterned strip",
+          "src": "fiber",
+          "pw": 2000,
+          "mat": "al",
+          "w": "Robot paths give sharp boundaries where masking would otherwise be required."
+        }
+      }
+    },
+    "cutxg": {
+      "fam": "cut",
+      "ind": [
+        "battery",
+        "ems",
+        "medical"
+      ],
+      "lead": 30,
+      "warranty": 12,
+      "install": 5,
+      "code": "X-G",
+      "n": "Cut X-G",
+      "t": "Galvo Precision Cutting System",
+      "tag": "Beam-steered micro cutting of foils, films and flexible circuits — fiber, UV or picosecond engines.",
+      "base": 4500000,
+      "deliv": "galvo",
+      "src": [
+        "fiber",
+        "uv",
+        "pico"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "fume"
+      ],
+      "pw": [
+        100,
+        200,
+        300
+      ],
+      "dpw": 200,
+      "pwBySrc": {
+        "fiber": [
+          100,
+          200,
+          300
+        ],
+        "uv": [
+          10,
+          15,
+          20
+        ],
+        "pico": [
+          50,
+          100
+        ]
+      },
+      "lens": [
+        "f163",
+        "f254",
+        "f420"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Engines",
+          "100–300 W ns fiber · 10–20 W UV · picosecond option"
+        ],
+        [
+          "Fields",
+          "110–300 mm with step-and-repeat stitching"
+        ],
+        [
+          "Fixturing",
+          "Vacuum and pin registration; roll-to-roll module"
+        ],
+        [
+          "Foil capability",
+          "Cu 6–12 µm, Al 10–20 µm"
+        ]
+      ],
+      "apps": {
+        "electrode": {
+          "n": "Battery electrode & foil",
+          "d": "Cu 6–12 µm, Al 10–20 µm",
+          "src": "fiber",
+          "pw": 200,
+          "mat": "cu",
+          "w": "Tool-free geometry with no burr and no mechanical slitting stress on the electrode edge."
+        },
+        "flexpcb": {
+          "n": "Flexible PCB singulation",
+          "d": "Coverlay and outline cutting",
+          "src": "uv",
+          "pw": 15,
+          "mat": "pi",
+          "w": "UV avoids the delamination and carbonisation that IR produces on polyimide stacks."
+        },
+        "film": {
+          "n": "Film, gasket & kiss-cut",
+          "d": "Adhesives, shielding, mesh",
+          "src": "fiber",
+          "pw": 200,
+          "mat": "poly",
+          "w": "Die and punch tooling cost and lead time disappear; geometry changes are a CAD edit."
+        },
+        "haz": {
+          "n": "HAZ-critical micro cuts",
+          "d": "Stents, thin precision profiles",
+          "src": "pico",
+          "pw": 100,
+          "mat": "ss",
+          "w": "Picosecond pulses interact before heat diffuses — the cleanest edges on the most sensitive materials."
+        }
+      }
+    },
+    "cutxt": {
+      "fam": "cut",
+      "ind": [
+        "genengg",
+        "ems",
+        "consumer"
+      ],
+      "lead": 32,
+      "warranty": 12,
+      "install": 6,
+      "code": "X-T",
+      "n": "Cut X-T",
+      "t": "Precision Gantry Cutting Table",
+      "tag": "Large-format accuracy for thin metals, plastics, glass scribing and technical ceramics.",
+      "base": 6200000,
+      "deliv": "gantry",
+      "src": [
+        "fiber",
+        "co2"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "gascon",
+        "fume"
+      ],
+      "pw": [
+        300,
+        500,
+        1000
+      ],
+      "dpw": 500,
+      "pwBySrc": {
+        "fiber": [
+          300,
+          500,
+          1000
+        ],
+        "co2": [
+          60,
+          100,
+          150
+        ]
+      },
+      "lens": [
+        "f254"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Work area",
+          "900 × 600 or 1,300 × 900 mm"
+        ],
+        [
+          "Sources",
+          "300 W–1 kW fiber and/or 60–150 W sealed CO₂"
+        ],
+        [
+          "Height control",
+          "Capacitive, with automatic head selection"
+        ],
+        [
+          "Gas",
+          "N₂ / air / O₂ console, honeycomb and pin tables"
+        ],
+        [
+          "Registration",
+          "Camera edge and fiducial"
+        ]
+      ],
+      "apps": {
+        "thinmetal": {
+          "n": "Thin metal profiles",
+          "d": "SS, Al, brass shim and sheet",
+          "src": "fiber",
+          "pw": 500,
+          "mat": "ss",
+          "w": "Precision guides and capacitive height sensing deliver thin-gauge edge quality plate cutters cannot."
+        },
+        "plastics": {
+          "n": "Engineering plastics",
+          "d": "Acrylic, PC, technical sheet",
+          "src": "co2",
+          "pw": 150,
+          "mat": "poly",
+          "w": "CO₂ is efficiently absorbed by organics that ignore 1064 nm — one table serves both material worlds."
+        },
+        "glassscribe": {
+          "n": "Glass scribe-and-break",
+          "d": "Controlled-depth grooving",
+          "src": "fiber",
+          "pw": 300,
+          "mat": "glass",
+          "w": "Scribe modes turn brittleness into an asset, avoiding the chipping of mechanical dicing."
+        },
+        "ceramic": {
+          "n": "Alumina / AlN scribing",
+          "d": "Electronics substrates",
+          "src": "fiber",
+          "pw": 500,
+          "mat": "al2o3",
+          "w": "Controlled-depth grooves give clean snap lines on technical ceramic substrates."
+        }
+      }
+    },
+    "semiwm": {
+      "fam": "semi",
+      "ind": [
+        "semi"
+      ],
+      "lead": 44,
+      "warranty": 12,
+      "install": 14,
+      "code": "WM-300",
+      "n": "Semi WM-300",
+      "t": "Wafer Marking System",
+      "tag": "SEMI-standard wafer identity — soft or hard marks, front or back side, cassette to cassette.",
+      "base": 24000000,
+      "deliv": "galvo",
+      "src": [
+        "uv",
+        "green"
+      ],
+      "dsrc": "uv",
+      "std": [
+        "visver",
+        "secsgem"
+      ],
+      "pw": [
+        3,
+        5,
+        10
+      ],
+      "dpw": 5,
+      "lens": [
+        "f100",
+        "f163"
+      ],
+      "dlens": "f100",
+      "specs": [
+        [
+          "Wafer sizes",
+          "150 / 200 / 300 mm bridge tool"
+        ],
+        [
+          "Standards",
+          "SEMI T7 / M12 / M13 conventions"
+        ],
+        [
+          "Regimes",
+          "Soft-mark low-stress dot or hard-mark engraving"
+        ],
+        [
+          "Handling",
+          "Edge-grip robot, notch/flat pre-aligner, double-slot sensing"
+        ],
+        [
+          "Verification",
+          "In-line OCR read-back with mark-quality scoring"
+        ],
+        [
+          "Host",
+          "SECS/GEM (E30/E37/E40 class)"
+        ],
+        [
+          "Environment",
+          "ISO Class 5-compatible mini-environment option"
+        ]
+      ],
+      "apps": {
+        "frontid": {
+          "n": "Front-side scribe ID",
+          "d": "Incoming wafer identity",
+          "src": "uv",
+          "pw": 5,
+          "mat": "si",
+          "w": "Font geometry, dot morphology and depth are tuned per film stack against your OCR readers, then locked in recipe."
+        },
+        "backid": {
+          "n": "Back-side ID post-grind",
+          "d": "Identity that survives backgrind",
+          "src": "uv",
+          "pw": 5,
+          "mat": "si",
+          "w": "Marks placed and profiled so downstream readers still resolve them after thinning and film deposition."
+        },
+        "code2d": {
+          "n": "2D wafer codes",
+          "d": "Lot and slot data marking",
+          "src": "uv",
+          "pw": 5,
+          "mat": "si",
+          "w": "Machine-readable codes to SEMI convention keep foundry and OSAT interoperability intact."
+        },
+        "reflect": {
+          "n": "High-reflectivity films",
+          "d": "Metallised and mirrored stacks",
+          "src": "green",
+          "pw": 5,
+          "mat": "al",
+          "w": "Green couples into reflective films where UV or IR scatter, holding mark consistency across the stack."
+        }
+      }
+    },
+    "semispm": {
+      "fam": "semi",
+      "ind": [
+        "semi"
+      ],
+      "lead": 40,
+      "warranty": 12,
+      "install": 12,
+      "code": "SPM",
+      "n": "Semi SPM",
+      "t": "Strip & Package Marking System",
+      "tag": "Magazine-to-magazine package identity — per-unit 2D codes, OCV verified, at OSAT throughput.",
+      "base": 15000000,
+      "deliv": "galvo",
+      "src": [
+        "fiber",
+        "green",
+        "uv"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "magazine",
+        "visver"
+      ],
+      "pw": [
+        20,
+        30,
+        50
+      ],
+      "dpw": 20,
+      "pwBySrc": {
+        "fiber": [
+          20,
+          30,
+          50
+        ],
+        "green": [
+          10,
+          20,
+          30
+        ],
+        "uv": [
+          3,
+          5,
+          10
+        ]
+      },
+      "lens": [
+        "f163",
+        "f254"
+      ],
+      "dlens": "f163",
+      "specs": [
+        [
+          "Handling",
+          "Magazine-to-magazine with pusher/indexer; JEDEC tray option"
+        ],
+        [
+          "Engines",
+          "Fiber, green or UV per compound and contrast"
+        ],
+        [
+          "Correction",
+          "Strip-level and per-image fiducial; X-out map import"
+        ],
+        [
+          "Verification",
+          "100 % OCV plus DMC grading to ISO/IEC 29158"
+        ],
+        [
+          "Host",
+          "SECS/GEM or MES connector, per-unit records"
+        ],
+        [
+          "Build",
+          "Static-safe, cleanroom-compatible, low-particulate extraction"
+        ]
+      ],
+      "apps": {
+        "mould": {
+          "n": "Mould-compound marking",
+          "d": "QFN, QFP, BGA, SOIC, modules",
+          "src": "fiber",
+          "pw": 20,
+          "mat": "emc",
+          "w": "Contrast on epoxy mould compound with grading correlated to your reader optics — readability engineered, not hoped for."
+        },
+        "perunit": {
+          "n": "Per-unit DMC serialisation",
+          "d": "Unit-level traceability",
+          "src": "fiber",
+          "pw": 20,
+          "mat": "emc",
+          "w": "Every unit posts identity to the host with map correlation, so test and tape-and-reel inherit clean data."
+        },
+        "substrate": {
+          "n": "Substrate & strip ID",
+          "d": "Laminate and lead-frame carriers",
+          "src": "green",
+          "pw": 20,
+          "mat": "fr4",
+          "w": "Green gives contrast on substrates where IR marks read weak or damage the surface finish."
+        },
+        "fine": {
+          "n": "Fine-pitch micro codes",
+          "d": "0.5 mm DMC and below",
+          "src": "uv",
+          "pw": 5,
+          "mat": "emc",
+          "w": "UV holds cell definition at code sizes where thermal marking blurs the module boundary."
+        }
+      }
+    },
+    "semils": {
+      "fam": "semi",
+      "ind": [
+        "semi",
+        "ems"
+      ],
+      "lead": 34,
+      "warranty": 12,
+      "install": 8,
+      "code": "LS",
+      "n": "Semi LS",
+      "t": "Substrate Scribing System",
+      "tag": "Alumina and AlN scribing with controlled depth and clean snap quality.",
+      "base": 8500000,
+      "deliv": "galvo",
+      "src": [
+        "fiber",
+        "pico"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "fume"
+      ],
+      "pw": [
+        30,
+        50,
+        100
+      ],
+      "dpw": 50,
+      "lens": [
+        "f163",
+        "f254"
+      ],
+      "dlens": "f163",
+      "specs": [
+        [
+          "Materials",
+          "Alumina, AlN, glass and specialised stacks"
+        ],
+        [
+          "Control",
+          "Programmed depth with snap-quality optimisation"
+        ],
+        [
+          "Basis",
+          "Grooving programmes executed as joint developments"
+        ]
+      ],
+      "apps": {
+        "alumina": {
+          "n": "Alumina substrate scribing",
+          "d": "Electronics substrate singulation",
+          "src": "fiber",
+          "pw": 50,
+          "mat": "al2o3",
+          "w": "Controlled-depth grooving gives predictable break lines without micro-cracking the ceramic."
+        },
+        "aln": {
+          "n": "AlN scribing",
+          "d": "High thermal-conductivity substrates",
+          "src": "fiber",
+          "pw": 50,
+          "mat": "aln",
+          "w": "AlN demands tighter depth control than alumina; parameters are established per supplier lot."
+        },
+        "glasss": {
+          "n": "Glass scribing",
+          "d": "Display and sensor glass",
+          "src": "pico",
+          "pw": 30,
+          "mat": "glass",
+          "w": "Ultrashort pulses scribe glass with chip-free edges where nanosecond regimes fracture."
+        }
+      }
+    },
+    "semidc": {
+      "fam": "semi",
+      "ind": [
+        "semi"
+      ],
+      "lead": 24,
+      "warranty": 12,
+      "install": 4,
+      "code": "DC",
+      "n": "Semi DC",
+      "t": "Laser Decapsulation System",
+      "tag": "Selective, dry, wire-safe EMC removal for failure analysis — acid time cut by an order of magnitude.",
+      "base": 4200000,
+      "deliv": "galvo",
+      "src": [
+        "fiber"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "fume"
+      ],
+      "pw": [
+        20,
+        30
+      ],
+      "dpw": 20,
+      "lens": [
+        "f100",
+        "f163"
+      ],
+      "dlens": "f100",
+      "specs": [
+        [
+          "Format",
+          "Bench system with camera process view"
+        ],
+        [
+          "Process",
+          "Laser-assisted EMC removal, wire-safe openings"
+        ],
+        [
+          "Benefit",
+          "Order-of-magnitude reduction in acid exposure time"
+        ]
+      ],
+      "apps": {
+        "fa": {
+          "n": "Failure-analysis decap",
+          "d": "Selective cavity opening",
+          "src": "fiber",
+          "pw": 20,
+          "mat": "emc",
+          "w": "Dry, controlled removal opens the cavity without the bond-wire attack and handling burden of pure acid decap."
+        },
+        "wiresafe": {
+          "n": "Wire-safe window opening",
+          "d": "Preserving bond integrity",
+          "src": "fiber",
+          "pw": 20,
+          "mat": "emc",
+          "w": "Layer-by-layer ablation with camera process view stops short of the wire loop plane."
+        }
+      }
+    },
+    "voltm": {
+      "fam": "volt",
+      "ind": [
+        "battery"
+      ],
+      "lead": 30,
+      "warranty": 12,
+      "install": 6,
+      "code": "Volt-M",
+      "n": "Volt-M",
+      "t": "Cell & Can Marking System",
+      "tag": "Permanent, corrosion-safe cell identity at line rate — cylindrical, prismatic or pouch.",
+      "base": 3800000,
+      "deliv": "galvo",
+      "src": [
+        "mopa",
+        "fiber"
+      ],
+      "dsrc": "mopa",
+      "std": [
+        "visver"
+      ],
+      "pw": [
+        20,
+        30,
+        50
+      ],
+      "dpw": 30,
+      "lens": [
+        "f163",
+        "f254"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Throughput",
+          "to 120 ppm single-lane; multi-lane scaling"
+        ],
+        [
+          "Formats",
+          "18650 / 21700 / 4680, prismatic housings, pouch"
+        ],
+        [
+          "Grade discipline",
+          "Every code read and graded, ISO/IEC 29158 ≥ B target"
+        ],
+        [
+          "Genealogy",
+          "Per-cell record posted to MES"
+        ],
+        [
+          "Handling",
+          "Rotary spindles, servo belts or encoder-synced MOTF"
+        ]
+      ],
+      "apps": {
+        "cylcan": {
+          "n": "Cylindrical can marking",
+          "d": "18650 / 21700 / 4680",
+          "src": "mopa",
+          "pw": 30,
+          "mat": "al",
+          "w": "MOPA delivers dark, high-contrast codes on aluminium and nickel-plated steel with negligible heat into the cell."
+        },
+        "prismatic": {
+          "n": "Prismatic housing",
+          "d": "Flat-face cell identity",
+          "src": "mopa",
+          "pw": 30,
+          "mat": "al",
+          "w": "Flat presentation allows larger codes and in-line grading before the cell enters formation."
+        },
+        "pouch": {
+          "n": "Pouch material marking",
+          "d": "Laminate film identity",
+          "src": "fiber",
+          "pw": 20,
+          "mat": "al",
+          "w": "Low fluence marks the laminate without compromising the barrier layer."
+        }
+      }
+    },
+    "voltt": {
+      "fam": "volt",
+      "ind": [
+        "battery"
+      ],
+      "lead": 26,
+      "warranty": 12,
+      "install": 4,
+      "code": "Volt-T",
+      "n": "Volt-T",
+      "t": "Traceability & Genealogy Station",
+      "tag": "Aggregating weld scores, mark grades and parameters into one genealogy per cell, module and pack.",
+      "base": 2800000,
+      "deliv": "galvo",
+      "src": [
+        "fiber"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "visver"
+      ],
+      "pw": [
+        20,
+        30
+      ],
+      "dpw": 20,
+      "lens": [
+        "f254"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Function",
+          "Read, verify and aggregate identity across line stages"
+        ],
+        [
+          "Data",
+          "LaserSuite Volt genealogy model"
+        ],
+        [
+          "Scope",
+          "Cell → module → pack record consolidation"
+        ]
+      ],
+      "apps": {
+        "agg": {
+          "n": "Genealogy aggregation",
+          "d": "Cell → module → pack",
+          "src": "fiber",
+          "pw": 20,
+          "mat": "al",
+          "w": "One record per unit tying weld scores, mark grades and parameters together — the record your recall team will need."
+        },
+        "eol": {
+          "n": "End-of-line traceability",
+          "d": "Pack plate marking and verify",
+          "src": "fiber",
+          "pw": 30,
+          "mat": "al",
+          "w": "Final identity applied and verified, closing the data chain before dispatch."
+        }
+      }
+    },
+    "roto": {
+      "fam": "auto",
+      "ind": [
+        "auto",
+        "ems",
+        "genengg",
+        "medical"
+      ],
+      "lead": 34,
+      "warranty": 12,
+      "install": 8,
+      "code": "RotoCell",
+      "n": "RotoCell",
+      "t": "Rotary Indexing Laser Cell",
+      "tag": "4/6/8-station dial with process stations around it — load and unload overlap process time.",
+      "base": 7500000,
+      "deliv": "galvo",
+      "src": [
+        "fiber",
+        "mopa",
+        "uv",
+        "green",
+        "co2"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "rotoidx",
+        "fume"
+      ],
+      "pw": [
+        20,
+        30,
+        50,
+        100
+      ],
+      "dpw": 50,
+      "pwBySrc": {
+        "fiber": [
+          20,
+          30,
+          50,
+          100
+        ],
+        "mopa": [
+          20,
+          30,
+          50,
+          100
+        ],
+        "uv": [
+          3,
+          5,
+          10
+        ],
+        "green": [
+          5,
+          10,
+          20
+        ],
+        "co2": [
+          10,
+          30,
+          60
+        ]
+      },
+      "lens": [
+        "f163",
+        "f254"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Architecture",
+          "4 / 6 / 8-station rotary table, Ø 800–1,500 mm"
+        ],
+        [
+          "Cycle window",
+          "2–10 s"
+        ],
+        [
+          "Loading",
+          "Operator or robot presented"
+        ],
+        [
+          "Safety",
+          "Risk assessment to ISO 12100, PL-rated circuits"
+        ]
+      ],
+      "apps": {
+        "multi": {
+          "n": "Multi-process cell",
+          "d": "Clean, mark, verify in one dial",
+          "src": "fiber",
+          "pw": 50,
+          "mat": "steel",
+          "w": "Sequential stations around the dial collapse several operations into one takt and one fixture datum."
+        },
+        "highrate": {
+          "n": "High-rate single process",
+          "d": "Load-while-process",
+          "src": "fiber",
+          "pw": 50,
+          "mat": "steel",
+          "w": "Overlapping load with process makes effective cycle equal to the longest station, not their sum."
+        }
+      }
+    },
+    "lin": {
+      "fam": "auto",
+      "ind": [
+        "ems",
+        "auto",
+        "battery"
+      ],
+      "lead": 38,
+      "warranty": 12,
+      "install": 10,
+      "code": "LinCell",
+      "n": "LinCell",
+      "t": "Pallet Inline Transfer System",
+      "tag": "Pallet-based transfer with SMEMA/Hermes interfaces, lift-and-locate stations, buffers and bypass.",
+      "base": 9500000,
+      "deliv": "gantry",
+      "src": [
+        "fiber",
+        "uv",
+        "co2",
+        "green"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "conveyor"
+      ],
+      "pw": [
+        20,
+        30,
+        50,
+        100
+      ],
+      "dpw": 30,
+      "pwBySrc": {
+        "fiber": [
+          20,
+          30,
+          50,
+          100
+        ],
+        "uv": [
+          3,
+          5,
+          10
+        ],
+        "co2": [
+          10,
+          30,
+          60
+        ],
+        "green": [
+          5,
+          10,
+          20
+        ]
+      },
+      "lens": [
+        "f163",
+        "f254"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Architecture",
+          "Pallet transfer, lift-and-locate stations"
+        ],
+        [
+          "Interfaces",
+          "SMEMA / Hermes, buffers and bypass lanes"
+        ],
+        [
+          "Changeover",
+          "Recipe-driven for high-mix flows"
+        ],
+        [
+          "Controls",
+          "Siemens, Beckhoff, Mitsubishi or Rockwell per your standard"
+        ]
+      ],
+      "apps": {
+        "inline": {
+          "n": "Inline integration",
+          "d": "Into existing conveyorised flow",
+          "src": "fiber",
+          "pw": 30,
+          "mat": "fr4",
+          "w": "Products flow through multiple processes without leaving the pallet datum, so accuracy compounds rather than degrades."
+        },
+        "highmix": {
+          "n": "High-mix production",
+          "d": "Recipe-driven changeover",
+          "src": "fiber",
+          "pw": 30,
+          "mat": "fr4",
+          "w": "Bypass lanes and buffers absorb model changes without stopping the upstream line."
+        }
+      }
+    },
+    "robo": {
+      "fam": "auto",
+      "ind": [
+        "auto",
+        "genengg",
+        "aero",
+        "battery"
+      ],
+      "lead": 36,
+      "warranty": 12,
+      "install": 10,
+      "code": "RoboCell",
+      "n": "RoboCell",
+      "t": "Robotic Laser Process Cell",
+      "tag": "6-axis, SCARA or collaborative robot with laser head, tool changers and flexible fixturing.",
+      "base": 8500000,
+      "deliv": "robot",
+      "src": [
+        "fiber",
+        "smcw",
+        "mopa",
+        "green"
+      ],
+      "dsrc": "fiber",
+      "std": [
+        "robot6"
+      ],
+      "pw": [
+        50,
+        100,
+        500,
+        1000,
+        2000
+      ],
+      "dpw": 100,
+      "pwBySrc": {
+        "fiber": [
+          20,
+          50,
+          100,
+          200
+        ],
+        "mopa": [
+          20,
+          50,
+          100
+        ],
+        "smcw": [
+          500,
+          1000,
+          2000,
+          3000
+        ],
+        "green": [
+          100,
+          500,
+          1000
+        ]
+      },
+      "lens": [
+        "f254",
+        "f420"
+      ],
+      "dlens": "f254",
+      "specs": [
+        [
+          "Robot",
+          "6-axis, SCARA or collaborative"
+        ],
+        [
+          "Flexibility",
+          "Tool changers, one robot serving several processes"
+        ],
+        [
+          "Safety",
+          "Fenced or collaborative concepts, Class 1 guarding"
+        ],
+        [
+          "Vision",
+          "2D/3D-guided picking and datum-referenced placement"
+        ]
+      ],
+      "apps": {
+        "complex3d": {
+          "n": "Complex 3D geometry",
+          "d": "Parts a fixed optic cannot reach",
+          "src": "fiber",
+          "pw": 100,
+          "mat": "steel",
+          "w": "Six axes present the part or carry the head wherever the feature sits, without bespoke fixturing per variant."
+        },
+        "multimachine": {
+          "n": "Multi-machine tending",
+          "d": "One robot, several processes",
+          "src": "fiber",
+          "pw": 100,
+          "mat": "steel",
+          "w": "Tool changers let a single cell cover marking, cleaning and inspection on a shared takt."
+        },
+        "collab": {
+          "n": "Collaborative loading",
+          "d": "Operator-shared workspace",
+          "src": "fiber",
+          "pw": 50,
+          "mat": "al",
+          "w": "Force-limited handling suits light parts and frequent redeployment without full guarding."
+        }
+      }
+    }
+  },
+  "MOD": {
+    "visfid": {
+      "g": "Vision & verification",
+      "n": "Fiducial / part-locate vision",
+      "d": "Automatic part location and mark-placement correction",
+      "p": 650000
+    },
+    "visver": {
+      "g": "Vision & verification",
+      "n": "Mark verification & grading",
+      "d": "In-machine decode + ISO/IEC 29158 / 15415 grading",
+      "p": 750000
+    },
+    "weldmon": {
+      "g": "Vision & verification",
+      "n": "Photodiode weld monitor",
+      "d": "Per-weld plasma / temperature envelopes",
+      "p": 700000
+    },
+    "oct": {
+      "g": "Vision & verification",
+      "n": "Inline OCT depth monitoring",
+      "d": "Direct keyhole depth measurement, ± 50 µm",
+      "p": 2600000
+    },
+    "seamtrk": {
+      "g": "Vision & verification",
+      "n": "Laser seam tracking",
+      "d": "Real-time path correction with touch-sense backup",
+      "p": 950000
+    },
+    "autofoc": {
+      "g": "Optics & motion",
+      "n": "Auto Z-focus (triangulation)",
+      "d": "Mixed-height parts without manual refocus",
+      "p": 450000
+    },
+    "scan3d": {
+      "g": "Optics & motion",
+      "n": "3-axis scan head",
+      "d": "Stepped and curved surfaces within one field",
+      "p": 850000
+    },
+    "wobble": {
+      "g": "Optics & motion",
+      "n": "Wobble module",
+      "d": "Gap tolerance and melt-pool control",
+      "p": 550000
+    },
+    "rotary": {
+      "g": "Optics & motion",
+      "n": "Rotary / 4th axis",
+      "d": "Cylindrical and circumferential work",
+      "p": 350000
+    },
+    "shuttle": {
+      "g": "Optics & motion",
+      "n": "Dual-station shuttle table",
+      "d": "Load-while-process on a two-position table",
+      "p": 550000
+    },
+    "gascon": {
+      "g": "Optics & motion",
+      "n": "Process-gas console",
+      "d": "Shield or cutting gas, N₂ / Ar / air / O₂",
+      "p": 320000
+    },
+    "conveyor": {
+      "g": "Handling & flow",
+      "n": "SMEMA / edge-belt conveyor",
+      "d": "Inline transport with line handshakes",
+      "p": 650000
+    },
+    "rotoidx": {
+      "g": "Handling & flow",
+      "n": "Rotary indexer",
+      "d": "4 / 6 / 8-station dial, load overlaps process",
+      "p": 1200000
+    },
+    "robot6": {
+      "g": "Handling & flow",
+      "n": "6-axis robot integration",
+      "d": "Full-3D manipulation or process carrying",
+      "p": 1800000
+    },
+    "cobotld": {
+      "g": "Handling & flow",
+      "n": "Cobot loading",
+      "d": "Force-limited, operator-shared workspace",
+      "p": 1100000
+    },
+    "feeder": {
+      "g": "Handling & flow",
+      "n": "Bowl / flex feeder",
+      "d": "Bulk singulation and orientation",
+      "p": 900000
+    },
+    "magazine": {
+      "g": "Handling & flow",
+      "n": "Magazine loader",
+      "d": "Strip and board magazine-to-magazine",
+      "p": 1400000
+    },
+    "traytwr": {
+      "g": "Handling & flow",
+      "n": "Tray tower",
+      "d": "Stack storage for delicate oriented parts",
+      "p": 1000000
+    },
+    "turntbl": {
+      "g": "Handling & flow",
+      "n": "2-station servo turntable",
+      "d": "Operator loads while the cell processes",
+      "p": 1400000
+    },
+    "reject": {
+      "g": "Handling & flow",
+      "n": "Reject / NG station",
+      "d": "Documented removal with sealed bins",
+      "p": 280000
+    },
+    "r2r": {
+      "g": "Handling & flow",
+      "n": "Roll-to-roll module",
+      "d": "Continuous web processing",
+      "p": 1600000
+    },
+    "fume": {
+      "g": "Environment & safety",
+      "n": "Filtered fume extraction",
+      "d": "Flow-monitored, process-inhibit on failure",
+      "p": 280000
+    },
+    "cleanrm": {
+      "g": "Environment & safety",
+      "n": "Cleanroom build",
+      "d": "ISO-class materials, sealed cable management",
+      "p": 1500000
+    },
+    "dryroom": {
+      "g": "Environment & safety",
+      "n": "Dry-room build",
+      "d": "To −40 °C dew point, static-safe per IEC 61340-5-1",
+      "p": 1200000
+    },
+    "glovebx": {
+      "g": "Environment & safety",
+      "n": "Controlled atmosphere / glovebox",
+      "d": "N₂, Ar or He backfill chamber",
+      "p": 2200000
+    },
+    "cepath": {
+      "g": "Environment & safety",
+      "n": "CE-path documentation",
+      "d": "Full-cell conformity file, not laser only",
+      "p": 450000
+    }
+  },
+  "SW": {
+    "desktop": {
+      "n": "LaserSuite Desktop",
+      "d": "Recipe management, code engines, local database",
+      "p": 0
+    },
+    "inline": {
+      "n": "LaserSuite Inline",
+      "d": "Adds transport, handshakes and order queues",
+      "p": 450000
+    },
+    "volt": {
+      "n": "LaserSuite Volt",
+      "d": "Adds battery genealogy models, cell → pack",
+      "p": 750000
+    },
+    "regulated": {
+      "n": "LaserSuite Regulated",
+      "d": "Adds e-signature user controls and audit trails",
+      "p": 950000
+    }
+  },
+  "EXTRA": {
+    "connect": {
+      "n": "TEAL Connect (remote)",
+      "d": "Outbound-only diagnostics and health telemetry",
+      "p": 320000
+    },
+    "secsgem": {
+      "n": "SECS/GEM host interface",
+      "d": "E30 / E37 / E40 class connectivity",
+      "p": 800000
+    },
+    "mes": {
+      "n": "MES / ERP integration",
+      "d": "OPC UA, MQTT, REST — order download, result upload",
+      "p": 520000
+    },
+    "iqoqpq": {
+      "n": "IQ/OQ/PQ validation package",
+      "d": "Protocols and execution support for validated sites",
+      "p": 650000
+    }
+  },
+  "MODFIT": {
+    "visfid": {
+      "noDeliv": [
+        "handpiece"
+      ]
+    },
+    "visver": {
+      "noDeliv": [
+        "handpiece"
+      ]
+    },
+    "weldmon": {
+      "fam": [
+        "weld"
+      ]
+    },
+    "oct": {
+      "fam": [
+        "weld"
+      ]
+    },
+    "seamtrk": {
+      "fam": [
+        "weld",
+        "cut"
+      ]
+    },
+    "autofoc": {
+      "deliv": [
+        "galvo",
+        "galvo2",
+        "gantry"
+      ]
+    },
+    "scan3d": {
+      "deliv": [
+        "galvo",
+        "galvo2",
+        "gantry"
+      ]
+    },
+    "wobble": {
+      "fam": [
+        "weld"
+      ]
+    },
+    "rotary": {
+      "deliv": [
+        "galvo",
+        "gantry"
+      ],
+      "noFam": [
+        "semi"
+      ],
+      "noPlat": [
+        "markc2i",
+        "marku",
+        "markit"
+      ]
+    },
+    "shuttle": {
+      "deliv": [
+        "galvo",
+        "gantry"
+      ]
+    },
+    "gascon": {
+      "fam": [
+        "weld",
+        "cut",
+        "clean"
+      ]
+    },
+    "conveyor": {
+      "noDeliv": [
+        "handpiece"
+      ]
+    },
+    "rotoidx": {
+      "deliv": [
+        "galvo",
+        "robot"
+      ]
+    },
+    "robot6": {
+      "noDeliv": [
+        "handpiece"
+      ]
+    },
+    "cobotld": {
+      "noDeliv": [
+        "handpiece"
+      ]
+    },
+    "feeder": {
+      "deliv": [
+        "galvo",
+        "robot"
+      ]
+    },
+    "magazine": {
+      "fam": [
+        "mark",
+        "semi"
+      ]
+    },
+    "traytwr": {
+      "fam": [
+        "mark",
+        "semi",
+        "weld"
+      ]
+    },
+    "turntbl": {
+      "deliv": [
+        "galvo",
+        "gantry",
+        "robot"
+      ]
+    },
+    "reject": {
+      "noDeliv": [
+        "handpiece"
+      ]
+    },
+    "r2r": {
+      "fam": [
+        "cut",
+        "volt",
+        "mark"
+      ],
+      "mat": [
+        "cu",
+        "al",
+        "pi",
+        "poly",
+        "fr4"
+      ]
+    },
+    "fume": {},
+    "cleanrm": {
+      "fam": [
+        "semi"
+      ]
+    },
+    "dryroom": {
+      "fam": [
+        "volt",
+        "weld"
+      ]
+    },
+    "glovebx": {
+      "fam": [
+        "volt",
+        "weld"
+      ]
+    },
+    "cepath": {},
+    "connect": {},
+    "secsgem": {
+      "fam": [
+        "semi",
+        "volt",
+        "auto"
+      ]
+    },
+    "mes": {},
+    "iqoqpq": {
+      "fam": [
+        "weld",
+        "semi",
+        "mark",
+        "auto"
+      ]
+    }
+  },
+  "RECO": [
+    {
+      "id": "r-pcb-line",
+      "n": "Inline PCB traceability",
+      "why": "Inline board marking is only auditable if every code is graded as it is made and failures are physically segregated.",
+      "iff": {
+        "plat": [
+          "markc2i",
+          "marku",
+          "markit"
+        ]
+      },
+      "then": {
+        "mods": [
+          "visver",
+          "reject"
+        ],
+        "extra": [
+          "mes"
+        ],
+        "sw": "inline"
+      }
+    },
+    {
+      "id": "r-semi-host",
+      "n": "Semiconductor host integration",
+      "why": "OSAT and fab lines expect SECS/GEM handshakes and per-unit records; retrofitting them later means re-qualifying the tool.",
+      "iff": {
+        "fam": [
+          "semi"
+        ]
+      },
+      "then": {
+        "mods": [
+          "visver"
+        ],
+        "extra": [
+          "secsgem",
+          "mes"
+        ],
+        "sw": "inline"
+      }
+    },
+    {
+      "id": "r-semi-clean",
+      "n": "Cleanroom compatibility",
+      "why": "Wafer and package tools sit inside classified space — particulate control has to be designed in, not added.",
+      "iff": {
+        "plat": [
+          "semiwm",
+          "semispm"
+        ]
+      },
+      "then": {
+        "mods": [
+          "cleanrm"
+        ]
+      }
+    },
+    {
+      "id": "r-volt-gen",
+      "n": "Battery genealogy",
+      "why": "Cell-to-pack recall exposure is the reason to capture genealogy at the point of marking rather than reconstructing it later.",
+      "iff": {
+        "fam": [
+          "volt"
+        ]
+      },
+      "then": {
+        "mods": [
+          "visver"
+        ],
+        "extra": [
+          "mes"
+        ],
+        "sw": "volt"
+      }
+    },
+    {
+      "id": "r-weld-mon",
+      "n": "Weld process monitoring",
+      "why": "A weld you cannot measure is a weld you cannot warrant; monitoring turns each joint into inspectable data.",
+      "iff": {
+        "fam": [
+          "weld"
+        ]
+      },
+      "then": {
+        "mods": [
+          "weldmon"
+        ]
+      }
+    },
+    {
+      "id": "r-weld-cu",
+      "n": "Copper joint control",
+      "why": "Copper welding is unstable at the melt boundary — depth monitoring is what makes the process capable rather than merely repeatable.",
+      "iff": {
+        "plat": [
+          "weldb"
+        ],
+        "src": [
+          "green",
+          "smcw"
+        ]
+      },
+      "then": {
+        "mods": [
+          "oct",
+          "wobble"
+        ]
+      }
+    },
+    {
+      "id": "r-weld-dry",
+      "n": "Dry-room environment",
+      "why": "Electrode-area humidity degrades cell performance; the cell build must match the room it will live in.",
+      "iff": {
+        "plat": [
+          "weldb"
+        ]
+      },
+      "then": {
+        "mods": [
+          "dryroom"
+        ]
+      }
+    },
+    {
+      "id": "r-med-val",
+      "n": "Regulated-site validation",
+      "why": "Medical and hermetic work is audited on evidence, so e-signature controls and IQ/OQ/PQ belong in the machine scope from day one.",
+      "iff": {
+        "plat": [
+          "weldh"
+        ]
+      },
+      "then": {
+        "extra": [
+          "iqoqpq"
+        ],
+        "sw": "regulated"
+      }
+    },
+    {
+      "id": "r-fume",
+      "n": "Extraction and operator exposure",
+      "why": "Marking, cutting and cleaning all generate process emissions; filtered extraction with flow monitoring is the baseline duty of care.",
+      "iff": {
+        "fam": [
+          "mark",
+          "cut",
+          "clean",
+          "semi"
+        ]
+      },
+      "then": {
+        "mods": [
+          "fume"
+        ]
+      }
+    },
+    {
+      "id": "r-vision-mark",
+      "n": "Placement accuracy",
+      "why": "Fixture tolerance, not the scanner, usually limits mark placement — fiducial correction removes that variable.",
+      "iff": {
+        "fam": [
+          "mark",
+          "volt"
+        ]
+      },
+      "then": {
+        "mods": [
+          "visfid"
+        ]
+      }
+    },
+    {
+      "id": "r-3d",
+      "n": "Non-flat surfaces",
+      "why": "Stepped and curved parts drift out of focus across the field; a 3-axis head holds spot size where a 2-axis head cannot.",
+      "iff": {
+        "app": [
+          "deep",
+          "tool",
+          "complex3d",
+          "corner"
+        ],
+        "deliv": [
+          "galvo",
+          "galvo2",
+          "gantry"
+        ]
+      },
+      "then": {
+        "mods": [
+          "scan3d"
+        ]
+      }
+    },
+    {
+      "id": "r-rotary",
+      "n": "Cylindrical work",
+      "why": "Circumferential features need synchronised rotation to keep energy density constant around the part.",
+      "iff": {
+        "app": [
+          "cylcan",
+          "feed",
+          "canseam"
+        ]
+      },
+      "then": {
+        "mods": [
+          "rotary"
+        ]
+      }
+    },
+    {
+      "id": "r-remote",
+      "n": "Remote support",
+      "why": "Diagnostics that need a site visit cost days; outbound telemetry resolves most faults the same shift.",
+      "iff": {},
+      "then": {
+        "extra": [
+          "connect"
+        ]
+      }
+    },
+    {
+      "id": "r-gas-weld",
+      "n": "Shield gas",
+      "why": "An unshielded weld pool oxidises as it solidifies; the joint looks acceptable and fails on test.",
+      "iff": {
+        "fam": [
+          "weld"
+        ]
+      },
+      "then": {
+        "mods": [
+          "gascon"
+        ]
+      }
+    },
+    {
+      "id": "r-gas-cut",
+      "n": "Cutting gas",
+      "why": "Assist gas ejects the melt from the kerf — without it the cut redeposits and the edge closes behind the beam.",
+      "iff": {
+        "fam": [
+          "cut"
+        ]
+      },
+      "then": {
+        "mods": [
+          "gascon"
+        ]
+      }
+    },
+    {
+      "id": "r-oct-deep",
+      "n": "Deep-penetration control",
+      "why": "Above a kilowatt the process runs in keyhole; penetration cannot be inferred from the surface, so it has to be measured.",
+      "iff": {
+        "fam": [
+          "weld"
+        ],
+        "pwMin": 800
+      },
+      "then": {
+        "mods": [
+          "oct"
+        ]
+      }
+    },
+    {
+      "id": "r-wobble-gap",
+      "n": "Gap bridging",
+      "why": "Real assemblies do not present zero gap; beam oscillation widens the fusion zone enough to tolerate the fit-up you actually get.",
+      "iff": {
+        "fam": [
+          "weld"
+        ],
+        "not": {
+          "plat": [
+            "weldh"
+          ]
+        }
+      },
+      "then": {
+        "mods": [
+          "wobble"
+        ]
+      }
+    },
+    {
+      "id": "r-seam-track",
+      "n": "Seam following",
+      "why": "Thermal distortion moves the joint during the weld; a fixed path walks off it on long seams.",
+      "iff": {
+        "fam": [
+          "weld"
+        ],
+        "deliv": [
+          "robot",
+          "gantry"
+        ]
+      },
+      "then": {
+        "mods": [
+          "seamtrk"
+        ]
+      }
+    },
+    {
+      "id": "r-autofoc-3d",
+      "n": "Mixed-height parts",
+      "why": "Spot size is only valid at focus; a part family with varying height loses fluence long before the operator sees a defect.",
+      "iff": {
+        "deliv": [
+          "galvo",
+          "galvo2",
+          "gantry"
+        ]
+      },
+      "then": {
+        "mods": [
+          "autofoc"
+        ]
+      }
+    },
+    {
+      "id": "r-shuttle-takt",
+      "n": "Load while processing",
+      "why": "On a single-station table the machine waits for the operator; a second station returns that time to production.",
+      "iff": {
+        "fam": [
+          "mark",
+          "cut"
+        ],
+        "deliv": [
+          "galvo",
+          "gantry"
+        ],
+        "not": {
+          "plat": [
+            "markc2i",
+            "marku",
+            "markit"
+          ]
+        }
+      },
+      "then": {
+        "mods": [
+          "shuttle"
+        ]
+      }
+    },
+    {
+      "id": "r-magazine-board",
+      "n": "Board handling",
+      "why": "Manual board loading is where inline traceability breaks down — magazine-to-magazine keeps the chain intact.",
+      "iff": {
+        "fam": [
+          "mark"
+        ],
+        "plat": [
+          "markc2i",
+          "marku",
+          "markit"
+        ]
+      },
+      "then": {
+        "mods": [
+          "magazine"
+        ]
+      }
+    },
+    {
+      "id": "r-tray-semi",
+      "n": "Oriented package handling",
+      "why": "Singulated packages cannot be bulk fed without damage; tray handling preserves orientation and surface.",
+      "iff": {
+        "fam": [
+          "semi"
+        ]
+      },
+      "then": {
+        "mods": [
+          "traytwr"
+        ]
+      }
+    },
+    {
+      "id": "r-r2r-web",
+      "n": "Continuous web",
+      "why": "Foil and film arrive on a reel; cutting them as sheets adds a conversion step the process does not need.",
+      "iff": {
+        "fam": [
+          "cut",
+          "volt"
+        ],
+        "mat": [
+          "cu",
+          "al",
+          "pi",
+          "poly"
+        ]
+      },
+      "then": {
+        "mods": [
+          "r2r"
+        ]
+      }
+    },
+    {
+      "id": "r-turn-robot",
+      "n": "Operator-safe loading",
+      "why": "A turntable keeps the operator outside the guarded volume while the cell runs, which is what makes the interlock scheme workable.",
+      "iff": {
+        "deliv": [
+          "robot"
+        ]
+      },
+      "then": {
+        "mods": [
+          "turntbl"
+        ]
+      }
+    },
+    {
+      "id": "r-glovebox-cell",
+      "n": "Reactive-material atmosphere",
+      "why": "Lithium-bearing assemblies react with atmospheric moisture during processing; an inert backfill is a process requirement, not a precaution.",
+      "iff": {
+        "fam": [
+          "volt"
+        ],
+        "pwMin": 200
+      },
+      "then": {
+        "mods": [
+          "glovebx"
+        ]
+      }
+    },
+    {
+      "id": "r-ce-cell",
+      "n": "Whole-cell conformity",
+      "why": "A CE-marked laser inside an integrated cell does not make the cell compliant — the conformity file has to cover the machine as delivered.",
+      "iff": {
+        "deliv": [
+          "robot",
+          "gantry"
+        ]
+      },
+      "then": {
+        "mods": [
+          "cepath"
+        ]
+      }
+    },
+    {
+      "id": "r-med-iq",
+      "n": "Validated-site protocols",
+      "why": "Medical and implant-adjacent production is audited on documented evidence; retrofitting IQ/OQ/PQ after installation repeats the qualification.",
+      "iff": {
+        "fam": [
+          "weld",
+          "semi",
+          "mark"
+        ],
+        "not": {
+          "deliv": [
+            "handpiece"
+          ]
+        }
+      },
+      "then": {
+        "extra": [
+          "iqoqpq"
+        ]
+      }
+    }
+  ],
+  "RULES": {
+    "band_lo": 0.9,
+    "band_hi": 1.12,
+    "pw_up": 0.42,
+    "pw_dn": 0.22,
+    "lens_uplift": 1.03,
+    "adminPin": "teal2026"
+  }
+}
