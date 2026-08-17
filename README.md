@@ -878,6 +878,110 @@ Requiring word boundaries at both ends of short terms stopped "welding" matching
 the stem `weld`. The rule is prefix-only: "welding", "welded" and "welds" all
 match `weld`, while `ng` inside "welding" still correctly fails.
 
+## v9.0 — platform layer
+
+An enterprise UI/UX and simulator pass over the existing product. Nothing was
+rebuilt: the machine families, platforms, optical model, process physics, pricing
+model, advisor, saved/history/compare, value store and 3D machine view are all
+the code they were. Every data literal in `index.html` — `SRC`, `LENS`, `MAT`,
+`IND`, `STD`, `LEX`, `FAM`, `PLAT`, `MOD`, `EXTRA`, `SW`, `MODFIT`,
+`MODCONFLICT`, `RECO`, `RULES`, `DEFAULTS` — is byte-identical to the previous
+revision, and `data.json` was not touched. Eight gaps were closed.
+
+**Global navigation.** The header carries four destinations — Configurator,
+Portfolio, Applications, Engineering — each mapped to a place that already
+existed (the rail, the family step, the application step, the review step),
+with Saved, Compare, Value store and Submit enquiry on the right. The shell caps
+at 1460 px, so the centre nav and the static catalogue meta cannot share the row:
+above 1360 px the nav takes it, below that the meta comes back. Nothing wraps.
+Measured at every width from 360 to 1900 px — no overlap, no page overflow, and
+the header never exceeds 72 px.
+
+**Indicative configuration fit.** A score out of 100 over five dimensions, each
+derived from a rule that already existed rather than a new one:
+
+| Dimension | Derived from |
+|---|---|
+| Application fit | the application's own recommended source and power |
+| Optical fit | the objective against the platform default, plus computed spot, field and depth of focus |
+| Parameter fit | the platform's declared source list and power classes |
+| Automation fit | module fitment and the conflict table |
+| Throughput fit | a machine cycle that has actually been run |
+
+The panel states how many dimensions it could derive — "4 of 5" until a cycle is
+run — and labels itself as indicative, not a certification. Throughput is stamped
+with the designation it ran for, so a result is never carried onto a
+configuration that was changed afterwards: change the objective and it reverts to
+*not available from the current model*.
+
+**Process result.** The live telemetry gained a classification alongside cycle,
+rate, yield and utilisation: OPTIMAL, WITHIN TARGET, ATTENTION, OUTSIDE TARGET
+or REQUIRES VALIDATION. Before the first part completes there is nothing to
+classify, and it says so rather than reporting a pass.
+
+**Engineering considerations.** A conflict is a decision with a consequence, not
+"invalid". Each one states what changed, why it matters and what can be adjusted,
+then offers Review configuration, Change parameter, or Continue to engineering
+review. Raised from the conflict table, module fitment, the platform's declared
+source and power lists, and an application whose recommended source was
+overridden.
+
+**Standard and Engineering views.** Progressive disclosure over the same screens,
+not a second interface. Standard shows spot, depth of focus, scan field,
+absorptivity and coupled power. Engineering adds the pulse train and thermal
+scale — on a pulsed fiber marker: pulse energy, peak power, fluence, peak
+irradiance, thermal conductivity and heat diffusion per pulse. The choice
+persists per browser.
+
+**Customer demo mode.** Shift+D, or `?demo` on the URL for a kiosk. It runs the
+worked example this README already documents — Mark PCB C2i, dual-side board ID,
+sealed RF CO₂ at 30 W, F254 — step by step, then the machine cycle, narrating
+each stage in a footer bar. No configuration values are invented: every key it
+sets exists in the value store, and it refuses to run if the platform is absent.
+
+**Simulation summary.** A text report covering configuration, computed optics,
+process parameters, simulation result, configuration fit, considerations,
+assumptions and validation requirements. An un-run cycle is reported as
+`NOT RUN`, not as a zero.
+
+**Contextual status.** Named states replace the absent generic spinner —
+*Loading value store…*, *Generating DFM report…*, *Reading data.json…*,
+*Importing MOD values…*. Applied only where work is genuinely slow: the fetch,
+the PDF build, the file reads. Synchronous updates get none, because a status
+that cannot paint before the work finishes is decoration.
+
+### Fixed during this pass
+
+- **The fit panel did not refresh when a run stopped.** `simHud` clears the
+  telemetry and returns early once the run is off, so the refresh never fired and
+  the throughput dimension kept reading *not available* after a completed cycle.
+  It is now refreshed from `simStop`.
+- **Optical fit printed a bare field number** — "field 175" where the rest of the
+  tool reads "175 × 175 mm". `LENS.fld` is a single edge, not a formatted string.
+- The centre nav overflowed into the advisor button between 1180 and 1360 px; the
+  breakpoints now sit where the row actually fits, verified by sweep rather than
+  by eye.
+
+### Verification
+
+A Playwright suite covers all sixty checks in this pass: navigation, fit
+derivation and its staleness guard, the status vocabulary, considerations,
+progressive disclosure, demo mode, the summary sections, contextual status,
+accessible names on every new control, no horizontal overflow at 390 px, and a
+regression pass confirming designation, optics, physics, price, the standards
+register, the summary rows, the budget band and every overlay still work.
+Two apparent failures were test artefacts, not defects: the value store is
+PIN-gated by `RULES.adminPin`, which headless `prompt()` auto-dismisses, and
+Google Fonts is blocked in the sandbox — the documented system-font fallback.
+
+### Not yet covered
+
+The fit score weights are judgement, not measurement: OPTIMAL 100, WITHIN TARGET
+88, REQUIRES VALIDATION 70, ATTENTION 62, OUTSIDE TARGET 30, averaged over the
+dimensions that could be derived. They order configurations sensibly but the
+absolute number carries no more authority than the dimension rows beneath it,
+which is why the panel shows both and calls itself indicative.
+
 ---
 
 © Titan Engineering & Automation Limited — A TATA Enterprise.
