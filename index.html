@@ -24,6 +24,7 @@
   --cta:#C44A0E; --cta-h:#A63D07; --cta-wash:#FDF0E9;
   --amber:#A66A12; --amber-wash:#FBF4E7;
   --ok:#0F7B5A;
+  --crit:#B3261E; --crit-wash:#FDECEA;
   --r-sm:8px; --r:12px; --r-lg:16px; --r-pill:999px;
   --sh1:0 1px 2px rgba(11,26,42,.05),0 1px 3px rgba(11,26,42,.04);
   --sh2:0 4px 12px rgba(11,26,42,.07),0 2px 4px rgba(11,26,42,.04);
@@ -1030,12 +1031,136 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
   .rv{opacity:1;transform:none}
 }
 
+/* ==================================================================
+   v9.0 — platform layer
+   Global navigation, view modes, indicative configuration fit,
+   engineering considerations, contextual status and demo mode.
+   Additive only: no existing selector is redefined here.
+   ================================================================== */
+
+/* ---------- global navigation: centre destinations ---------- */
+/* The shell caps at 1460 px, so the centre nav and the static catalogue meta
+   cannot share the row. Above the nav breakpoint the nav takes it; below, the
+   meta comes back. Nothing wraps — a header that reflows reads as an accident. */
+.lock h1,.lock .s,.hb{white-space:nowrap}
+@media(min-width:1361px){.hmeta{display:none}}
+.hnav{display:flex;align-items:center;gap:2px;flex:0 0 auto}
+.hnav button{background:none;border:0;padding:8px 14px;font-size:13.5px;font-weight:550;
+  color:var(--ink-2);border-radius:var(--r-sm);position:relative;white-space:nowrap;
+  transition:color .2s var(--ease),background .2s var(--ease)}
+.hnav button:hover{color:var(--ink);background:var(--card-2)}
+.hnav button[aria-current="page"]{color:var(--teal-deep);font-weight:650}
+.hnav button[aria-current="page"]::after{content:"";position:absolute;left:14px;right:14px;
+  bottom:-13px;height:2px;background:var(--teal);border-radius:2px}
+@media(max-width:1360px){.hnav{display:none}}
+
+/* Icon-only header actions keep five destinations inside a 64 px header. */
+.hb-ico{padding:9px 11px}
+/* The advisor keeps its label longest — it is the entry point most people want
+   by name — but gives it up before the row is allowed to crowd. */
+@media(max-width:1460px){.hb-adv span{display:none}.hb-adv{padding:9px 11px}}
+.hb-cta{background:var(--cta);border-color:var(--cta);color:#fff;font-weight:600}
+.hb-cta:hover{background:var(--cta-h);border-color:var(--cta-h);color:#fff;
+  transform:translateY(-1px)}
+@media(max-width:900px){.hb-cta span{display:none}}
+
+/* ---------- standard / engineering view ---------- */
+.sheadtop{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;margin-bottom:12px}
+.sheadtop .eyebrow{margin-bottom:0}
+.vmode{display:inline-flex;align-items:center;background:var(--card-2);
+  border:1px solid var(--rule);border-radius:var(--r-pill);padding:2px}
+.vmode button{background:none;border:0;border-radius:var(--r-pill);padding:5px 12px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:600;color:var(--ink-3);transition:all .2s var(--ease)}
+.vmode button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:var(--sh1)}
+.adv-only{display:none}
+body.eng .adv-only{display:block}
+body.eng tr.adv-only{display:table-row}
+
+/* ---------- indicative configuration fit ---------- */
+.fitblk{border-top:1px solid var(--rule);padding:16px 0 4px}
+.fithd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.fitl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600}
+.fitsc{font-family:var(--disp);font-size:26px;font-weight:680;letter-spacing:-.02em;
+  line-height:1;font-feature-settings:'tnum'}
+.fitsc small{font-size:12px;font-weight:500;color:var(--ink-3);letter-spacing:0}
+.fitrow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;
+  padding:7px 0;border-top:1px solid var(--rule-2)}
+.fitrow:first-of-type{border-top:0}
+.fitrow .fk{font-size:12.5px;color:var(--ink-2);font-weight:520}
+.fitrow .fs{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;font-weight:600;
+  text-transform:uppercase;white-space:nowrap}
+.fitrow .fn{grid-column:1/-1;font-size:11.5px;color:var(--ink-3);line-height:1.5}
+.fitbar{grid-column:1/-1;height:3px;background:var(--rule-2);border-radius:2px;overflow:hidden}
+.fitbar i{display:block;height:100%;border-radius:2px;transition:width .45s var(--ease)}
+.st-opt{color:var(--ok)}      .bg-opt{background:var(--ok)}
+.st-tgt{color:var(--teal-deep)} .bg-tgt{background:var(--teal)}
+.st-att{color:var(--amber)}   .bg-att{background:var(--amber)}
+.st-out{color:var(--crit)}    .bg-out{background:var(--crit)}
+.st-val{color:var(--ink-3)}   .bg-val{background:var(--ink-3)}
+.st-na{color:var(--ink-3)}    .bg-na{background:var(--rule)}
+.fitfoot{font-size:11px;color:var(--ink-3);line-height:1.5;margin-top:8px;
+  padding-top:8px;border-top:1px solid var(--rule-2)}
+
+/* ---------- engineering considerations ---------- */
+.econs{border:1px solid var(--amber);background:var(--amber-wash);
+  border-radius:var(--r);padding:16px 18px;margin:0 0 24px}
+.econs.crit{border-color:var(--crit);background:var(--crit-wash)}
+.econs .eh{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.econs .eh svg{width:15px;height:15px;flex:0 0 auto}
+.econs .et{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:var(--amber)}
+.econs.crit .et{color:var(--crit)}
+.econs .ei{padding:12px 0;border-top:1px solid rgba(166,106,18,.22)}
+.econs.crit .ei{border-top-color:rgba(179,38,30,.22)}
+.econs .ei:first-of-type{border-top:0;padding-top:0}
+.econs .en{font-size:14px;font-weight:620;margin-bottom:6px}
+.econs dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 12px}
+.econs dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;padding-top:2px}
+.econs dd{margin:0;font-size:13px;color:var(--ink-2);line-height:1.55}
+.econs .eact{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+@media(max-width:560px){.econs dl{grid-template-columns:1fr}.econs dt{padding-top:8px}}
+
+/* ---------- contextual status ---------- */
+#status{position:fixed;left:50%;transform:translateX(-50%) translateY(-8px);top:calc(var(--hdr) + 14px);
+  z-index:65;display:flex;align-items:center;gap:9px;background:var(--glass-light);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--rule);border-radius:var(--r-pill);padding:8px 16px;
+  box-shadow:var(--glass-lift);font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;font-weight:600;color:var(--ink-2);
+  opacity:0;pointer-events:none;transition:opacity .2s var(--ease),transform .2s var(--ease)}
+#status.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#status i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--teal);
+  border-top-color:transparent;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#status i{animation:none;border-top-color:var(--teal)}}
+
+/* ---------- demo mode ---------- */
+body.demo #adminBtn,body.demo .hb-ico,body.demo #toTop{display:none}
+#demobar{position:fixed;left:0;right:0;bottom:0;z-index:75;display:none;
+  align-items:center;gap:16px;padding:12px 28px;background:var(--navy);color:#fff;
+  box-shadow:0 -6px 24px rgba(11,26,42,.24)}
+body.demo #demobar{display:flex}
+#demobar .dm{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:700;color:var(--teal);flex:0 0 auto}
+#demobar .ds{font-size:13px;color:rgba(255,255,255,.86);flex:1 1 auto;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#demobar button{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.24);
+  color:#fff;border-radius:var(--r-pill);padding:7px 16px;font-size:12.5px;font-weight:560;
+  flex:0 0 auto;transition:background .2s var(--ease)}
+#demobar button:hover{background:rgba(255,255,255,.20)}
+@media(max-width:640px){#demobar{padding:10px 16px;gap:10px}#demobar .ds{display:none}}
+
 /* ---------- print ---------- */
 #sheet{display:none}
 @media print{
   @page{size:A4;margin:14mm}
   body{background:#fff}
-  header.site,footer.site,.rail,.nav,.plate,.acts,main,#drawer,#inquiry,#toasts,.skip,#adminBtn,#toTop{display:none!important}
+  header.site,footer.site,.rail,.nav,.plate,.acts,main,#drawer,#inquiry,#toasts,.skip,#adminBtn,#toTop,
+  #status,#demobar{display:none!important}
   #compare.open{display:block!important;position:static;background:#fff}
   #compare.open .ahead{background:#fff;color:#000;position:static;box-shadow:none}
   #compare.open .ahead .btn{display:none}
@@ -1059,6 +1184,7 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
 
 <a href="#rail" class="skip">Skip to configurator</a>
 <div id="toasts" aria-live="polite" aria-atomic="false"></div>
+<div id="status" role="status" aria-live="polite"><i aria-hidden="true"></i><span></span></div>
 
 <header class="site">
   <div class="bar"></div>
@@ -1071,9 +1197,16 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
         <div class="s">Laser &amp; Photonics Vertical · 2026 Portfolio</div>
       </div>
     </div>
+    <nav class="hnav" id="hnav" aria-label="Sections"></nav>
     <div class="hact">
       <button class="hb hb-adv" id="openAdvisor" aria-haspopup="dialog"></button>
-      <button class="hb" id="openSaved" aria-haspopup="dialog"></button>
+      <button class="hb hb-ico" id="openSaved" aria-haspopup="dialog"
+              aria-label="Saved and history" title="Saved &amp; history"></button>
+      <button class="hb hb-ico" id="hCmp" aria-haspopup="dialog"
+              aria-label="Compare configurations" title="Compare configurations"></button>
+      <button class="hb hb-ico" id="hVal" aria-haspopup="dialog"
+              aria-label="Value store" title="Value store"></button>
+      <button class="hb hb-cta" id="hInq" aria-haspopup="dialog"></button>
       <div class="hmeta"><b>Product Catalogue 2026</b><br>Bengaluru · India</div>
     </div>
   </div>
@@ -1086,7 +1219,13 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
     <section class="stage">
       <div class="shead">
         <button class="topback" id="topback"></button>
-        <p class="eyebrow" id="eyebrow"></p>
+        <div class="sheadtop">
+          <p class="eyebrow" id="eyebrow"></p>
+          <div class="vmode" id="vmode" role="group" aria-label="Level of technical detail">
+            <button id="vmStd" aria-pressed="true">Standard</button>
+            <button id="vmEng" aria-pressed="false">Engineering</button>
+          </div>
+        </div>
         <h2 id="stitle">—</h2>
         <p id="sdesc">—</p>
       </div>
@@ -1147,6 +1286,14 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
         <div class="bs" id="bs"></div>
         <div class="bn" id="bn">Select a platform to generate a budgetary band.</div>
       </div>
+      <div class="fitblk" id="fitblk" style="display:none">
+        <div class="fithd">
+          <span class="fitl">Indicative Configuration Fit</span>
+          <span class="fitsc" id="fitsc">—</span>
+        </div>
+        <div id="fitrows"></div>
+        <div class="fitfoot" id="fitfoot"></div>
+      </div>
     </aside>
   </div>
 </div>
@@ -1186,6 +1333,13 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
 </div></footer>
 
 <button id="toTop" aria-label="Back to top"></button>
+
+<div id="demobar" role="region" aria-label="Customer demonstration">
+  <span class="dm">Demo Mode</span>
+  <span class="ds" id="demostep">Ready</span>
+  <button id="demoRun">Start demo</button>
+  <button id="demoEnd">Exit</button>
+</div>
 
 <!-- advisor -->
 <div id="advisor" role="dialog" aria-modal="true" aria-label="Requirement advisor">
@@ -2077,11 +2231,13 @@ function exportData(){
 }
 function loadData(cb){
   if(location.protocol==='file:'){ cb(); return; }         // fetch is blocked on file://
-  var done=false, t=setTimeout(function(){ if(!done){done=true;cb();} }, 3500);
+  busy('Loading value store…');
+  function fin(){ busyDone(); cb(); }
+  var done=false, t=setTimeout(function(){ if(!done){done=true;fin();} }, 3500);
   fetch('data.json',{cache:'no-store'})
     .then(function(r){ return r.ok? r.json() : null; })
-    .then(function(d){ if(!done){ done=true; clearTimeout(t); if(d) applyData(d,'data.json'); cb(); } })
-    .catch(function(){ if(!done){ done=true; clearTimeout(t); cb(); } });
+    .then(function(d){ if(!done){ done=true; clearTimeout(t); if(d) applyData(d,'data.json'); fin(); } })
+    .catch(function(){ if(!done){ done=true; clearTimeout(t); fin(); } });
 }
 
 /* ---- state ------------------------------------------------------------ */
@@ -2773,6 +2929,8 @@ function render(){
   if(s.k==='src')  uiSrc(b);
   if(s.k==='mod')  uiMod(b);
   if(s.k==='spec'){ uiSpec(b); try{ pushHist(); }catch(e){} }
+  /* Considerations sit above the controls on the steps that can raise them. */
+  if(s.k==='src'||s.k==='mod'||s.k==='spec'){ try{ consMount(b); }catch(e){} }
   $('#back').disabled = cur===0;
   var tb=$('#topback');
   if(cur===0){ tb.style.display='none'; }
@@ -2784,6 +2942,7 @@ function render(){
   $('#next').innerHTML = cur===STEPS.length-1 ? ico('print')+'Print specification' : 'Continue'+ico('right');
   $('#next').disabled = !ok();
   rail(); sync();
+  try{ fitSync(); navSync(); }catch(e){}
 }
 
 function uiFam(b){
@@ -2919,8 +3078,12 @@ function uiSrc(b){
   var o=optics(), ph=physics();
   if(o&&ph){
     var g=el('div','phys');
-    function pc(lab,val,note){
-      return '<div class="pcell"><span class="pl">'+lab+'</span><span class="pv">'+val+'</span>'+
+    /* adv marks a cell as engineering detail: the pulse train, the energy
+       densities and the thermal scale. Standard view keeps what a non-specialist
+       reads — spot, focus, field, coupling — and the toggle reveals the rest. */
+    function pc(lab,val,note,adv){
+      return '<div class="pcell'+(adv?' adv-only':'')+'"><span class="pl">'+lab+'</span>'+
+             '<span class="pv">'+val+'</span>'+
              (note?'<span class="pn">'+note+'</span>':'')+'</div>';
     }
     var html='<div class="phh"><span class="pt">Computed process data</span>'+
@@ -2929,23 +3092,23 @@ function uiSrc(b){
     html+=pc('Depth of focus', '± '+(o.dof/1000).toFixed(2)+' mm', 'Rayleigh ± '+num(ph.rayleigh_mm)+' mm');
     html+=pc('Scan field', o.fld+' × '+o.fld+' mm', LENS[S.lens].n+', f = '+LENS[S.lens].f+' mm');
     if(ph.mode==='pulsed'){
-      html+=pc('Pulse energy', num(ph.Ep_mJ)+' mJ', 'at '+num(ph.frep_khz)+' kHz ('+ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz usable)');
-      html+=pc('Peak power', num(ph.Ppk_kW)+' kW', 'τ = '+(ph.tau_ns<1? (ph.tau_ns*1000).toFixed(0)+' ps' : ph.tau_ns+' ns'));
-      if(ph.showFluence) html+=pc('Fluence', num(ph.fluence)+' J/cm²', 'energy per pulse over the focused spot');
-      html+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d);
-      if(ph.heat_Jmm) html+=pc('Heat input', num(ph.heat_Jmm)+' J/mm', 'at an indicative 50 mm/s travel');
+      html+=pc('Pulse energy', num(ph.Ep_mJ)+' mJ', 'at '+num(ph.frep_khz)+' kHz ('+ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz usable)', 1);
+      html+=pc('Peak power', num(ph.Ppk_kW)+' kW', 'τ = '+(ph.tau_ns<1? (ph.tau_ns*1000).toFixed(0)+' ps' : ph.tau_ns+' ns'), 1);
+      if(ph.showFluence) html+=pc('Fluence', num(ph.fluence)+' J/cm²', 'energy per pulse over the focused spot', 1);
+      html+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d, 1);
+      if(ph.heat_Jmm) html+=pc('Heat input', num(ph.heat_Jmm)+' J/mm', 'at an indicative 50 mm/s travel', 1);
     } else {
-      html+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d);
-      if(ph.heat_Jmm) html+=pc('Heat input', num(ph.heat_Jmm)+' J/mm', 'at an indicative 50 mm/s travel');
+      html+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d, 1);
+      if(ph.heat_Jmm) html+=pc('Heat input', num(ph.heat_Jmm)+' J/mm', 'at an indicative 50 mm/s travel', 1);
     }
     if(ph.mat){
       html+=pc('Absorptivity', (ph.mat.abs*100).toFixed(0)+' %',
         ph.mat.m.n+' at '+SRC[S.src].wl+', cold and clean');
       html+=pc('Coupled power', num(ph.mat.coupled)+' W', 'of '+S.pw+' W incident');
       html+=pc('Thermal conductivity', ph.mat.m.k+' W/m·K',
-        ph.mat.m.org? 'Organic — decomposes near '+ph.mat.m.tm+' °C' : 'Melts at '+ph.mat.m.tm+' °C');
+        ph.mat.m.org? 'Organic — decomposes near '+ph.mat.m.tm+' °C' : 'Melts at '+ph.mat.m.tm+' °C', 1);
       if(ph.mat.diff_um!=null)
-        html+=pc('Heat diffusion / pulse', num(ph.mat.diff_um)+' µm', '√(4ατ) — the heat-affected scale');
+        html+=pc('Heat diffusion / pulse', num(ph.mat.diff_um)+' µm', '√(4ατ) — the heat-affected scale', 1);
     }
     html+='</div>';
     g.innerHTML=html;
@@ -3147,6 +3310,7 @@ function uiSpec(b){
     '<button class="btn" id="cp">'+ico('copy')+'Copy designation</button>'+
     '<button class="btn" id="lk">'+ico('link')+'Copy shareable link</button>'+
     '<button class="btn" id="dfm">'+ico('doc')+'DFM report (PDF)</button>'+
+    '<button class="btn" id="ss">'+ico('wave')+'Simulation summary</button>'+
     '<button class="btn" id="rq">'+ico('mail')+'Copy RFQ summary</button>'+
     '<button class="btn" id="rs">'+ico('reset')+'Start over</button>';
   b.appendChild(acts);
@@ -3170,6 +3334,7 @@ function uiSpec(b){
     bindCopy('#lk', location.origin+location.pathname+'#'+encodeState(), ico('link')+'Copy shareable link');
     bindCopy('#rq', rfq(p,a,o,lo,hi,mk,ex,sd), ico('mail')+'Copy RFQ summary');
     $('#dfm').onclick=dfmDownload;
+    $('#ss').onclick=simSummary;
   $('#rs').onclick=function(){
       S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
       famSel=null; reach=0; PQ=''; SEARCH_ALL=false; IFILT=null; location.hash=''; go(0);
@@ -5380,7 +5545,10 @@ $('#aimp').onclick=function(){ $('#afile').click(); };
 $('#afile').onchange=function(){
   var f=this.files&&this.files[0]; if(!f) return;
   var r=new FileReader();
+  busy('Reading '+f.name+'…');
+  r.onerror=function(){ busyDone(); toast('Could not read that file.','warn'); };
   r.onload=function(){
+    busyDone();
     try{
       var d=JSON.parse(r.result);
       applyData(d, f.name);
@@ -5400,7 +5568,12 @@ $('#acsv').onchange=function(){
   if(!CSVTARGET) CSVTARGET=TABCSV[ATAB]||null;
   if(!CSVTARGET){ toast('Open the tab you want to import into first.','warn'); this.value=''; return; }
   var r=new FileReader();
-  r.onload=function(){ try{ csvImport(CSVTARGET, r.result); }catch(e){ toast('Could not read that CSV.','warn'); } };
+  busy('Importing '+CSVTARGET+' values…');
+  r.onerror=function(){ busyDone(); toast('Could not read that CSV.','warn'); };
+  r.onload=function(){
+    busyDone();
+    try{ csvImport(CSVTARGET, r.result); }catch(e){ toast('Could not read that CSV.','warn'); }
+  };
   r.readAsText(f); this.value='';
 };
 $('#arst').onclick=function(){
@@ -8107,6 +8280,9 @@ function simStart(){
   if(!simReady()) return;
   SIM.on=true; SIM.t=0; SIM.ph=0; SIM.cyc=0; SIM.ng=0; SIM.grade=''; SIM.sparks=[];
   SIM.fault=null; SIM.faultT=0; SIM.stops=0; SIM.runT=0; SIM.stopT=0;
+  /* Stamp the run with the machine it ran for, so a result is never carried
+     over onto a configuration that was changed after the fact. */
+  SIM.forDesig=desig(); SIM._fitAt=-1;
   SIM.fx=procFX(); SIM.rate=SIM.rate||1;
   var segs=markPath(), w=(S.lens? LENS[S.lens].fld/100 : 1.75);
   SIM.moves=buildMoves(segs, w*0.92);
@@ -8125,6 +8301,10 @@ function simStop(){
   SIM.on=false; SIM.sparks=[]; SIM.msg=''; SIM.fault=null;
   M3D.vp && (M3D.vp.dirty=true);
   m3dSync(); simHud();
+  /* simHud clears the telemetry and returns early once the run is off, so the
+     throughput dimension is refreshed here — the last completed cycle stays
+     the basis for the fit until the configuration changes. */
+  try{ fitSync(); }catch(e){}
 }
 function simPhaseAt(t){
   var acc=0, i;
@@ -8996,6 +9176,7 @@ function simHud(){
   var bd=$('#simbreak');
   if(bd) bd.innerHTML='<i style="width:'+pcProc+'%" title="Beam on '+pcProc+'%"></i>'+
                       '<i class="h" style="width:'+(100-pcProc)+'%" title="Handling '+(100-pcProc)+'%"></i>';
+  var pr=procResult(yld, util, SIM.stops, done);
   ss.innerHTML=
     '<div>Cycle<b>'+cyc.toFixed(1)+' s</b></div>'+
     '<div>Process<b>'+SIM.procS.toFixed(2)+' s</b></div>'+
@@ -9005,7 +9186,11 @@ function simHud(){
     '<div>Yield<b class="'+(yld>=99?'ok':yld>=95?'':'warn')+'">'+yld.toFixed(1)+' %</b></div>'+
     '<div>Stops<b class="'+(SIM.stops?'warn':'ok')+'">'+(SIM.stops||0)+'</b></div>'+
     '<div>Beam on<b>'+pcProc+' %</b></div>'+
-    '<div>Utilisation<b class="'+(util>=98?'ok':util>=90?'':'warn')+'">'+util.toFixed(1)+' %</b></div>';
+    '<div>Utilisation<b class="'+(util>=98?'ok':util>=90?'':'warn')+'">'+util.toFixed(1)+' %</b></div>'+
+    '<div>Result<b class="'+pr.c+'">'+pr.l+'</b></div>';
+  /* The fit panel carries the throughput dimension, so refresh it when a cycle
+     completes rather than on every frame. */
+  if(SIM.cyc!==SIM._fitAt){ SIM._fitAt=SIM.cyc; try{ fitSync(); }catch(e){} }
   var msg=$('#simmsg'), k=SIM.phases[SIM.ph].k;
   if(SIM.fault){ msg.textContent=SIM.msg; msg.style.color='#FF9E8C'; return; }
   msg.style.color='';
@@ -9934,6 +10119,9 @@ function dfmPDF(){
 }
 function dfmDownload(){
   if(!P()||!A()||!optics()){ toast('Complete the configuration first.','warn'); return; }
+  withBusy('Generating DFM report…', _dfmDownload);
+}
+function _dfmDownload(){
   try{
     var blob=dfmPDF();
     if(!blob){ toast('Could not generate the report.','warn'); return; }
@@ -9946,11 +10134,496 @@ function dfmDownload(){
   }catch(e){ toast('Could not generate the report.','warn'); }
 }
 
+/* ==========================================================================
+   v9.0 — PLATFORM LAYER
+   Global navigation, level-of-detail modes, indicative configuration fit,
+   engineering considerations, contextual status and customer demo mode.
+
+   Nothing here introduces a specification. Every value is derived from rules
+   that already exist in the value store: the application's recommended source
+   and power, the platform's declared source list, power classes and default
+   objective, module fitment, the conflict table, and the computed optics and
+   process regime. Where a dimension cannot be derived from those, it reports
+   that rather than estimating.
+   ========================================================================== */
+
+/* ---- contextual status -------------------------------------------------- */
+/* A named status beats a spinner: it says which work is in flight. Only used
+   where work is genuinely slow — a fetch, a PDF build, a scene rebuild — never
+   as decoration on a synchronous update. */
+var _busyT=null;
+function busy(msg){
+  var s=$('#status'); if(!s) return;
+  s.querySelector('span').textContent=msg;
+  s.classList.add('on');
+  clearTimeout(_busyT);
+  _busyT=setTimeout(busyDone, 6000);   // a dropped callback must not pin it open
+}
+function busyDone(){
+  var s=$('#status'); if(!s) return;
+  clearTimeout(_busyT); s.classList.remove('on');
+}
+/* Paint the status, then do the blocking work on the next frame. */
+function withBusy(msg, fn){
+  busy(msg);
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      try{ fn(); } finally { busyDone(); }
+    });
+  });
+}
+
+/* ---- level of technical detail ----------------------------------------- */
+/* Progressive disclosure, not a second interface: the same screens, with the
+   advanced optical and pulse rows revealed. */
+var ENG=false, BOOTED=false;
+function applyEng(on){
+  ENG=!!on;
+  document.body.classList.toggle('eng', ENG);
+  var a=$('#vmStd'), b=$('#vmEng');
+  if(a) a.setAttribute('aria-pressed', ENG?'false':'true');
+  if(b) b.setAttribute('aria-pressed', ENG?'true':'false');
+}
+function setEng(on){
+  applyEng(on);
+  try{ Store.set('teal.eng', ENG); }catch(e){}
+  if(BOOTED) render();
+}
+
+/* ---- process result ----------------------------------------------------- */
+/* Classifies a cycle that has actually been run, from the model's own yield,
+   utilisation and stop count. Until the first part completes there is nothing
+   to classify, so it says so. */
+function procResult(yld, util, stops, done){
+  if(!done) return {l:'Requires validation', c:''};
+  if(yld<90)                       return {l:'Outside target', c:'warn'};
+  if(stops>0 || yld<95)            return {l:'Attention',      c:'warn'};
+  if(yld>=99 && util>=98)          return {l:'Optimal',        c:'ok'};
+  return {l:'Within target', c:'ok'};
+}
+
+/* ---- indicative configuration fit -------------------------------------- */
+var FITST={
+  opt:{l:'Optimal',             c:'opt', w:100},
+  tgt:{l:'Within target',       c:'tgt', w:88},
+  att:{l:'Attention',           c:'att', w:62},
+  out:{l:'Outside target',      c:'out', w:30},
+  val:{l:'Requires validation', c:'val', w:70},
+  na :{l:'Not available',       c:'na',  w:null}
+};
+var FITORD=['opt','tgt','val','att','out'];       // ascending severity
+function fitD(l,st,note){ return {l:l, st:st, note:note}; }
+
+function cfgFit(){
+  var p=P(); if(!p) return null;
+  var a=A(), o=optics(), ph=null, d=[];
+  try{ ph=physics(); }catch(e){ ph=null; }
+
+  /* Application — against the recommendation the application itself carries */
+  if(a && S.src){
+    var rec=(SRC[a.src]&&SRC[a.src].n)||a.src;
+    if(a.src===S.src && (a.pw==null || S.pw===a.pw))
+      d.push(fitD('Application fit','opt','Source and power match the recommendation for '+a.n+'.'));
+    else if(a.src===S.src)
+      d.push(fitD('Application fit','tgt',S.pw+' W selected where '+a.n+' recommends '+a.pw+' W.'));
+    else
+      d.push(fitD('Application fit','att',SRC[S.src].n+' selected where '+a.n+' recommends '+
+        rec+'. Indicative trend — confirm by process trial.'));
+  } else d.push(fitD('Application fit','na','Select an application and a source.'));
+
+  /* Optical — objective against the platform default, with the computed optics */
+  if(o){
+    var on='Spot '+o.spot.toFixed(0)+' µm · field '+o.fld+' × '+o.fld+' mm · depth of focus '+
+           (o.dof/1000).toFixed(2)+' mm.';
+    if(!p.dlens || p.dlens===S.lens) d.push(fitD('Optical fit','opt',on));
+    else d.push(fitD('Optical fit','tgt','Objective changed from the platform default '+
+        ((LENS[p.dlens]&&LENS[p.dlens].n)||p.dlens)+'. '+on));
+  } else d.push(fitD('Optical fit','na','Select a source and objective.'));
+
+  /* Parameter — against the option lists the catalogue declares */
+  if(S.src && S.pw!=null){
+    var pws=powersFor(p,S.src), bad=[];
+    if((p.src||[]).indexOf(S.src)<0) bad.push('source not listed for this platform');
+    if(pws.length && pws.indexOf(S.pw)<0) bad.push(S.pw+' W outside the declared power classes');
+    if(bad.length) d.push(fitD('Parameter fit','out',bad.join('; ')+'.'));
+    else if(ph && ph.regime) d.push(fitD('Parameter fit','opt',
+      'Within the declared option set. Regime: '+ph.regime.n+'.'));
+    else d.push(fitD('Parameter fit','tgt','Within the declared option set.'));
+  } else d.push(fitD('Parameter fit','na','Select a source and power.'));
+
+  /* Automation — fitment rules and the conflict table */
+  var sel=[], k;
+  for(k in (S.mods||{})) if(S.mods[k]) sel.push(k);
+  var unfit=sel.filter(function(m){ return !modFits(p,m); });
+  var cf=modConflicts(S.mods||{});
+  if(cf.length) d.push(fitD('Automation fit','out',cf.length+' conflicting module pair'+
+    (cf.length>1?'s':'')+' selected — see the engineering considerations.'));
+  else if(unfit.length) d.push(fitD('Automation fit','out',
+    unfit.map(modName).join(', ')+' not fitted to this platform.'));
+  else if(sel.length) d.push(fitD('Automation fit','opt',sel.length+' module'+
+    (sel.length>1?'s':'')+' selected, all within this platform’s fitment.'));
+  else d.push(fitD('Automation fit','tgt','Platform standard content only.'));
+
+  /* Throughput — derived from a cycle that has actually been run, never guessed,
+     and only while the run still belongs to this configuration */
+  if(typeof SIM!=='undefined' && SIM && SIM.cyc>0 && SIM.forDesig===desig()){
+    var rate=Math.round(3600/SIM.cycle), yld=(SIM.cyc-SIM.ng)/SIM.cyc*100;
+    d.push(fitD('Throughput fit', SIM.stops? 'att' : (yld>=99?'opt':'tgt'),
+      'Simulated '+inr(rate)+' parts/h at '+SIM.cycle.toFixed(1)+' s cycle, '+
+      yld.toFixed(1)+' % yield'+(SIM.stops? ', '+SIM.stops+' stop'+(SIM.stops>1?'s':''):'')+'.'));
+  } else {
+    d.push(fitD('Throughput fit','na','Not available from the current model — run the machine cycle.'));
+  }
+
+  var got=d.filter(function(x){ return FITST[x.st].w!=null; });
+  var score=got.length? Math.round(got.reduce(function(s,x){ return s+FITST[x.st].w; },0)/got.length) : null;
+  var worst='opt';
+  d.forEach(function(x){
+    if(x.st==='na') return;
+    if(FITORD.indexOf(x.st)>FITORD.indexOf(worst)) worst=x.st;
+  });
+  return {score:score, dims:d, worst:worst, got:got.length, total:d.length};
+}
+
+function fitSync(){
+  var blk=$('#fitblk'); if(!blk) return;
+  var f=cfgFit();
+  if(!f){ blk.style.display='none'; return; }
+  blk.style.display='block';
+  var sc=$('#fitsc');
+  sc.className='fitsc st-'+FITST[f.worst].c;
+  sc.innerHTML = f.score==null? '<small>Not available</small>' : f.score+'<small> / 100</small>';
+  var h='';
+  f.dims.forEach(function(x){
+    var s=FITST[x.st];
+    h+='<div class="fitrow">'+
+         '<span class="fk">'+esc(x.l)+'</span>'+
+         '<span class="fs st-'+s.c+'">'+esc(s.l)+'</span>'+
+         '<span class="fitbar"><i class="bg-'+s.c+'" style="width:'+(s.w==null?100:s.w)+'%"></i></span>'+
+         '<span class="fn">'+esc(x.note)+'</span>'+
+       '</div>';
+  });
+  $('#fitrows').innerHTML=h;
+  $('#fitfoot').textContent='Indicative configuration fit — derived from the catalogue option lists, '+
+    'module fitment and the computed optics. '+f.got+' of '+f.total+' dimensions derived. '+
+    'Not a certification, a guarantee or an acceptance specification.';
+}
+
+/* ---- engineering considerations ---------------------------------------- */
+/* A conflict is not "invalid" — it is a decision with a consequence. Each one
+   states what changed, why it matters and what can be adjusted. */
+function considerations(){
+  var p=P(); if(!p) return [];
+  var out=[], a=A(), i, k;
+
+  var cf=modConflicts(S.mods||{});
+  for(i=0;i<cf.length;i++){
+    out.push({sev:'out',
+      n:modName(cf[i][0])+' with '+modName(cf[i][1]),
+      changed:'Both modules are selected on the same station.',
+      why:cf[i][2],
+      adjust:'Remove one of the two, or split the operations across two stations.'});
+  }
+  for(k in (S.mods||{})){
+    if(!S.mods[k] || modFits(p,k)) continue;
+    out.push({sev:'out',
+      n:modName(k)+' on '+p.n,
+      changed:modName(k)+' is selected on a platform its fitment rules exclude.',
+      why:'Fitment in the value store restricts this module by family, beam delivery, '+
+          'platform or material, and this platform falls outside that set.',
+      adjust:'Deselect the module, or move to a platform whose fitment allows it.'});
+  }
+  if(S.src && (p.src||[]).indexOf(S.src)<0){
+    out.push({sev:'out',
+      n:SRC[S.src].n+' is not listed for '+p.n,
+      changed:'A source outside the platform’s declared list is selected.',
+      why:'The catalogue lists '+(p.src||[]).map(function(s){ return SRC[s]?SRC[s].n:s; }).join(' and ')+
+          ' for this platform. Anything else is a special.',
+      adjust:'Return to a listed source, or carry this forward as a special to engineering.'});
+  }
+  var pws=powersFor(p,S.src);
+  if(S.pw!=null && pws.length && pws.indexOf(S.pw)<0){
+    out.push({sev:'out',
+      n:S.pw+' W is outside the declared power classes',
+      changed:'A power outside the platform’s class list is set.',
+      why:'This platform declares '+pws.join(' / ')+' W for the selected source. '+
+          'Enclosure, chiller and beam delivery are sized around those classes.',
+      adjust:'Select a declared power class, or request a re-rated build.'});
+  }
+  if(a && S.src && a.src!==S.src){
+    out.push({sev:'att',
+      n:'Source overridden for '+a.n,
+      changed:SRC[S.src].n+' selected where the application recommends '+
+              ((SRC[a.src]&&SRC[a.src].n)||a.src)+'.',
+      why:a.w || 'The recommendation reflects the wavelength and pulse behaviour that '+
+                 'couples best into this material.',
+      adjust:'Restore the recommended source, or confirm the override by trial at the '+
+             'Application Laboratory.'});
+  }
+  return out;
+}
+
+function consMount(b){
+  var c=considerations();
+  if(!c.length) return;
+  var crit=c.some(function(x){ return x.sev==='out'; });
+  var w=el('div','econs'+(crit?' crit':''));
+  var h='<div class="eh">'+ico('alert')+'<span class="et">Engineering consideration'+
+        (c.length>1?'s ('+c.length+')':'')+'</span></div>';
+  c.forEach(function(x){
+    h+='<div class="ei"><div class="en">'+esc(x.n)+'</div><dl>'+
+       '<dt>Changed</dt><dd>'+esc(x.changed)+'</dd>'+
+       '<dt>Why</dt><dd>'+esc(x.why)+'</dd>'+
+       '<dt>Adjust</dt><dd>'+esc(x.adjust)+'</dd></dl></div>';
+  });
+  h+='<div class="eact">'+
+       '<button class="btn" id="ecRev">Review configuration</button>'+
+       '<button class="btn" id="ecPar">Change parameter</button>'+
+       '<button class="btn pri" id="ecEng">Continue to engineering review</button>'+
+     '</div>';
+  w.innerHTML=h;
+  b.insertBefore(w, b.firstChild);
+  setTimeout(function(){
+    var r=$('#ecRev'), q=$('#ecPar'), g=$('#ecEng');
+    if(r) r.onclick=function(){ go(STEPS.length-1); };
+    if(q) q.onclick=function(){ go(3); };
+    if(g) g.onclick=openInquiry;
+  },0);
+}
+
+/* ---- simulation summary ------------------------------------------------- */
+/* Reports only what the model produced. Anything not run is reported as not
+   run — the summary never implies a validated result. */
+function simSummaryText(){
+  var p=P(), a=A(), o=optics(), ph=null, L=[], f=cfgFit();
+  try{ ph=physics(); }catch(e){ ph=null; }
+  function h(t){ L.push('', t, new Array(t.length+1).join('=')); }
+  function kv(k,v){ L.push('  '+(k+'                        ').slice(0,24)+': '+v); }
+
+  L.push('TEAL LASER EQUIPMENT CONFIGURATOR — SIMULATION SUMMARY');
+  L.push('Generated '+new Date().toISOString().slice(0,19).replace('T',' ')+' · indicative, not a quotation');
+
+  h('CONFIGURATION');
+  kv('Model designation', desig());
+  kv('Family', FAM[p.fam].n);
+  kv('Platform', p.n+' ('+p.code+')');
+  kv('Application', a? a.n : 'not selected');
+  kv('Material', (a&&MAT[a.mat])? MAT[a.mat].n : 'not selected');
+  kv('Source', S.src? SRC[S.src].n+' · '+SRC[S.src].wl : 'not selected');
+  kv('Power', S.pw!=null? S.pw+' W' : 'not selected');
+  kv('Objective', S.lens? LENS[S.lens].n : 'not selected');
+  kv('Software', SW[S.sw].n);
+
+  h('OPTICS — COMPUTED');
+  if(o){
+    kv('Spot diameter', o.spot.toFixed(1)+' µm');
+    kv('Depth of focus', (o.dof/1000).toFixed(3)+' mm');
+    kv('Addressable field', o.fld);
+    kv('Focal length', o.f+' mm');
+  } else L.push('  Not available — source and objective not selected.');
+
+  h('PROCESS PARAMETERS');
+  if(ph){
+    kv('Process regime', ph.regime.n);
+    if(ph.Ep_mJ!=null)  kv('Pulse energy', ph.Ep_mJ.toFixed(3)+' mJ');
+    if(ph.Ppk_kW!=null) kv('Peak power', ph.Ppk_kW.toFixed(2)+' kW');
+    if(ph.frep_khz!=null) kv('Repetition rate', ph.frep_khz+' kHz');
+    if(ph.tau_ns!=null) kv('Pulse width', ph.tau_ns+' ns');
+    if(ph.irr!=null)    kv(ph.irrLabel, sci(ph.irr)+' W/cm²');
+    if(ph.fluence!=null && ph.showFluence) kv('Fluence', ph.fluence.toFixed(2)+' J/cm²');
+    if(ph.abs!=null)    kv('Absorptivity', (ph.abs*100).toFixed(1)+' % (clean, room temperature)');
+  } else L.push('  Not available — complete the source and objective selection.');
+
+  h('SIMULATION RESULT');
+  if(typeof SIM!=='undefined' && SIM && SIM.cyc>0 && SIM.forDesig===desig()){
+    kv('Status', 'Cycle run in the process model');
+    kv('Cycle time', SIM.cycle.toFixed(2)+' s');
+    kv('Process time', SIM.procS.toFixed(2)+' s');
+    kv('Handling time', Math.max(0,SIM.cycle-SIM.procS).toFixed(2)+' s');
+    kv('Indicative rate', inr(Math.round(3600/SIM.cycle))+' parts/h');
+    kv('Parts completed', SIM.cyc);
+    kv('Yield', ((SIM.cyc-SIM.ng)/SIM.cyc*100).toFixed(1)+' %');
+    kv('Stops', SIM.stops||0);
+  } else {
+    kv('Status', 'NOT RUN — no cycle has been simulated for this configuration');
+  }
+
+  h('INDICATIVE CONFIGURATION FIT');
+  if(f){
+    kv('Score', (f.score==null? 'not available' : f.score+' / 100')+
+       '  ('+f.got+' of '+f.total+' dimensions derived)');
+    f.dims.forEach(function(x){ kv(x.l, FITST[x.st].l.toUpperCase()+' — '+x.note); });
+  } else L.push('  Not available — no platform selected.');
+
+  var c=considerations();
+  h('ENGINEERING CONSIDERATIONS');
+  if(!c.length) L.push('  None raised by the current rule set.');
+  else c.forEach(function(x){
+    L.push('  · '+x.n);
+    L.push('      Changed : '+x.changed);
+    L.push('      Why     : '+x.why);
+    L.push('      Adjust  : '+x.adjust);
+  });
+
+  h('SIMULATION ASSUMPTIONS AND LIMITATIONS');
+  L.push('  · The process model is a deterministic optics and energy-balance model.');
+  L.push('    Spot and depth of focus are diffraction-limited estimates, not measured values.');
+  L.push('  · Material constants are handbook values for a clean, flat, room-temperature');
+  L.push('    surface. Oxide, roughness and melt all raise absorptivity substantially.');
+  L.push('  · Cycle and rate figures come from the motion and phase model in this tool.');
+  L.push('    They are indicative, and exclude line-level starvation and blocking.');
+  L.push('  · Ablation thresholds, removal rates and eyewear optical density are');
+  L.push('    deliberately absent — see Data provenance.');
+
+  h('VALIDATION REQUIREMENTS');
+  L.push('  · Process trial on representative parts at the TEAL Application Laboratory.');
+  L.push('  · Cycle time confirmed against the agreed handling format and part presentation.');
+  L.push('  · Laser safety assessment under IEC 60825-1 by a Laser Safety Officer.');
+  L.push('  · Commercial quotation required — budgetary figures are not a quotation.');
+  L.push('');
+  L.push('Nothing in this summary is a process guarantee, a conformity statement or a');
+  L.push('validated result. Naming a standard is not a claim of conformity.');
+  return L.join('\n');
+}
+
+function simSummary(){
+  if(!P()){ toast('Select a platform first.','warn'); return; }
+  withBusy('Generating summary…', function(){
+    try{
+      download('TEAL-simulation-summary-'+desig().replace(/[^A-Za-z0-9-]/g,'')+'.txt',
+               simSummaryText());
+      toast('Simulation summary downloaded.');
+    }catch(e){ toast('Could not generate the summary.','warn'); }
+  });
+}
+
+/* ---- global navigation -------------------------------------------------- */
+/* Four destinations, each one an existing part of the product. */
+var HNAV=[
+  {k:'cfg',  l:'Configurator'},
+  {k:'port', l:'Portfolio'},
+  {k:'app',  l:'Applications'},
+  {k:'eng',  l:'Engineering'}
+];
+function navGo(k){
+  if(k==='port'){ go(0); return; }
+  if(k==='app'){
+    if(!S.plat){ toast('Select a platform first — applications are per platform.','warn'); go(1); return; }
+    go(2); return;
+  }
+  if(k==='eng'){
+    if(!ENG) setEng(true);
+    if(stepReady(STEPS.length-1) && ok()) go(STEPS.length-1);
+    else { go(cur); toast('Engineering view on. Complete the configuration for the review step.'); }
+    return;
+  }
+  var r=$('#rail'); if(r) r.scrollIntoView({block:'start'});
+}
+function navSync(){
+  var n=$('#hnav'); if(!n) return;
+  var k=STEPS[cur].k;
+  var act = cur===0? 'port' : k==='app'? 'app' : k==='spec'? 'eng' : 'cfg';
+  if(!n.firstChild){
+    n.innerHTML=HNAV.map(function(x){
+      return '<button data-nav="'+x.k+'">'+x.l+'</button>';
+    }).join('');
+    n.onclick=function(e){
+      var t=e.target.closest('[data-nav]'); if(t) navGo(t.getAttribute('data-nav'));
+    };
+  }
+  Array.prototype.forEach.call(n.children, function(b){
+    if(b.getAttribute('data-nav')===act) b.setAttribute('aria-current','page');
+    else b.removeAttribute('aria-current');
+  });
+}
+
+/* ---- customer demo mode ------------------------------------------------- */
+/* Runs the configuration the README documents as the worked example, then the
+   machine cycle. No new data: every key below exists in the value store. */
+var DEMO={on:false, t:null, seq:0};
+var DEMOCFG={fam:'mark', plat:'markc2i', app:'dual', src:'co2', pw:30, lens:'f254'};
+
+function demoSay(s){ var e=$('#demostep'); if(e) e.textContent=s; }
+function demoOn(){
+  DEMO.on=true;
+  document.body.classList.add('demo');
+  demoSay('Ready — press Start demo');
+  toast('Demo mode on.');
+}
+function demoOff(){
+  DEMO.on=false;
+  clearTimeout(DEMO.t); DEMO.seq++;
+  document.body.classList.remove('demo');
+  try{ simStop(); }catch(e){}
+  toast('Demo mode off.');
+}
+function demoRun(){
+  if(!PLAT[DEMOCFG.plat]){ toast('Demo configuration unavailable in this value store.','warn'); return; }
+  var my=++DEMO.seq;
+  var steps=[
+    [0,   'Portfolio — seven TEAL laser families', function(){
+      S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
+      famSel=DEMOCFG.fam; reach=0; go(0);
+    }],
+    [1400,'Platform — '+PLAT[DEMOCFG.plat].n, function(){ S.plat=DEMOCFG.plat; reach=1; go(1); }],
+    [1600,'Application — inline PCB marking', function(){ S.app=DEMOCFG.app; reach=2; go(2); }],
+    [1600,'Source, power and objective', function(){
+      S.src=DEMOCFG.src; S.pw=DEMOCFG.pw; S.lens=DEMOCFG.lens; reach=3; go(3);
+    }],
+    [1800,'Integration — platform standard content', function(){ reach=4; go(4); }],
+    [1600,'Specification, optics and budgetary band', function(){ reach=5; go(5); }],
+    [1800,'Running the machine cycle', function(){
+      try{ if(simReady()) simStart(); }catch(e){}
+    }]
+  ];
+  var i=0, acc=0;
+  function fire(){
+    if(my!==DEMO.seq) return;                 // superseded or exited
+    var s=steps[i++];
+    demoSay(s[1]);
+    try{ s[2](); }catch(e){}
+    if(i<steps.length) DEMO.t=setTimeout(fire, steps[i][0]);
+    else demoSay('Demo complete — '+desig());
+  }
+  demoSay('Starting…');
+  DEMO.t=setTimeout(fire, 400);
+}
+
+/* ---- wiring ------------------------------------------------------------- */
+(function(){
+  var m={openSaved:['layers',''], hCmp:['grid',''], hVal:['sliders',''],
+         hInq:['mail','Submit enquiry']};
+  Object.keys(m).forEach(function(id){
+    var e=document.getElementById(id); if(!e) return;
+    e.innerHTML=ico(m[id][0]) + (m[id][1]? '<span>'+m[id][1]+'</span>' : '');
+  });
+  $('#hCmp').onclick=function(){
+    if(CMP.length<2){ toast('Add at least two saved configurations to compare.','warn'); openDrawer('saved'); return; }
+    openCompare();
+  };
+  $('#hVal').onclick=openAdmin;
+  $('#hInq').onclick=openInquiry;
+  $('#vmStd').onclick=function(){ if(ENG) setEng(false); };
+  $('#vmEng').onclick=function(){ if(!ENG) setEng(true); };
+  $('#demoRun').onclick=demoRun;
+  $('#demoEnd').onclick=demoOff;
+  try{ if(Store.get('teal.eng', false)) applyEng(true); }catch(e){}
+  /* Demo mode is a presenter tool, so it stays out of the chrome: shift+D, or
+     ?demo / #demo on the URL for a kiosk. */
+  document.addEventListener('keydown', function(e){
+    if(e.key==='D' && e.shiftKey && !/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))){
+      if(DEMO.on) demoOff(); else demoOn();
+    }
+  });
+  if(/(^|[?&#])demo(=|&|$)/.test(location.search+location.hash)) demoOn();
+})();
+
 /* ---- init -------------------------------------------------------------- */
 $('#stamp').textContent='Configurator v3.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
+  BOOTED = true;
   render();
   try{ m3dInit(); }catch(e){}
   editInit();
