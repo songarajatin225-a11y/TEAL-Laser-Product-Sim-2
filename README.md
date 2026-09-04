@@ -982,6 +982,79 @@ dimensions that could be derived. They order configurations sensibly but the
 absolute number carries no more authority than the dimension rows beneath it,
 which is why the panel shows both and calls itself indicative.
 
+## v9.1 — simulation performance
+
+The machine view adapts its resolution to keep motion smooth. That adaptation
+had never once taken effect.
+
+**The downshift was dead code.** `frame()` lowered `this.dpr` a quarter step and
+then called `resize()`, which recomputed the ratio from `window.devicePixelRatio`
+and put it straight back. The comment promised "trading resolution, not detail";
+it traded nothing. Measured directly: 2 → 1.75 → 2 across a single resize.
+`resize()` now honours a `dprCap` the panel owns, so a decision to spend less
+survives the next resize.
+
+**It was watching the wrong clock.** The heuristic averaged the time spent inside
+`paint()` and compared it against 13 ms. At a high pixel ratio the cost is not the
+script — it is rasterising the backing store, which lands after `paint()` returns.
+On a fully loaded Mark PCB C2i at device pixel ratio 2, the script measured 6.1 ms
+while frames were actually arriving every 42.6 ms. Nothing above the threshold,
+nothing to react to, 23.5 fps. Adaptation now runs on the real frame cadence and
+falls back to the script time only as a second signal.
+
+| | before | after |
+|---|---|---|
+| Heavy configuration, dpr 2 | 23.5 fps | 60 fps |
+| Chosen pixel ratio | 2 (fixed) | 1.25 (adaptive) |
+| Script time per frame | 6.1 ms | unchanged — it was never the problem |
+
+The controller settles on the sharpest ratio that still holds rate. Measured on
+the same scene: dpr 2 gives 27 fps, 1.75 gives 35, 1.5 gives 44, 1.25 gives 57.
+It picks 1.25. On hardware that sustains 60 fps at full ratio it never downshifts
+at all, because the frame time never crosses the threshold.
+
+**It no longer oscillates.** A level that has proved too expensive is remembered
+and not tried again until the panel is genuinely resized, and restoration needs
+eight consecutive good windows. Without that ratchet the panel stepped up and
+back down every few seconds, which reads worse than simply holding still. A
+warm-up window is skipped so first-paint costs do not trigger a permanent
+downshift.
+
+### Also fixed
+
+**The nameplate overlay collided with itself.** The assembly list was pinned at
+`top:54px`, which assumed the title block was always two lines. A designation
+long enough to wrap to three — Mark PCB C2i at 1,250 × 1,450 × 1,650 mm is one —
+ran the list straight through the dimensions. The two now share a flow column.
+
+### On rendering this in Blender
+
+Asked, considered, declined — with the reasoning recorded so it does not have to
+be relitigated. Blender is a desktop authoring tool and cannot run in a browser,
+so "in Blender" means one of three things, and each gives up more than it returns:
+
+- **Model in Blender, render with three.js at runtime.** Adds a library an order
+  of magnitude larger than the current engine and breaks the single-file, no-CDN
+  deployment. More seriously, it gives up the property the tool exists for: the
+  machine is *assembled from the configuration*. The frame is built from the
+  stated footprint, the chiller sized from the wall-plug efficiency of the chosen
+  source, head standoff and cone angle from the focal length, each selected module
+  placed on its own footprint. A hand-modelled asset is fixed; you would have to
+  rebuild that same procedural logic in three.js and would have gained nothing.
+- **Bake Blender geometry into the existing engine.** Keeps the single file and
+  the assembly logic, but the components it would replace are parametric — they
+  scale with power, focal length and footprint — and a baked mesh is not.
+- **Pre-render stills.** The configuration space is 22 platforms × 12 sources ×
+  5 objectives × 26 modules. Combinatorially hopeless, and it removes orbit, zoom,
+  layers and the run cycle.
+
+The brief this work follows says it plainly: prefer high-quality technical
+visualisation over fake photorealistic 3D, and use heavier technology only where
+it provides genuine value. The engine already renders perspective, back-face and
+sub-pixel culling, Blinn-Phong with key/fill/bounce lights, fresnel glazing, fog
+and painter-sorted shadows at 60 fps in a single file with no dependencies. The
+useful work is in that engine, not beside it.
+
 ---
 
 © Titan Engineering & Automation Limited — A TATA Enterprise.

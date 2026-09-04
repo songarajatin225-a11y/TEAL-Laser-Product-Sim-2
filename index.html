@@ -377,7 +377,13 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .v3dinfo .ix:hover{background:rgba(255,255,255,.16);color:#fff}
 .v3dinfo .ix svg{width:11px;height:11px}
 @media(max-width:640px){.v3dinfo{width:auto;left:10px;right:10px;max-width:none}}
-.v3dstack{position:absolute;left:12px;top:54px;display:flex;flex-direction:column;gap:2px;
+/* The assembly list used to sit at a hard top:54px, which assumed the title
+   block was always two lines. A longer designation wraps to three and the two
+   overlapped. They now share one column and flow. */
+.v3dhud{position:absolute;left:12px;top:11px;right:12px;display:flex;flex-direction:column;
+  gap:10px;pointer-events:none}
+.v3dtop{position:static;left:auto;top:auto;right:auto}
+.v3dstack{position:static;display:flex;flex-direction:column;gap:2px;
   pointer-events:none;max-width:52%}
 .v3dstack .bi{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:8.6px;
   letter-spacing:.1em;text-transform:uppercase;color:#7FA0B4;line-height:1.5;
@@ -1241,11 +1247,13 @@ body.demo #demobar{display:flex}
       <div class="view">
         <div class="v3d" id="v3d">
           <canvas id="mcanvas"></canvas>
-          <div class="v3dtop">
-            <div class="v3dname" id="v3dname"><b>No machine</b>Select a family to begin the build</div>
-            <span class="v3dstate" id="v3dstate">Standby</span>
+          <div class="v3dhud">
+            <div class="v3dtop">
+              <div class="v3dname" id="v3dname"><b>No machine</b>Select a family to begin the build</div>
+              <span class="v3dstate" id="v3dstate">Standby</span>
+            </div>
+            <div class="v3dstack" id="v3dstack"></div>
           </div>
-          <div class="v3dstack" id="v3dstack"></div>
           <div class="simmsg" id="simmsg"></div>
           <div class="v3dinfo" id="v3dinfo" role="dialog" aria-label="Component detail"></div>
           <div class="v3dstat" id="v3dstat" aria-live="polite"></div>
@@ -5937,6 +5945,11 @@ function Viewport(canvas, build, opts){
   this.spin=this.o.spin!==false; this.spinV=this.o.spinV==null?0.085:this.o.spinV;
   this.idle=0; this.live=this.o.live!==false; this.vis=true; this.dirty=true;
   this.W=1; this.H=1; this.dpr=1; this.T=0; this.t0=0; this.dt=0;
+  /* dprMax is what the display offers; dprCap is what we have decided this
+     panel can afford. resize() honours the lower of the two, so an adaptive
+     downshift survives the next resize instead of being recomputed away. */
+  this.dprMax=Math.min(window.devicePixelRatio||1, 2); this.dprCap=this.dprMax;
+  this._last=0; this._fac=0; this._good=0; this._capFail=0; this._warm=2;
   this.reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   this.quality = this.o.quality==null? 1 : this.o.quality;
   this.canBlur = (function(){ try{ var c=document.createElement('canvas').getContext('2d');
@@ -5962,8 +5975,13 @@ function Viewport(canvas, build, opts){
 Viewport.prototype.resize = function(){
   var r=this.cv.getBoundingClientRect();
   var w=Math.max(1,Math.round(r.width)), h=Math.max(1,Math.round(r.height));
-  var d=Math.min(window.devicePixelRatio||1, 2);
+  this.dprMax=Math.min(window.devicePixelRatio||1, 2);
+  var d=Math.min(this.dprMax, this.dprCap);
   if(w===this.W && h===this.H && d===this.dpr) return;
+  /* A genuine change of panel size is a new cost picture, so the record of
+     which pixel ratio was too expensive is cleared and the level can be tried
+     again. A change of dpr alone is our own doing and clears nothing. */
+  if(w!==this.W || h!==this.H){ this._capFail=0; this._warm=2; }
   this.W=w; this.H=h; this.dpr=d;
   this.cv.width=Math.round(w*d); this.cv.height=Math.round(h*d);
 };
@@ -6022,25 +6040,56 @@ Viewport.prototype.frame = function(now){
   if(!this.t0) this.t0=now;
   var t=(now-this.t0)/1000;
   this.dt=Math.min(0.05, t-this.T); this.T=t;
-  if(!this.vis || document.hidden) return;
-  if(this.o.hidden && this.o.hidden()) return;
+  /* A hidden panel resumes with an arbitrarily long gap since the last paint;
+     that is not a slow frame, so the cadence restarts rather than being judged. */
+  if(!this.vis || document.hidden){ this._last=0; return; }
+  if(this.o.hidden && this.o.hidden()){ this._last=0; return; }
   var animating=this.live && (this.o.animating? this.o.animating() : true);
   if(this.spin && !this.reduce){
     this.idle+=this.dt;
     if(this.idle>2.2 && !this.touched) this.cam.yaw += this.spinV*this.dt;
     animating=true;
   }
-  if(!animating && !this.dirty) return;
+  if(!animating && !this.dirty){ this._last=0; return; }   /* cadence broken */
   this.dirty=false;
   var t0=performance.now();
   this.paint(t);
-  /* keep the panel smooth on modest hardware by trading resolution, not detail */
-  this._acc+=performance.now()-t0; this._frames++;
-  if(this._frames>=12){
-    var ms=this._acc/this._frames; this._acc=0; this._frames=0;
-    if(ms>13 && this.dpr>1){ this.dpr=Math.max(1,this.dpr-0.25); this.W=0; this.resize(); }
-    else if(ms>11 && this.quality>0.55) this.quality=0.55;
-    else if(ms<6 && this.quality<1) this.quality=1;
+
+  /* Keep the panel smooth on modest hardware by trading resolution, not detail.
+     Adapt on the real frame cadence rather than on script time alone: at a high
+     pixel ratio the cost is rasterising the backing store, which lands after
+     paint() returns and so never appears in the paint timer. Measuring only the
+     script left the panel at 24 fps with a 6 ms paint and nothing to react to. */
+  var pms=performance.now()-t0;
+  var fms=this._last? (t0-this._last) : 0;
+  this._last=t0;
+  this._acc+=pms; this._fac+=fms; this._frames++;
+  if(this._frames>=15){
+    var ms=this._acc/this._frames, fr=this._fac/this._frames;
+    this._acc=0; this._fac=0; this._frames=0;
+    if(fr<=0) return;                       /* no continuous cadence to judge */
+    if(this._warm>0){ this._warm--; return; }  /* ignore the warm-up window */
+    if(fr>24 || ms>13){                     /* below ~42 fps, or script-bound */
+      this._good=0;
+      if(this.dprCap>1){
+        this._capFail=this.dprCap;          /* remember the level that failed */
+        this.dprCap=Math.max(1,this.dprCap-0.25); this.resize();
+      }
+      else if(this.quality>0.55) this.quality=0.55;
+    } else if(fr<19 && ms<6){               /* at rate with headroom to spare */
+      /* Restore slowly: a single fast sample straight after a downshift would
+         otherwise oscillate. A level that has already failed is not tried again
+         until the panel is genuinely resized — stepping up into a known-slow
+         level and back down every few seconds is worse than holding steady. */
+      if(++this._good>=8){
+        this._good=0;
+        var next=Math.min(this.dprMax, this.dprCap+0.25);
+        if(this.quality<1) this.quality=1;
+        else if(next>this.dprCap && !(this._capFail && next>=this._capFail)){
+          this.dprCap=next; this.resize();
+        }
+      }
+    } else this._good=0;
   }
 };
 Viewport.prototype.paint = function(T){
