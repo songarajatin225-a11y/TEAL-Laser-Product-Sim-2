@@ -1055,6 +1055,56 @@ sub-pixel culling, Blinn-Phong with key/fill/bounce lights, fresnel glazing, fog
 and painter-sorted shadows at 60 fps in a single file with no dependencies. The
 useful work is in that engine, not beside it.
 
+## v9.2 — material and surface pass
+
+Fidelity work inside the existing engine, chosen over moving the view to
+Blender and three.js for the reasons recorded above. Three changes, each
+measured on a fixed camera against the previous revision.
+
+**Metals tint their own highlight.** The material table already separated powder
+coat from brushed aluminium by specular strength and shininess. It now also
+carries metalness. A dielectric — paint, moulded plastic, powder coat — reflects
+the lamp and keeps a near-white highlight; a metal reflects it through its own
+colour, so brass and copper read warm at the edge of the light instead of looking
+like painted steel. Warm-tinted pixels across the machine rose from 1.25 % to
+1.83 %, which is the brass, copper, aluminium and stainless finally reading as
+different materials rather than different greys.
+
+**Contact darkening follows the normal.** Ambient occlusion was a single
+height-based term, so a downward-facing surface was lit as brightly as an
+upward-facing one at the same height. A downward face sees floor bounce rather
+than sky, and now shades accordingly. No ray is cast — it is a standing term on
+the normal — but parts stop reading as though they float. Mean scene luminance
+moved 73.1 → 68.9.
+
+**Polygon seams close.** Two abutting quads each anti-alias their shared edge
+independently, so the half-covered pixels do not sum to full coverage and the
+background shows through as a hairline crack. Faces that carry an edge colour
+were already stroked and never showed it; faces without one did. They now draw
+their own outline. Crack pixels — measurably darker than both horizontal
+neighbours, inside the machine body — fell from 198 to 134, a 32 % reduction,
+with no measurable change in silhouette area.
+
+### Paid for out of the frame budget, not on top of it
+
+Closing seams costs a second stroke per face: +29 % script time, 5.7 → 7.4 ms on
+the heaviest scene. That is poor value per millisecond compared with resolution,
+and the benefit shrinks as faces get smaller. Rather than gate it on scene size —
+face counts across every configuration sit in a narrow 1,300–2,000 band and would
+not separate typical from heavy — it joins the degradation ladder as the first
+thing surrendered:
+
+| Frames slipping | Action |
+|---|---|
+| 1st | drop seam closing |
+| 2nd | step the pixel ratio down |
+| 3rd | drop shading quality |
+
+Verified under sustained load: seam closing goes at 15.5 s, then the ratio steps
+2 → 1.75 → 1.5 → 1.25 → 1, settling at 59 fps. Hardware that holds 60 fps never
+enters the ladder and keeps every one of them. A genuine panel resize restores
+the full budget and re-evaluates.
+
 ---
 
 © Titan Engineering & Automation Limited — A TATA Enterprise.
