@@ -72,22 +72,35 @@ unload, with the beam tracing a real path on the part (a Data Matrix for
 marking, a seam for welding, a raster for cleaning, a contour for cutting, die
 crosses for semiconductor, tab welds for battery).
 
-The timings come out of the catalogue rather than being hard-coded. The path
-length is measured in millimetres, divided by the marking speed the platform
-specifies, and jumps are traversed at 3.2× that — so the process time is a
-consequence of the objective and the family, not a constant. Handling time comes
-from the modules actually specified, and overlapping loaders (shuttle,
-turntable, dial) subtract from it. A stated `Cycle time` in the platform
-specification wins over the computed figure. Fitting a larger objective on a
-Mark F-Series takes the marked path from 327 mm to 1,403 mm and the process time
-from 0.08 s to 0.33 s; the enclosure grows with it.
+The timings come out of the configuration rather than being hard-coded, and one
+list of real phase durations drives the telemetry, the breakdown bar and the
+phase strip, so they always agree.
+
+**Process time.** Marking is modelled at the size a code is actually made: a
+12 × 12 ECC200 Data Matrix at the module the DFM report recommends for this spot,
+plus a 9-character text line, filled with hatch lines at half the line width.
+A pulsed source can only go as fast as 50 % pulse overlap allows, so a
+Q-switched fiber at 45 kHz marks at about 715 mm/s rather than the head's
+7,000 mm/s. Each vector pays a 250 µs scanner delay. A 30 W Mark F-Series with
+the F254 marks its 3.9 mm code in 1.03 s. The drawn path still fills the part so
+it can be seen. Other processes use the reference path across the field at the
+head speed the platform specifies.
+
+**Handling and cycle.** Handling comes from the modules actually specified. A
+shuttle, turntable or dial works a second station, so the machine only waits for
+the index unless the second station is the slower of the two, and then the
+index says so. Where the specification states a cycle, a cycle window or a
+throughput, the handling is fitted to it and the process stays computed. Where
+the process alone cannot reach the stated figure, the computed cycle is used and
+the summary says why: the Mark IT's "up to 200 parts/min" assumes lighter content
+than the reference code.
 
 Motion follows the configuration too: the conveyor only runs if one is
 specified, the vision ring light only fires if fiducial vision is fitted, the
 grading camera only reads if verification is fitted, and parts only divert to a
 bin if a reject station is fitted. Phase durations keep their real proportions
 but are fitted to a watchable runtime, so a 6-second weld visibly dominates its
-cycle where a 0.19-second mark does not. Telemetry reports cycle, process,
+cycle where a one-second mark does not. Telemetry reports cycle, process,
 throughput, parts and yield, and states the slow-motion ratio; playback speed is
 switchable between 0.5× and 4×.
 
@@ -104,19 +117,31 @@ vapour column — and below it as **conduction**, wide and shallow. Cutting leav
 kerf, cleaning an ablated band, marking a thin bright line. Each is drawn
 accordingly, with a melt pool where one physically exists.
 
-The cycle can also stop, for the reasons this machine could actually stop:
-a guard interlock opening, extraction flow falling below threshold, or no part at
-the load station. The beacon goes red, the beam inhibits, the message line says
-why, and the stoppage is counted. Faults are only drawn from hardware that is
-fitted — a machine without extraction never reports an extraction fault.
+The cycle can also stop, for the reasons this machine could actually stop, at
+the point in the cycle where each happens: extraction flow falling below
+threshold mid-process (the mark stops part-drawn), no part at the load station,
+or a guard interlock opening at unload. The beacon and the frame go red, the beam
+inhibits, and the message bar says why and what clears it: "Close the guard,
+acknowledge and reset — typically 25 s on a real machine". Faults are only drawn
+from hardware that is fitted, so a machine without extraction never reports an
+extraction fault. Stoppages are shown far more often than a healthy machine has
+them, because a run you can watch has to show one, so they never count against
+the throughput fit or the result. The ⚠ button turns them off.
 
 Controls sit along the bottom edge: camera presets (Iso / Front / Top / Work),
 auto-rotate, callout labels, **layers and view mode**, reset, the original 2D
 optical schematic, and expand to full screen (Esc to exit). Drag to orbit, scroll
-or pinch to zoom. Playback runs at 0.5× to 4×, or pauses and steps frame by frame. Clicking any
-phase in the strip scrubs straight to it, and the cycle can loop or run once.
-Telemetry reports cycle, process, handling, rate, parts, yield, stoppages,
-beam-on share and utilisation, over a bar showing where the cycle time goes.
+or pinch to zoom. Playback runs at 0.5× to 4×, or pauses and steps a tenth of a
+second at a time. Clicking any phase in the strip scrubs straight to it, and the
+cycle can loop or run once.
+
+Telemetry sits below the machine, not on it: the view frames the machine in the
+space above the run bar, and callouts stay clear of the telemetry and the status
+text. In the nameplate panel or on a phone it shows the five figures that matter
+(cycle, rate, parts, yield, result) and the three key status rows. Expanded, it
+adds process, handling, beam-on share, good parts per 8-hour shift, speed or
+performance against a target, and stops, plus the full machine status. On a
+phone the stage grows taller while the cycle runs.
 
 ### Layers and view modes
 
@@ -981,6 +1006,75 @@ The fit score weights are judgement, not measurement: OPTIMAL 100, WITHIN TARGET
 dimensions that could be derived. They order configurations sensibly but the
 absolute number carries no more authority than the dimension rows beneath it,
 which is why the panel shows both and calls itself indicative.
+
+
+## v10.0 — audit and simulation pass
+
+A full walk through every step, overlay and admin tab at desktop and phone
+widths, and a read of the simulation code. It fixes what was wrong, reworks the
+run cycle, and makes the telemetry readable at the size it is usually seen.
+Data literals and `data.json` are unchanged.
+
+### Defects fixed
+
+| Defect | Effect | Fix |
+|---|---|---|
+| Depth of focus omitted M² | Every DOF read M² times too deep: ±0.75 mm instead of ±0.58 mm on a 1.3-M² fiber, and 18× too deep on the direct diode. It showed as "Depth of focus" never matching the "Rayleigh range" beside it | DOF is now ±z_R = πd²/(4M²λ). A tighter ±5 % spot window (0.32 z_R) is shown alongside it. The fix flows into the panel, spec sheet, RFQ, DFM PDF, fit and summary |
+| The simulation ignored standard content | A link without `m=`, including this README's own example, and demo mode drew the C2i's conveyor, vision and grading camera, but the cycle loaded by hand, reported "Camera: not fitted" and skipped locate and grade | `hasMod()` counts the platform's standard content. Links seed it, and every entry point selects a platform through one `pickPlatform()` path |
+| Step button did nothing | It advanced time by `dt × rate` while the rate was 0 | The run advances in animation seconds through `simAdvance()`, and the step button moves 0.1 s |
+| Telemetry disagreed with the animation | The C2i reported a 3.5 s cycle while its phases added up to 6.15 s, and "Handling" was cycle minus process rather than the handling phases | One list of real phase durations drives everything. A stated cycle fits the handling to it |
+| Stale run after a link change | Pasting a link while the cycle ran kept animating the old machine | A configuration change ends the run |
+| Throughput carried across applications | Runs were stamped with the designation, which does not name the application | Runs are stamped with the full configuration |
+| Single-cycle end left the controls wrong | The speed button showed "1×" while paused, and the step button was hidden. Stepping past the end would also have counted parts that never ran | Controls sync from one function. A completed cycle holds until it is deliberately resumed |
+| Advisor close button was blank | `advX` was missing from the icon map | Added |
+| Value store opened empty | The default tab was `'platforms'`, renamed to `'catalogue'` in v5 | Defaults to Catalogue |
+| Enquiry labels never floated | The label came before its input, so `input:focus + span` never matched. Typed text overlapped the label, and example text sat under it | Label after input, blank placeholders, example text only on focus |
+| Summary misreported | The field printed as a bare number, the repetition rate as `44.721359549995796 kHz`, and absorptivity never printed (it read `ph.abs`, not `ph.mat.abs`) | Fixed. The summary also carries material and coupled power |
+| Pulse duration formatting | Femtosecond showed as "0 ps", and QCW as "500000 ns" | `tauTxt()` gives 300 fs, 10 ps, 0.5 ms |
+| Layout | The fit panel sat flush to the edge, the process grid left a grey filler cell, the value-store Close button wrapped onto its own line, and the footer said v3.0 | Corrected |
+
+### Simulation
+
+- **Readable in place.** The message bar joins the telemetry stack, so it can't
+  overlap the figures. The view frames the machine above the run bar, and
+  callouts avoid the telemetry, the name block and the status column. A
+  container query shows five figures and three status rows in the nameplate
+  panel or on a phone, and everything when expanded.
+- **Physical process time.** Codes are marked at their real size with hatch
+  fill, and pulsed sources are held to 50 % pulse overlap. See *The run cycle
+  is computed* above.
+- **Honest stated figures.** Cycle times, windows and "up to N/h" throughputs are
+  read from the specification. The handling is fitted to them where the process
+  can reach them; where it can't, the summary explains why.
+- **Second-station handling.** Turntable, dial and shuttle machines wait only for
+  the index, unless loading the second station is slower.
+- **Stoppages where they happen**, with the real recovery action and time, a
+  red alarm state, and an on/off toggle. They are demonstrations, so they never
+  count against the fit.
+- **Target rate.** Set it in the fit panel, or it comes from the advisor brief
+  ("300 boards per hour"). It travels in the link as `t=`. The throughput fit
+  becomes a real comparison: at or above target is optimal, within 10 % needs
+  attention, and anything lower is outside target. The telemetry shows
+  performance against it and good parts per 8-hour shift.
+- **Status that means something.** Temperature and air-pressure figures were
+  constants, so they're replaced: extraction flow, part presence, and heat load
+  from the energy balance.
+- **Summary.** Adds the cycle basis, process basis, speed and its limit, each
+  phase's real seconds, good parts per shift, the target comparison, and a plain
+  statement of what the stoppages are.
+
+### Verification
+
+- Every platform × application × source (161 combinations) was started and run
+  through at least two cycles with stoppages on. No exceptions, no non-finite
+  figures, and no `NaN` or `undefined` in the telemetry or the summary.
+- Catalogue health: 0 errors, 0 warnings. Rule sweep 954/954 and 3D build sweep
+  88/88 still pass.
+- The six-step click-through, demo mode (now with the conveyor, camera and
+  Inline edition the card selects), the advisor, saved configurations, the
+  enquiry and the value store all run without page errors.
+- No horizontal overflow at 390 px. At phone width the camera presets and tools
+  share one row without overlapping, and the tool buttons keep their 29 px size.
 
 ---
 

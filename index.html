@@ -213,8 +213,11 @@ main{padding:32px 0 40px;min-height:60vh}
 .phh .pt{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;font-weight:600}
 .phh .preg{font-family:var(--mono);font-size:11px;background:rgba(0,183,186,.2);border:1px solid var(--teal);
   color:#7FF0F2;border-radius:var(--r-pill);padding:4px 13px;font-weight:600}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:1px;background:var(--rule-2)}
-.pcell{background:#fff;padding:14px 16px}
+/* rules are drawn by the cells rather than painted through the gaps, so an
+   incomplete last row ends cleanly instead of leaving a grey filler cell */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));background:#fff;
+  margin:0 -1px -1px 0}
+.pcell{background:#fff;padding:14px 16px;border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
 .pcell .pl{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink-3);display:block;font-weight:600}
 .pcell .pv{font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink);display:block;
@@ -325,7 +328,7 @@ main{padding:32px 0 40px;min-height:60vh}
 .view{overflow:hidden;position:relative}
 .v3d{position:relative;background:
   radial-gradient(120% 90% at 50% 8%,#16324A 0%,#0C1E30 46%,#060F19 100%);
-  aspect-ratio:5/4;isolation:isolate}
+  aspect-ratio:5/4;isolation:isolate;container-type:inline-size;container-name:v3d}
 .v3d canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .v3d canvas:active{cursor:grabbing}
 .v3d.dragging canvas{cursor:grabbing}
@@ -353,6 +356,11 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .v3dstate.run{color:#FFC061;background:rgba(240,163,46,.12);border-color:rgba(240,163,46,.40)}
 .v3dstate.run::before{background:#FFC061;box-shadow:0 0 0 3px rgba(240,163,46,.22);
   animation-duration:.75s}
+/* a held stoppage reads at a glance: the frame and the state pill go red */
+.v3d.alarm::after{content:'';position:absolute;inset:0;border:2px solid rgba(255,120,98,.6);
+  pointer-events:none;z-index:9;border-radius:inherit}
+.v3d.alarm .v3dstate.run{color:#FF9E8C;background:rgba(216,64,47,.16);border-color:rgba(255,142,122,.5)}
+.v3d.alarm .v3dstate.run::before{background:#FF8E7A;box-shadow:0 0 0 3px rgba(216,64,47,.25)}
 
 /* build stack — the modules that have been assembled so far */
 .v3dstat{position:absolute;right:12px;top:52px;z-index:4;display:none;flex-direction:column;gap:2px;
@@ -466,6 +474,7 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
   transition:all .18s var(--ease)}
 .simspeed:hover{color:#00E2E5;border-color:rgba(0,226,229,.45)}
 .simspeed.paused{color:#FFC061;border-color:rgba(240,163,46,.45)}
+.simspeed svg{width:12px;height:12px}
 .v3d.running .simspeed{display:inline-flex}
 .simhint{align-self:center;font-family:var(--mono);font-size:8.8px;letter-spacing:.13em;
   text-transform:uppercase;color:#6F8DA1;text-align:center;max-width:30ch;line-height:1.5}
@@ -488,18 +497,26 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .simbreak{display:flex;height:4px;border-radius:3px;overflow:hidden;background:rgba(154,196,216,.14)}
 .simbreak i{display:block;background:#00D6D9}
 .simbreak i.h{background:rgba(154,196,216,.34)}
-.simstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:6px 8px}
+.simstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(66px,1fr));gap:6px 10px}
 .simstats div{font-family:var(--mono);font-size:8.4px;letter-spacing:.11em;text-transform:uppercase;
   color:#6F8DA1;line-height:1.5}
 .simstats div b{display:block;font-size:12px;letter-spacing:-.01em;color:#EAF4F8;font-weight:600;
   text-transform:none;font-variant-numeric:tabular-nums}
 .simstats div b.ok{color:#4FE0A6}
 .simstats div b.warn{color:#FFC061}
+.simstats div.r b{font-size:10.5px;line-height:1.3;letter-spacing:0;padding-top:2px}
 
-/* alarm / message line */
-.simmsg{position:absolute;left:12px;right:12px;bottom:136px;z-index:4;text-align:center;
-  font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;
-  color:#9FD8E4;pointer-events:none;transition:opacity .3s var(--ease)}
+/* message bar — what the machine is doing, and for a stoppage what clears it.
+   It sits in the telemetry stack, so it can never land on the figures. */
+.v3drun .simmsg{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:16px;
+  text-align:center;pointer-events:none}
+.simmsg .mm{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:#9FD8E4;line-height:1.5;max-width:100%}
+.simmsg .mf{font-size:10.5px;color:#C4DAE6;line-height:1.4}
+.simmsg .mf:empty{display:none}
+.simmsg.bad .mm{color:#FFD3CA;background:rgba(216,64,47,.22);border:1px solid rgba(255,142,122,.5);
+  border-radius:var(--r-pill);padding:3px 12px}
+.simmsg.bad .mf{color:#FFB9AC}
 
 .view.mode2d .v3d{display:none}
 .view.mode2d #beam{display:block!important}
@@ -509,13 +526,36 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .view.mode2d .cap{display:block;z-index:6}
 .v3d.full .v3drun{padding-bottom:56px}
 .v3d.full .v3dstack{max-width:300px}
-.v3d.full .simmsg{bottom:172px}
-.v3d.full.running .simmsg{bottom:196px}
 @media(max-width:1120px){.v3d{aspect-ratio:16/10}}
 @media(max-width:640px){
   .v3dstack{display:none}
-  .simstats{grid-template-columns:repeat(3,1fr)}
   .v3dname b{font-size:10.5px}
+  /* on a phone the run gets a taller stage, so the telemetry sits under the machine */
+  .v3d.running{aspect-ratio:4/5}
+}
+/* The panel is a size container: in the nameplate column (or a phone) the run
+   shows the five figures that matter and the key status rows; expanded, all. */
+@container v3d (max-width:720px){
+  .simstats{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px 8px}
+  .simstats div.s{display:none}
+  .v3dstat span:not(.k){display:none}
+  .v3dstat{top:48px}
+}
+@container v3d (max-width:460px){
+  .simstats div{font-size:7.6px;letter-spacing:.08em}
+  .simstats div b{font-size:11px}
+  .simstats div.r b{font-size:9.5px}
+  .simphase span{font-size:0}
+  .simphase span.on{font-size:7.5px;flex:2.6}
+  .v3dname{font-size:8.5px}
+  .v3dstat span{font-size:7.8px}
+}
+/* The camera presets and tools sit beside the stage, not inside its container,
+   so the viewport decides: on a phone they share one row without touching. */
+@media(max-width:500px){
+  .v3dview{padding:2px;gap:1px}
+  .v3dview button{padding:4px 6px;font-size:8px;letter-spacing:.06em}
+  .v3dctl{gap:4px}
 }
 @media(prefers-reduced-motion:reduce){
   .v3dstate::before,.simbtn.armed{animation:none}
@@ -702,6 +742,9 @@ table.cmp tr:last-child td{border-bottom:none}
 .fl input:focus,.fl textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.14)}
 .fl span{position:absolute;left:15px;top:15px;font-size:14px;color:var(--ink-3);pointer-events:none;
   transition:all .18s var(--ease);background:transparent}
+/* the example text only appears once the label has moved out of its way */
+.fl input::placeholder,.fl textarea::placeholder{color:transparent;transition:color .18s var(--ease)}
+.fl input:focus::placeholder,.fl textarea:focus::placeholder{color:var(--ink-3)}
 .fl input:focus+span,.fl input:not(:placeholder-shown)+span,
 .fl textarea:focus+span,.fl textarea:not(:placeholder-shown)+span{
   top:7px;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--teal-deep);font-weight:600;font-family:var(--mono)}
@@ -734,7 +777,7 @@ table.cmp tr:last-child td{border-bottom:none}
 .ahead .btn:hover{background:rgba(255,255,255,.17);border-color:rgba(255,255,255,.34);color:#fff;transform:translateY(-1px)}
 .ahead .btn:disabled{opacity:.32;pointer-events:none}
 .atools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.atools input[type=search]{flex:0 1 300px;min-width:180px;padding:10px 15px;border-radius:var(--r-pill);
+.atools input[type=search]{flex:0 1 260px;min-width:170px;padding:10px 15px;border-radius:var(--r-pill);
   border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.09);color:#fff;
   font-family:var(--sans);font-size:13px}
 .atools input[type=search]::placeholder{color:rgba(255,255,255,.5)}
@@ -1079,7 +1122,7 @@ body.eng .adv-only{display:block}
 body.eng tr.adv-only{display:table-row}
 
 /* ---------- indicative configuration fit ---------- */
-.fitblk{border-top:1px solid var(--rule);padding:16px 0 4px}
+.fitblk{border-top:1px solid var(--rule);padding:16px 20px 18px}
 .fithd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
 .fitl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--ink-3);font-weight:600}
@@ -1101,6 +1144,13 @@ body.eng tr.adv-only{display:table-row}
 .st-out{color:var(--crit)}    .bg-out{background:var(--crit)}
 .st-val{color:var(--ink-3)}   .bg-val{background:var(--ink-3)}
 .st-na{color:var(--ink-3)}    .bg-na{background:var(--rule)}
+.fittgt{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:10px;
+  border-top:1px solid var(--rule-2)}
+.fittgt label{font-size:12.5px;color:var(--ink-2);font-weight:520}
+.fittgt input{width:96px;padding:7px 10px;border:1px solid var(--rule);border-radius:var(--r-sm);
+  font-family:var(--mono);font-size:12.5px;color:var(--ink);background:#fff;font-variant-numeric:tabular-nums}
+.fittgt input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.14)}
+.fittgt span{font-size:11px;color:var(--ink-3)}
 .fitfoot{font-size:11px;color:var(--ink-3);line-height:1.5;margin-top:8px;
   padding-top:8px;border-top:1px solid var(--rule-2)}
 
@@ -1246,19 +1296,20 @@ body.demo #demobar{display:flex}
             <span class="v3dstate" id="v3dstate">Standby</span>
           </div>
           <div class="v3dstack" id="v3dstack"></div>
-          <div class="simmsg" id="simmsg"></div>
           <div class="v3dinfo" id="v3dinfo" role="dialog" aria-label="Component detail"></div>
-          <div class="v3dstat" id="v3dstat" aria-live="polite"></div>
+          <div class="v3dstat" id="v3dstat"></div>
           <div class="v3drun">
             <div class="simtel">
+              <div class="simmsg" id="simmsg" aria-live="polite"><span class="mm"></span><span class="mf"></span></div>
               <div class="simphase" id="simphase"></div>
               <div class="simbreak" id="simbreak"></div>
               <div class="simstats" id="simstats"></div>
             </div>
             <div class="simrow">
-              <button class="simspeed" id="simSpeed" title="Playback speed — click to slow, then pause">1×</button>
-              <button class="simspeed" id="simStep" title="Advance one step" style="display:none">▸|</button>
+              <button class="simspeed" id="simSpeed" title="Playback speed — click to change, then pause">1×</button>
+              <button class="simspeed" id="simStep" title="Advance one step" aria-label="Advance one step" style="display:none">▸|</button>
               <button class="simspeed" id="simLoop" title="Loop or single cycle">↻</button>
+              <button class="simspeed" id="simFault" aria-pressed="true" aria-label="Demonstrate stoppages"></button>
               <button class="simbtn" id="simBtn" disabled></button>
             </div>
             <span class="simhint" id="simhint">Configure the machine to unlock the run cycle</span>
@@ -1292,6 +1343,12 @@ body.demo #demobar{display:flex}
           <span class="fitsc" id="fitsc">—</span>
         </div>
         <div id="fitrows"></div>
+        <div class="fittgt">
+          <label for="fitTarget">Target rate</label>
+          <input id="fitTarget" type="number" min="1" step="1" inputmode="numeric" placeholder="none set"
+                 aria-describedby="fitTargetU">
+          <span id="fitTargetU">parts / h — judges the throughput fit</span>
+        </div>
         <div class="fitfoot" id="fitfoot"></div>
       </div>
     </aside>
@@ -1328,7 +1385,7 @@ body.demo #demobar{display:flex}
   </div>
   <div class="fbot">
     <span>© <span id="yr"></span> Titan Engineering &amp; Automation Ltd — A TATA Enterprise</span>
-    <span id="stamp">Configurator v5.0</span>
+    <span id="stamp">Configurator v10.0</span>
   </div>
 </div></footer>
 
@@ -2345,8 +2402,12 @@ function optics(){
   if(!S.src||!S.lens) return null;
   var s=SRC[S.src], L=LENS[S.lens];
   var d = (4*s.um*L.f*s.m2)/(Math.PI*s.dia);       // spot diameter, µm
-  var dof = (Math.PI*d*d)/(4*s.um);                 // Rayleigh-ish DOF, µm
-  return {spot:d, dof:dof, f:L.f, fld:L.fld, lens:L.n};
+  /* Depth of focus is quoted as ± the Rayleigh range, z_R = πw0²/(M²λ) = πd²/(4M²λ):
+     the distance over which the spot grows to √2 × its waist. M² belongs in it —
+     without it a multimode diode (M² 18) read eighteen times too deep. dof5 is the
+     tighter window that holds the spot within 5 %: z = z_R·√(1.05² − 1) ≈ 0.32 z_R. */
+  var dof = (Math.PI*d*d)/(4*s.m2*s.um);            // ± µm
+  return {spot:d, dof:dof, dof5:dof*Math.sqrt(1.05*1.05-1), f:L.f, fld:L.fld, lens:L.n};
 }
 
 
@@ -2458,6 +2519,16 @@ function sci(x,dp){
   }).join('');
 }
 function num(x,dp){ return x>=100? x.toFixed(0) : x>=10? x.toFixed(1) : x>=1? x.toFixed(2) : x.toFixed(3); }
+/* Pulse duration in its natural unit — a femtosecond pulse is 300 fs, not "0 ps",
+   and a QCW pulse is 0.5 ms, not 500000 ns. */
+function tauTxt(ns){
+  if(ns==null) return '—';
+  if(ns<1e-3) return +(ns*1e6).toPrecision(3)+' fs';
+  if(ns<1)    return +(ns*1e3).toPrecision(3)+' ps';
+  if(ns>=1e5) return +(ns/1e6).toPrecision(3)+' ms';
+  if(ns>=1e3) return +(ns/1e3).toPrecision(3)+' µs';
+  return +ns.toPrecision(3)+' ns';
+}
 
 
 
@@ -3015,19 +3086,27 @@ function uiPlat(b){
       (p.lead? ' · '+p.lead+' wk lead':'')+'</span>'+
       ((p.ind&&p.ind.length)? '<span class="indtags">'+p.ind.map(function(i){
           return '<em>'+(IND[i]?IND[i].n:i)+'</em>'; }).join('')+'</span>':''));
-    c.onclick=function(){ if(p.fam!==famSel){ famSel=p.fam; }
-      if(S.plat!==k){
-        S.plat=k; S.app=null; S.src=p.dsrc; S.pw=snapPower(p,p.dsrc,p.dpw); S.lens=p.dlens;
-        S.mods={}; S.extra={};
-        (p.std||[]).forEach(function(sk){ if(MOD[sk]) S.mods[sk]=true; else if(EXTRA[sk]) S.extra[sk]=true; });
-        S.sw = (p.fam==='volt')?'volt':(p.deliv==='galvo2'||p.fam==='auto')?'inline':'desktop';
-      }
-      render(); advance();
-    };
+    c.onclick=function(){ pickPlatform(k); render(); advance(); };
     w.appendChild(c);
   });
   b.appendChild(w);
   if(!shown) b.appendChild(el('div','nores','No platform matches “'+PQ+'”. Try a material, an application or a family name — or search across all families.'));
+}
+
+/* Selecting a platform — from its card, the demo or anywhere else — starts
+   from its defaults with its standard content fitted and the matching
+   LaserSuite edition. One path, so every entry point builds the same machine. */
+function stdSeed(p){
+  (p.std||[]).forEach(function(sk){ if(MOD[sk]) S.mods[sk]=true; else if(EXTRA[sk]) S.extra[sk]=true; });
+}
+function pickPlatform(k){
+  var p=PLAT[k]; if(!p) return;
+  famSel=p.fam;
+  if(S.plat===k) return;
+  S.plat=k; S.app=null; S.src=p.dsrc; S.pw=snapPower(p,p.dsrc,p.dpw); S.lens=p.dlens;
+  S.mods={}; S.extra={};
+  stdSeed(p);
+  S.sw = (p.fam==='volt')?'volt':(p.deliv==='galvo2'||p.fam==='auto')?'inline':'desktop';
 }
 
 function uiApp(b){
@@ -3089,11 +3168,12 @@ function uiSrc(b){
     var html='<div class="phh"><span class="pt">Computed process data</span>'+
              '<span class="preg">'+ph.regime.n+'</span></div><div class="pgrid">';
     html+=pc('Spot diameter', o.spot.toFixed(0)+' µm', 'd = 4λfM²/πD, M² = '+SRC[S.src].m2);
-    html+=pc('Depth of focus', '± '+(o.dof/1000).toFixed(2)+' mm', 'Rayleigh ± '+num(ph.rayleigh_mm)+' mm');
+    html+=pc('Depth of focus', '± '+(o.dof/1000).toFixed(2)+' mm',
+      'Rayleigh range, spot grows to √2× · ± '+(o.dof5/1000).toFixed(2)+' mm holds it within 5 %');
     html+=pc('Scan field', o.fld+' × '+o.fld+' mm', LENS[S.lens].n+', f = '+LENS[S.lens].f+' mm');
     if(ph.mode==='pulsed'){
       html+=pc('Pulse energy', num(ph.Ep_mJ)+' mJ', 'at '+num(ph.frep_khz)+' kHz ('+ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz usable)', 1);
-      html+=pc('Peak power', num(ph.Ppk_kW)+' kW', 'τ = '+(ph.tau_ns<1? (ph.tau_ns*1000).toFixed(0)+' ps' : ph.tau_ns+' ns'), 1);
+      html+=pc('Peak power', num(ph.Ppk_kW)+' kW', 'τ = '+tauTxt(ph.tau_ns), 1);
       if(ph.showFluence) html+=pc('Fluence', num(ph.fluence)+' J/cm²', 'energy per pulse over the focused spot', 1);
       html+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d, 1);
       if(ph.heat_Jmm) html+=pc('Heat input', num(ph.heat_Jmm)+' J/mm', 'at an indicative 50 mm/s travel', 1);
@@ -3236,7 +3316,7 @@ function uiSpec(b){
     if(ph.mode==='pulsed'){
       eh+=li('Pulse energy', num(ph.Ep_mJ)+' mJ');
       eh+=li('Peak power', num(ph.Ppk_kW)+' kW');
-      eh+=li('Pulse duration', ph.tau_ns<1? (ph.tau_ns*1000).toFixed(0)+' ps' : ph.tau_ns+' ns');
+      eh+=li('Pulse duration', tauTxt(ph.tau_ns));
       eh+=li('Repetition rate', ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz');
       if(ph.showFluence) eh+=li('Fluence', num(ph.fluence)+' J/cm²');
       eh+=li(ph.irrLabel, sci(ph.irr)+' W/cm²');
@@ -3245,7 +3325,7 @@ function uiSpec(b){
       eh+=li(ph.irrLabel, sci(ph.irr)+' W/cm²');
       if(ph.heat_Jmm) eh+=li('Heat input @ 50 mm/s', num(ph.heat_Jmm)+' J/mm');
     }
-    eh+=li('Rayleigh range', '± '+num(ph.rayleigh_mm)+' mm');
+    eh+=li('Focus window, spot ±5 %', '± '+(o.dof5/1000).toFixed(2)+' mm');
     if(ph.mat){
       eh+=li('Material', ph.mat.m.n);
       eh+=li('Absorptivity @ '+SRC[S.src].wl, (ph.mat.abs*100).toFixed(0)+' %');
@@ -3436,7 +3516,7 @@ function sheet(p,a,o,lo,hi,mk,ex,sd){
     pr2('Process regime', ph.regime.n+' — '+ph.regime.d);
     if(ph.mode==='pulsed'){
       pr2('Pulse energy', num(ph.Ep_mJ)+' mJ at '+num(ph.frep_khz)+' kHz');
-      pr2('Peak power', num(ph.Ppk_kW)+' kW (τ = '+(ph.tau_ns<1?(ph.tau_ns*1000).toFixed(0)+' ps':ph.tau_ns+' ns')+')');
+      pr2('Peak power', num(ph.Ppk_kW)+' kW (τ = '+tauTxt(ph.tau_ns)+')');
       if(ph.showFluence) pr2('Fluence', num(ph.fluence)+' J/cm²');
       pr2(ph.irrLabel, sci(ph.irr)+' W/cm²');
       if(ph.heat_Jmm) pr2('Heat input', num(ph.heat_Jmm)+' J/mm at an indicative 50 mm/s');
@@ -3445,7 +3525,7 @@ function sheet(p,a,o,lo,hi,mk,ex,sd){
       pr2('Irradiance', sci(ph.irr)+' W/cm²');
       if(ph.heat_Jmm) pr2('Heat input', num(ph.heat_Jmm)+' J/mm at an indicative 50 mm/s');
     }
-    pr2('Rayleigh range', '± '+num(ph.rayleigh_mm)+' mm');
+    pr2('Focus window, spot ±5 %', '± '+(o.dof5/1000).toFixed(2)+' mm');
     if(ph.mat){
       pr2('Material', ph.mat.m.n);
       pr2('Absorptivity at '+SRC[S.src].wl, (ph.mat.abs*100).toFixed(0)+' % — clean, room temperature, optically flat');
@@ -3557,6 +3637,7 @@ function encodeState(){
   if(S.pw!=null)q.push('w='+S.pw); if(S.lens)q.push('l='+S.lens);
   if(mk.length)q.push('m='+mk.join('.')); if(S.sw)q.push('f='+S.sw);
   if(ex.length)q.push('x='+ex.join('.'));
+  if(S.target>0)q.push('t='+Math.round(S.target));
   return q.join('&');
 }
 var hashLock=false;
@@ -3577,6 +3658,9 @@ function readHash(){
   S.lens= (q.l&&LENS[q.l])? q.l : p.dlens;
   S.mods={}; if(q.m) q.m.split('.').forEach(function(k){ if(MOD[k]) S.mods[k]=true; });
   S.extra={}; if(q.x) q.x.split('.').forEach(function(k){ if(EXTRA[k]) S.extra[k]=true; });
+  stdSeed(p);                                   /* a link cannot un-fit standard content */
+  var tg=q.t? parseInt(q.t,10) : NaN;
+  S.target = tg>0? tg : null;
   S.sw = (q.f&&SW[q.f])? q.f : 'desktop';
   reach=STEPS.length-1; cur=STEPS.length-1;
   return true;
@@ -3689,13 +3773,14 @@ var HIST  = Store.get('teal.hist', []);
 function snapshot(){
   return {plat:S.plat, app:S.app, src:S.src, pw:S.pw, lens:S.lens,
           mods:JSON.parse(JSON.stringify(S.mods)), sw:S.sw,
-          extra:JSON.parse(JSON.stringify(S.extra)), notes:S.notes||''};
+          extra:JSON.parse(JSON.stringify(S.extra)), notes:S.notes||'', target:S.target||null};
 }
 function restore(st){
   if(!st||!PLAT[st.plat]) return false;
   S.plat=st.plat; famSel=PLAT[st.plat].fam;
   S.app=st.app; S.src=st.src; S.pw=st.pw; S.lens=st.lens;
   S.mods=st.mods||{}; S.sw=st.sw||'desktop'; S.extra=st.extra||{}; S.notes=st.notes||'';
+  S.target=st.target||null;
   reach=STEPS.length-1; cur=STEPS.length-1; render();
   return true;
 }
@@ -3869,13 +3954,15 @@ function openInquiry(){
   $('#inqBody').innerHTML=
    '<p class="anote">This builds a complete enquiry from the current configuration. On a static site there is no server to receive it, so it is delivered as an email draft, a CSV row for your pipeline, or plain text you can paste.</p>'+
    '<div class="fgrid">'+
-   '<label class="fl"><span>Name <i>*</i></span><input id="iq_name" type="text" autocomplete="name" required></label>'+
-   '<label class="fl"><span>Company</span><input id="iq_co" type="text" autocomplete="organization"></label>'+
-   '<label class="fl"><span>Email <i>*</i></span><input id="iq_em" type="email" autocomplete="email" required></label>'+
-   '<label class="fl"><span>Phone</span><input id="iq_ph" type="tel" autocomplete="tel"></label>'+
-   '<label class="fl"><span>Quantity</span><input id="iq_qt" type="text" placeholder="e.g. 1 machine"></label>'+
-   '<label class="fl"><span>Timeline</span><input id="iq_wh" type="text" placeholder="e.g. Q3 FY27"></label>'+
-   '<label class="fl wide"><span>Message</span><textarea id="iq_ms" rows="3" placeholder="Parts, takt time, existing line, anything relevant"></textarea></label>'+
+   /* The control comes before its label so `input:focus + span` can float it;
+      a blank placeholder makes :placeholder-shown mean "empty" on every field. */
+   '<label class="fl"><input id="iq_name" type="text" autocomplete="name" placeholder=" " required><span>Name <i>*</i></span></label>'+
+   '<label class="fl"><input id="iq_co" type="text" autocomplete="organization" placeholder=" "><span>Company</span></label>'+
+   '<label class="fl"><input id="iq_em" type="email" autocomplete="email" placeholder=" " required><span>Email <i>*</i></span></label>'+
+   '<label class="fl"><input id="iq_ph" type="tel" autocomplete="tel" placeholder=" "><span>Phone</span></label>'+
+   '<label class="fl"><input id="iq_qt" type="text" placeholder="e.g. 1 machine"><span>Quantity</span></label>'+
+   '<label class="fl"><input id="iq_wh" type="text" placeholder="e.g. Q3 FY27"><span>Timeline</span></label>'+
+   '<label class="fl wide"><textarea id="iq_ms" rows="3" placeholder="Parts, takt time, existing line, anything relevant"></textarea><span>Message</span></label>'+
    '</div>'+
    '<div class="ferr" id="iq_err" role="alert"></div>'+
    '<div class="acts" style="margin-top:14px">'+
@@ -4073,9 +4160,12 @@ function advResults(b, r){
       S.sw=(p.fam==='volt')?'volt':(p.deliv==='galvo2'||p.fam==='auto')?'inline':'desktop';
       var brief=ADV.turns.filter(function(x){return x.who==='user';}).map(function(x){return x.text;}).join(' · ');
       S.notes = brief? 'From the brief: '+brief : '';
+      /* a rate named in the brief becomes the throughput target the run is judged against */
+      S.target = r.facts.perHour>0? Math.max(1,Math.ceil(r.facts.perHour)) : null;
       reach=STEPS.length-1;
       closeAdvisor(); go(3);
-      toast('Loaded '+p.n+' — adjust anything from here.');
+      toast('Loaded '+p.n+(S.target? ' — target '+inr(S.target)+' parts/h from your brief':'')+
+            ' — adjust anything from here.');
     };
     act.appendChild(open); card.appendChild(act);
     b.appendChild(card);
@@ -4094,7 +4184,7 @@ function closeOverlay(sel){ $(sel).classList.remove('open'); document.body.style
    Edits mutate the live data objects, so the configurator updates instantly.
    Nothing persists in the browser — export data.json and commit it.
    ===================================================================== */
-var ATAB='platforms', adminOpen=false;
+var ATAB='catalogue', adminOpen=false;
 
 function money(n){ return shortINR(n); }
 function numIn(val, onch, step){
@@ -5508,8 +5598,9 @@ function closeAdmin(){
 
 $('#adminBtn').onclick=openAdmin;
 $('#acls').onclick=closeAdmin;
-$('#aundo').innerHTML=ico('undo')+'<span>Undo</span>';
-$('#aredo').innerHTML=ico('redo')+'<span>Redo</span>';
+/* icon-only: the titles carry the shortcuts, and the toolbar fits one row */
+$('#aundo').innerHTML=ico('undo'); $('#aundo').setAttribute('aria-label','Undo');
+$('#aredo').innerHTML=ico('redo'); $('#aredo').setAttribute('aria-label','Redo');
 $('#aundo').onclick=editUndo;
 $('#aredo').onclick=editRedo;
 $('#asearch').oninput=function(){
@@ -5630,7 +5721,7 @@ document.addEventListener('keydown',function(e){
   var m={openAdvisor:['info','Help me choose'], openSaved:['layers','Saved &amp; history'], adminBtn:['sliders','Values'],
          cmpPrint:['print','Print'], cmpX:['x','Close'], aimp:['up','Import data.json'],
          arst:['reset','Reset to defaults'], aexp:['down','Export data.json'], acls:['x','Close'],
-         toTop:['up',''], drawX:['x',''], inqX:['x','']};
+         toTop:['up',''], drawX:['x',''], inqX:['x',''], advX:['x','']};
   Object.keys(m).forEach(function(id){
     var e=document.getElementById(id); if(!e) return;
     e.innerHTML = ico(m[id][0]) + (m[id][1]? '<span>'+m[id][1]+'</span>' : '');
@@ -5942,6 +6033,8 @@ function Viewport(canvas, build, opts){
   this.canBlur = (function(){ try{ var c=document.createElement('canvas').getContext('2d');
     c.filter='blur(2px)'; return c.filter!=='none'; }catch(e){ return false; } })();
   this.fps=60; this._acc=0; this._frames=0;
+  /* px at the bottom kept clear for an overlay (the run telemetry); eased */
+  this.inset=0; this.insetT=0;
 
   this.resize();
   if(window.ResizeObserver){
@@ -6025,6 +6118,9 @@ Viewport.prototype.frame = function(now){
   if(!this.vis || document.hidden) return;
   if(this.o.hidden && this.o.hidden()) return;
   var animating=this.live && (this.o.animating? this.o.animating() : true);
+  if(Math.abs((this.insetT||0)-this.inset)>0.5){
+    this.inset += ((this.insetT||0)-this.inset)*(this.reduce? 1 : Math.min(1,this.dt*7)); this.dirty=true;
+  } else this.inset=this.insetT||0;
   if(this.spin && !this.reduce){
     this.idle+=this.dt;
     if(this.idle>2.2 && !this.touched) this.cam.yaw += this.spinV*this.dt;
@@ -6069,7 +6165,10 @@ Viewport.prototype.paint = function(T){
   var fwd=v3n(v3s([cam.tx,cam.ty,cam.tz], eye));
   var rgt=v3n(v3x(fwd,[0,1,0]));
   var up =v3x(rgt,fwd);
-  var fs=(H*0.5)/Math.tan(cam.fov*0.5);
+  /* frame the scene in the space the overlay leaves: centre it there and scale
+     it down a little, rather than letting the telemetry sit on the machine */
+  var ins=Math.min(this.inset||0, H*0.55), cy=(H-ins)*0.5+ins*0.13;
+  var fs=(H*0.5-ins*0.40)/Math.tan(cam.fov*0.5);
   var L1=LIGHT1, L2=LIGHT2, L3=LIGHT3;
   var HV=v3n(v3s(L1, fwd));                       /* Blinn half-vector, camera-facing */
   var fogA=this.o.fogA==null? cam.dist*0.60 : this.o.fogA;
@@ -6083,7 +6182,7 @@ Viewport.prototype.paint = function(T){
     if(z<0.30) return null;
     var iz=1/z;
     return [W*0.5+(dx*rgt[0]+dy*rgt[1]+dz*rgt[2])*iz*fs,
-            H*0.5-(dx*up[0] +dy*up[1] +dz*up[2] )*iz*fs, z];
+            cy-(dx*up[0] +dy*up[1] +dz*up[2] )*iz*fs, z];
   }
   this._proj=proj;
 
@@ -6206,8 +6305,8 @@ Viewport.prototype.paint = function(T){
       if(tp) cand.push({t:b.tags[i], s:tp});
     }
     cand.sort(function(a,c){ return a.s[2]-c.s[2]; });
-    var placed=[], big=W>620, cap=(big? 16 : 5), used=0;
-    var yLo=big? 10 : H*0.16, yHi=big? H-12 : H*0.66;
+    var placed=(this.avoid||[]).map(function(r){ return r.slice(); }), big=W>620, cap=(big? 16 : 5), used=0;
+    var yLo=big? 10 : H*0.16, yHi=Math.min(big? H-12 : H*0.66, H-ins-10);
     for(i=0;i<cand.length && used<cap;i++){
       var tg=cand[i].t, ap=cand[i].s;
       var x=ap[0]+tg.dx, y=ap[1]+tg.dy;
@@ -6709,7 +6808,10 @@ var M3D = {
   layers:{enc:true, glz:true, cov:true, lit:true, mod:true, util:true, flr:true, beam:true}
 };
 
-function hasMod(k){ return !!(S.mods && S.mods[k]) || !!(S.extra && S.extra[k]); }
+/* Standard content is fitted whether or not the selection lists it — a link
+   written by hand, or the demo, names only the platform, yet the 3D draws the
+   platform's standard content. The run cycle has to see the same machine. */
+function hasMod(k){ return !!(S.mods && S.mods[k]) || !!(S.extra && S.extra[k]) || isStd(P(),k); }
 function modName(k){ return (MOD[k]&&MOD[k].n) || (EXTRA[k]&&EXTRA[k].n) || k; }
 
 /* ---- which sub-assemblies belong in the scene right now ----------------- */
@@ -8171,10 +8273,11 @@ function buildMoves(segs, w){
 /* ======================================================================== */
 /*  SIMULATION                                                              */
 /* ======================================================================== */
-var SIM = {on:false, t:0, ph:0, cyc:0, ng:0, grade:'', msg:'', sparks:[], rate:1,
-           fault:null, faultT:0, stops:0, faults:true, loop:true, runT:0, stopT:0,
+var SIM = {on:false, t:0, ph:0, cyc:0, ng:0, grade:'', msg:'', msgT:0, sparks:[], rate:1,
+           fault:null, faultT:0, fix:'', stops:0, faults:true, loop:true, pend:null,
            moves:null, phases:null, total:1, cycle:6, dt:0, last:0, hud:0,
-           procS:1, realS:1, animS:1, speed:2500, markMM:0, jumpMM:0, fx:'spark', beamOn:false};
+           procS:1, realS:1, animS:1, speed:2500, markMM:0, jumpMM:0, fx:'spark', beamOn:false,
+           pm:null, basis:'', cycNote:''};
 
 function famVerb(){
   var f=P()? P().fam : 'mark';
@@ -8215,32 +8318,99 @@ function loadVerb(){
   if(hasMod('conveyor')) return 'CONVEY IN';
   if(hasMod('robot6')||hasMod('cobotld')) return 'ROBOT LOAD';
   if(hasMod('turntbl')||hasMod('rotoidx')) return 'INDEX IN';
+  if(hasMod('shuttle')) return 'SHUTTLE IN';
   if(hasMod('magazine')) return 'MAGAZINE';
   if(hasMod('traytwr')) return 'TRAY PICK';
   if(hasMod('r2r')) return 'WEB FEED';
   return 'LOAD';
 }
-function simPhases(){
-  var ld=handlingS()*0.55, i, ph=[
-    {k:'HOME',    n:'Home',                            d:0.35},
-    {k:'LOAD',    n:loadVerb(),                        d:ld},
-    {k:'CLAMP',   n:'Clamp',                           d:0.35},
-    {k:'LOCATE',  n:hasMod('visfid')?'Locate':'Datum', d:hasMod('visfid')?0.55:0.18},
-    {k:'FOCUS',   n:hasMod('autofoc')?'Auto-focus':'Focus', d:hasMod('autofoc')?0.35:0.22},
-    {k:'PROCESS', n:famVerb(),                         d:Math.max(0.4,SIM.procS)},
-    {k:'VERIFY',  n:hasMod('visver')?'Grade':'Release', d:hasMod('visver')?0.6:0.12},
-    {k:'UNLOAD',  n:hasMod('reject')?'Sort':'Unload',  d:ld*0.85}
-  ];
-  /* real seconds → animation seconds: keep the proportions, bound the runtime,
-     and never let a phase flash past unreadably */
-  var real=0;
-  for(i=0;i<ph.length;i++){ ph[i].real=ph[i].d; real+=ph[i].d; }
-  var budget=clamp(real, 7, 15), k=budget/real, tot=0;
-  /* the process phase is the one worth watching, so it never runs shorter
-     than the eye can follow — the true figure stays in the telemetry */
-  for(i=0;i<ph.length;i++){ ph[i].d=Math.max(ph[i].k==='PROCESS'?2.4:0.30, ph[i].real*k); tot+=ph[i].d; }
-  SIM.realS=real; SIM.animS=tot;
-  return ph;
+function unloadVerb(){
+  if(hasMod('reject')) return 'Sort';
+  if(hasMod('turntbl')||hasMod('rotoidx')) return 'Index out';
+  if(hasMod('shuttle')) return 'Shuttle out';
+  return 'Unload';
+}
+
+/* ---- handling ------------------------------------------------------------ */
+/* Seconds a part spends arriving and leaving, from the module that moves it.
+   A shuttle, turntable or dial works a second station: the finished part comes
+   off and the next goes on while this one is processed, so the machine only
+   waits for the index — unless the second station is the slower of the two. */
+function stationS(){
+  return 0.45 + (hasMod('conveyor')?1.2 : hasMod('r2r')?0.8 : hasMod('magazine')?1.8 :
+    hasMod('traytwr')?2.2 : hasMod('robot6')?2.6 : hasMod('cobotld')?3.0 : hasMod('feeder')?1.4 : 4.0);
+}
+function handlingPlan(){
+  var ov = hasMod('turntbl')? 'turntbl' : hasMod('rotoidx')? 'rotoidx' : hasMod('shuttle')? 'shuttle' : null;
+  var io = stationS();
+  var index = ov==='shuttle'? 1.2 : ov==='turntbl'? 1.0 : ov==='rotoidx'? 0.8 : 0;
+  return {overlap:ov, index:index, station:io,
+          load: ov? index*0.5 : io*0.55, unload: ov? index*0.5 : io*0.4675};
+}
+
+/* ---- what the specification states --------------------------------------- */
+/* A stated cycle, cycle window or throughput. "Up to N/h" is a best case, so it
+   is read as the rated cycle the handling is fitted to — where the process can
+   actually get there. */
+function statedCycle(){
+  var p=P(), i, lab, val, m;
+  if(!p||!p.specs) return null;
+  for(i=0;i<p.specs.length;i++){
+    lab=p.specs[i][0]; val=String(p.specs[i][1]).replace(/,/g,'');
+    if(!/cycle|takt/i.test(lab)) continue;
+    m=val.match(/(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*s\b/);
+    if(m) return {kind:'window', lo:+m[1], hi:+m[2], row:p.specs[i]};
+    m=val.match(/(\d+(?:\.\d+)?)\s*s\b/);
+    if(m) return {kind:'cycle', s:+m[1], row:p.specs[i]};
+  }
+  for(i=0;i<p.specs.length;i++){
+    lab=p.specs[i][0]; val=String(p.specs[i][1]).replace(/,/g,'');
+    if(!/throughput|output/i.test(lab)) continue;
+    m=val.match(/(\d+(?:\.\d+)?)\s*(?:[a-z-]+\s*)?(?:\/\s*|per\s+)(hour|hr|h|minute|min)\b/i) ||
+      val.match(/(\d+(?:\.\d+)?)\s*(ppm|pph|uph)\b/i);
+    if(m){
+      var perH = /^(ppm|min)/i.test(m[2])? +m[1]*60 : +m[1];
+      if(perH>0) return {kind:'rate', s:3600/perH, perH:perH, row:p.specs[i]};
+    }
+  }
+  return null;
+}
+
+/* ---- process time ------------------------------------------------------------ */
+/* Marking a code is modelled at the size the code is actually made, not at the
+   size of the field: a 12 × 12 ECC200 at the module the DFM report recommends
+   for this spot, plus a line of human-readable text, filled with hatch lines.
+   The mark line is the spot, but not narrower than 20 µm — below that the
+   ablated line is wider than the optics. The hatch is half the line, as in the
+   physics panel. A pulsed source can only go as fast as 50 % pulse overlap
+   allows; past that the line breaks into dots. Every vector also pays the
+   scanner's jump and mark delays, taken at a typical 250 µs.
+   Other processes keep the drawn path at the scale of the field. */
+function procModel(){
+  var p=P(), fam=p? p.fam : 'mark', o=optics(), head=scanSpeed(), ph=null;
+  try{ ph=physics(); }catch(e){ ph=null; }
+  if(fam==='mark' && o){
+    var s=o.spot/1000, lw=Math.max(s,0.020), hatch=lw*0.5;
+    var cell=Math.max(0.30, Math.max(0.25, s*4)*1.3), n=12, side=cell*n;
+    var dark=0.55*side*side, fill=dark/hatch;
+    var chH=Math.max(s*25,0.5), text=9*chH*2.6;
+    var lines=n*cell/hatch, vecs=Math.round(lines*n*0.55/1.8)+9*4;
+    var v=head, lim='head';
+    if(ph && ph.mode==='pulsed' && ph.frep_khz){
+      var vo=ph.frep_khz*1000*lw*0.5;
+      if(vo<v){ v=vo; lim='overlap'; }
+    }
+    var len=fill+text, jump=vecs*cell*0.9;
+    var t=len/v + jump/head + vecs*250e-6;
+    return {t:t, len:len, jump:jump, v:v, head:head, lim:lim, kind:'code', vecs:vecs,
+      cell:cell, side:side, hatch:hatch,
+      basis:'12 × 12 Data Matrix at '+cell.toFixed(2)+' mm module ('+side.toFixed(1)+' mm square) and a '+
+            '9-character line, hatched at '+Math.round(hatch*1000)+' µm'};
+  }
+  var mv=buildMoves(markPath(), (S.lens? LENS[S.lens].fld/100 : 1.75)*0.92);
+  var mm=mv.markLen*100, jm=mv.jumpLen*100;
+  return {t:mm/head + jm/(head*3.2), len:mm, jump:jm, v:head, head:head, lim:'head', kind:'path',
+    basis:'Reference '+famVerb().toLowerCase()+' path across the '+(S.lens? LENS[S.lens].fld : 175)+' mm field'};
 }
 /* Marking speed from the specification, otherwise a family default. */
 function scanSpeed(){
@@ -8253,52 +8423,97 @@ function scanSpeed(){
   var f=p? p.fam : 'mark';
   return f==='weld'?120 : f==='clean'?900 : f==='cut'?400 : f==='volt'?300 : f==='semi'?3000 : 2500;
 }
-/* Handling time from the modules actually specified. */
-function handlingS(){
-  var t=0.45;
-  t += hasMod('conveyor')?1.2 : hasMod('r2r')?0.8 : (hasMod('turntbl')||hasMod('rotoidx'))?1.0 :
-       hasMod('magazine')?1.8 : hasMod('traytwr')?2.2 : hasMod('robot6')?2.6 :
-       hasMod('cobotld')?3.0 : hasMod('feeder')?1.4 : 4.0;
-  if(hasMod('shuttle')||hasMod('turntbl')||hasMod('rotoidx')) t-=0.7;   /* load overlaps process */
-  return Math.max(0.7,t);
-}
-/* Nominal cycle time — from the platform specification where it states one. */
-function simCycle(){
-  var p=P(), i, m;
-  if(p&&p.specs) for(i=0;i<p.specs.length;i++){
-    if(/cycle|takt/i.test(p.specs[i][0])){
-      m=String(p.specs[i][1]).match(/([\d.]+)\s*s/);
-      if(m) return parseFloat(m[1]);
+
+/* ---- the cycle ---------------------------------------------------------------- */
+/* Real phase durations are the single source of truth: the telemetry, the
+   breakdown bar and the phase strip all come from the same list. Where the
+   platform states a cycle, the handling phases are fitted to it and the process
+   stays computed — unless the process alone cannot get there, which is said
+   rather than hidden. */
+function simPhases(){
+  var H=handlingPlan(), vf=hasMod('visfid'), af=hasMod('autofoc'), vv=hasMod('visver'), i;
+  var ph=[
+    {k:'HOME',    n:'Home',                            d:0.35},
+    {k:'LOAD',    n:loadVerb(),                        d:H.load},
+    {k:'CLAMP',   n:'Clamp',                           d:0.35},
+    {k:'LOCATE',  n:vf?'Locate':'Datum',               d:vf?0.55:0.18},
+    {k:'FOCUS',   n:af?'Auto-focus':'Focus',           d:af?0.35:0.22},
+    {k:'PROCESS', n:famVerb(),                         d:SIM.procS},
+    {k:'VERIFY',  n:vv?'Grade':'Release',              d:vv?0.6:0.12},
+    {k:'UNLOAD',  n:unloadVerb(),                      d:H.unload}
+  ];
+  var real=0;
+  for(i=0;i<ph.length;i++) real+=ph[i].d;
+  /* the second station has to be ready when the index comes round */
+  SIM.wait=0;
+  if(H.overlap && H.station>real-H.index){
+    SIM.wait=H.station-(real-H.index); ph[1].d+=SIM.wait; real+=SIM.wait;
+  }
+  SIM.basis='computed from the phase model'; SIM.cycNote='';
+  var st=statedCycle();
+  if(st){
+    var want = st.kind==='window'? clamp(real, st.lo, st.hi) : st.s;
+    var rest = real-SIM.procS, kf = rest>0? (want-SIM.procS)/rest : 0;
+    var said = st.row[0]+' — '+st.row[1];
+    if(Math.abs(want-real)<0.005){ SIM.basis='computed; within the stated '+st.row[0].toLowerCase(); }
+    else if(kf>=0.35){
+      for(i=0;i<ph.length;i++) if(ph[i].k!=='PROCESS') ph[i].d*=kf;
+      if(SIM.wait) SIM.wait*=kf;
+      real=want;
+      SIM.basis='platform specification ('+said+'); handling fitted to it';
+    } else {
+      SIM.basis='computed from the phase model';
+      SIM.cycNote='The specification states “'+st.row[1]+'” — '+want.toFixed(2)+' s a part. This reference '+
+        famVerb().toLowerCase()+' takes '+SIM.procS.toFixed(2)+' s on its own, so that figure assumes lighter '+
+        'content or marking on the fly. The computed cycle is used.';
     }
   }
-  return handlingS()*2.1 + SIM.procS;
+  /* real seconds → animation seconds: keep the proportions, bound the runtime,
+     and never let a phase flash past unreadably — the process phase least of
+     all. The true figures stay in the telemetry. */
+  var budget=clamp(real, 7, 15), k=budget/real, tot=0;
+  for(i=0;i<ph.length;i++){
+    ph[i].real=ph[i].d;
+    ph[i].d=Math.max(ph[i].k==='PROCESS'?2.4:0.30, ph[i].real*k);
+    tot+=ph[i].d;
+  }
+  SIM.realS=real; SIM.animS=tot;
+  return ph;
 }
+function simCycle(){ return SIM.realS; }
+/* What a run belongs to: the whole configuration, not just the designation —
+   the designation does not name the application, and the application sets the
+   part and the path. The target rate is a judgement, not the machine. */
+function simKey(){ return encodeState().replace(/(^|&)t=\d+/,''); }
+function simFor(){ return typeof SIM!=='undefined' && SIM && SIM.cyc>0 && SIM.forKey===simKey(); }
 function simReady(){
   return !!(S.plat && S.app && S.src && S.lens && S.pw!=null && cur>=STEPS.length-1);
 }
 function simStart(){
   if(!simReady()) return;
   SIM.on=true; SIM.t=0; SIM.ph=0; SIM.cyc=0; SIM.ng=0; SIM.grade=''; SIM.sparks=[];
-  SIM.fault=null; SIM.faultT=0; SIM.stops=0; SIM.runT=0; SIM.stopT=0;
+  SIM.fault=null; SIM.faultT=0; SIM.fix=''; SIM.stops=0; SIM.msg=''; SIM.msgT=0; SIM.pend=null; SIM.hold=false;
   /* Stamp the run with the machine it ran for, so a result is never carried
      over onto a configuration that was changed after the fact. */
-  SIM.forDesig=desig(); SIM._fitAt=-1;
-  SIM.fx=procFX(); SIM.rate=SIM.rate||1;
-  var segs=markPath(), w=(S.lens? LENS[S.lens].fld/100 : 1.75);
-  SIM.moves=buildMoves(segs, w*0.92);
-  /* the path is real: its length in mm over the specified scan speed is the
-     process time, so a bigger objective genuinely takes longer */
-  SIM.speed=scanSpeed();
-  SIM.markMM=SIM.moves.markLen*100; SIM.jumpMM=SIM.moves.jumpLen*100;
-  SIM.procS=SIM.markMM/SIM.speed + SIM.jumpMM/(SIM.speed*3.2);
-  SIM.phases=simPhases(); SIM.cycle=simCycle();
+  SIM.forKey=simKey(); SIM._fitAt=-1;
+  SIM.fx=procFX(); if(SIM.rate==null) SIM.rate=1;
+  if(SIM.rate===0) SIM.rate=1;
+  /* the drawn path fills the part so it can be seen; the time comes from the
+     process model at real size */
+  var w=(S.lens? LENS[S.lens].fld/100 : 1.75);
+  SIM.moves=buildMoves(markPath(), w*0.92);
+  SIM.pm=procModel();
+  SIM.speed=SIM.pm.v; SIM.procS=SIM.pm.t;
+  SIM.markMM=SIM.pm.len; SIM.jumpMM=SIM.pm.jump;
+  SIM.phases=simPhases(); SIM.cycle=SIM.realS;
   SIM.total=0; SIM.phases.forEach(function(p){ SIM.total+=p.d; });
-  SIM.msg='Interlocks closed · beam enabled';
+  simPlanCycle();
+  simSay('Interlocks closed · beam enabled', 1.6);
   M3D.vp && (M3D.vp.dirty=true);
-  m3dSync(); simHud();
+  simCtlSync(); m3dSync(); simHud();
 }
 function simStop(){
-  SIM.on=false; SIM.sparks=[]; SIM.msg=''; SIM.fault=null;
+  SIM.on=false; SIM.sparks=[]; SIM.msg=''; SIM.fault=null; SIM.pend=null;
   M3D.vp && (M3D.vp.dirty=true);
   m3dSync(); simHud();
   /* simHud clears the telemetry and returns early once the run is off, so the
@@ -8314,57 +8529,101 @@ function simPhaseAt(t){
   }
   return {i:SIM.phases.length-1, u:1};
 }
-/* Faults the machine can actually have, only where the hardware exists. */
+function simPhaseStart(k){
+  var acc=0, i;
+  for(i=0;i<SIM.phases.length;i++){ if(SIM.phases[i].k===k) return {t:acc, d:SIM.phases[i].d}; acc+=SIM.phases[i].d; }
+  return null;
+}
+/* A short-lived line on the message bar, in animation seconds. */
+function simSay(m, s){ SIM.msg=m; SIM.msgT=s||1.8; }
+/* start the next cycle after a single cycle was held at its end */
+function simResume(){
+  if(!SIM.hold) return;
+  SIM.hold=false; SIM.t=0; SIM.msg=''; SIM.msgT=0; simPlanCycle();
+}
+
+/* ---- stoppages ------------------------------------------------------------------ */
+/* What this machine can actually suffer, only where the hardware exists, each at
+   the point in the cycle where it happens and with what recovering from it takes.
+   They are shown far more often than a healthy machine has them — a run you can
+   watch has to show one — so they are a demonstration, not a reliability figure,
+   and they never count against the throughput or the result. */
 function simFaults(){
-  var f=[{k:'interlock', m:'Guard interlock opened — beam inhibited', p:0.05}];
-  if(hasMod('fume')) f.push({k:'extract', m:'Extraction flow below threshold — process inhibited', p:0.05});
-  if(loadKind()!=='hand') f.push({k:'nopart', m:'No part detected at the load station', p:0.04});
+  var f=[{k:'interlock', at:'UNLOAD', u:0.40, m:'Guard interlock opened — beam inhibited',
+          fix:'Close the guard, acknowledge and reset', mttr:25}];
+  if(hasMod('fume')) f.push({k:'extract', at:'PROCESS', u:0.45,
+          m:'Extraction flow below threshold — process inhibited',
+          fix:'Restore extraction flow and check the filter', mttr:60});
+  if(loadKind()!=='hand') f.push({k:'nopart', at:'LOAD', u:0.20,
+          m:'No part detected at the load station', fix:'Waiting for upstream supply', mttr:12});
   return f;
+}
+/* Decided at the start of each cycle, deterministically: whether this part
+   grades NG, and whether — and where — the cycle will stop. */
+function simPlanCycle(){
+  var c=SIM.cyc;
+  SIM.grade = (hasMod('visver') && hash01(c*7.3+1.9)>0.90)? 'NG' : 'OK';
+  SIM.pend=null;
+  if(SIM.faults===false || c<1) return;
+  if(hash01(c*3.7+11)>0.88){
+    var fl=simFaults(), f=fl[Math.floor(hash01(c*5.1)*fl.length)%fl.length], at=simPhaseStart(f.at);
+    if(at) SIM.pend={f:f, t:at.t+at.d*f.u};
+  }
 }
 /* rate 0 means paused — `||1` would quietly resume it */
 function simRate(){ return SIM.rate==null? 1 : SIM.rate; }
 function simTick(dt){
   if(!SIM.on) return;
-  /* a fault holds the cycle until it clears, the way an interlock really does */
-  SIM.runT+=dt*simRate();
+  simAdvance(dt*simRate());
+  SIM.hud+=dt;
+  if(SIM.hud>0.12){ SIM.hud=0; simHud(); simStatus(); }
+}
+/* Advance the run by d animation seconds. Kept apart from the frame clock so the
+   step button can move a paused machine on. */
+function simAdvance(d){
+  if(SIM.msgT>0){ SIM.msgT-=d; if(SIM.msgT<=0 && !SIM.fault) SIM.msg=''; }
+  /* a completed single cycle stays complete until it is deliberately resumed —
+     stepping must not count parts that never ran */
+  if(SIM.hold) return;
   if(SIM.fault){
-    SIM.faultT-=dt*simRate();
-    SIM.stopT+=dt*simRate();
-    if(SIM.faultT<=0){ SIM.fault=null; SIM.msg=''; }
+    /* a stoppage holds the cycle exactly where it happened until it is cleared */
+    SIM.faultT-=d;
+    if(SIM.faultT<=0){ SIM.fault=null; SIM.fix=''; simSay('Reset acknowledged — resuming the cycle', 1.4); }
     return;
   }
-  SIM.t+=dt*simRate();
+  var before=SIM.t;
+  SIM.t+=d;
+  if(SIM.pend && before<SIM.pend.t && SIM.t>=SIM.pend.t){
+    var f=SIM.pend.f;
+    SIM.t=SIM.pend.t; SIM.pend=null;          /* stop exactly where it happens */
+    SIM.fault=f.k; SIM.faultT=2.6; SIM.msg=f.m; SIM.msgT=0;
+    SIM.fix=f.fix+' — typically '+f.mttr+' s on a real machine';
+    SIM.stops=(SIM.stops||0)+1;
+  }
   if(SIM.t>=SIM.total){
     SIM.t-=SIM.total; SIM.cyc++;
-    if(!SIM.loop){ SIM.t=SIM.total-0.001; SIM.rate=0; SIM.msg='Single cycle complete'; simHud(); return; }
-    /* a modelled yield miss now and then — the reject path has to do something */
-    var fail = hasMod('visver') && hash01(SIM.cyc*7.3)>0.90;
-    if(fail){ SIM.ng++; SIM.grade='NG'; SIM.msg='Grade below threshold — part diverted to NG'; }
-    else { SIM.grade='OK'; SIM.msg=''; }
-    /* occasional stoppage, chosen from what this machine can actually suffer */
-    if(SIM.faults!==false){
-      var fl=simFaults(), r=hash01(SIM.cyc*3.7+11);
-      if(r>0.86){
-        var pick=fl[Math.floor(hash01(SIM.cyc*5.1)*fl.length)%fl.length];
-        SIM.fault=pick.k; SIM.faultT=1.6; SIM.msg=pick.m; SIM.stops=(SIM.stops||0)+1;
-      }
+    if(SIM.grade==='NG') SIM.ng++;
+    if(!SIM.loop){
+      SIM.t=SIM.total-0.001; SIM.rate=0; SIM.hold=true; simSay('Single cycle complete', 1e9);
+      simCtlSync(); simHud(); return;
     }
+    simPlanCycle();
   }
   var q=simPhaseAt(SIM.t), i;
   SIM.ph=q.i; SIM.u=q.u;
-  /* spatter */
+  /* spatter, smoke or plasma — in animation time, so a paused run is still */
   var k=SIM.phases[q.i].k;
   if(k==='PROCESS'){
     for(i=SIM.sparks.length-1;i>=0;i--){
       var s=SIM.sparks[i];
-      if(s.k==='smoke'){ s.l-=dt*0.55; s.r+=s.gr*dt; s.vy*=(1-dt*0.5); s.vx*=(1-dt*0.3); }
-      else if(s.k==='plasma'){ s.l-=dt*4.2; s.vy-=dt*4; }
-      else { s.l-=dt*1.7; s.vy-=dt*9; }
-      s.x+=s.vx*dt; s.y+=s.vy*dt; s.z+=s.vz*dt;
+      if(s.k==='smoke'){ s.l-=d*0.55; s.r+=s.gr*d; s.vy*=(1-d*0.5); s.vx*=(1-d*0.3); }
+      else if(s.k==='plasma'){ s.l-=d*4.2; s.vy-=d*4; }
+      else { s.l-=d*1.7; s.vy-=d*9; }
+      s.x+=s.vx*d; s.y+=s.vy*d; s.z+=s.vz*d;
       if(s.l<=0 || (s.k!=='smoke' && s.y<TY)) SIM.sparks.splice(i,1);
     }
     var fx=SIM.fx, cap=fx==='smoke'? 20 : 26;
-    if(SIM.sparks.length<cap && SIM.spot && SIM.beamOn){
+    if(d>0 && SIM.sparks.length<cap && SIM.spot && SIM.beamOn){
       for(i=0;i<(fx==='smoke'?1:2);i++){
         if(fx==='smoke') SIM.sparks.push({
           k:'smoke', x:SIM.spot[0]+(Math.random()-0.5)*0.2, y:SIM.spot[1]+0.08,
@@ -8381,8 +8640,20 @@ function simTick(dt){
       }
     }
   } else if(SIM.sparks.length) SIM.sparks.length=0;
-  SIM.hud+=dt;
-  if(SIM.hud>0.12){ SIM.hud=0; simHud(); simStatus(); }
+}
+/* Keep the run controls honest about the state they control. */
+function simCtlSync(){
+  var sp=$('#simSpeed'), st=$('#simStep'), lp=$('#simLoop'), fb=$('#simFault');
+  if(sp){ sp.textContent = SIM.rate? SIM.rate+'×' : 'II'; sp.classList.toggle('paused', SIM.rate===0);
+          sp.title = SIM.rate? 'Playback '+SIM.rate+'× — click to change, then pause' : 'Paused — click to resume'; }
+  if(st) st.style.display = SIM.rate===0? 'inline-flex':'none';
+  if(lp){ lp.textContent = SIM.loop? '↻' : '1';
+          lp.title = SIM.loop? 'Looping — click for a single cycle' : 'Single cycle — click to loop';
+          lp.classList.toggle('paused', !SIM.loop); }
+  if(fb){ fb.classList.toggle('paused', SIM.faults===false);
+          fb.title = SIM.faults===false? 'Stoppages off — click to demonstrate them'
+                                       : 'Stoppages on — click to run without them';
+          fb.setAttribute('aria-pressed', SIM.faults===false? 'false':'true'); }
 }
 
 /* ======================================================================== */
@@ -8397,11 +8668,12 @@ function mmBuild(b, T, vp){
   R.xray = R.vm==='xray';
   R.cut  = R.vm==='cutaway';
   R.exp  = R.vm==='exploded'? 1 : 0;
-  /* frame the machine as it grows, and lift it clear of the telemetry strip
-     once the cycle starts — but never fight a camera the user has moved */
+  /* frame the machine as it grows — but never fight a camera the user has
+     moved. The viewport's inset keeps it clear of the telemetry once the
+     cycle starts, whatever the camera is doing. */
   if(vp && M3D.autoCam && !vp.touched && (vp.o.minD===14 || vp.o.preview)){
     var k=Math.min(1,(vp.dt||0.016)*2.4);
-    var wy=(SIM.on? 0.40 : 0.52)*TOPY;
+    var wy=0.52*TOPY;
     var wd=Math.max(24, 3.05*Math.max(MW, MD, TOPY*0.95));
     vp.cam.ty  += (wy-vp.cam.ty)*k;
     vp.cam.dist+= (wd-vp.cam.dist)*k;
@@ -8956,7 +9228,7 @@ function m3dInit(){
     var w=$('#v3d'), full=w.classList.toggle('full');
     document.body.classList.toggle('v3dlock', full);
     bt.innerHTML=ico(full?'shrink':'expand'); bt.classList.toggle('on', full);
-    setTimeout(function(){ M3D.vp.resize(); M3D.vp.dirty=true; }, 60);
+    setTimeout(function(){ M3D.vp.resize(); M3D.vp.dirty=true; simInset(); }, 60);
   });
 
   /* click any assembly to read what it is; a drag still orbits */
@@ -8995,22 +9267,33 @@ function m3dInit(){
   $('#simSpeed').onclick=function(){
     var i=RATES.indexOf(SIM.rate);
     SIM.rate=RATES[(i+1)%RATES.length];
-    $('#simSpeed').textContent = SIM.rate? SIM.rate+'×' : 'II';
-    $('#simSpeed').classList.toggle('paused', SIM.rate===0);
-    $('#simStep').style.display = SIM.rate===0? 'inline-flex':'none';
+    /* resuming after a single cycle completed starts the next one cleanly */
+    if(SIM.rate) simResume();
+    simCtlSync();
   };
-  $('#simStep').onclick=function(){ SIM.rate=0; simTick(0.10/1); simHud(); M3D.vp.dirty=true; };
-  $('#simLoop').onclick=function(){
-    SIM.loop=!SIM.loop;
-    $('#simLoop').textContent = SIM.loop? '↻' : '1';
-    $('#simLoop').title = SIM.loop? 'Looping — click for a single cycle' : 'Single cycle — click to loop';
-    $('#simLoop').classList.toggle('paused', !SIM.loop);
+  /* one tenth of an animation second, whatever the playback rate — the frame
+     clock multiplies by the rate, and the rate is zero while paused */
+  $('#simStep').onclick=function(){
+    SIM.rate=0; simResume(); simAdvance(0.10); simCtlSync(); simHud(); simStatus(); M3D.vp.dirty=true;
   };
+  $('#simLoop').onclick=function(){ SIM.loop=!SIM.loop; simCtlSync(); };
+  $('#simFault').innerHTML=ico('alert');
+  $('#simFault').onclick=function(){
+    SIM.faults = SIM.faults===false;
+    if(SIM.faults===false){
+      SIM.pend=null;
+      if(SIM.fault){ SIM.fault=null; SIM.fix=''; SIM.msg=''; }
+    }
+    simCtlSync(); simHud(); simStatus();
+    toast(SIM.faults===false? 'Stoppages off — the machine runs uninterrupted.'
+                            : 'Stoppages on — interlock, extraction and supply stops are demonstrated.');
+  };
+  simCtlSync();
   document.addEventListener('keydown', function(e){
     if(e.key==='Escape' && $('#v3d').classList.contains('full')){
       $('#v3d').classList.remove('full'); document.body.classList.remove('v3dlock');
       var bt=$('#v3dctl').lastChild; bt.innerHTML=ico('expand'); bt.classList.remove('on');
-      setTimeout(function(){ M3D.vp.resize(); M3D.vp.dirty=true; }, 60);
+      setTimeout(function(){ M3D.vp.resize(); M3D.vp.dirty=true; simInset(); }, 60);
     }
   });
 
@@ -9023,6 +9306,7 @@ function m3dInit(){
     requestAnimationFrame(tick);
   })(performance.now());
 
+  window.addEventListener('resize', function(){ setTimeout(simInset, 80); }, {passive:true});
   M3D.ready=true;
   m3dSync();
 }
@@ -9111,7 +9395,8 @@ function m3dSync(){
     state.textContent = p? (cur>=5?'Built':'Assembling') : 'Standby';
   }
   $('#v3d').classList.toggle('running', SIM.on);
-  if(!SIM.on){ $('#simphase').innerHTML=''; $('#simstats').innerHTML=''; $('#simmsg').textContent=''; }
+  if(!SIM.on){ $('#simphase').innerHTML=''; $('#simstats').innerHTML=''; simMsg('',''); }
+  simInset();
   M3D.vp.dirty=true;
 }
 
@@ -9134,73 +9419,123 @@ function showComp(id){
 function simStatus(){
   var el2=$('#v3dstat'); if(!el2) return;
   if(!SIM.on){ el2.innerHTML=''; return; }
-  var k=SIM.phases[SIM.ph].k, beamOn=SIM.beamOn && !SIM.fault, fault=SIM.fault;
+  var k=SIM.phases[SIM.ph].k, beamOn=SIM.beamOn && !SIM.fault, fault=SIM.fault, ph=null;
+  try{ ph=physics(); }catch(e){ ph=null; }
   var axis=(SIM.spot? SIM.spot[0]*100 : 0);
-  function row(l,v,c){ return '<span>'+l+'<b'+(c?' class="'+c+'"':'')+'>'+v+'</b></span>'; }
+  /* key rows stay visible in the compact panel; the rest appear with room */
+  function row(l,v,c,key){ return '<span'+(key?' class="k"':'')+'>'+l+'<b'+(c?' class="'+c+'"':'')+'>'+v+'</b></span>'; }
   el2.innerHTML=
-    row('Machine', fault? 'Halted':'Running', fault?'bad':'ok')+
-    row('Laser', beamOn? 'EMISSION':'Standby', beamOn?'warn':'')+
+    row('Machine', fault? 'Halted':'Running', fault?'bad':'ok', 1)+
+    row('Laser', beamOn? 'Emission' : fault? 'Inhibited' : 'Standby', beamOn?'warn':fault?'bad':'', 1)+
+    row('Door', fault==='interlock'? 'Open':'Closed & locked', fault==='interlock'?'bad':'ok', 1)+
     row('X / Z', axis.toFixed(0)+' / '+Math.round((R3D.headY||0)*100)+' mm')+
     row('Cycle', Math.round(SIM.t/SIM.total*100)+' %')+
-    row('Door', fault==='interlock'? 'Open':'Closed & locked', fault==='interlock'?'bad':'ok')+
     row('E-stop','Released','ok')+
     row('Camera', hasMod('visfid')? (k==='LOCATE'?'Acquiring':'Ready'):'Not fitted')+
-    row('Cooling', fault? 'Idle':'Nominal','ok')+
-    row('Air', fault==='extract'? 'Low':'5.8 bar', fault==='extract'?'bad':'ok')+
-    row('Temp', (26+(beamOn?4:0)+(S.pw>500?6:0)).toFixed(0)+' °C', S.pw>500?'warn':'ok');
+    row('Extraction', !hasMod('fume')? 'Not fitted' : fault==='extract'? 'Low flow' : 'Nominal',
+        fault==='extract'?'bad':hasMod('fume')?'ok':'')+
+    row('Part', fault==='nopart'? 'Not present' : (k==='HOME'||k==='LOAD')? 'Arriving' : 'Present',
+        fault==='nopart'?'bad':'')+
+    row('Heat load', ph? (beamOn? num(ph.heat_kW)+' kW' : 'Idle') : '—', beamOn&&ph&&ph.heat_kW>2?'warn':'');
 }
 
 /* telemetry, refreshed while the cycle runs */
 function simHud(){
-  var ps=$('#simphase'), ss=$('#simstats');
+  var ps=$('#simphase'), ss=$('#simstats'), msg=$('#simmsg');
   if(!ps||!ss) return;
-  if(!SIM.on){ ps.innerHTML=''; ss.innerHTML=''; $('#simmsg').textContent=''; $('#v3d').classList.remove('running'); return; }
+  if(!SIM.on){
+    ps.innerHTML=''; ss.innerHTML=''; simMsg('',''); $('#v3d').classList.remove('running','alarm');
+    var bd0=$('#simbreak'); if(bd0) bd0.innerHTML='';
+    return;
+  }
   var h='', i;
   for(i=0;i<SIM.phases.length;i++)
-    h+='<span class="'+(i<SIM.ph?'done':i===SIM.ph?'on':'')+'" data-ph="'+i+'" title="Jump to '+
-       esc(SIM.phases[i].n)+'">'+esc(SIM.phases[i].n)+'</span>';
+    h+='<span class="'+(i<SIM.ph?'done':i===SIM.ph?'on':'')+'" data-ph="'+i+'" title="'+
+       esc(SIM.phases[i].n)+' — '+SIM.phases[i].real.toFixed(2)+' s · click to jump">'+esc(SIM.phases[i].n)+'</span>';
   ps.innerHTML=h;
   ps.onclick=function(ev){
     var t=ev.target.closest('[data-ph]'); if(!t) return;
     var idx=+t.getAttribute('data-ph'), acc=0, j;
     for(j=0;j<idx;j++) acc+=SIM.phases[j].d;
-    SIM.t=acc+0.001; simHud(); M3D.vp.dirty=true;
+    /* jumping clears a held stoppage — the scrubbed-to point is a fresh look */
+    SIM.fault=null; SIM.fix=''; SIM.msg=''; SIM.msgT=0; SIM.hold=false;
+    if(SIM.pend && SIM.pend.t<acc) SIM.pend=null;
+    SIM.t=acc+0.001; simAdvance(0); simHud(); simStatus(); M3D.vp.dirty=true;
   };
 
-  var cyc=SIM.cycle, rate=Math.round(3600/cyc);
-  var done=SIM.cyc, ok=done-SIM.ng;
-  var yld=done? (ok/done*100) : 100;
-  SIM.slowLbl=cyc.toFixed(1)+' s cycle · '+(SIM.total/cyc*simRate()).toFixed(1)+'× slow motion';
-  var handS=Math.max(0, cyc-SIM.procS), pcProc=Math.round(SIM.procS/cyc*100);
-  var util=SIM.runT>0? Math.max(0,(SIM.runT-SIM.stopT)/SIM.runT*100) : 100;
+  var cyc=SIM.cycle, rate=3600/cyc, done=SIM.cyc, ok=done-SIM.ng;
+  var yld=done? (ok/done*100) : 100, good=rate*yld/100, tgt=S.target>0? S.target : null;
+  SIM.slowLbl=fmtS(cyc)+' cycle · '+(SIM.total/cyc*simRate()).toFixed(1)+'× slow motion';
+  var handS=Math.max(0, cyc-SIM.procS), pcProc=Math.max(SIM.procS>0?1:0, Math.round(SIM.procS/cyc*100));
   var bd=$('#simbreak');
-  if(bd) bd.innerHTML='<i style="width:'+pcProc+'%" title="Beam on '+pcProc+'%"></i>'+
-                      '<i class="h" style="width:'+(100-pcProc)+'%" title="Handling '+(100-pcProc)+'%"></i>';
-  var pr=procResult(yld, util, SIM.stops, done);
+  if(bd) bd.innerHTML='<i style="width:'+pcProc+'%" title="Process '+fmtS(SIM.procS)+' — '+pcProc+' %"></i>'+
+                      '<i class="h" style="width:'+(100-pcProc)+'%" title="Handling and motion '+fmtS(handS)+'"></i>';
+  var pr=procResult(yld, done, good, tgt);
+  function cell(l,v,cls,vc){ return '<div class="'+cls+'">'+l+'<b'+(vc?' class="'+vc+'"':'')+'>'+v+'</b></div>'; }
   ss.innerHTML=
-    '<div>Cycle<b>'+cyc.toFixed(1)+' s</b></div>'+
-    '<div>Process<b>'+SIM.procS.toFixed(2)+' s</b></div>'+
-    '<div>Handling<b>'+handS.toFixed(2)+' s</b></div>'+
-    '<div>Rate<b>'+inr(rate)+' /h</b></div>'+
-    '<div>Parts<b>'+done+'</b></div>'+
-    '<div>Yield<b class="'+(yld>=99?'ok':yld>=95?'':'warn')+'">'+yld.toFixed(1)+' %</b></div>'+
-    '<div>Stops<b class="'+(SIM.stops?'warn':'ok')+'">'+(SIM.stops||0)+'</b></div>'+
-    '<div>Beam on<b>'+pcProc+' %</b></div>'+
-    '<div>Utilisation<b class="'+(util>=98?'ok':util>=90?'':'warn')+'">'+util.toFixed(1)+' %</b></div>'+
-    '<div>Result<b class="'+pr.c+'">'+pr.l+'</b></div>';
+    cell('Cycle', fmtS(cyc), 'p')+
+    cell('Rate', inr(Math.round(rate))+' /h', 'p')+
+    cell('Parts', done, 'p')+
+    cell('Yield', yld.toFixed(1)+' %', 'p', yld>=99?'ok':yld>=95?'':'warn')+
+    cell('Result', pr.l, 'p r', pr.c)+
+    cell('Process', fmtS(SIM.procS), 's')+
+    cell('Handling', fmtS(handS), 's')+
+    cell('Beam on', pcProc+' %', 's')+
+    cell('Good / 8 h', inr(Math.round(good*8)), 's')+
+    (tgt? cell('vs target', Math.round(good/tgt*100)+' %', 's', good>=tgt?'ok':'warn')
+        : cell('Speed', inr(Math.round(SIM.speed))+' mm/s', 's'))+
+    cell('Stops', (SIM.stops||0)+(SIM.faults===false?' · off':''), 's', SIM.stops?'warn':'');
   /* The fit panel carries the throughput dimension, so refresh it when a cycle
      completes rather than on every frame. */
   if(SIM.cyc!==SIM._fitAt){ SIM._fitAt=SIM.cyc; try{ fitSync(); }catch(e){} }
-  var msg=$('#simmsg'), k=SIM.phases[SIM.ph].k;
-  if(SIM.fault){ msg.textContent=SIM.msg; msg.style.color='#FF9E8C'; return; }
-  msg.style.color='';
-  msg.textContent = SIM.msg || (k==='PROCESS'
-      ? S.pw+' W · '+SRC[S.src].wl+' · '+inr(SIM.speed)+' mm/s over '+inr(Math.round(SIM.markMM))+' mm'
+  simInset();
+
+  var k=SIM.phases[SIM.ph].k, o=optics();
+  $('#v3d').classList.toggle('alarm', !!SIM.fault);
+  if(SIM.fault){ simMsg(SIM.msg, SIM.fix, 'bad'); return; }
+  if(SIM.msg){ simMsg(SIM.msg, '', ''); return; }
+  if(SIM.grade==='NG' && (k==='VERIFY'||k==='UNLOAD')){
+    simMsg('Grade below threshold — part diverted to NG', hasMod('reject')? 'Reject station sorts it out of the flow' : '', 'bad'); return;
+  }
+  var pm=SIM.pm||{};
+  simMsg(k==='PROCESS'
+      ? S.pw+' W · '+SRC[S.src].wl+' · '+inr(Math.round(SIM.speed))+' mm/s'+
+        (pm.lim==='overlap'? ' (50 % pulse overlap)' : '')+' · '+inr(Math.round(SIM.markMM))+' mm'
+    : k==='LOAD' && SIM.wait>0.05 ? 'Index waits for station 2 — '+fmtS(SIM.wait)+' of loading'
     : k==='LOCATE' && hasMod('visfid') ? 'Fiducial correction · ± 0.05 mm'
-    : k==='FOCUS' ? 'Standoff '+(S.lens?LENS[S.lens].f:0)+' mm · DOF ± '+
-        (optics()? (optics().dof/1000).toFixed(2) : '—')+' mm'
-    : k==='VERIFY' && hasMod('visver') ? 'Decode and grade to ISO/IEC 29158' : '');
-  msg.style.color = SIM.grade==='NG' && SIM.msg? '#FF9E8C' : '';
+    : k==='FOCUS' ? (hasMod('autofoc')? 'Triangulation — Z set to the part · ' : 'Standoff '+(S.lens?LENS[S.lens].f:0)+' mm · ')+
+        'DOF ± '+(o? (o.dof/1000).toFixed(2) : '—')+' mm'
+    : k==='VERIFY' && hasMod('visver') ? 'Decode and grade to ISO/IEC 29158' : '',
+    k==='PROCESS' && pm.kind==='code'? pm.basis : '', '');
+}
+/* the message bar: what is happening, and — for a stoppage — what clears it */
+function simMsg(main, sub, cls){
+  var m=$('#simmsg'); if(!m) return;
+  var a=m.querySelector('.mm'), b=m.querySelector('.mf');
+  if(a && a.textContent!==main) a.textContent=main||'';
+  if(b && b.textContent!==(sub||'')) b.textContent=sub||'';
+  m.className='simmsg'+(cls?' '+cls:'')+(main?'':' empty');
+}
+/* seconds, with the precision the magnitude deserves */
+function fmtS(s){ return (s<10? s.toFixed(2) : s.toFixed(1))+' s'; }
+/* Tell the viewport how much of the bottom the run telemetry covers, so it can
+   frame the machine above it and keep callouts out from underneath. */
+function simInset(){
+  var vp=M3D.vp, v=$('#v3d'); if(!vp||!v) return;
+  var tel=v.querySelector('.simtel'), ins=0, r=v.getBoundingClientRect();
+  if(SIM.on && tel){
+    var t=tel.getBoundingClientRect();
+    if(t.height>0) ins=Math.max(0, r.bottom-t.top-8);
+  }
+  if(Math.abs(ins-(vp.insetT||0))>1){ vp.insetT=ins; vp.dirty=true; }
+  /* and the text blocks along the top, so a callout never lands on them */
+  var av=[];
+  ['#v3dname','#v3dstate','#v3dstat','#v3dstack'].forEach(function(sel){
+    var n=$(sel); if(!n) return;
+    var b=n.getBoundingClientRect();
+    if(b.width>0 && b.height>0) av.push([b.left-r.left-4, b.top-r.top-3, b.width+8, b.height+6]);
+  });
+  vp.avoid=av;
 }
 
 /* ==========================================================================
@@ -9523,7 +9858,7 @@ var _render3d=render;
 render=function(){
   if(STEPS[cur].k!=='fam') famUnmount();
   _render3d();
-  if(SIM.on && !simReady()) simStop();
+  if(SIM.on && (!simReady() || SIM.forKey!==simKey())) simStop();
 };
 
 
@@ -10191,14 +10526,16 @@ function setEng(on){
 }
 
 /* ---- process result ----------------------------------------------------- */
-/* Classifies a cycle that has actually been run, from the model's own yield,
-   utilisation and stop count. Until the first part completes there is nothing
-   to classify, so it says so. */
-function procResult(yld, util, stops, done){
+/* Classifies a cycle that has actually been run, from the model's yield and —
+   where one is set — the throughput target. Until the first part completes there
+   is nothing to classify, so it says so. Demonstrated stoppages do not count:
+   they are shown far more often than a healthy machine has them. */
+function procResult(yld, done, good, tgt){
   if(!done) return {l:'Requires validation', c:''};
   if(yld<90)                       return {l:'Outside target', c:'warn'};
-  if(stops>0 || yld<95)            return {l:'Attention',      c:'warn'};
-  if(yld>=99 && util>=98)          return {l:'Optimal',        c:'ok'};
+  if(tgt && good<0.9*tgt)          return {l:'Outside target', c:'warn'};
+  if(yld<95 || (tgt && good<tgt))  return {l:'Attention',      c:'warn'};
+  if(yld>=99)                      return {l:'Optimal',        c:'ok'};
   return {l:'Within target', c:'ok'};
 }
 
@@ -10266,13 +10603,21 @@ function cfgFit(){
 
   /* Throughput — derived from a cycle that has actually been run, never guessed,
      and only while the run still belongs to this configuration */
-  if(typeof SIM!=='undefined' && SIM && SIM.cyc>0 && SIM.forDesig===desig()){
-    var rate=Math.round(3600/SIM.cycle), yld=(SIM.cyc-SIM.ng)/SIM.cyc*100;
-    d.push(fitD('Throughput fit', SIM.stops? 'att' : (yld>=99?'opt':'tgt'),
-      'Simulated '+inr(rate)+' parts/h at '+SIM.cycle.toFixed(1)+' s cycle, '+
-      yld.toFixed(1)+' % yield'+(SIM.stops? ', '+SIM.stops+' stop'+(SIM.stops>1?'s':''):'')+'.'));
+  var tgt=S.target>0? S.target : null;
+  if(simFor()){
+    var rate=3600/SIM.cycle, yld=(SIM.cyc-SIM.ng)/SIM.cyc*100, good=rate*yld/100;
+    var tn='Simulated '+inr(Math.round(rate))+' parts/h at '+fmtS(SIM.cycle)+' cycle, '+yld.toFixed(1)+' % yield';
+    if(tgt){
+      d.push(fitD('Throughput fit', good>=tgt? 'opt' : good>=0.9*tgt? 'att' : 'out',
+        tn+' — '+inr(Math.round(good))+' good parts/h against a '+inr(tgt)+' /h target ('+
+        Math.round(good/tgt*100)+' %).'));
+    } else {
+      d.push(fitD('Throughput fit', yld>=99? 'opt':'tgt',
+        tn+'. Set a target rate below to judge it against your requirement.'));
+    }
   } else {
-    d.push(fitD('Throughput fit','na','Not available from the current model — run the machine cycle.'));
+    d.push(fitD('Throughput fit','na','Not available from the current model — run the machine cycle'+
+      (tgt? ' to compare with the '+inr(tgt)+' /h target.' : '.')));
   }
 
   var got=d.filter(function(x){ return FITST[x.st].w!=null; });
@@ -10304,6 +10649,8 @@ function fitSync(){
        '</div>';
   });
   $('#fitrows').innerHTML=h;
+  var ti=$('#fitTarget');
+  if(ti && document.activeElement!==ti) ti.value = S.target>0? S.target : '';
   $('#fitfoot').textContent='Indicative configuration fit — derived from the catalogue option lists, '+
     'module fitment and the computed optics. '+f.got+' of '+f.total+' dimensions derived. '+
     'Not a certification, a guarantee or an acceptance specification.';
@@ -10417,8 +10764,9 @@ function simSummaryText(){
   h('OPTICS — COMPUTED');
   if(o){
     kv('Spot diameter', o.spot.toFixed(1)+' µm');
-    kv('Depth of focus', (o.dof/1000).toFixed(3)+' mm');
-    kv('Addressable field', o.fld);
+    kv('Depth of focus', '± '+(o.dof/1000).toFixed(3)+' mm (Rayleigh range)');
+    kv('Focus window, ±5 %', '± '+(o.dof5/1000).toFixed(3)+' mm');
+    kv('Addressable field', o.fld+' × '+o.fld+' mm');
     kv('Focal length', o.f+' mm');
   } else L.push('  Not available — source and objective not selected.');
 
@@ -10427,25 +10775,46 @@ function simSummaryText(){
     kv('Process regime', ph.regime.n);
     if(ph.Ep_mJ!=null)  kv('Pulse energy', ph.Ep_mJ.toFixed(3)+' mJ');
     if(ph.Ppk_kW!=null) kv('Peak power', ph.Ppk_kW.toFixed(2)+' kW');
-    if(ph.frep_khz!=null) kv('Repetition rate', ph.frep_khz+' kHz');
-    if(ph.tau_ns!=null) kv('Pulse width', ph.tau_ns+' ns');
+    if(ph.frep_khz!=null) kv('Repetition rate', num(ph.frep_khz)+' kHz (usable '+ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz)');
+    if(ph.tau_ns!=null) kv('Pulse width', tauTxt(ph.tau_ns));
     if(ph.irr!=null)    kv(ph.irrLabel, sci(ph.irr)+' W/cm²');
     if(ph.fluence!=null && ph.showFluence) kv('Fluence', ph.fluence.toFixed(2)+' J/cm²');
-    if(ph.abs!=null)    kv('Absorptivity', (ph.abs*100).toFixed(1)+' % (clean, room temperature)');
+    if(ph.mat){
+      kv('Material', ph.mat.m.n);
+      kv('Absorptivity', (ph.mat.abs*100).toFixed(1)+' % (clean, room temperature)');
+      kv('Coupled power', num(ph.mat.coupled)+' W of '+S.pw+' W');
+    }
   } else L.push('  Not available — complete the source and objective selection.');
 
   h('SIMULATION RESULT');
-  if(typeof SIM!=='undefined' && SIM && SIM.cyc>0 && SIM.forDesig===desig()){
+  var tgt=S.target>0? S.target : null;
+  if(simFor()){
+    var yl=(SIM.cyc-SIM.ng)/SIM.cyc*100, rt=3600/SIM.cycle, gd=rt*yl/100, pm=SIM.pm||{};
     kv('Status', 'Cycle run in the process model');
     kv('Cycle time', SIM.cycle.toFixed(2)+' s');
+    kv('Cycle basis', SIM.basis);
+    if(SIM.cycNote) L.push('    Note: '+SIM.cycNote);
     kv('Process time', SIM.procS.toFixed(2)+' s');
+    if(pm.basis) kv('Process basis', pm.basis);
+    kv('Process speed', inr(Math.round(SIM.speed))+' mm/s'+
+      (pm.lim==='overlap'? ' — held to 50 % pulse overlap (head '+inr(pm.head)+' mm/s)' : ' — scan head'));
+    kv('Path', inr(Math.round(SIM.markMM))+' mm processed, '+inr(Math.round(SIM.jumpMM))+' mm jumps');
     kv('Handling time', Math.max(0,SIM.cycle-SIM.procS).toFixed(2)+' s');
-    kv('Indicative rate', inr(Math.round(3600/SIM.cycle))+' parts/h');
+    L.push('  Phases (real seconds):');
+    SIM.phases.forEach(function(x){
+      var nm=x.n.charAt(0).toUpperCase()+x.n.slice(1).toLowerCase();
+      L.push('    '+(nm+'                    ').slice(0,20)+x.real.toFixed(2)+' s'+(x.k==='PROCESS'?'  ← computed':''));
+    });
+    kv('Indicative rate', inr(Math.round(rt))+' parts/h');
     kv('Parts completed', SIM.cyc);
-    kv('Yield', ((SIM.cyc-SIM.ng)/SIM.cyc*100).toFixed(1)+' %');
-    kv('Stops', SIM.stops||0);
+    kv('Yield', yl.toFixed(1)+' %'+(hasMod('visver')? ' (graded in machine)' : ' (no in-machine grading fitted)'));
+    kv('Good parts / 8 h shift', inr(Math.round(gd*8)));
+    if(tgt) kv('Against target', inr(Math.round(gd))+' of '+inr(tgt)+' good parts/h ('+Math.round(gd/tgt*100)+' %)');
+    kv('Stops demonstrated', (SIM.stops||0)+' — shown far more often than a healthy machine has them;');
+    L.push('                            not a reliability figure, and not counted against the result.');
   } else {
     kv('Status', 'NOT RUN — no cycle has been simulated for this configuration');
+    if(tgt) kv('Target rate', inr(tgt)+' parts/h');
   }
 
   h('INDICATIVE CONFIGURATION FIT');
@@ -10472,6 +10841,10 @@ function simSummaryText(){
   L.push('    surface. Oxide, roughness and melt all raise absorptivity substantially.');
   L.push('  · Cycle and rate figures come from the motion and phase model in this tool.');
   L.push('    They are indicative, and exclude line-level starvation and blocking.');
+  L.push('  · Marking time is modelled on a 12 × 12 Data Matrix at the DFM-recommended');
+  L.push('    module and a line of text, hatched at half the line width. Pulsed sources');
+  L.push('    are held to 50 % pulse overlap; each vector pays a 250 µs scanner delay.');
+  L.push('    Your own content, hatch and passes set the real figure.');
   L.push('  · Ablation thresholds, removal rates and eyewear optical density are');
   L.push('    deliberately absent — see Data provenance.');
 
@@ -10565,7 +10938,7 @@ function demoRun(){
       S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
       famSel=DEMOCFG.fam; reach=0; go(0);
     }],
-    [1400,'Platform — '+PLAT[DEMOCFG.plat].n, function(){ S.plat=DEMOCFG.plat; reach=1; go(1); }],
+    [1400,'Platform — '+PLAT[DEMOCFG.plat].n, function(){ pickPlatform(DEMOCFG.plat); reach=1; go(1); }],
     [1600,'Application — inline PCB marking', function(){ S.app=DEMOCFG.app; reach=2; go(2); }],
     [1600,'Source, power and objective', function(){
       S.src=DEMOCFG.src; S.pw=DEMOCFG.pw; S.lens=DEMOCFG.lens; reach=3; go(3);
@@ -10607,6 +10980,13 @@ function demoRun(){
   $('#vmEng').onclick=function(){ if(!ENG) setEng(true); };
   $('#demoRun').onclick=demoRun;
   $('#demoEnd').onclick=demoOff;
+  /* the throughput target: carried in the link, judged in the fit and the run */
+  $('#fitTarget').oninput=function(){
+    var v=parseInt(this.value,10);
+    S.target = v>0? v : null;
+    writeHash(); fitSync();
+    if(SIM.on) simHud();
+  };
   try{ if(Store.get('teal.eng', false)) applyEng(true); }catch(e){}
   /* Demo mode is a presenter tool, so it stays out of the chrome: shift+D, or
      ?demo / #demo on the URL for a kiosk. */
@@ -10619,7 +10999,7 @@ function demoRun(){
 })();
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v3.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v10.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
