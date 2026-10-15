@@ -212,6 +212,92 @@ try {
   await pg.close();
 
   /* ------------------------------------------------------------------ */
+  sec('Machine story');
+  pg = await open();
+  const scene = async i => { await pg.evaluate(i => { STORY.reduce = true; storyJump(i); STORY.reduce = false; }, i);
+                             await pg.waitForTimeout(1300); return pg.evaluate(() => STORY.i); };
+  check('the story opens at the top with the machine and its headline', await pg.evaluate(() =>
+    STORY.on && STORY.i === 0 && !!document.querySelector('.sty-scene.on h2') && scrollY < 5));
+  check('with nothing configured it tells a labelled example', await pg.evaluate(() =>
+    STORY.ex && /Example/.test(document.querySelector('.sty-scene[data-s="0"]').textContent)));
+  await pg.waitForTimeout(2600);
+  check('the opening reveal settles on the hero framing', await pg.evaluate(() => {
+    const k = storyKey(0), c = STORY.vp.cam; return !STORY.intro && Math.abs(c.yaw - k.yaw) < 0.12 && Math.abs(c.dist - k.dist) / k.dist < 0.05; }));
+  const stBefore = await pg.evaluate(() => JSON.stringify({ S, cur, reach, vm: M3D.vmode, ex: M3D.expA, iso: M3D.iso,
+                                                          sim: [SIM.on, SIM.cyc], h: localStorage.getItem('teal.hist') }));
+  check('scene B ghosts the enclosure back', await scene(1) === 1 && await pg.evaluate(() => STORY.view.xk > 0.5));
+  check('scene C separates the assemblies', await scene(2) === 2 && await pg.evaluate(() => STORY.view.expA > 0.5));
+  check('scene D isolates the optical system', await scene(3) === 3 && await pg.evaluate(() =>
+    STORY.view.isoW.optic > 0.9 && STORY.view.isoW._ < 0.3));
+  check('scene E draws the beam from the configured optical train', await scene(4) === 4 && await pg.evaluate(() =>
+    document.getElementById('styE').classList.contains('on') && STORY.insE.lines.length > 0 &&
+    STORY.insE.lines.some(l => parseFloat(l.el.style.strokeDashoffset) < l.n)));
+  check('scene F traces the real scan path', await scene(5) === 5 && await pg.evaluate(() =>
+    document.getElementById('styF').classList.contains('on') && +STORY.insF.path.getAttribute('stroke-dashoffset') < 1));
+  check('the process time shown is the process model’s own', await pg.evaluate(() => {
+    const t = withStory(() => procModel().t).toFixed(2);
+    return document.querySelector('.sty-scene[data-s="5"]').textContent.includes(t + ' s'); }));
+  check('scene G hands over to the configurator', await scene(6) === 6 && !!(await pg.$('.sty-scene.on [data-go]')));
+  const stAfter = await pg.evaluate(() => JSON.stringify({ S, cur, reach, vm: M3D.vmode, ex: M3D.expA, iso: M3D.iso,
+                                                         sim: [SIM.on, SIM.cyc], h: localStorage.getItem('teal.hist') }));
+  check('scrolling the story changes no configuration, simulation, viewer or History state', stBefore === stAfter);
+  check('the scene index is navigable: jumping to A returns to the top', await scene(0) === 0 && await pg.evaluate(() => scrollY < 5));
+  await pg.click('#stySkip'); await pg.waitForTimeout(900);
+  check('“Skip to configurator” lands on the workspace', await pg.evaluate(() => {
+    const t = document.getElementById('rail').getBoundingClientRect().top; return t > 40 && t < 200; }));
+  await pg.evaluate(() => { famSel = 'mark'; render(); });
+  await pg.evaluate(() => { pickPlatform('markc2i'); render(); go(2); }); await pg.waitForTimeout(800);
+  check('step changes keep the workspace in view rather than scrolling to the story', await pg.evaluate(() =>
+    document.getElementById('story').getBoundingClientRect().bottom < innerHeight * 0.3));
+  check('the schematic glow cannot drop axis-aligned beams', await pg.evaluate(() =>
+    /<filter id="gl" filterUnits="userSpaceOnUse"/.test(schematicSVG())));
+  const sweep = await pg.evaluate(() => {
+    const keep = JSON.stringify(S), keepCur = cur, bad = [];
+    for (const pk of Object.keys(PLAT)) {
+      S = {plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
+      pickPlatform(pk); S.app = Object.keys(PLAT[pk].apps)[0];
+      try { storySync();
+        for (let i = 0; i < 7; i++) { const w = storyWant(i, 0.6); Object.assign(STORY.view, {xk:w.xk, expA:w.expA, isoW:w.w});
+          const b = new B3(); b.q = 1; b.lod = 1; storyBuild(b, 1, STORY.vp);
+          if (!Object.values(storyKey(i)).every(isFinite)) bad.push(pk + ' scene ' + i + ' camera'); }
+        if (/NaN|undefined|Infinity/.test(document.getElementById('styCopy').textContent)) bad.push(pk + ' caption');
+        if (!(STORY.insF.len > 0) || !STORY.insE.lines.length) bad.push(pk + ' insets');
+      } catch (e) { bad.push(pk + ': ' + e.message); }
+    }
+    S = JSON.parse(keep); cur = keepCur; render(); return bad;
+  });
+  check('every platform tells the whole story: all scenes build, all figures finite', sweep.length === 0, sweep.join(', '));
+  check('no script errors in the story', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  pg = await open('#p=markf&a=metal&s=mopa&w=50&l=f420');
+  check('a shared link lands on the workspace, with the story above it', await pg.evaluate(() => {
+    const t = document.getElementById('rail').getBoundingClientRect().top; return t > 40 && t < 200 && scrollY > 200; }));
+  check('the story follows the configuration: it tells the user’s own machine', await pg.evaluate(() =>
+    !STORY.ex && document.querySelector('.sty-scene[data-s="0"] h2').textContent === P().n));
+  await pg.evaluate(() => { S.lens = 'f163'; render(); });
+  check('changing an option rebuilds the story’s machine and its numbers', await pg.evaluate(() =>
+    STORY.S.lens === 'f163' && document.querySelector('.sty-scene[data-s="3"]').textContent.includes('F163')));
+  await pg.close();
+
+  pg = await open('', { reducedMotion: 'reduce' });
+  check('reduced motion: no opening reveal, and the camera starts where it rests', await pg.evaluate(() => {
+    const k = storyKey(0), c = STORY.vp.cam; return STORY.reduce && !STORY.intro && Math.abs(c.yaw - k.yaw) < 1e-6; }));
+  await pg.close();
+
+  const ctx = await browser.newContext();
+  await ctx.addInitScript(() => { try { localStorage.setItem('teal.seenAdvisor', 'true'); } catch (e) {}
+    const g = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function () { return this.id === 'scanvas' ? null : g.apply(this, arguments); }; });
+  pg = await ctx.newPage(); pg.errors = []; pg.on('pageerror', e => pg.errors.push(e.message));
+  await pg.goto(BASE, { waitUntil: 'networkidle' }); await pg.waitForTimeout(800);
+  check('without a canvas the story falls back to readable text, and the configurator still works', await pg.evaluate(() =>
+    document.getElementById('story').classList.contains('sty-static') &&
+    document.querySelectorAll('.sty-scene').length >= 1 && typeof render === 'function' && !!document.querySelector('#rail .st, #rail > *')));
+  check('the fallback raises no script errors', pg.errors.length === 0, pg.errors.join(' | '));
+  await ctx.close();
+
+  /* ------------------------------------------------------------------ */
   sec('Layout and accessibility');
   pg = await open(C2I);
   const bad = [];

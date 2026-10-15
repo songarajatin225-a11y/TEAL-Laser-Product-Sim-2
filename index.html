@@ -1102,6 +1102,8 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
 .hnav button[aria-current="page"]::after{content:"";position:absolute;left:14px;right:14px;
   bottom:-13px;height:2px;background:var(--teal);border-radius:2px}
 @media(max-width:1360px){.hnav{display:none}}
+body.in-story .hnav button[aria-current="page"]{color:var(--ink-2);font-weight:550}
+body.in-story .hnav button[aria-current="page"]::after{opacity:0}
 
 /* Icon-only header actions keep five destinations inside a 64 px header. */
 .hb-ico{padding:9px 11px}
@@ -1197,6 +1199,104 @@ body.eng tr.adv-only{display:table-row}
 .v3diso.on{display:flex}
 .v3diso button{background:#00B7BA;border:0;color:#04161F;border-radius:999px;padding:5px 11px;font-family:var(--mono);
   font-size:8.6px;letter-spacing:.09em;text-transform:uppercase;font-weight:700}
+
+/* ---------- machine story (v12) ---------- */
+/* One sticky stage; native scroll moves the camera and the view state through
+   seven scenes. Nothing intercepts the wheel — scrolling is the browser's own. */
+.story{--scene:88vh;position:relative;margin:-32px 0 32px;height:calc(100vh - var(--hdr) + 7 * var(--scene));background:#07131F}
+.sty-stage{position:sticky;top:var(--hdr);height:calc(100vh - var(--hdr));overflow:hidden;color:#EAF4F8;
+  background:radial-gradient(120% 90% at 68% 44%,#12324A 0%,#0B1F31 48%,#07131F 100%)}
+#scanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sty-scrim{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(7,19,31,.95) 0,rgba(7,19,31,.74) 30%,rgba(7,19,31,0) 58%)}
+.sty-copy{position:absolute;top:0;bottom:0;left:max(28px,calc((100vw - 1460px)/2 + 28px));width:min(500px,38vw)}
+.sty-scene{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);pointer-events:none}
+.sty-scene.on{pointer-events:auto}
+.sty-scene>*{opacity:0;transform:translateY(16px);transition:opacity .5s var(--ease),transform .7s var(--ease)}
+.sty-scene.on>*{opacity:1;transform:none}
+.sty-scene.on>*:nth-child(2){transition-delay:.06s} .sty-scene.on>*:nth-child(3){transition-delay:.12s}
+.sty-scene.on>*:nth-child(4){transition-delay:.18s} .sty-scene.on>*:nth-child(5){transition-delay:.24s}
+.sty-scene.on>*:nth-child(6){transition-delay:.30s}
+.sty-k{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#00D6D9;
+  font-weight:600;margin:0 0 14px;display:flex;gap:10px;align-items:center}
+.sty-k i{font-style:normal;color:#4E6E82}
+.sty-ex{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#E8B23A;
+  border:1px solid rgba(232,178,58,.42);border-radius:999px;padding:3px 9px;margin-left:4px}
+.sty-scene h2{font-size:clamp(30px,3.4vw,44px);line-height:1.06;letter-spacing:-.03em;font-weight:680;
+  margin:0 0 14px;color:#F2F8FB}
+.sty-scene[data-s="0"] h2{font-size:clamp(38px,4.6vw,62px);margin-bottom:12px}
+.sty-scene p{font-size:16px;line-height:1.6;color:rgba(214,230,238,.84);margin:0 0 20px;max-width:44ch}
+.sty-facts{display:grid;grid-template-columns:auto 1fr;gap:7px 18px;margin:0 0 20px;max-width:440px}
+.sty-facts dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:#6F8DA1;padding-top:3px}
+.sty-facts dd{margin:0;color:#DDEBF2;font-family:var(--mono);font-size:12.5px;line-height:1.45}
+.sty-list{margin:0 0 18px;padding:0;list-style:none;columns:2;column-gap:20px;max-width:460px}
+.sty-list li{font-size:12.5px;color:#C6DAE4;padding:3px 0 3px 14px;position:relative;break-inside:avoid}
+.sty-list li::before{content:'';position:absolute;left:0;top:10px;width:5px;height:5px;border-radius:50%;background:#00B7BA}
+.sty-scene .sty-note{font-size:12px;color:#7F9BAD;line-height:1.55;margin:0 0 4px;max-width:46ch}
+.sty-acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.sty-btn{border-radius:999px;padding:12px 20px;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.06);color:#EAF4F8;transition:background .2s var(--ease),border-color .2s var(--ease)}
+.sty-btn:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45)}
+.sty-btn.pri{background:var(--teal);border-color:var(--teal);color:#04161F}
+.sty-btn.pri:hover{background:#2FD0D3;border-color:#2FD0D3}
+.sty-inset{position:absolute;right:168px;bottom:58px;width:min(470px,36vw);margin:0;z-index:2;
+  background:rgba(9,24,37,.88);border:1px solid rgba(0,214,217,.26);border-radius:12px;padding:14px 14px 10px;
+  opacity:0;transform:translateY(14px);transition:opacity .45s var(--ease),transform .6s var(--ease);pointer-events:none}
+.sty-inset.on{opacity:1;transform:none}
+.sty-inset svg{width:100%;height:auto;display:block}
+.sty-inset figcaption{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#7F9BAD;
+  margin-top:8px;line-height:1.5}
+.sty-nav{position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;z-index:3}
+.sty-nav button{display:flex;align-items:center;justify-content:flex-end;gap:10px;background:none;border:0;padding:4px 0;
+  color:#6F8DA1;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase}
+.sty-nav em{font-style:normal;opacity:0;transform:translateX(6px);transition:opacity .25s var(--ease),transform .25s var(--ease);white-space:nowrap}
+.sty-nav span{width:24px;height:24px;border-radius:50%;border:1px solid rgba(154,196,216,.32);display:grid;place-items:center;
+  transition:border-color .25s var(--ease),background .25s var(--ease)}
+.sty-nav button:hover em,.sty-nav button:focus-visible em,.sty-nav button[aria-current="step"] em{opacity:1;transform:none}
+.sty-nav button[aria-current="step"]{color:#00E2E5}
+.sty-nav button[aria-current="step"] span{border-color:#00D6D9;background:rgba(0,214,217,.16)}
+.sty-skip{position:absolute;right:20px;top:18px;z-index:3;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:#C6DAE4;text-decoration:none;border:1px solid rgba(154,196,216,.32);border-radius:999px;
+  padding:7px 14px;background:rgba(7,19,31,.5)}
+.sty-skip:hover{color:#fff;border-color:rgba(0,226,229,.6)}
+.sty-tag{position:absolute;left:max(28px,calc((100vw - 1460px)/2 + 28px));bottom:16px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.12em;text-transform:uppercase;color:#4E6E82}
+.sty-bar{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(154,196,216,.10)}
+.sty-bar i{display:block;height:100%;width:0;background:var(--teal)}
+.sty-cue{position:absolute;left:58%;bottom:20px;transform:translateX(-50%);font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:#7F9BAD;transition:opacity .4s var(--ease);text-align:center}
+.sty-cue::after{content:'';display:block;width:1px;height:26px;margin:8px auto 0;background:linear-gradient(#00D6D9,transparent);
+  transform-origin:top;animation:cue 2.4s var(--ease) infinite}
+@keyframes cue{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
+.story.moved .sty-cue{opacity:0}
+header.site{animation:hdrIn .6s var(--ease) both}
+@keyframes hdrIn{from{opacity:0;transform:translateY(-10px)}}
+#rail{scroll-margin-top:calc(var(--hdr) + 16px)}
+@media(max-width:820px){
+  .story{--scene:74vh}
+  .sty-scrim{background:linear-gradient(0deg,rgba(7,19,31,.97) 0,rgba(7,19,31,.84) 40%,rgba(7,19,31,0) 66%)}
+  .sty-copy{left:16px;right:16px;width:auto;top:auto;bottom:28px;height:62%}
+  .sty-scene{top:auto;bottom:0;transform:none}
+  .sty-scene h2,.sty-scene[data-s="0"] h2{font-size:28px}
+  .sty-scene p{font-size:14px;margin-bottom:12px}
+  .sty-facts{gap:4px 14px;margin-bottom:12px} .sty-facts dd{font-size:11.5px}
+  .sty-list{columns:1;margin-bottom:10px} .sty-list li:nth-child(n+5){display:none}
+  .sty-scene .sty-note{font-size:11px}
+  .sty-btn{padding:10px 16px;font-size:13px}
+  .sty-inset{left:16px;right:46px;width:auto;top:56px;bottom:auto}
+  body.in-story #adminBtn,body.in-story #toTop{display:none}
+  .sty-nav{top:58px;right:10px;transform:none} .sty-nav em{display:none} .sty-nav span{width:20px;height:20px;font-size:8.5px}
+  .sty-skip{right:auto;left:16px;top:14px}
+  .sty-tag,.sty-cue{display:none}
+}
+/* Without a canvas the story reads as a document, every scene in order. */
+.story.sty-static{height:auto}
+.story.sty-static .sty-stage{position:relative;top:auto;height:auto;padding:48px 28px}
+.story.sty-static #scanvas,.story.sty-static .sty-scrim,.story.sty-static .sty-nav,.story.sty-static .sty-cue,
+.story.sty-static .sty-bar,.story.sty-static .sty-inset{display:none}
+.story.sty-static .sty-copy{position:static;width:auto;max-width:640px}
+.story.sty-static .sty-scene{position:static;transform:none;margin:0 0 44px;pointer-events:auto}
+.story.sty-static .sty-scene>*{opacity:1;transform:none}
 
 /* ---------- commercial breakdown (BOM) ---------- */
 .bom{margin-top:24px;border:1px solid var(--rule);border-radius:var(--r);background:#fff;box-shadow:var(--sh1)}
@@ -1316,6 +1416,23 @@ body.demo #demobar{display:flex}
 </header>
 
 <main>
+<section class="story" id="story" aria-label="Machine overview">
+  <div class="sty-stage" id="styStage">
+    <canvas id="scanvas" aria-hidden="true"></canvas>
+    <div class="sty-scrim" aria-hidden="true"></div>
+    <div class="sty-copy" id="styCopy">
+      <article class="sty-scene on" data-s="0"><p class="sty-k">TEAL Laser</p>
+        <h2>Laser Equipment Configurator</h2><p>Configure the complete laser cell, then see it built.</p></article>
+    </div>
+    <figure class="sty-inset" id="styE"><svg viewBox="0 0 640 300" role="img" aria-label="Optical train drawn from the configuration"></svg><figcaption></figcaption></figure>
+    <figure class="sty-inset" id="styF"><svg role="img" aria-label="Scan path drawn from the configuration"></svg><figcaption></figcaption></figure>
+    <nav class="sty-nav" id="styNav" aria-label="Overview scenes"></nav>
+    <a class="sty-skip" href="#rail" id="stySkip">Skip to configurator</a>
+    <span class="sty-tag">Parametric model — built from the configuration, not CAD</span>
+    <div class="sty-cue" id="styCue" aria-hidden="true">Scroll to explore</div>
+    <div class="sty-bar" aria-hidden="true"><i id="styBar"></i></div>
+  </div>
+</section>
 <div class="wrap">
   <div class="rail" id="rail" role="tablist" aria-label="Configuration steps"></div>
   <div class="grid">
@@ -2944,7 +3061,7 @@ function desig(){
 }
 
 /* ============================ BEAM SCHEMATIC ============================ */
-function schematic(){
+function schematicSVG(){
   var p=P(), o=optics();
   var col = S.src? SRC[S.src].col : '#31414C';
   var wl  = S.src? SRC[S.src].wl : '—';
@@ -2976,7 +3093,10 @@ function schematic(){
     return s;
   }
 
-  var defs='<defs><filter id="gl" x="-60%" y="-60%" width="220%" height="220%">'+
+  /* The glow's region is set in user space over the whole drawing. In bounding-
+     box units a perfectly horizontal or vertical beam has a zero-height box, so
+     its filter region collapses, and a renderer may then drop the line. */
+  var defs='<defs><filter id="gl" filterUnits="userSpaceOnUse" x="-20" y="-20" width="680" height="340">'+
     '<feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
     '<marker id="ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="'+DIM+'"/></marker></defs>';
 
@@ -3096,7 +3216,11 @@ function schematic(){
       G+=lbl(310,276,'SPOT ⌀ '+o.spot.toFixed(0)+' µm  ·  DOF ± '+(o.dof/1000).toFixed(2)+' mm','middle',8.5,TEALC);
     }
   }
-  $('#beam').innerHTML = defs+G;
+  return defs+G;
+}
+function schematic(){
+  $('#beam').innerHTML = schematicSVG();
+  var p=P();
   $('#viewcap').textContent = p? (p.n+' — indicative optical train') : 'Beam path — indicative';
 }
 
@@ -3164,6 +3288,7 @@ function render(){
   $('#next').disabled = !ok();
   rail(); sync();
   try{ fitSync(); navSync(); }catch(e){}
+  try{ storySync(); }catch(e){}
 }
 
 function uiFam(b){
@@ -3825,7 +3950,17 @@ function readHash(){
 }
 
 /* ---- nav --------------------------------------------------------------- */
-function go(i){ cur=Math.max(0,Math.min(STEPS.length-1,i)); reach=Math.max(reach,cur); render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function go(i){ cur=Math.max(0,Math.min(STEPS.length-1,i)); reach=Math.max(reach,cur); render(); toWork(); }
+/* Bring the workspace's step title into view. The page used to scroll to its
+   very top on every step change; with the machine story above the workspace
+   that would throw the user back into the story on each Continue. */
+function toWork(force){
+  var r=$('#rail'); if(!r) return;
+  var t=r.getBoundingClientRect().top, hh=(document.querySelector('header.site')||{}).offsetHeight||64;
+  if(!force && t>=hh-2 && t<innerHeight*0.5) return;            /* already in view */
+  var red=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({top:Math.max(0, scrollY+t-hh-12), behavior:red?'auto':'smooth'});
+}
 $('#next').onclick=function(){ if(cur===STEPS.length-1){window.print();return;} if(ok()) go(cur+1); };
 $('#back').onclick=function(){ go(cur-1); };
 $('#topback').onclick=function(){ go(cur-1); };
@@ -5897,6 +6032,14 @@ function onScroll(){
   var t=$('#toTop'); if(t){ if(window.scrollY>420) t.classList.add('show'); else t.classList.remove('show'); }
 }
 window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+/* While the story fills the view, no configurator step is "where you are". */
+(function(){
+  var pend=false;
+  function chk(){ pend=false; var st=document.getElementById('story');
+    document.body.classList.toggle('in-story', !!st && st.getBoundingClientRect().bottom > innerHeight*0.5); }
+  window.addEventListener('scroll', function(){ if(!pend){ pend=true; requestAnimationFrame(chk); } }, {passive:true});
+  chk();
+})();
 $('#toTop').onclick=function(){ window.scrollTo({top:0,behavior:'smooth'}); };
 
 /* Scroll reveal — cards and panels ease in once */
@@ -6194,6 +6337,9 @@ function Viewport(canvas, build, opts){
      panel can afford. resize() honours the lower of the two, so an adaptive
      downshift survives the next resize instead of being recomputed away. */
   this.dprMax=Math.min(window.devicePixelRatio||1, 2); this.dprCap=this.dprMax;
+  /* the floor the downshift may reach: 1 for a panel whose detail must stay
+     crisp; lower for a full-bleed backdrop, where softness beats stutter */
+  this.dprMin=this.o.dprMin||1;
   this._last=0; this._fac=0; this._good=0; this._capFail=0; this._warm=2;
   /* Seam closing costs a second stroke per face. It is worth having and it is
      the cheapest thing to drop, so it leads the degradation ladder. */
@@ -6342,9 +6488,9 @@ Viewport.prototype.frame = function(now){
       /* Cheapest first: closing seams buys the least per millisecond, so it is
          surrendered before resolution is. */
       if(this.fine) this.fine=false;
-      else if(this.dprCap>1){
+      else if(this.dprCap>this.dprMin){
         this._capFail=this.dprCap;          /* remember the level that failed */
-        this.dprCap=Math.max(1,this.dprCap-0.25); this.resize();
+        this.dprCap=Math.max(this.dprMin,this.dprCap-0.25); this.resize();
       }
       else if(this.quality>0.55) this.quality=0.55;
     } else if(fr<19 && ms<6){               /* at rate with headroom to spare */
@@ -6392,6 +6538,7 @@ Viewport.prototype.paint = function(T){
   /* frame the scene in the space the overlay leaves: centre it there and scale
      it down a little, rather than letting the telemetry sit on the machine */
   var ins=Math.min(this.inset||0, H*0.55), cy=(H-ins)*0.5+ins*0.13;
+  var cx=W*(this.cxK==null? 0.5 : this.cxK);        /* the story frames the machine beside its text */
   var fs=(H*0.5-ins*0.40)/Math.tan(cam.fov*0.5);
   var L1=LIGHT1, L2=LIGHT2, L3=LIGHT3;
   var HV=v3n(v3s(L1, fwd));                       /* Blinn half-vector, camera-facing */
@@ -6405,7 +6552,7 @@ Viewport.prototype.paint = function(T){
     var z=dx*fwd[0]+dy*fwd[1]+dz*fwd[2];
     if(z<0.30) return null;
     var iz=1/z;
-    return [W*0.5+(dx*rgt[0]+dy*rgt[1]+dz*rgt[2])*iz*fs,
+    return [cx+(dx*rgt[0]+dy*rgt[1]+dz*rgt[2])*iz*fs,
             cy-(dx*up[0] +dy*up[1] +dz*up[2] )*iz*fs, z];
   }
   this._proj=proj;
@@ -6518,7 +6665,7 @@ Viewport.prototype.paint = function(T){
 
   /* ---- vignette ---- */
   if(this.quality>0.6){
-    var vg=ctx.createRadialGradient(W*0.5,H*0.46,H*0.28,W*0.5,H*0.5,H*0.95);
+    var vg=ctx.createRadialGradient(cx,H*0.46,H*0.28,cx,H*0.5,H*0.95);
     vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(2,8,15,.42)');
     ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
   }
@@ -7124,11 +7271,16 @@ function grp(b,R,id,fn){
   var v=R.vis(id);
   if(v<=0.004) return;
   var a=v;
-  if(R.xray && XRAY_GHOST[id]) a*=0.16;
+  if(R.xk>0 && XRAY_GHOST[id]) a*=lerp(1,0.16,R.xk);
   /* Isolation ghosts every other assembly rather than hiding it, so the one
-     being inspected keeps its context. The floor plan is never ghosted. */
+     being inspected keeps its context. The floor plan is never ghosted. The
+     story passes a weight per assembly instead, so emphasis can move between
+     sets of assemblies without anything popping. */
   var iso=!!(R.iso && id!==R.iso && id!=='site');
-  if(iso) a*=0.07;
+  if(R.isoW && id!=='site'){
+    var wt=R.isoW[id]; if(wt==null) wt=R.isoW._==null? 1 : R.isoW._;
+    a*=lerp(0.07,1,wt); iso=wt<0.5;
+  } else if(iso) a*=0.07;
   var sa=b.a, se=b.eov, f0=b.f.length, t0=b.tags.length;
   b.push(); b.a=sa*a;
   if(iso) b.eov='rgba(120,196,224,.16)';
@@ -7219,6 +7371,11 @@ function asmPost(b,R){
     for(i=0;i<G.length;i++) if(G[i].o) asmMove(b,G[i],G[i].o);
   }
   if(M3D.offscreen) return;
+  if(R.story){                       /* extents for the story camera; nothing shared */
+    var bx={}; for(i=0;i<G.length;i++) if(G[i].box) bx[G[i].id]=G[i].box;
+    if(R.vp) R.vp.boxes=bx;
+    return;
+  }
   /* tag every face with its assembly so a click can be resolved to one */
   for(i=0;i<G.length;i++) for(var j=G[i].f0;j<G[i].f1;j++) b.f[j].gid=G[i].id;
   M3D.faces=b.f;
@@ -7255,7 +7412,7 @@ function gFloor(b,R){
 function gFrame(b,R,a){
   var p=R.p, d=R.deliv;
   if(d==='handpiece'){ gBench(b,R); return; }
-  var fenced=(d==='robot'), COV=R.L('cov'), XA=R.xray?0.13:1, lod=b.lod;
+  var fenced=(d==='robot'), COV=R.L('cov'), XA=lerp(1,0.13,R.xk||0), lod=b.lod;
   b.shadow(MW+1.2, MD+1.2, TOPY*0.55, {a:0.40, grow:0.6});
 
   /* ---- welded steel base frame ------------------------------------- */
@@ -7292,7 +7449,7 @@ function gFrame(b,R,a){
   var y0=CAB-PLY, fzz=MD/2+0.012;
   if(COV) b.box(MW, y0, MD, MT('powder',{side:MTL.powderD.c, a:XA,
     front:R.cut?null:MTL.powderL.c, noFront:R.cut, noRight:R.cut, top:MTL.steel.c,
-    e:R.xray?'rgba(150,215,240,.34)':undefined}));
+    e:(R.xk||0)>0.5?'rgba(150,215,240,.34)':undefined}));
 
   if(COV && !R.cut && lod>=1){
     /* brand stripe */
@@ -7590,7 +7747,7 @@ function gTable(b,R){
    built: incomer and breakers, drives, PLC, PSU, IPC, switch, terminals. */
 function gCabinet(b,R){
   if(R.deliv==='handpiece') return;
-  if(R.L('cov') && !R.cut && !R.xray) return;      /* only when you can see in */
+  if(R.L('cov') && !R.cut && !((R.xk||0)>0.01)) return;   /* only when you can see in */
   var lod=b.lod, y=PLY+0.6, z=-MD/2+0.55, W=Math.min(MW-1.6, 9.5);
   b.comp('cabinet_backplane');
   b.push(); b.t(0,y,z);
@@ -9010,17 +9167,23 @@ function simCtlSync(){
 function mmBuild(b, T, vp){
   var p=P(), R={T:T, p:p, sim:SIM, slot:{back:0}};
   machineDims();
-  var LY=M3D.layers;
+  /* A viewport may carry its own view state (the story does); otherwise the
+     configurator's. Configuration and simulation state are never per-view. */
+  var V=(vp && (vp.view || (vp.o && vp.o.view))) || null;
+  var LY=(V && V.layers) || M3D.layers;
   R.L  = function(k){ return LY[k]!==false; };
-  R.vm = M3D.vmode;
-  R.xray = R.vm==='xray';
+  R.vm = V? V.vmode : M3D.vmode;
+  R.xk = V? (V.xk||0) : (R.vm==='xray'? 1 : 0);
+  R.xray = R.xk>0.5;
+  R.story = !!V; R.vp = vp;
   R.cut  = R.vm==='cutaway';
   /* Health-check sweeps build every mode at full separation; the live view
      draws the eased amount. Roof clearance scales with the machine height. */
   var expT = R.vm==='exploded'? M3D.expK : 0;
-  R.exp  = M3D.offscreen? (R.vm==='exploded'? 1 : 0) : M3D.expA;
+  R.exp  = V? (V.expA||0) : M3D.offscreen? (R.vm==='exploded'? 1 : 0) : M3D.expA;
   R.roofLift = R.exp*TOPY*0.6;
-  R.iso  = M3D.offscreen? null : M3D.iso;
+  R.iso  = V? null : M3D.offscreen? null : M3D.iso;
+  R.isoW = V? V.isoW : null;
   R.groups = [];
   /* frame the machine as it grows — but never fight a camera the user has
      moved. The viewport's inset keeps it clear of the telemetry once the
@@ -11481,6 +11644,336 @@ function demoOff(){
     (function wait(){ if(BOOTED) demoOn(); else setTimeout(wait, 120); })();
 })();
 
+/* ==========================================================================
+   v12.0 — MACHINE STORY
+   A scroll-told introduction to the machine being configured: the assembled
+   machine, the enclosure ghosted back, the assemblies separated, the optical
+   system, the beam path, the process, and the hand-off to the configurator.
+
+   Everything drawn is the configuration's own. The machine is the configurator's
+   parametric model; the optical train is schematicSVG(); the path is markPath();
+   the times come from procModel(). The story renders through its own viewport
+   with its own view state. It reads the configuration — the user's, once it is
+   complete, otherwise a labelled example — and never writes it, and it never
+   touches the simulator. Scroll is the browser's: no wheel is intercepted.
+   ========================================================================== */
+var STORY={on:false, vp:null, S:null, ex:false, key:'', list:[], seen:{}, dims:null,
+           N:7, i:-1, p:0, intro:null, introEnd:0, view:null, reduce:false, insE:null, insF:null, done:{}};
+var SCN=[{k:'A',l:'Machine'},{k:'B',l:'Enclosure'},{k:'C',l:'Assemblies'},{k:'D',l:'Optical system'},
+         {k:'E',l:'Laser path'},{k:'F',l:'Process'},{k:'G',l:'Configure'}];
+var DELIVTXT={galvo:'Scan head over a work table', galvo2:'Opposed scan heads above and below an inline conveyor',
+  gantry:'Gantry bridge and carriage over the bed', robot:'Articulated arm in a fenced cell',
+  handpiece:'Hand-guided head on a mobile trolley'};
+
+/* The machine to tell: the user's, once complete; otherwise the README's worked
+   example, chosen exactly as a click on its platform card would choose it. */
+function storyConfig(){
+  if(P() && A() && S.src && S.lens && S.pw!=null) return {S:JSON.parse(JSON.stringify(S)), ex:false};
+  var kS=S, kF=famSel, ex=null;
+  S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
+  try{
+    if(PLAT[DEMOCFG.plat]){ pickPlatform(DEMOCFG.plat); S.app=DEMOCFG.app;
+      S.src=DEMOCFG.src; S.pw=DEMOCFG.pw; S.lens=DEMOCFG.lens; ex=JSON.parse(JSON.stringify(S)); }
+  } finally { S=kS; famSel=kF; }
+  return {S:ex, ex:true};
+}
+/* Run fn with the story's machine as the configuration, then put the user's
+   back — whatever fn does or throws. Every value the story shows is computed
+   in here, by the same functions the configurator uses. */
+function withStory(fn){
+  var kS=S, kC=cur, kSn=M3D.seen, kL=M3D.list, kF=famSel, r;
+  S=STORY.S; cur=5; M3D.seen=STORY.seen; M3D.list=STORY.list;
+  try{ r=fn(); }
+  finally{ S=kS; cur=kC; M3D.seen=kSn; M3D.list=kL; famSel=kF; try{ machineDims(); }catch(e){} }
+  return r;
+}
+function storyBuild(b, T, vp){ withStory(function(){ mmBuild(b, T, vp); }); }
+
+function storySync(){
+  if(!STORY.on) return;
+  var c=storyConfig(); if(!c.S) return;
+  var key=JSON.stringify(c.S); if(key===STORY.key) return;
+  var first=!STORY.key;
+  STORY.key=key; STORY.S=c.S; STORY.ex=c.ex;
+  withStory(function(){
+    var g=mmGroups(), now=Date.now(), i, seen={};
+    for(i=0;i<g.length;i++){
+      var id=g[i].id;
+      /* on the opening reveal the assemblies arrive one after another; after
+         that, a changed configuration drops only its new parts into place */
+      seen[id]= (id in STORY.seen)? STORY.seen[id] : (first && STORY.intro? now+260+i*150 : (first? 0 : now));
+      g[i].t=seen[id];
+    }
+    STORY.seen=seen; STORY.list=g;
+    STORY.introEnd= first && STORY.intro? now+260+g.length*150+700 : now+700;
+    machineDims(); STORY.dims={MW:MW, MD:MD, TOPY:TOPY};
+  });
+  storyText(); storyInsets();
+  STORY.done={};
+  if(STORY.vp) STORY.vp.dirty=true;
+}
+
+/* ---- captions: every number is computed, every label says what it is ------ */
+function storyText(){
+  var c=$('#styCopy'); if(!c) return;
+  var H=withStory(function(){
+    var p=P(), a=A(), o=optics(), ph=null, pm=null, pr=priceLines(), dm=machineDims(), d=desig(), i;
+    try{ ph=physics(); }catch(e){}
+    try{ pm=procModel(); }catch(e){}
+    var src=SRC[S.src], L=LENS[S.lens];
+    function k(i){ return '<p class="sty-k"><span>'+SCN[i].k+'</span><i>/</i>'+SCN[i].l+
+      (i===0 && STORY.ex? '<span class="sty-ex">Example</span>' : '')+'</p>'; }
+    function dl(rows){ return '<dl class="sty-facts">'+rows.map(function(r){
+      return '<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>'; }).join('')+'</dl>'; }
+    var env=inr(dm.w)+' × '+inr(dm.d)+' × '+inr(dm.h)+' mm'+(dm.stated? '' : ' (estimated)');
+    var asm=STORY.list.filter(function(g){ return g.id!=='site' && g.id!=='cert' && g.id!=='sw'; });
+    var out=[];
+    out.push(k(0)+'<h2>'+esc(p.n)+'</h2><p>'+esc(p.t)+'.</p>'+
+      dl([['Designation',esc(d)],['Source',esc(src.n)+' · '+esc(src.wl)+' · '+S.pw+' W'],['Envelope',env]])+
+      '<div class="sty-acts"><button type="button" class="sty-btn pri" data-go="work">'+
+        (STORY.ex? 'Start configuring' : 'Continue configuring')+'</button>'+
+      '<button type="button" class="sty-btn" data-go="1">Explore the machine</button></div>');
+    out.push(k(1)+'<h2>Inside the enclosure</h2><p>The guarding and covers ghost back as you scroll, leaving the '+
+      'chamber, motion and handling where they are — the X-ray view the configurator offers, made continuous.</p>'+
+      dl([['Delivery',esc(DELIVTXT[p.deliv]||p.deliv)],['Envelope',env],
+          ['Standard',esc((p.std||[]).map(stdName).join(' · ')||'Base platform')]]));
+    out.push(k(2)+'<h2>'+asm.length+' assemblies, separated</h2><p>Each moves as a rigid body by a stated rule: the frame '+
+      'and through-feed transport hold still, side equipment moves outward, the chamber lifts in height order.</p>'+
+      '<ul class="sty-list">'+asm.map(function(g){ return '<li>'+esc(g.n)+'</li>'; }).join('')+'</ul>'+
+      '<p class="sty-note">Separated for inspection — not an assembly sequence.</p>');
+    out.push(k(3)+'<h2>The optical system</h2><p>'+esc(src.n)+' at '+esc(src.wl)+', '+S.pw+' W, delivered to the '+
+      esc(L.n)+' f-theta objective.</p>'+
+      dl([['Focal length',L.f+' mm'],['Field',L.fld+' × '+L.fld+' mm'],
+          ['Spot ⌀', o? o.spot.toFixed(0)+' µm' : '—'],['M²',src.m2]])+
+      '<p class="sty-note">Spot computed from wavelength, M², focal length and beam diameter — a diffraction-limited estimate, not a measurement.</p>');
+    out.push(k(4)+'<h2>The beam path</h2><p>Source to work plane, drawn from this configuration’s own optical train.</p>'+
+      dl([['Depth of focus', o? '± '+(o.dof/1000).toFixed(2)+' mm' : '—'],
+          ['Rayleigh range', ph&&ph.rayleigh_mm!=null? '± '+num(ph.rayleigh_mm)+' mm' : '—'],
+          ['Regime', ph? esc(ph.regime.n) : '—']])+
+      '<p class="sty-note">Illustrative: the drawing is a schematic of the train, not a ray trace.</p>');
+    var lim= pm && pm.lim==='overlap'? 'held to 50 % pulse overlap' : 'the head’s scan speed';
+    out.push(k(5)+'<h2>The process</h2><p>'+(pm? esc(pm.basis)+'.' : 'The path this machine runs.')+'</p>'+
+      dl([['Process time', pm? pm.t.toFixed(2)+' s' : '—'],
+          ['Speed', pm? inr(pm.v)+' mm/s — '+lim : '—'],
+          ['Path', pm? inr(pm.len)+' mm marked' : '—']])+
+      '<p class="sty-note">Times come from the configuration’s process model — indicative, not a validated result.</p>');
+    out.push(k(6)+'<h2>'+(STORY.ex? 'Make it yours' : 'Your configuration')+'</h2><p>'+
+      (STORY.ex? 'Everything above was built from one configuration. Choose your own and the machine is rebuilt around it.'
+               : 'Everything above was built from your configuration. Change any option and the machine is rebuilt around it.')+'</p>'+
+      dl([['Designation',esc(d)],['Budget', shortINR(pr.lo)+' – '+shortINR(pr.hi)+' · estimate'],
+          ['Lead time',(p.lead||'—')+' weeks from order']])+
+      '<div class="sty-acts">'+(STORY.ex
+        ? '<button type="button" class="sty-btn pri" data-go="use">Configure this machine</button>'+
+          '<button type="button" class="sty-btn" data-go="work">Start from the portfolio</button>'
+        : '<button type="button" class="sty-btn pri" data-go="spec">Review the specification</button>'+
+          '<button type="button" class="sty-btn" data-go="work">Back to the configurator</button>')+'</div>');
+    return out;
+  });
+  var h='';
+  for(var i=0;i<H.length;i++) h+='<article class="sty-scene'+(i===Math.max(0,STORY.i)?' on':'')+'" data-s="'+i+'"'+
+    ' aria-label="'+SCN[i].k+' — '+SCN[i].l+'">'+H[i]+'</article>';
+  c.innerHTML=h;
+}
+
+/* ---- insets: the optical train and the scan field, drawn on with scroll ---- */
+function storyInsets(){
+  var e=$('#styE'), f=$('#styF'); if(!e||!f) return;
+  withStory(function(){
+    var p=P(), o=optics(), L=LENS[S.lens], col=SRC[S.src].col||'#FF5A4A', pm=null;
+    try{ pm=procModel(); }catch(x){}
+    /* E — the configurator's own schematic, ids renamed so two copies can coexist */
+    var sv=e.querySelector('svg');
+    sv.innerHTML=schematicSVG().replace(/id="gl"/g,'id="sgl"').replace(/url\(#gl\)/g,'url(#sgl)')
+                               .replace(/id="ar"/g,'id="sar"').replace(/url\(#ar\)/g,'url(#sar)');
+    var lines=[].slice.call(sv.querySelectorAll('line[filter]')), tot=0;
+    STORY.insE={lines:lines.map(function(l){
+      var n=Math.hypot(l.x2.baseVal.value-l.x1.baseVal.value, l.y2.baseVal.value-l.y1.baseVal.value)||1;
+      l.style.strokeDasharray=n; l.style.strokeDashoffset=n; var r={el:l, n:n, at:tot}; tot+=n; return r; }),
+      cones:[].slice.call(sv.querySelectorAll('path[opacity]')), tot:tot, last:-1};
+    STORY.insE.cones.forEach(function(cn){ cn.dataset.op=cn.getAttribute('opacity'); cn.setAttribute('opacity',0); });
+    e.querySelector('figcaption').textContent='Optical train · '+p.n+' · indicative';
+    /* F — markPath() at the field's true size; a code is enlarged so it can be read */
+    var fld=L.fld, h=fld/2, pad=fld*0.10, segs=markPath(), sc=fld*0.92, d='', jd='', prev=null, i, j;
+    for(i=0;i<segs.length;i++){
+      var sg=segs[i];
+      if(prev) jd+='M'+(prev[0]*sc).toFixed(2)+' '+(prev[1]*sc).toFixed(2)+'L'+(sg[0][0]*sc).toFixed(2)+' '+(sg[0][1]*sc).toFixed(2);
+      for(j=0;j<sg.length;j++) d+=(j?'L':'M')+(sg[j][0]*sc).toFixed(2)+' '+(sg[j][1]*sc).toFixed(2);
+      prev=sg[sg.length-1];
+    }
+    var sw=Math.max(fld*0.0055, o? o.spot/1000 : 0), fs=fld*0.045;
+    var fsv=f.querySelector('svg');
+    fsv.setAttribute('viewBox',(-h-pad)+' '+(-h-pad*1.6)+' '+(fld+pad*2)+' '+(fld+pad*2.6));
+    fsv.innerHTML=
+      '<rect x="'+(-h)+'" y="'+(-h)+'" width="'+fld+'" height="'+fld+'" fill="rgba(0,183,186,.04)" stroke="rgba(154,196,216,.40)" stroke-width="'+(fld*0.003)+'" stroke-dasharray="'+(fld*0.012)+' '+(fld*0.010)+'"/>'+
+      '<text x="'+(-h)+'" y="'+(-h-pad*0.55)+'" font-family="IBM Plex Mono,monospace" font-size="'+fs+'" fill="#7F9BAD" letter-spacing="'+(fs*0.1)+'">FIELD '+fld+' × '+fld+' mm</text>'+
+      '<path d="'+jd+'" fill="none" stroke="rgba(154,196,216,.28)" stroke-width="'+(sw*0.6)+'" stroke-dasharray="'+(fld*0.006)+' '+(fld*0.008)+'"/>'+
+      '<path id="styPath" d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>'+
+      '<circle id="stySpot" r="'+(fld*0.014)+'" fill="'+col+'" opacity="0"/>';
+    var pth=fsv.querySelector('#styPath');
+    STORY.insF={path:pth, spot:fsv.querySelector('#stySpot'), len:pth.getTotalLength()||1, last:-1};
+    f.querySelector('figcaption').textContent= pm && pm.kind==='code'
+      ? 'Scan path · enlarged to be legible — marked at '+pm.side.toFixed(1)+' mm square'
+      : 'Scan path · reference path across the '+fld+' mm field';
+  });
+}
+function storyDraw(k){                      /* E: beam drawn from source to work plane */
+  var E=STORY.insE; if(!E) return; k=Math.round(clamp(k,0,1)*400)/400; if(k===E.last) return; E.last=k;
+  var at=k*E.tot;
+  E.lines.forEach(function(l){ l.el.style.strokeDashoffset=l.n-clamp(at-l.at,0,l.n); });
+  E.cones.forEach(function(cn){ cn.setAttribute('opacity', (+cn.dataset.op)*clamp((k-0.35)/0.5,0,1)); });
+}
+function storyTrace(k){                     /* F: the path traced in the order it is run */
+  var F=STORY.insF; if(!F) return; k=Math.round(clamp(k,0,1)*500)/500; if(k===F.last) return; F.last=k;
+  F.path.setAttribute('stroke-dashoffset', 1-k);
+  var pt=F.path.getPointAtLength(F.len*k);
+  F.spot.setAttribute('cx',pt.x); F.spot.setAttribute('cy',pt.y);
+  F.spot.setAttribute('opacity', k>0.002 && k<0.998? 0.95 : 0);
+}
+
+/* ---- the choreography -------------------------------------------------------- */
+/* The resting camera for each scene, from the machine's own dimensions and the
+   measured extents of its assemblies — nothing is a hard-coded coordinate. */
+function storyKey(i){
+  var d=STORY.dims||{MW:13,MD:11,TOPY:15}, D0=3.05*Math.max(d.MW,d.MD,d.TOPY*0.95), ty=0.52*d.TOPY;
+  var bx=(STORY.vp && STORY.vp.boxes)||{}, mob=innerWidth<820? 1.12 : 1;
+  var home={yaw:-0.62, pitch:0.30, dist:D0*mob, tx:0, ty:ty, tz:0};
+  function at(id, k, yaw, pitch){
+    var b=bx[id]; if(!b) return home;
+    var sz=Math.max(b.mx[0]-b.mn[0], b.mx[1]-b.mn[1], b.mx[2]-b.mn[2]);
+    return {yaw:yaw, pitch:pitch, dist:clamp(sz*k, 7, D0)*mob, tx:b.c[0], ty:b.c[1], tz:b.c[2]};
+  }
+  switch(i){
+    case 0: return home;
+    case 1: return {yaw:-0.30, pitch:0.22, dist:D0*0.92*mob, tx:0, ty:ty, tz:0};
+    case 2: return {yaw:-0.80, pitch:0.42, dist:D0*1.34*mob, tx:0, ty:ty*1.3, tz:0};
+    case 3: return at('optic', 2.7, -0.95, 0.22);
+    case 4: return at('optic', 2.1, -0.52, 0.12);
+    case 5: return at('part', 3.6, -0.40, 0.72);
+    default: return home;
+  }
+}
+/* The view each scene asks for, as a function of how far into it you are. */
+function storyWant(i, f){
+  var v={xk:0, expA:0, w:{_:1}};
+  if(i===1) v.xk=easeIO(f/0.7);
+  if(i===2){ v.xk=1-easeIO(f/0.25); v.expA=easeIO((f-0.15)/0.6); }
+  if(i===3){ v.expA=1-easeIO(f/0.35); var k=easeIO((f-0.2)/0.4); v.w={_:1-k, optic:1, source:1}; }
+  if(i===4) v.w={_:0, optic:1, source:1};
+  if(i===5) v.w={_:0, optic:1, part:1, table:1};
+  return v;
+}
+function storyProgress(){
+  var st=$('#story'), stg=$('#styStage'); if(!st||!stg) return 0;
+  var hh=(document.querySelector('header.site')||{}).offsetHeight||64;
+  var dist=Math.max(1, st.offsetHeight-stg.offsetHeight), r=st.getBoundingClientRect();
+  return clamp((hh-r.top)/dist, 0, 1)*STORY.N;
+}
+function storyScene(i){
+  if(i===STORY.i) return;
+  STORY.i=i;
+  var arts=document.querySelectorAll('#styCopy .sty-scene');
+  for(var a=0;a<arts.length;a++) arts[a].classList.toggle('on', a===i);
+  var nb=document.querySelectorAll('#styNav button');
+  for(var b=0;b<nb.length;b++){ if(b===i) nb[b].setAttribute('aria-current','step'); else nb[b].removeAttribute('aria-current'); }
+  var e=$('#styE'), f=$('#styF');
+  if(e) e.classList.toggle('on', i===4);
+  if(f) f.classList.toggle('on', i===5);
+  if(STORY.vp) STORY.vp.o.tags = (i<=2 || i===6);       /* callouts where they help, not over the insets */
+}
+/* Called by the story viewport once per frame while it is on screen. Scroll sets
+   the target; the drawn state eases toward it, so a wheel's discrete steps still
+   read as one continuous move. Returns whether anything is still moving. */
+function storyTick(){
+  var vp=STORY.vp; if(!vp) return false;
+  var p=storyProgress(), N=STORY.N, i=Math.min(N-1, Math.floor(p)), f=p-i, now=performance.now();
+  STORY.p=p;
+  storyScene(i);
+  var st=$('#story'); if(st) st.classList.toggle('moved', p>0.06);
+  var bar=$('#styBar'); if(bar) bar.style.width=(p/N*100).toFixed(2)+'%';
+  if(p>0.04 && STORY.intro) STORY.intro=null;            /* scrolling takes over from the reveal */
+
+  var red=STORY.reduce, kf=red? 1 : easeIO(f/0.5);
+  var A0=storyKey(Math.max(0,i-1)), A1=storyKey(i), tgt={};
+  ['yaw','pitch','dist','tx','ty','tz'].forEach(function(q){ tgt[q]=i===0? A1[q] : lerp(A0[q],A1[q],kf); });
+  if(STORY.intro){
+    var t=clamp((now-STORY.intro.t0)/STORY.intro.dur,0,1), e=easeIO(t);
+    tgt.yaw=lerp(-1.55,tgt.yaw,e); tgt.pitch=lerp(0.64,tgt.pitch,e); tgt.dist=lerp(tgt.dist*1.75,tgt.dist,e);
+    tgt.ty=lerp(tgt.ty*1.45,tgt.ty,e);
+    if(t>=1) STORY.intro=null;
+  } else if(i===0 && !red){
+    tgt.yaw+=0.06*Math.sin(now/1000*0.42)*clamp(1-f/0.5,0,1);  /* the hero breathes, then settles */
+  }
+  var want=storyWant(i, red? 1 : f), V=STORY.view, cam=vp.cam;
+  var k=(red || !STORY.done.cam)? 1 : 1-Math.exp(-(vp.dt||0.016)*8);
+  STORY.done.cam=true;
+  var moving=!!STORY.intro || Date.now()<STORY.introEnd || (i===0 && !red);
+  ['yaw','pitch','dist','tx','ty','tz'].forEach(function(q){
+    var d=tgt[q]-cam[q]; if(Math.abs(d)>1e-4){ cam[q]+=d*k; moving=true; } });
+  function ez(cur, to){ var d=to-cur; if(Math.abs(d)>1e-3){ moving=true; return cur+d*k; } return to; }
+  V.xk=ez(V.xk, want.xk); V.expA=ez(V.expA, want.expA);
+  var ids=STORY.list.map(function(g){ return g.id; }), w={_:ez(V.isoW._==null?1:V.isoW._, want.w._)};
+  ids.forEach(function(id){
+    var to=want.w[id]!=null? want.w[id] : want.w._, from=V.isoW[id]!=null? V.isoW[id] : (V.isoW._==null?1:V.isoW._);
+    w[id]=ez(from, to);
+  });
+  V.isoW=w;
+  var cxT=innerWidth<820? 0.5 : 0.62;
+  /* on a phone the caption takes the lower part of the stage: frame the model
+     in the space above it, the way the viewer frames it above its telemetry */
+  vp.insetT=innerWidth<820? vp.cv.clientHeight*0.44 : 0;
+  vp.cxK=vp.cxK==null? cxT : ez(vp.cxK, cxT);
+  storyDraw(i===4? (red? 1 : (f-0.05)/0.7) : (i>4? 1 : 0));
+  storyTrace(i===5? (red? 1 : (f-0.08)/0.78) : (i>5? 1 : 0));
+  if(moving) vp.dirty=true;
+  return moving;
+}
+function storyJump(i){
+  var st=$('#story'), stg=$('#styStage'); if(!st) return;
+  var hh=(document.querySelector('header.site')||{}).offsetHeight||64;
+  var dist=st.offsetHeight-stg.offsetHeight, top=st.getBoundingClientRect().top+scrollY-hh;
+  window.scrollTo({top: top + (i===0? 0 : (i+0.55)/STORY.N*dist), behavior: STORY.reduce? 'auto':'smooth'});
+}
+function storyGo(a){
+  if(a==='work'){ toWork(true); return; }
+  if(a==='spec'){ go(STEPS.length-1); toWork(true); return; }
+  if(a==='use'){                        /* an explicit choice: load the example, as its card would */
+    S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
+    pickPlatform(DEMOCFG.plat); S.app=DEMOCFG.app; S.src=DEMOCFG.src; S.pw=DEMOCFG.pw; S.lens=DEMOCFG.lens;
+    reach=STEPS.length-1; go(STEPS.length-1); toWork(true);
+    toast('Example loaded into the configurator — change anything.'); return;
+  }
+  storyJump(+a);
+}
+function storyInit(){
+  var cv=$('#scanvas'), st=$('#story'); if(!cv||!st) return;
+  STORY.reduce=!!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  try{
+    if(!cv.getContext || !cv.getContext('2d')) throw new Error('no 2D canvas');
+    STORY.view={vmode:'solid', layers:{enc:true,glz:true,cov:true,lit:true,mod:true,util:true,flr:true,beam:true},
+                xk:0, expA:0, isoW:{_:1}};
+    STORY.on=true;
+    STORY.intro=(!STORY.reduce && scrollY<40)? {t0:performance.now(), dur:2400} : null;
+    storySync();
+    if(!STORY.S) throw new Error('no configuration to show');
+    var k0=storyKey(0);
+    STORY.vp=new Viewport(cv, storyBuild, {orbit:false, spin:false, tags:true, view:STORY.view, dprMin:0.6,
+      yaw:STORY.intro? -1.55 : k0.yaw, pitch:STORY.intro? 0.64 : k0.pitch,
+      dist:STORY.intro? k0.dist*1.75 : k0.dist, ty:STORY.intro? k0.ty*1.45 : k0.ty,
+      animating:storyTick});
+    STORY.vp.view=STORY.view;
+    var nav=$('#styNav');
+    nav.innerHTML=SCN.map(function(s,i){
+      return '<button type="button" data-i="'+i+'" aria-label="Scene '+s.k+': '+s.l+'"><em>'+s.l+'</em><span>'+s.k+'</span></button>'; }).join('');
+    nav.onclick=function(ev){ var b=ev.target.closest('[data-i]'); if(b) storyJump(+b.getAttribute('data-i')); };
+    $('#styCopy').addEventListener('click', function(ev){ var b=ev.target.closest('[data-go]'); if(b) storyGo(b.getAttribute('data-go')); });
+    $('#stySkip').onclick=function(ev){ ev.preventDefault(); toWork(true); };
+    storyScene(0);
+  }catch(err){
+    STORY.on=false; st.classList.add('sty-static');
+    if(window.console) console.warn('Machine story shown as text:', err.message);
+  }
+}
+
 /* ---- init -------------------------------------------------------------- */
 $('#stamp').textContent='Configurator v10.0 · '+new Date().getFullYear();
 loadData(function(){
@@ -11489,13 +11982,22 @@ loadData(function(){
   BOOTED = true;
   render();
   try{ m3dInit(); }catch(e){}
+  try{ storyInit(); }catch(e){}
   editInit();
   if(wantAdmin){ openAdmin(); return; }
+  /* Someone arriving on a shared configuration came for that configuration:
+     land on the workspace, with the story still above it. */
+  if(hadHash){ var rl=$('#rail'), hh0=(document.querySelector('header.site')||{}).offsetHeight||64;
+    if(rl) window.scrollTo(0, Math.max(0, rl.getBoundingClientRect().top+scrollY-hh0-12)); }
   /* Offer the advisor once on a first visit — never to someone arriving on a
-     shared configuration, and never twice. */
-  if(!hadHash && !Store.get('teal.seenAdvisor', false)){
-    Store.set('teal.seenAdvisor', true);
-    setTimeout(openAdvisor, 500);
+     shared configuration, and never twice. It waits until the visitor reaches
+     the workspace, so it never lands on top of the story's opening. */
+  if(!hadHash && !Store.get('teal.seenAdvisor', false) && 'IntersectionObserver' in window){
+    var advIO=new IntersectionObserver(function(es){
+      if(!es[0].isIntersecting || Store.get('teal.seenAdvisor', false)) return;
+      Store.set('teal.seenAdvisor', true); advIO.disconnect(); setTimeout(openAdvisor, 400);
+    },{threshold:0.25});
+    advIO.observe($('#rail'));
   }
 });
 </script>

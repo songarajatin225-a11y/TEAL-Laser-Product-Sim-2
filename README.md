@@ -1217,8 +1217,8 @@ before publishing a new `data.json`. Its last full report is in
 [`DATA-QUALITY.md`](DATA-QUALITY.md).
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 43 checks across navigation, pricing reconciliation, the BOM,
-fit and considerations, the 3D view, the run cycle, the presentation, layout from
+headless Chromium: 66 checks across navigation, pricing reconciliation, the BOM,
+fit and considerations, the 3D view, the run cycle, the presentation, the machine story, layout from
 360 to 1,900 px and accessible names. Each check names the behaviour it protects.
 
 ## v11.0 — commercial breakdown, assemblies, presentation
@@ -1314,6 +1314,102 @@ view mode and camera exactly, and nothing is written to History.
 - **Supplier, part number, lead time per line.** Not in the value store.
 - **A language-model assistant.** The advisor is deterministic and says so;
   connecting a model needs a server to hold the key, which a static site has not.
+
+## v12.0 — the machine story
+
+The page now opens on the machine itself. Above the configurator sits a
+scroll-told introduction in seven scenes, each one built from the configuration
+rather than drawn for the occasion:
+
+| Scene | What happens | Drawn from |
+|---|---|---|
+| A · Machine | The machine is revealed — assemblies arrive one after another as the camera settles | The configurator's parametric model and its own callouts |
+| B · Enclosure | Guarding and covers ghost back as you scroll | The X-ray view, made continuous |
+| C · Assemblies | The machine separates | The v11.0 exploded-view rules |
+| D · Optical system | Everything but the source and optics ghosts back, and the camera moves in | The assemblies' measured extents |
+| E · Laser path | The beam is drawn from source to work plane | `schematicSVG()` — the configured optical train |
+| F · Process | The scan path is traced in the order it is run | `markPath()` and `procModel()` |
+| G · Configure | The machine reassembles, and the configurator takes over | Designation, budget band, lead time |
+
+**It tells your machine.** With nothing configured it shows the README's worked
+example, chosen exactly as a click on its card would choose it and labelled
+*Example*. Once a configuration is complete, every scene shows that machine
+instead, and changing an option rebuilds the story's machine and its numbers.
+All 22 platforms, across every delivery type, are swept through every scene by
+the test suite.
+
+**It never touches the configurator.** The story renders through its own
+viewport with its own view state. `mmBuild` now takes its view state — view mode,
+X-ray amount, separation, emphasis — from the viewport when one is supplied, and
+from the configurator otherwise. The story reads the configuration and never
+writes it, and it never starts, stops or advances the simulator. The suite scrolls
+the whole story and checks that the selection, step, simulator, viewer and
+History come out unchanged.
+
+**Scroll is the browser's.** No wheel event is intercepted and nothing is
+hijacked: a sticky stage and native scroll progress drive a target state, and
+the drawn state eases toward it, so a wheel's discrete steps read as one move.
+Scene letters on the right jump to any scene; *Skip to configurator* is always
+on screen; each scene stands on its own. Someone arriving on a shared link lands
+on the workspace, with the story above it. The advisor's first-visit offer now
+waits until the visitor reaches the workspace, rather than covering the opening.
+
+**What it claims.** Every number is computed by the same functions the
+configurator uses, and every caption says what kind of number it is: the spot is
+a diffraction-limited estimate, the beam path is a schematic rather than a ray
+trace, the process time comes from the process model and is indicative, and the
+scan path of a code is enlarged to be legible, with its real marked size stated.
+The stage carries a standing label: *parametric model — built from the
+configuration, not CAD*.
+
+**Motion with a reason.** The camera moves only to bring something into view,
+the hero breathes slightly until you scroll and then settles, and the scroll cue
+disappears once used. Under `prefers-reduced-motion` there is no opening reveal,
+no easing and no drift: scenes change state directly. On a phone the caption
+moves below the model, which is framed in the space above it, and the floating
+buttons step aside. Without a canvas the story falls back to plain text, every
+scene in order, and the configurator works as before.
+
+### Technology
+
+No GSAP, no Three.js. The page is a single file with no dependencies, and its
+own engine already draws the machine; native scroll position plus the engine's
+frame loop do what a timeline library would, without adding one. There is no
+WebGL to detect or recover from, because the renderer is Canvas 2D.
+
+### Performance
+
+Measured in headless Chromium without a GPU — a pessimistic case — scrolling the
+whole story at device pixel ratio 2, using the page's real frame cadence:
+
+| | Median frame | 95th percentile | Frames over 50 ms |
+|---|---|---|---|
+| First scroll, while the renderer adapts | 33 ms | 117 ms | 64 of 240 |
+| After adapting, either direction | 16.7 ms | 33 ms | 0–2 of 240 |
+
+The story canvas is the full viewport, about six times the pixels of the
+configurator's panel, so its viewport may lower resolution below pixel ratio 1
+(to 0.6) under load — softness is the better trade on a full-bleed backdrop. The
+configurator's viewer keeps its floor of 1. On hardware that holds 60 fps at full
+resolution neither ever steps down.
+
+### Defects found on the way
+
+- **Every step change scrolled to the top of the page.** `go()` called
+  `scrollTo(0)`. With the story above the workspace, each Continue would have
+  thrown the user back into it. Step changes now bring the workspace into view.
+- **The optical schematic dropped beam segments.** Its glow filter used
+  bounding-box units, and an exactly horizontal or vertical beam has a
+  zero-height box, which collapses the filter region. The configurator's own
+  schematic was losing about a tenth of its beam pixels; a copy in the story
+  lost all of them. The filter now uses a user-space region.
+
+### Not done
+
+- **The reference site.** motionsites.ai does not resolve from the build
+  environment, so the direction was taken from the brief itself.
+- **CAD.** There are still no CAD or glTF assets; the machine is the parametric
+  model, and says so.
 
 ---
 
