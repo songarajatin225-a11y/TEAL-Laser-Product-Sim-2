@@ -1076,6 +1076,245 @@ Data literals and `data.json` are unchanged.
 - No horizontal overflow at 390 px. At phone width the camera presets and tools
   share one row without overlapping, and the tool buttons keep their 29 px size.
 
+## v10.1 — simulation performance
+
+The machine view adapts its resolution to keep motion smooth. That adaptation
+had never once taken effect.
+
+**The downshift was dead code.** `frame()` lowered `this.dpr` a quarter step and
+then called `resize()`, which recomputed the ratio from `window.devicePixelRatio`
+and put it straight back. The comment promised "trading resolution, not detail";
+it traded nothing. Measured directly: 2 → 1.75 → 2 across a single resize.
+`resize()` now honours a `dprCap` the panel owns, so a decision to spend less
+survives the next resize.
+
+**It was watching the wrong clock.** The heuristic averaged the time spent inside
+`paint()` and compared it against 13 ms. At a high pixel ratio the cost is not the
+script — it is rasterising the backing store, which lands after `paint()` returns.
+On a fully loaded Mark PCB C2i at device pixel ratio 2, the script measured 6.1 ms
+while frames were actually arriving every 42.6 ms. Nothing above the threshold,
+nothing to react to, 23.5 fps. Adaptation now runs on the real frame cadence and
+falls back to the script time only as a second signal.
+
+| | before | after |
+|---|---|---|
+| Heavy configuration, dpr 2 | 23.5 fps | 60 fps |
+| Chosen pixel ratio | 2 (fixed) | 1.25 (adaptive) |
+| Script time per frame | 6.1 ms | unchanged — it was never the problem |
+
+The controller settles on the sharpest ratio that still holds rate. Measured on
+the same scene: dpr 2 gives 27 fps, 1.75 gives 35, 1.5 gives 44, 1.25 gives 57.
+It picks 1.25. On hardware that sustains 60 fps at full ratio it never downshifts
+at all, because the frame time never crosses the threshold.
+
+**It no longer oscillates.** A level that has proved too expensive is remembered
+and not tried again until the panel is genuinely resized, and restoration needs
+eight consecutive good windows. Without that ratchet the panel stepped up and
+back down every few seconds, which reads worse than simply holding still. A
+warm-up window is skipped so first-paint costs do not trigger a permanent
+downshift.
+
+### Also fixed
+
+**The nameplate overlay collided with itself.** The assembly list was pinned at
+`top:54px`, which assumed the title block was always two lines. A designation
+long enough to wrap to three — Mark PCB C2i at 1,250 × 1,450 × 1,650 mm is one —
+ran the list straight through the dimensions. The two now share a flow column.
+
+### On rendering this in Blender
+
+Asked, considered, declined — with the reasoning recorded so it does not have to
+be relitigated. Blender is a desktop authoring tool and cannot run in a browser,
+so "in Blender" means one of three things, and each gives up more than it returns:
+
+- **Model in Blender, render with three.js at runtime.** Adds a library an order
+  of magnitude larger than the current engine and breaks the single-file, no-CDN
+  deployment. More seriously, it gives up the property the tool exists for: the
+  machine is *assembled from the configuration*. The frame is built from the
+  stated footprint, the chiller sized from the wall-plug efficiency of the chosen
+  source, head standoff and cone angle from the focal length, each selected module
+  placed on its own footprint. A hand-modelled asset is fixed; you would have to
+  rebuild that same procedural logic in three.js and would have gained nothing.
+- **Bake Blender geometry into the existing engine.** Keeps the single file and
+  the assembly logic, but the components it would replace are parametric — they
+  scale with power, focal length and footprint — and a baked mesh is not.
+- **Pre-render stills.** The configuration space is 22 platforms × 12 sources ×
+  5 objectives × 26 modules. Combinatorially hopeless, and it removes orbit, zoom,
+  layers and the run cycle.
+
+The brief this work follows says it plainly: prefer high-quality technical
+visualisation over fake photorealistic 3D, and use heavier technology only where
+it provides genuine value. The engine already renders perspective, back-face and
+sub-pixel culling, Blinn-Phong with key/fill/bounce lights, fresnel glazing, fog
+and painter-sorted shadows at 60 fps in a single file with no dependencies. The
+useful work is in that engine, not beside it.
+
+## v10.2 — material and surface pass
+
+Fidelity work inside the existing engine, chosen over moving the view to
+Blender and three.js for the reasons recorded above. Three changes, each
+measured on a fixed camera against the previous revision.
+
+**Metals tint their own highlight.** The material table already separated powder
+coat from brushed aluminium by specular strength and shininess. It now also
+carries metalness. A dielectric — paint, moulded plastic, powder coat — reflects
+the lamp and keeps a near-white highlight; a metal reflects it through its own
+colour, so brass and copper read warm at the edge of the light instead of looking
+like painted steel. Warm-tinted pixels across the machine rose from 1.25 % to
+1.83 %, which is the brass, copper, aluminium and stainless finally reading as
+different materials rather than different greys.
+
+**Contact darkening follows the normal.** Ambient occlusion was a single
+height-based term, so a downward-facing surface was lit as brightly as an
+upward-facing one at the same height. A downward face sees floor bounce rather
+than sky, and now shades accordingly. No ray is cast — it is a standing term on
+the normal — but parts stop reading as though they float. Mean scene luminance
+moved 73.1 → 68.9.
+
+**Polygon seams close.** Two abutting quads each anti-alias their shared edge
+independently, so the half-covered pixels do not sum to full coverage and the
+background shows through as a hairline crack. Faces that carry an edge colour
+were already stroked and never showed it; faces without one did. They now draw
+their own outline. Crack pixels — measurably darker than both horizontal
+neighbours, inside the machine body — fell from 198 to 134, a 32 % reduction,
+with no measurable change in silhouette area.
+
+### Paid for out of the frame budget, not on top of it
+
+Closing seams costs a second stroke per face: +29 % script time, 5.7 → 7.4 ms on
+the heaviest scene. That is poor value per millisecond compared with resolution,
+and the benefit shrinks as faces get smaller. Rather than gate it on scene size —
+face counts across every configuration sit in a narrow 1,300–2,000 band and would
+not separate typical from heavy — it joins the degradation ladder as the first
+thing surrendered:
+
+| Frames slipping | Action |
+|---|---|
+| 1st | drop seam closing |
+| 2nd | step the pixel ratio down |
+| 3rd | drop shading quality |
+
+Verified under sustained load: seam closing goes at 15.5 s, then the ratio steps
+2 → 1.75 → 1.5 → 1.25 → 1, settling at 59 fps. Hardware that holds 60 fps never
+enters the ladder and keeps every one of them. A genuine panel resize restores
+the full budget and re-evaluates.
+
+## Testing
+
+The site is still `index.html` and `data.json` — no build step. `package.json`
+exists only to run the tests.
+
+```
+npm install
+npx playwright install chromium     # once
+npm test                            # data validator, then the browser suite
+npm run validate                    # data validator alone — no dependencies
+```
+
+`tests/validate-data.mjs` checks every cross-reference in the value store and
+exits non-zero on a critical or high finding; run it after any admin-panel edit
+before publishing a new `data.json`. Its last full report is in
+[`DATA-QUALITY.md`](DATA-QUALITY.md).
+
+`tests/e2e.mjs` serves the repository on a free local port and drives the page in
+headless Chromium: 43 checks across navigation, pricing reconciliation, the BOM,
+fit and considerations, the 3D view, the run cycle, the presentation, layout from
+360 to 1,900 px and accessible names. Each check names the behaviour it protects.
+
+## v11.0 — commercial breakdown, assemblies, presentation
+
+### One itemiser for every price
+
+`price()` was a single number. It is now the total of `priceLines()`, which
+itemises it — platform base, the power, source and objective levers, each added
+module, the software edition and each extra — and the budget band, the BOM, the
+comparison, the RFQ text and the printed sheet all read from it. A line item
+cannot disagree with the total it sums to, because they are one computation.
+
+The arithmetic and its order are exactly those of the old function. Checked
+against the previous implementation across 3,000 configurations — every
+platform, source, power class and objective, with random module, extra and
+software sets — the result is bit-identical in every case.
+
+The specification step shows the breakdown as an engineering table, and it
+exports as CSV and prints on the A4 sheet. Each line is rounded to the rupee by
+the largest-remainder method so the column visibly sums to the displayed total.
+Every priced line is labelled **Estimate**, because Data provenance classes every
+price that way; supplier and part numbers are not in the value store, so they are
+not shown as empty columns.
+
+### Exploded view is an exploded view
+
+"Exploded" used to lift the roof. Every assembly is now separated once the whole
+machine is built, so each one's extent is known before any of them moves. Each
+translates as a rigid body:
+
+| Assembly | Separation |
+|---|---|
+| Floor plan, frame, CE plate | Stay put — the frame is the reference |
+| Through-feed transport | Stays put — it is the line's reference |
+| Status beacon | Rides on the roof |
+| Enclosing shells | Lift clear above the roof |
+| Equipment beside the frame | Moves radially outward |
+| Equipment in the base cabinet | Leaves through the front |
+| Everything in the chamber | Lifts in height order, evenly spaced |
+
+Callout labels travel with their parts, contact shadows stay on the floor and
+thin as parts rise, and a **Separation** control sets the amount. Switching mode
+eases in and out. At zero separation every vertex is bit-identical to the
+assembled build — checked face by face. The panel says what the view is:
+separated for inspection, not an assembly sequence.
+
+### Focus and isolate
+
+Clicking an assembly still opens its description, and now offers **Focus**, which
+flies the camera to that component, and **Isolate assembly**, which ghosts
+everything else and limits clicking to what is isolated. The flight is
+interruptible — a drag or a scroll takes the camera back — and claims the camera
+so automatic framing does not fight it. Esc, Reset view, or removing the isolated
+module ends isolation.
+
+### Presentation mode
+
+The demo overwrote the user's configuration and wrote its own machine into their
+History. It is now an eight-scene presentation — portfolio, platform,
+application, optical train, cutaway, exploded assemblies, the run cycle and the
+commercial breakdown — with Previous, Play/Pause, Next and Exit. Each scene sets
+its whole state from scratch, so a scene is the same however it is reached, and
+chooses the platform through `pickPlatform()`, the same path a click on its card
+takes — so the conveyor, cameras and LaserSuite edition the v10.0 audit seeded
+are all there.
+Touching the configurator pauses the show. Exit restores the selection, step,
+view mode and camera exactly, and nothing is written to History.
+
+### Defects fixed
+
+- **X-ray mode lifted the machine 420 mm off the floor.** The drop-in animation
+  read the ghosted transparency as "not yet arrived", so the frame, cabinet and
+  control cabinet floated 4.2 units up. It now reads arrival only.
+- **The view-mode panel lost Exploded** — a regression from v9.0. The
+  Standard/Engineering toggle reused the class name `.vmode`, which restyled the
+  3D panel's 2×2 mode grid into a pill that overflowed it; X-RAY wrapped and
+  EXPLODED was clipped out of reach. The toggle is now `.dmode`.
+- **The header's primary action was a dead end on a first visit** — another v9.0
+  regression. *Submit enquiry* with nothing configured only raised a toast. It
+  now opens the advisor, which is how a configuration starts.
+- **The health check moved the live view.** It builds every platform through the
+  main viewport; it now builds offscreen, at full separation, and leaves the
+  user's view mode, separation, isolation and selection untouched.
+- The `?demo` kiosk link snapshotted the configuration before reading it from the
+  URL, so Exit would have restored an empty machine.
+
+### Not done, and why
+
+- **Real CAD.** There are no STEP, IGES or GLB assets in the repository, so the
+  machine remains the parametric model the engine builds from the configuration.
+  The assembly bookkeeping is per group, which is where a CAD asset would be
+  swapped in.
+- **Supplier, part number, lead time per line.** Not in the value store.
+- **A language-model assistant.** The advisor is deterministic and says so;
+  connecting a model needs a server to hold the key, which a static site has not.
+
 ---
 
 © Titan Engineering & Automation Limited — A TATA Enterprise.

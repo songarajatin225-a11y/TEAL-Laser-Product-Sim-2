@@ -385,7 +385,13 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .v3dinfo .ix:hover{background:rgba(255,255,255,.16);color:#fff}
 .v3dinfo .ix svg{width:11px;height:11px}
 @media(max-width:640px){.v3dinfo{width:auto;left:10px;right:10px;max-width:none}}
-.v3dstack{position:absolute;left:12px;top:54px;display:flex;flex-direction:column;gap:2px;
+/* The assembly list used to sit at a hard top:54px, which assumed the title
+   block was always two lines. A longer designation wraps to three and the two
+   overlapped. They now share one column and flow. */
+.v3dhud{position:absolute;left:12px;top:11px;right:12px;display:flex;flex-direction:column;
+  gap:10px;pointer-events:none}
+.v3dtop{position:static;left:auto;top:auto;right:auto}
+.v3dstack{position:static;display:flex;flex-direction:column;gap:2px;
   pointer-events:none;max-width:52%}
 .v3dstack .bi{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:8.6px;
   letter-spacing:.1em;text-transform:uppercase;color:#7FA0B4;line-height:1.5;
@@ -1111,12 +1117,12 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
 .sheadtop{display:flex;align-items:center;justify-content:space-between;gap:16px;
   flex-wrap:wrap;margin-bottom:12px}
 .sheadtop .eyebrow{margin-bottom:0}
-.vmode{display:inline-flex;align-items:center;background:var(--card-2);
+.dmode{display:inline-flex;align-items:center;background:var(--card-2);
   border:1px solid var(--rule);border-radius:var(--r-pill);padding:2px}
-.vmode button{background:none;border:0;border-radius:var(--r-pill);padding:5px 12px;
+.dmode button{background:none;border:0;border-radius:var(--r-pill);padding:5px 12px;
   font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
   font-weight:600;color:var(--ink-3);transition:all .2s var(--ease)}
-.vmode button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:var(--sh1)}
+.dmode button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:var(--sh1)}
 .adv-only{display:none}
 body.eng .adv-only{display:block}
 body.eng tr.adv-only{display:table-row}
@@ -1174,6 +1180,50 @@ body.eng tr.adv-only{display:table-row}
 .econs .eact{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 @media(max-width:560px){.econs dl{grid-template-columns:1fr}.econs dt{padding-top:8px}}
 
+/* ---------- 3D: separation, isolation, component actions ---------- */
+.lsep{margin:10px 0 4px;padding:10px 0 2px;border-top:1px solid rgba(154,196,216,.16)}
+.lsep label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8.4px;
+  letter-spacing:.11em;text-transform:uppercase;color:#8FB2C4}
+.lsep label b{color:#00E2E5;font-weight:600}
+.lsep input{width:100%;margin:8px 0 4px;accent-color:#00B7BA}
+.lsep p{margin:0;font-size:10px;line-height:1.45;color:#6F8DA1}
+.v3dinfo .iact{display:flex;gap:6px;margin-top:10px;padding-top:9px;border-top:1px solid rgba(154,196,216,.16)}
+.v3dinfo .iact button{flex:1;background:rgba(0,214,217,.10);border:1px solid rgba(0,226,229,.38);color:#00E2E5;
+  border-radius:6px;padding:6px 8px;font-family:var(--mono);font-size:8.6px;letter-spacing:.09em;text-transform:uppercase}
+.v3dinfo .iact button:hover{background:rgba(0,214,217,.22)}
+.v3diso{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:9;display:none;align-items:center;gap:10px;
+  background:rgba(11,26,42,.86);border:1px solid rgba(0,226,229,.42);border-radius:999px;padding:5px 6px 5px 14px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#C6DAE4}
+.v3diso.on{display:flex}
+.v3diso button{background:#00B7BA;border:0;color:#04161F;border-radius:999px;padding:5px 11px;font-family:var(--mono);
+  font-size:8.6px;letter-spacing:.09em;text-transform:uppercase;font-weight:700}
+
+/* ---------- commercial breakdown (BOM) ---------- */
+.bom{margin-top:24px;border:1px solid var(--rule);border-radius:var(--r);background:#fff;box-shadow:var(--sh1)}
+.bomh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:16px 18px;border-bottom:1px solid var(--rule)}
+.bomt{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--ink-2)}
+.bomb{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  color:var(--cta);background:var(--cta-wash);border-radius:var(--r-pill);padding:4px 10px}
+.bomw{overflow-x:auto}
+.bomtab{width:100%;border-collapse:collapse;font-size:12.5px}
+.bomtab th{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+  color:var(--ink-3);text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);background:var(--card-2);white-space:nowrap}
+.bomtab td{padding:9px 12px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+.bomtab .n{text-align:right;font-family:var(--mono);white-space:nowrap;font-feature-settings:'tnum'}
+.bomtab td.id{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+.bomtab .bn{display:block;font-weight:560;color:var(--ink)}
+.bomtab .bd{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.45;margin-top:2px}
+.bomtab tr.k-std td{color:var(--ink-3)} .bomtab tr.k-std .bn{font-weight:500;color:var(--ink-2)}
+.bomtab tr.k-adj .bn{font-style:normal;color:var(--ink-2)}
+.bomtab tfoot td{border-bottom:0;padding-top:12px;font-weight:650}
+.bomtab tfoot tr:first-child td{border-top:1.5px solid var(--ink)}
+.bomtab tfoot tr.band td{padding-top:4px;font-weight:500;color:var(--ink-2)}
+.bs{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;white-space:nowrap}
+.bs-estimate{color:var(--cta)} .bs-included{color:var(--ok)}
+.bomf{font-size:11.5px;color:var(--ink-3);line-height:1.6;margin:0;padding:12px 18px 16px;border-top:1px solid var(--rule-2)}
+@media(max-width:640px){.bomtab .bd{display:none}.bomtab th,.bomtab td{padding:8px}}
+
 /* ---------- contextual status ---------- */
 #status{position:fixed;left:50%;transform:translateX(-50%) translateY(-8px);top:calc(var(--hdr) + 14px);
   z-index:65;display:flex;align-items:center;gap:9px;background:var(--glass-light);
@@ -1202,6 +1252,9 @@ body.demo #demobar{display:flex}
   color:#fff;border-radius:var(--r-pill);padding:7px 16px;font-size:12.5px;font-weight:560;
   flex:0 0 auto;transition:background .2s var(--ease)}
 #demobar button:hover{background:rgba(255,255,255,.20)}
+#demobar button:disabled{opacity:.38;cursor:default;background:rgba(255,255,255,.10)}
+#demobar #demoPlay{background:var(--teal);border-color:var(--teal);color:#04161F;font-weight:650;min-width:70px}
+#demobar .dc{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:rgba(255,255,255,.6);flex:0 0 auto}
 @media(max-width:640px){#demobar{padding:10px 16px;gap:10px}#demobar .ds{display:none}}
 
 /* ---------- print ---------- */
@@ -1271,7 +1324,7 @@ body.demo #demobar{display:flex}
         <button class="topback" id="topback"></button>
         <div class="sheadtop">
           <p class="eyebrow" id="eyebrow"></p>
-          <div class="vmode" id="vmode" role="group" aria-label="Level of technical detail">
+          <div class="dmode" id="dmode" role="group" aria-label="Level of technical detail">
             <button id="vmStd" aria-pressed="true">Standard</button>
             <button id="vmEng" aria-pressed="false">Engineering</button>
           </div>
@@ -1291,12 +1344,15 @@ body.demo #demobar{display:flex}
       <div class="view">
         <div class="v3d" id="v3d">
           <canvas id="mcanvas"></canvas>
-          <div class="v3dtop">
-            <div class="v3dname" id="v3dname"><b>No machine</b>Select a family to begin the build</div>
-            <span class="v3dstate" id="v3dstate">Standby</span>
+          <div class="v3dhud">
+            <div class="v3dtop">
+              <div class="v3dname" id="v3dname"><b>No machine</b>Select a family to begin the build</div>
+              <span class="v3dstate" id="v3dstate">Standby</span>
+            </div>
+            <div class="v3dstack" id="v3dstack"></div>
           </div>
-          <div class="v3dstack" id="v3dstack"></div>
           <div class="v3dinfo" id="v3dinfo" role="dialog" aria-label="Component detail"></div>
+          <div class="v3diso" id="v3diso" role="status" aria-live="polite"></div>
           <div class="v3dstat" id="v3dstat"></div>
           <div class="v3drun">
             <div class="simtel">
@@ -1392,9 +1448,12 @@ body.demo #demobar{display:flex}
 <button id="toTop" aria-label="Back to top"></button>
 
 <div id="demobar" role="region" aria-label="Customer demonstration">
-  <span class="dm">Demo Mode</span>
-  <span class="ds" id="demostep">Ready</span>
-  <button id="demoRun">Start demo</button>
+  <span class="dm">Presentation</span>
+  <span class="dc" id="demoCt"></span>
+  <span class="ds" id="demostep" aria-live="polite">Ready</span>
+  <button id="demoPrev" aria-label="Previous scene">‹ Prev</button>
+  <button id="demoPlay">Start</button>
+  <button id="demoNext" aria-label="Next scene">Next ›</button>
   <button id="demoEnd">Exit</button>
 </div>
 
@@ -2755,25 +2814,116 @@ function advise(text, picks){
 }
 
 /* ---- price ------------------------------------------------------------ */
-function price(){
+/* One itemiser for every commercial figure. The budget band, the BOM, the
+   comparison, the RFQ text and the printed sheet all read from here, so a line
+   item can never disagree with the total it sums to. The arithmetic and its
+   order are exactly those of the original price(): multiplicative adjustments
+   apply to the platform base, additions are made after. */
+function priceLines(){
   var p=P(); if(!p) return null;
-  var v=p.base;
-  // power scaling relative to platform default
+  var L=[], v=p.base, b, k, std=p.std||[];
+  function line(o){ o.qty=1; o.ext=o.unit; L.push(o); }
+  line({id:p.code, n:p.n, kind:'platform', unit:p.base, basis:'estimate',
+        note:'Platform base price. Includes standard content.'});
+  std.forEach(function(sk){
+    if(MOD[sk]||EXTRA[sk]) L.push({id:sk, n:stdName(sk), kind:'std', qty:1, unit:0, ext:0,
+                                   basis:'included', note:'Standard content of the platform.'});
+  });
   if(S.pw!=null && p.dpw){
-    var r = S.pw/p.dpw;
+    var r=S.pw/p.dpw; b=v;
     if(r>1) v *= (1 + (r-1)*RULES.pw_up);
     else if(r<1) v *= (1 - (1-r)*RULES.pw_dn);
+    if(v!==b) line({id:'ADJ-PWR', n:'Power class '+p.dpw+' W → '+S.pw+' W', kind:'adj', unit:v-b,
+                    basis:'estimate', note:'Pricing lever: '+(r>1? '+'+RULES.pw_up : '−'+RULES.pw_dn)+
+                    ' per unit of power ratio, applied to the platform base.'});
   }
-  // source premium relative to platform default source
-  if(S.src && p.dsrc) v *= (SRC[S.src].prem / SRC[p.dsrc].prem);
-  // larger objective
-  if(S.lens==='f420') v*=RULES.lens_uplift;
-  // modules — standard content is already inside the platform base price
-  var std=p.std||[];
-  for(var k in S.mods){ if(S.mods[k]&&MOD[k]&&std.indexOf(k)<0) v+=MOD[k].p; }
-  if(S.sw&&SW[S.sw]) v+=SW[S.sw].p;
-  for(var e in S.extra){ if(S.extra[e]&&EXTRA[e]&&std.indexOf(e)<0) v+=EXTRA[e].p; }
-  return v;
+  if(S.src && p.dsrc){
+    b=v; v *= (SRC[S.src].prem / SRC[p.dsrc].prem);
+    if(v!==b) line({id:'ADJ-SRC', n:'Source '+SRC[p.dsrc].n+' → '+SRC[S.src].n+' ('+SRC[S.src].wl+')',
+                    kind:'adj', unit:v-b, basis:'estimate',
+                    note:'Source premium ratio '+SRC[S.src].prem+' / '+SRC[p.dsrc].prem+'.'});
+  }
+  if(S.lens==='f420'){
+    b=v; v*=RULES.lens_uplift;
+    line({id:'ADJ-OBJ', n:'Objective '+LENS[S.lens].n+' (larger field)', kind:'adj', unit:v-b,
+          basis:'estimate', note:'Pricing lever ×'+RULES.lens_uplift+' for the large-field objective.'});
+  }
+  for(k in S.mods){ if(S.mods[k]&&MOD[k]&&std.indexOf(k)<0){
+    v+=MOD[k].p; line({id:k, n:MOD[k].n, kind:'mod', unit:MOD[k].p, basis:'estimate', note:MOD[k].g}); } }
+  if(S.sw&&SW[S.sw]){
+    v+=SW[S.sw].p; line({id:'SW-'+S.sw, n:SW[S.sw].n, kind:'sw', unit:SW[S.sw].p,
+                         basis: SW[S.sw].p? 'estimate':'included', note:'LaserSuite edition.'}); }
+  for(var e in S.extra){ if(S.extra[e]&&EXTRA[e]&&std.indexOf(e)<0){
+    v+=EXTRA[e].p; line({id:e, n:EXTRA[e].n, kind:'extra', unit:EXTRA[e].p, basis:'estimate', note:EXTRA[e].d}); } }
+  return {lines:L, total:v, lo:v*RULES.band_lo, hi:v*RULES.band_hi};
+}
+function price(){ var r=priceLines(); return r? r.total : null; }
+
+/* Display rows for the BOM. Each line is rounded to the rupee with the largest-
+   remainder method, so the column visibly sums to the displayed total — anyone
+   adding it up gets the same number. Display only: priceLines() is unrounded. */
+function bomRows(){
+  var r=priceLines(); if(!r) return null;
+  var tot=Math.round(r.total), base=0;
+  var rows=r.lines.map(function(l){ var f=Math.floor(l.ext); base+=f; return {l:l, v:f, frac:l.ext-f}; });
+  var rem=tot-base;
+  rows.slice().sort(function(a,b){ return b.frac-a.frac; })
+      .forEach(function(x){ if(rem>0 && x.l.kind!=='std'){ x.v++; rem--; } });
+  return {rows:rows, total:tot, lo:r.lo, hi:r.hi};
+}
+function sINR(n){ return (n<0?'−':'')+'₹'+inr(Math.abs(n)); }
+var BOMBASIS={estimate:'Estimate', included:'Included'};
+
+function bomTable(){
+  var B=bomRows(); if(!B) return '';
+  var h='<div class="bom"><div class="bomh"><span class="bomt">Commercial breakdown</span>'+
+        '<span class="bomb">Estimate · not a quotation</span></div>'+
+        '<div class="bomw"><table class="bomtab"><thead><tr><th>Item</th><th>Description</th>'+
+        '<th class="n">Qty</th><th class="n">Unit</th><th class="n">Extended</th><th>Basis</th></tr></thead><tbody>';
+  B.rows.forEach(function(x){
+    var l=x.l, inc=l.kind==='std';
+    h+='<tr class="k-'+l.kind+'"><td class="id">'+esc(l.id)+'</td>'+
+       '<td><span class="bn">'+esc(l.n)+'</span><span class="bd">'+esc(l.note||'')+'</span></td>'+
+       '<td class="n">'+l.qty+'</td>'+
+       '<td class="n">'+(inc?'—':sINR(Math.round(l.unit)))+'</td>'+
+       '<td class="n">'+(inc?'Included':sINR(x.v))+'</td>'+
+       '<td><span class="bs bs-'+l.basis+'">'+BOMBASIS[l.basis]+'</span></td></tr>';
+  });
+  h+='</tbody><tfoot>'+
+     '<tr><td></td><td>Indicative list total</td><td></td><td></td><td class="n">'+sINR(B.total)+'</td><td></td></tr>'+
+     '<tr class="band"><td></td><td>Budgetary band (−'+Math.round((1-RULES.band_lo)*100)+' % / +'+
+       Math.round((RULES.band_hi-1)*100)+' %)</td><td></td><td></td>'+
+       '<td class="n">'+shortINR(B.lo)+' – '+shortINR(B.hi)+'</td><td></td></tr>'+
+     '</tfoot></table></div>'+
+     '<p class="bomf">Every price above is classed <b>Estimate</b> in Data provenance — built for scoping from '+
+     'one anchor figure, not TEAL procurement data, and to be replaced before commercial use. Supplier and part '+
+     'numbers are not held in the value store. Standard content is inside the platform base price. '+
+     'Commercial quotation required.</p></div>';
+  return h;
+}
+/* The same breakdown on the printed A4 sheet, so a specification that leaves
+   the building carries its line items and their basis, not just a band. */
+function sheetBOM(){
+  var B=bomRows(); if(!B) return '';
+  var h='<table style="break-inside:avoid;page-break-inside:avoid"><tr><th>Item</th><th>Commercial breakdown — estimate</th>'+
+        '<th style="text-align:right">Extended</th><th>Basis</th></tr>';
+  B.rows.forEach(function(x){ var l=x.l;
+    h+='<tr><td class="mono">'+esc(l.id)+'</td><td>'+esc(l.n)+'</td><td style="text-align:right">'+
+       (l.kind==='std'? 'Included' : sINR(x.v))+'</td><td>'+BOMBASIS[l.basis]+'</td></tr>'; });
+  return h+'<tr><td></td><td><b>Indicative list total</b></td><td style="text-align:right"><b>'+sINR(B.total)+
+           '</b></td><td></td></tr></table>';
+}
+function bomCSV(){
+  var B=bomRows(); if(!B) return '';
+  var rows=[['TEAL Laser Equipment Configurator — indicative commercial breakdown'],
+            ['Designation', desig()], ['Generated', new Date().toISOString().slice(0,10)],
+            ['Status','ESTIMATE — not a quotation. Prices are not TEAL procurement data.'], [],
+            ['Item','Description','Kind','Qty','Unit INR','Extended INR','Basis','Note']];
+  B.rows.forEach(function(x){ var l=x.l;
+    rows.push([l.id, l.n, l.kind, l.qty, l.kind==='std'? 0 : Math.round(l.unit), x.v, BOMBASIS[l.basis], l.note||'']); });
+  rows.push([], ['','Indicative list total','','','',B.total],
+            ['','Budgetary band low','','','',Math.round(B.lo)], ['','Budgetary band high','','','',Math.round(B.hi)]);
+  return toCSV(rows);
 }
 
 /* ---- designation ------------------------------------------------------ */
@@ -3383,6 +3533,8 @@ function uiSpec(b){
     ta.onchange=function(){ S.notes=ta.value; sheet(p,a,o,lo,hi,mk,ex,sd); };
   },0);
 
+  var bw=el('div',''); bw.innerHTML=bomTable(); b.appendChild(bw);
+
   var acts=el('div','acts');
   acts.innerHTML='<button class="btn pri" id="pr">'+ico('print')+'Print / PDF specification</button>'+
     '<button class="btn" id="sv">'+ico('star')+'Save configuration</button>'+
@@ -3391,6 +3543,7 @@ function uiSpec(b){
     '<button class="btn" id="lk">'+ico('link')+'Copy shareable link</button>'+
     '<button class="btn" id="dfm">'+ico('doc')+'DFM report (PDF)</button>'+
     '<button class="btn" id="ss">'+ico('wave')+'Simulation summary</button>'+
+    '<button class="btn" id="bomx">'+ico('down')+'BOM (CSV)</button>'+
     '<button class="btn" id="rq">'+ico('mail')+'Copy RFQ summary</button>'+
     '<button class="btn" id="rs">'+ico('reset')+'Start over</button>';
   b.appendChild(acts);
@@ -3415,6 +3568,10 @@ function uiSpec(b){
     bindCopy('#rq', rfq(p,a,o,lo,hi,mk,ex,sd), ico('mail')+'Copy RFQ summary');
     $('#dfm').onclick=dfmDownload;
     $('#ss').onclick=simSummary;
+    $('#bomx').onclick=function(){
+      download('TEAL-BOM-'+desig().replace(/[^A-Za-z0-9-]/g,'')+'.csv', '\ufeff'+bomCSV(), 'text/csv');
+      toast('BOM exported — indicative, not a quotation.');
+    };
   $('#rs').onclick=function(){
       S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
       famSel=null; reach=0; PQ=''; SEARCH_ALL=false; IFILT=null; location.hash=''; go(0);
@@ -3563,6 +3720,7 @@ function sheet(p,a,o,lo,hi,mk,ex,sd){
    (st? '<table><tr><th colspan="2">Applicable standards</th></tr>'+st+'</table>':'')+
    '<table><tr><th colspan="2">Commercial</th></tr>'+cm+
    '<tr><td class="k">Indicative ex-works budget</td><td><b>'+shortINR(lo)+' – '+shortINR(hi)+' (INR)</b></td></tr></table>'+
+   sheetBOM()+
    '<div class="foot"><b>Indicative only — not a quotation.</b> Budgetary estimates generated from a parametric model for early '+
    'scoping. Specifications are indicative for standard configurations and are finalised against the customer\'s part, process and '+
    'factory conditions during application engineering. Performance on specific parts is confirmed through trials at the TEAL '+
@@ -3794,6 +3952,7 @@ function saveCfg(name){
 }
 function pushHist(){
   var p=P(); if(!p) return;
+  if(typeof DEMO!=='undefined' && DEMO.on) return;   /* a presentation is not the user's work */
   var d=desig();
   HIST = HIST.filter(function(x){ return x.desig!==d; });
   HIST.unshift({id:'h'+Date.now(), ts:Date.now(), desig:d, plat:p.n, st:snapshot(),
@@ -5504,6 +5663,7 @@ function aHealth(b){
   var bs={n:0, fail:[]};
   (function(){
     var keep={S:S, cur:cur, fam:famSel, seen:M3D.seen, list:M3D.list, vm:M3D.vmode, on:SIM.on};
+    M3D.offscreen=true;            /* full separation, no isolation, no live state touched */
     Object.keys(PLAT).forEach(function(pk){
       var pp=PLAT[pk];
       ['solid','cutaway','xray','exploded'].forEach(function(vm){
@@ -5524,7 +5684,7 @@ function aHealth(b){
       });
     });
     S=keep.S; cur=keep.cur; famSel=keep.fam; M3D.seen=keep.seen; M3D.list=keep.list;
-    M3D.vmode=keep.vm; SIM.on=keep.on;
+    M3D.vmode=keep.vm; SIM.on=keep.on; M3D.offscreen=false;
   })();
   bs.fail.forEach(function(f){ bad('3D build failed', esc(f)); });
 
@@ -5891,7 +6051,8 @@ B3.prototype.poly = function(pts, o){
   var f={v:w, c:o.c||C3.panel, a:(o.a==null?1:o.a)*this.a, em:o.em||0,
          e:(this.eov!==undefined? this.eov : (o.e===undefined? EDGE3 : o.e)),
          oc:o.oc||null, two:!!o.two, add:!!o.add, cull:o.cull!==false, lw:o.lw||0,
-         sp:o.sp==null?0.10:o.sp, sh:o.sh||28, fr:o.fr||0, floor:!!o.floor, cid:this.cid};
+         sp:o.sp==null?0.10:o.sp, sh:o.sh||28, fr:o.fr||0, mt:o.mt||0,
+         floor:!!o.floor, cid:this.cid};
   if(f.a>0.004) this.f.push(f);
   return f;
 };
@@ -5963,7 +6124,8 @@ B3.prototype.raw = function(w,o){
   var f={v:w, c:o.c||C3.panel, a:(o.a==null?1:o.a)*this.a, em:o.em||0,
          e:(this.eov!==undefined? this.eov : (o.e===undefined? EDGE3 : o.e)),
          oc:o.oc||null, two:!!o.two, add:!!o.add, cull:o.cull!==false, lw:o.lw||0,
-         sp:o.sp==null?0.10:o.sp, sh:o.sh||28, fr:o.fr||0, floor:!!o.floor, cid:this.cid};
+         sp:o.sp==null?0.10:o.sp, sh:o.sh||28, fr:o.fr||0, mt:o.mt||0,
+         floor:!!o.floor, cid:this.cid};
   if(f.a>0.004) this.f.push(f);
   return f;
 };
@@ -6028,6 +6190,14 @@ function Viewport(canvas, build, opts){
   this.spin=this.o.spin!==false; this.spinV=this.o.spinV==null?0.085:this.o.spinV;
   this.idle=0; this.live=this.o.live!==false; this.vis=true; this.dirty=true;
   this.W=1; this.H=1; this.dpr=1; this.T=0; this.t0=0; this.dt=0;
+  /* dprMax is what the display offers; dprCap is what we have decided this
+     panel can afford. resize() honours the lower of the two, so an adaptive
+     downshift survives the next resize instead of being recomputed away. */
+  this.dprMax=Math.min(window.devicePixelRatio||1, 2); this.dprCap=this.dprMax;
+  this._last=0; this._fac=0; this._good=0; this._capFail=0; this._warm=2;
+  /* Seam closing costs a second stroke per face. It is worth having and it is
+     the cheapest thing to drop, so it leads the degradation ladder. */
+  this.fine=true;
   this.reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   this.quality = this.o.quality==null? 1 : this.o.quality;
   this.canBlur = (function(){ try{ var c=document.createElement('canvas').getContext('2d');
@@ -6055,8 +6225,13 @@ function Viewport(canvas, build, opts){
 Viewport.prototype.resize = function(){
   var r=this.cv.getBoundingClientRect();
   var w=Math.max(1,Math.round(r.width)), h=Math.max(1,Math.round(r.height));
-  var d=Math.min(window.devicePixelRatio||1, 2);
+  this.dprMax=Math.min(window.devicePixelRatio||1, 2);
+  var d=Math.min(this.dprMax, this.dprCap);
   if(w===this.W && h===this.H && d===this.dpr) return;
+  /* A genuine change of panel size is a new cost picture, so the record of
+     which pixel ratio was too expensive is cleared and the level can be tried
+     again. A change of dpr alone is our own doing and clears nothing. */
+  if(w!==this.W || h!==this.H){ this._capFail=0; this._warm=2; this.fine=true; }
   this.W=w; this.H=h; this.dpr=d;
   this.cv.width=Math.round(w*d); this.cv.height=Math.round(h*d);
 };
@@ -6064,6 +6239,7 @@ Viewport.prototype.bindOrbit = function(){
   var self=this, down=false, lx=0, ly=0, pts={}, pd=0;
   function pos(e){ return {x:e.clientX, y:e.clientY}; }
   this.cv.addEventListener('pointerdown', function(e){
+    self.fly=null;                              /* the user takes the camera back */
     pts[e.pointerId]=pos(e);
     if(Object.keys(pts).length===1){ down=true; lx=e.clientX; ly=e.clientY;
       self.cv.setPointerCapture(e.pointerId); self.cv.parentNode.classList.add('dragging'); }
@@ -6092,14 +6268,22 @@ Viewport.prototype.bindOrbit = function(){
   this.cv.addEventListener('pointerup', up);
   this.cv.addEventListener('pointercancel', up);
   this.cv.addEventListener('wheel', function(e){
-    e.preventDefault(); self.zoom(e.deltaY*0.035); self.idle=0; self.dirty=true; self.touched=true;
+    e.preventDefault(); self.fly=null; self.zoom(e.deltaY*0.035); self.idle=0; self.dirty=true; self.touched=true;
   },{passive:false});
 };
 Viewport.prototype.zoom = function(d){
   this.cam.dist = clamp(this.cam.dist + d, this.o.minD||12, this.o.maxD||95);
 };
+/* Ease the camera to frame a point. Claims the camera (touched) so the
+   automatic framing yields to it; any drag or wheel input cancels the flight. */
+Viewport.prototype.flyTo = function(c, dist){
+  var cam=this.cam;
+  this.touched=true; this.idle=0;
+  if(this.reduce){ cam.tx=c[0]; cam.ty=c[1]; cam.tz=c[2]; cam.dist=dist; this.dirty=true; return; }
+  this.fly={t:0, a:[cam.tx,cam.ty,cam.tz,cam.dist], b:[c[0],c[1],c[2],dist]};
+};
 Viewport.prototype.reset = function(){
-  var h=this.home;
+  var h=this.home; this.fly=null;
   this.cam.yaw=h.yaw; this.cam.pitch=h.pitch; this.cam.dist=h.dist;
   this.cam.tx=h.tx; this.cam.ty=h.ty; this.cam.tz=h.tz; this.touched=false; this.dirty=true;
 };
@@ -6115,8 +6299,10 @@ Viewport.prototype.frame = function(now){
   if(!this.t0) this.t0=now;
   var t=(now-this.t0)/1000;
   this.dt=Math.min(0.05, t-this.T); this.T=t;
-  if(!this.vis || document.hidden) return;
-  if(this.o.hidden && this.o.hidden()) return;
+  /* A hidden panel resumes with an arbitrarily long gap since the last paint;
+     that is not a slow frame, so the cadence restarts rather than being judged. */
+  if(!this.vis || document.hidden){ this._last=0; return; }
+  if(this.o.hidden && this.o.hidden()){ this._last=0; return; }
   var animating=this.live && (this.o.animating? this.o.animating() : true);
   if(Math.abs((this.insetT||0)-this.inset)>0.5){
     this.inset += ((this.insetT||0)-this.inset)*(this.reduce? 1 : Math.min(1,this.dt*7)); this.dirty=true;
@@ -6126,17 +6312,55 @@ Viewport.prototype.frame = function(now){
     if(this.idle>2.2 && !this.touched) this.cam.yaw += this.spinV*this.dt;
     animating=true;
   }
-  if(!animating && !this.dirty) return;
+  if(this.fly){
+    var FL=this.fly, ek; FL.t=Math.min(1, FL.t+this.dt/0.7); ek=easeIO(FL.t);
+    this.cam.tx=lerp(FL.a[0],FL.b[0],ek); this.cam.ty=lerp(FL.a[1],FL.b[1],ek);
+    this.cam.tz=lerp(FL.a[2],FL.b[2],ek); this.cam.dist=lerp(FL.a[3],FL.b[3],ek);
+    this.dirty=true; if(FL.t>=1) this.fly=null;
+  }
+  if(!animating && !this.dirty){ this._last=0; return; }   /* cadence broken */
   this.dirty=false;
   var t0=performance.now();
   this.paint(t);
-  /* keep the panel smooth on modest hardware by trading resolution, not detail */
-  this._acc+=performance.now()-t0; this._frames++;
-  if(this._frames>=12){
-    var ms=this._acc/this._frames; this._acc=0; this._frames=0;
-    if(ms>13 && this.dpr>1){ this.dpr=Math.max(1,this.dpr-0.25); this.W=0; this.resize(); }
-    else if(ms>11 && this.quality>0.55) this.quality=0.55;
-    else if(ms<6 && this.quality<1) this.quality=1;
+
+  /* Keep the panel smooth on modest hardware by trading resolution, not detail.
+     Adapt on the real frame cadence rather than on script time alone: at a high
+     pixel ratio the cost is rasterising the backing store, which lands after
+     paint() returns and so never appears in the paint timer. Measuring only the
+     script left the panel at 24 fps with a 6 ms paint and nothing to react to. */
+  var pms=performance.now()-t0;
+  var fms=this._last? (t0-this._last) : 0;
+  this._last=t0;
+  this._acc+=pms; this._fac+=fms; this._frames++;
+  if(this._frames>=15){
+    var ms=this._acc/this._frames, fr=this._fac/this._frames;
+    this._acc=0; this._fac=0; this._frames=0;
+    if(fr<=0) return;                       /* no continuous cadence to judge */
+    if(this._warm>0){ this._warm--; return; }  /* ignore the warm-up window */
+    if(fr>24 || ms>13){                     /* below ~42 fps, or script-bound */
+      this._good=0;
+      /* Cheapest first: closing seams buys the least per millisecond, so it is
+         surrendered before resolution is. */
+      if(this.fine) this.fine=false;
+      else if(this.dprCap>1){
+        this._capFail=this.dprCap;          /* remember the level that failed */
+        this.dprCap=Math.max(1,this.dprCap-0.25); this.resize();
+      }
+      else if(this.quality>0.55) this.quality=0.55;
+    } else if(fr<19 && ms<6){               /* at rate with headroom to spare */
+      /* Restore slowly: a single fast sample straight after a downshift would
+         otherwise oscillate. A level that has already failed is not tried again
+         until the panel is genuinely resized — stepping up into a known-slow
+         level and back down every few seconds is worse than holding steady. */
+      if(++this._good>=8){
+        this._good=0;
+        var next=Math.min(this.dprMax, this.dprCap+0.25);
+        if(this.quality<1) this.quality=1;
+        else if(next>this.dprCap && !(this._capFail && next>=this._capFail)){
+          this.dprCap=next; this.resize();
+        }
+      }
+    } else this._good=0;
   }
 };
 Viewport.prototype.paint = function(T){
@@ -6242,7 +6466,11 @@ Viewport.prototype.paint = function(T){
     var lam = f.two? Math.abs(v3d(nn,L1)) : Math.max(0, v3d(nn,L1));
     var fil = f.two? Math.abs(v3d(nn,L2)) : Math.max(0, v3d(nn,L2));
     var bnc = Math.max(0, v3d(nn,L3));
+    /* Contact darkening: low geometry sits in its own shadow, and a downward
+       face sees floor bounce rather than sky. Both are cheap standing terms —
+       no ray is cast — but they stop parts reading as though they float. */
     var ao  = f.floor? 1 : 0.62+0.38*clamp(ctr[1]/5.5,0,1);
+    if(!f.floor) ao *= 0.80+0.20*(nn[1]*0.5+0.5);
     var kk  = (0.26 + 0.62*lam + 0.20*fil + 0.10*bnc) * ao;
 
     /* Blinn specular, and a fresnel rim that makes glazing read as glass */
@@ -6341,6 +6569,7 @@ Viewport.prototype.paint = function(T){
    so the front of the machine wins over what stands behind it. */
 Viewport.prototype.hit = function(cx,cy){
   var r=this.cv.getBoundingClientRect(), x=cx-r.left, y=cy-r.top, L=this._pick, i, j;
+  this.lastHit=null;
   if(!L) return null;
   for(i=0;i<L.length;i++){
     var sp=L[i].s, inside=false, n=sp.length;
@@ -6348,7 +6577,7 @@ Viewport.prototype.hit = function(cx,cy){
       var A=sp[j], B=sp[(j+1)%n];
       if(((A[1]>y)!==(B[1]>y)) && (x < (B[0]-A[0])*(y-A[1])/(B[1]-A[1])+A[0])) inside=!inside;
     }
-    if(inside) return L[i].f.cid;
+    if(inside){ this.lastHit=L[i].f; return L[i].f.cid; }
   }
   return null;
 };
@@ -6397,7 +6626,15 @@ Viewport.prototype.drawFace = function(it, fogA, fogB, fogC, fs){
   var base=rgb3(ff.c), kk=it.k;
   var r0=base[0]*kk, g0=base[1]*kk, b0=base[2]*kk;
   if(ff.em){ r0=lerp(r0,base[0]*1.62,ff.em); g0=lerp(g0,base[1]*1.62,ff.em); b0=lerp(b0,base[2]*1.62,ff.em); }
-  if(it.sp){ var s1=it.sp*225; r0+=s1; g0+=s1*1.01; b0+=s1*1.06; }
+  if(it.sp){
+    /* Dielectrics reflect the lamp: a near-white highlight, faintly cool.
+       Metals reflect it through their own colour, so the highlight carries the
+       base hue and brass stops looking like painted steel. */
+    var s1=it.sp*225, mt=ff.mt||0;
+    r0 += s1*(1-mt) + s1*mt*(base[0]/210);
+    g0 += s1*1.01*(1-mt) + s1*mt*(base[1]/210);
+    b0 += s1*1.06*(1-mt) + s1*mt*(base[2]/210);
+  }
   if(it.fr){ r0=lerp(r0,150,it.fr*0.85); g0=lerp(g0,214,it.fr*0.85); b0=lerp(b0,236,it.fr*0.85); }
   r0=lerp(r0,fogC[0],fog); g0=lerp(g0,fogC[1],fog); b0=lerp(b0,fogC[2],fog);
   var alpha=ff.a + (it.fr? it.fr*0.34*(1-ff.a) : 0);
@@ -6409,6 +6646,15 @@ Viewport.prototype.drawFace = function(it, fogA, fogB, fogC, fs){
   ctx.fillStyle='rgba('+(r0>255?255:r0|0)+','+(g0>255?255:g0|0)+','+(b0>255?255:b0|0)+','+alpha+')';
   ctx.fill();
   if(ff.e){ ctx.strokeStyle=ff.e; ctx.lineWidth=ff.lw||0.7; ctx.stroke(); }
+  else if(this.fine && ff.a>0.9){
+    /* Two abutting polygons each anti-alias their shared edge independently, so
+       the half-covered pixels do not sum to full cover and the background shows
+       through as a hairline crack. A face that draws its own outline closes the
+       seam; faces that already carry an edge colour are stroked above and need
+       no help, and translucent ones are left alone so the outline cannot
+       double-expose through the fill. */
+    ctx.strokeStyle=ctx.fillStyle; ctx.lineWidth=0.75; ctx.stroke();
+  }
   ctx.globalCompositeOperation='source-over';
 };
 /* ==========================================================================
@@ -6421,23 +6667,25 @@ Viewport.prototype.drawFace = function(it, fogA, fogB, fogC, fs){
    ========================================================================== */
 
 /* ---- materials --------------------------------------------------------- */
-/* Specular and shininess are what separate powder coat from brushed
-   aluminium on screen; the colours alone do not. */
+/* Specular, shininess and metalness are what separate powder coat from brushed
+   aluminium on screen; the colours alone do not. A metal tints its highlight
+   with its own colour, which is why brass and copper read warm at the edge of
+   the light; a painted or moulded surface reflects the source white. */
 var MTL = {
   powder    :{c:'#94A5B1', sp:0.13, sh:14},   /* powder-coated steel, matte  */
   powderD   :{c:'#75868F', sp:0.11, sh:14},
   powderL   :{c:'#AFBFC9', sp:0.15, sh:16},
-  alu       :{c:'#B2BDC6', sp:0.40, sh:32},   /* brushed aluminium           */
-  extru     :{c:'#A6B2BB', sp:0.32, sh:26},   /* anodised T-slot extrusion   */
-  steel     :{c:'#8A97A2', sp:0.28, sh:24},   /* welded structural steel     */
-  steelD    :{c:'#6B7883', sp:0.24, sh:22},
-  stainless :{c:'#B7C1C9', sp:0.62, sh:56},
-  chrome    :{c:'#C8D4DD', sp:0.86, sh:78},   /* ground shafting, rails      */
+  alu       :{c:'#B2BDC6', sp:0.40, sh:32, mt:1},   /* brushed aluminium           */
+  extru     :{c:'#A6B2BB', sp:0.32, sh:26, mt:0.85},   /* anodised T-slot extrusion   */
+  steel     :{c:'#8A97A2', sp:0.28, sh:24, mt:1},   /* welded structural steel     */
+  steelD    :{c:'#6B7883', sp:0.24, sh:22, mt:1},
+  stainless :{c:'#B7C1C9', sp:0.62, sh:56, mt:1},
+  chrome    :{c:'#C8D4DD', sp:0.86, sh:78, mt:1},   /* ground shafting, rails      */
   poly      :{c:'#8FD0E0', sp:0.48, sh:58, a:0.20, fr:0.72},  /* polycarbonate */
   glazing   :{c:'#5FC4D8', sp:0.50, sh:70, a:0.15, fr:0.80},  /* tempered glass */
   rubber    :{c:'#22272C', sp:0.05, sh:8},
-  copper    :{c:'#B4703A', sp:0.46, sh:38},
-  brass     :{c:'#BFA24E', sp:0.52, sh:44},
+  copper    :{c:'#B4703A', sp:0.46, sh:38, mt:1},
+  brass     :{c:'#BFA24E', sp:0.52, sh:44, mt:1},
   plastic   :{c:'#2A3138', sp:0.17, sh:18},   /* engineering plastic         */
   black     :{c:'#171D23', sp:0.09, sh:12},
   warnY     :{c:'#E4B23C', sp:0.18, sh:16},
@@ -6805,6 +7053,9 @@ var R3D = {headY:0};
 var M3D = {
   vp:null, seen:{}, list:[], mode:'3d', tags:true, ghost:true, autoCam:true,
   lastKey:'', queued:null, ready:false, vmode:'solid',
+  /* exploded separation: expA is the drawn amount, eased toward expK while the
+     mode is on; iso names the assembly shown solid while the rest is ghosted */
+  expA:0, expK:0.7, iso:null, offscreen:false, faces:null,
   layers:{enc:true, glz:true, cov:true, lit:true, mod:true, util:true, flr:true, beam:true}
 };
 
@@ -6870,14 +7121,111 @@ function mmVis(id){
 /* Wrap a sub-assembly so it drops into place as it is added. */
 var XRAY_GHOST={frame:1, ctrl:1, tower:1, cert:1};
 function grp(b,R,id,fn){
-  var a=R.vis(id);
-  if(a<=0.004) return;
+  var v=R.vis(id);
+  if(v<=0.004) return;
+  var a=v;
   if(R.xray && XRAY_GHOST[id]) a*=0.16;
-  var sa=b.a;
+  /* Isolation ghosts every other assembly rather than hiding it, so the one
+     being inspected keeps its context. The floor plan is never ghosted. */
+  var iso=!!(R.iso && id!==R.iso && id!=='site');
+  if(iso) a*=0.07;
+  var sa=b.a, se=b.eov, f0=b.f.length, t0=b.tags.length;
   b.push(); b.a=sa*a;
-  if(a<1) b.t(0,(1-a)*5.0,0);
+  if(iso) b.eov='rgba(120,196,224,.16)';
+  /* The drop-in offset follows how far the assembly has arrived, never how
+     transparent it is drawn. Keying it on the ghosted alpha lifted the frame,
+     cabinet and control cabinet 420 mm off the floor in X-ray mode. */
+  if(v<1) b.t(0,(1-v)*5.0,0);
   fn(b,R,a);
-  b.a=sa; b.pop();
+  b.a=sa; b.eov=se; b.pop();
+  if(R.groups) R.groups.push({id:id, f0:f0, f1:b.f.length, t0:t0, t1:b.tags.length});
+}
+
+/* ---- exploded separation, isolation bookkeeping -------------------------- */
+/* Runs once the whole machine is built, so every assembly's extent is known
+   before any of them moves. Each assembly translates as a rigid body; at zero
+   separation every vertex is exactly where it was built. The scheme separates
+   for inspection — it does not claim an assembly sequence:
+     floor plan, frame, CE plate   stay put — the frame is the reference
+     through-feed transport        stays put — it is the line's reference
+     status beacon                 rides on the roof
+     enclosing shells              lift clear above the roof
+     equipment beside the frame    moves radially outward
+     equipment in the base cabinet leaves through the front
+     everything in the chamber     lifts in height order, evenly spaced */
+var ASM_FIXED={site:1, frame:1, cert:1};
+function asmBox(b,g){
+  var mn=[1e9,1e9,1e9], mx=[-1e9,-1e9,-1e9], i, j, k;
+  for(i=g.f0;i<g.f1;i++){
+    var f=b.f[i]; if(f.kind==='shadow') continue;
+    var L=f.kind==='path'? f.v : [f.v];
+    for(k=0;k<L.length;k++) for(j=0;j<L[k].length;j++){
+      var q=L[k][j];
+      if(q[0]<mn[0])mn[0]=q[0]; if(q[1]<mn[1])mn[1]=q[1]; if(q[2]<mn[2])mn[2]=q[2];
+      if(q[0]>mx[0])mx[0]=q[0]; if(q[1]>mx[1])mx[1]=q[1]; if(q[2]>mx[2])mx[2]=q[2];
+    }
+  }
+  if(mn[0]>mx[0]) return null;
+  return {mn:mn, mx:mx, c:[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2]};
+}
+function asmMove(b,g,o){
+  var i, j, k;
+  function m(q){ return [q[0]+o[0], q[1]+o[1], q[2]+o[2]]; }
+  for(i=g.f0;i<g.f1;i++){
+    var f=b.f[i], nv=[];
+    if(f.kind==='shadow'){
+      /* contact shadows stay on the floor and thin out as the part rises */
+      for(j=0;j<f.v.length;j++) nv.push([f.v[j][0]+o[0], f.v[j][1], f.v[j][2]+o[2]]);
+      f.v=nv; f.a=f.a/(1+Math.max(0,o[1])*0.18); continue;
+    }
+    if(f.kind==='path'){ for(k=0;k<f.v.length;k++){ var pl=[]; for(j=0;j<f.v[k].length;j++) pl.push(m(f.v[k][j])); nv.push(pl); } }
+    else for(j=0;j<f.v.length;j++) nv.push(m(f.v[j]));   /* new arrays: corners may be shared */
+    f.v=nv;
+    if(f.oc) f.oc=m(f.oc);                                 /* keeps outward normals outward */
+  }
+  for(i=g.t0;i<g.t1;i++) b.tags[i].p=m(b.tags[i].p);       /* callouts travel with their part */
+}
+function asmPost(b,R){
+  var G=R.groups||[], i, hasFrame=false;
+  for(i=0;i<G.length;i++){ G[i].box=asmBox(b,G[i]); if(G[i].id==='frame') hasFrame=true; }
+  var E=R.exp;
+  if(E>0.001 && hasFrame){
+    /* The reference is the enclosure as specified (MW × MD, base cabinet top at
+       CAB), not the measured frame — the frame's own geometry already includes
+       the lifted roof, which would drag the reference up the machine. */
+    var fw=MW, fd=MD, fc=[0, TOPY/2, 0], roof=R.roofLift||0, inner=[];
+    for(i=0;i<G.length;i++){
+      var g=G[i], bx=g.box; if(!bx || ASM_FIXED[g.id]) continue;
+      var c=bx.c, o=null;
+      var shell=(bx.mx[0]-bx.mn[0])>=fw*0.95 && (bx.mx[2]-bx.mn[2])>=fd*0.95;
+      /* through-feed transport runs out of both sides of the frame: it is the
+         line's reference, like the frame, so it holds still */
+      var through=(bx.mn[0]<-fw/2 && bx.mx[0]>fw/2) || (bx.mn[2]<-fd/2 && bx.mx[2]>fd/2);
+      if(through && !shell) continue;
+      var out=Math.abs(c[0]-fc[0])>fw/2 || Math.abs(c[2]-fc[2])>fd/2;
+      if(g.id==='tower') o=[0, roof, 0];
+      else if(shell) o=[0, roof*1.3, 0];
+      else if(out){
+        var dx=c[0]-fc[0], dz=c[2]-fc[2], n=Math.sqrt(dx*dx+dz*dz)||1, mg=E*Math.max(fw,fd)*0.38;
+        o=[dx/n*mg, 0, dz/n*mg];
+      }
+      else if(c[1]<CAB) o=[0, 0, E*fd*0.75];
+      else { inner.push(g); continue; }
+      g.o=o;
+    }
+    inner.sort(function(x,y){ return x.box.c[1]-y.box.c[1]; });
+    var step=roof*0.8/(inner.length+0.5);
+    for(i=0;i<inner.length;i++) inner[i].o=[0, step*(i+1), 0];
+    for(i=0;i<G.length;i++) if(G[i].o) asmMove(b,G[i],G[i].o);
+  }
+  if(M3D.offscreen) return;
+  /* tag every face with its assembly so a click can be resolved to one */
+  for(i=0;i<G.length;i++) for(var j=G[i].f0;j<G[i].f1;j++) b.f[j].gid=G[i].id;
+  M3D.faces=b.f;
+  if(M3D.iso){
+    var still=false; for(i=0;i<G.length;i++) if(G[i].id===M3D.iso) still=true;
+    if(!still) isoSet(null);          /* the isolated module was removed */
+  }
 }
 function ghost(b,R,fn){
   if(!M3D.ghost) return;
@@ -7080,7 +7428,7 @@ function gFrame(b,R,a){
   /* plenum with lifting eyes */
   if(COV){
     b.comp('plenum');
-    b.push(); b.t(0,CAB+CH-0.3+R.exp*4.5,0);
+    b.push(); b.t(0,CAB+CH-0.3+(R.roofLift||0),0);
     b.box(MW+0.35,1.05,MD+0.35,MT('powder',{top:MTL.powderL.c,side:MTL.powderD.c,a:XA}));
     if(lod>=1){
       [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(q){
@@ -8667,7 +9015,13 @@ function mmBuild(b, T, vp){
   R.vm = M3D.vmode;
   R.xray = R.vm==='xray';
   R.cut  = R.vm==='cutaway';
-  R.exp  = R.vm==='exploded'? 1 : 0;
+  /* Health-check sweeps build every mode at full separation; the live view
+     draws the eased amount. Roof clearance scales with the machine height. */
+  var expT = R.vm==='exploded'? M3D.expK : 0;
+  R.exp  = M3D.offscreen? (R.vm==='exploded'? 1 : 0) : M3D.expA;
+  R.roofLift = R.exp*TOPY*0.6;
+  R.iso  = M3D.offscreen? null : M3D.iso;
+  R.groups = [];
   /* frame the machine as it grows — but never fight a camera the user has
      moved. The viewport's inset keeps it clear of the telemetry once the
      cycle starts, whatever the camera is doing. */
@@ -8835,6 +9189,7 @@ function mmBuild(b, T, vp){
     b.pop();
     b.tag([-MW/2+1.4, CAB-2.4, MD/2+0.1], 'CE · IEC 60825-1 CLASS 1', {dy:-12, c:'#8FD9DC'});
   });
+  asmPost(b,R);
 }
 /* ==========================================================================
    COMPONENT LIBRARY — what each assembly is, does and is made of
@@ -9183,7 +9538,7 @@ function m3dInit(){
     yaw:-0.62, pitch:0.32, dist:47, ty:8.4, fov:0.62, minD:14, maxD:110,
     spin:true, spinV:0.075,
     hidden:function(){ return M3D.mode!=='3d'; },
-    animating:function(){ return true; }
+    animating:function(){ m3dTick(); return true; }
   });
 
   /* camera presets */
@@ -9217,7 +9572,7 @@ function m3dInit(){
     bt.classList.toggle('on', open);
   });
   buildLayerPanel();
-  tool('reset','Reset view', function(){ M3D.vp.reset(); });
+  tool('reset','Reset view', function(){ M3D.vp.reset(); isoSet(null); });
   tool('wave','2D optical schematic', function(bt){
     M3D.mode = M3D.mode==='3d'? '2d':'3d';
     $('.view').classList.toggle('mode2d', M3D.mode==='2d');
@@ -9249,6 +9604,7 @@ function m3dInit(){
     var tag=(e.target.tagName||'').toLowerCase();
     if(tag==='input'||tag==='textarea'||e.metaKey||e.ctrlKey||e.altKey) return;
     if(document.querySelector('#advisor.open, #drawer.open, #compare.open, #inquiry.open')) return;
+    if(e.key==='Escape' && M3D.iso){ isoSet(null); return; }
     var k=e.key.toLowerCase(), i=['1','2','3','4'].indexOf(e.key);
     if(i>=0){ M3D.vmode=VMODES[i][0]; buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
     if(LKEY[k]){ M3D.layers[LKEY[k]]=!(M3D.layers[LKEY[k]]!==false); buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
@@ -9326,6 +9682,15 @@ function buildLayerPanel(){
     vm.appendChild(b2);
   });
   pn.appendChild(vm);
+  if(M3D.vmode==='exploded'){
+    var sp=el('div','lsep','<label for="expK">Separation <b>'+Math.round(M3D.expK*100)+' %</b></label>'+
+      '<input type="range" id="expK" min="20" max="100" step="5" value="'+Math.round(M3D.expK*100)+'">'+
+      '<p>Separated for inspection — not an assembly sequence.</p>');
+    sp.querySelector('input').oninput=function(){
+      M3D.expK=this.value/100; sp.querySelector('b').textContent=this.value+' %'; M3D.vp.dirty=true;
+    };
+    pn.appendChild(sp);
+  }
   pn.appendChild(el('h5','','Layers'));
   LAYERDEF.forEach(function(L){
     var on=M3D.layers[L[0]]!==false;
@@ -9336,6 +9701,48 @@ function buildLayerPanel(){
   var tg=el('div','lrow'+(M3D.tags?' on':''), '<i></i><span>Callout labels</span>');
   tg.onclick=function(){ M3D.tags=!M3D.tags; M3D.vp.o.tags=M3D.tags; buildLayerPanel(); M3D.vp.dirty=true; };
   pn.appendChild(tg);
+}
+
+/* Advance view transitions once per live frame — never inside mmBuild, which
+   the health check also calls through this same viewport. */
+function m3dTick(){
+  var vp=M3D.vp; if(!vp) return;
+  var tgt=M3D.vmode==='exploded'? M3D.expK : 0;
+  if(vp.reduce || Math.abs(tgt-M3D.expA)<0.002) M3D.expA=tgt;
+  else M3D.expA+=(tgt-M3D.expA)*Math.min(1,(vp.dt||0.016)*5);
+}
+
+/* ---- isolation and focus ------------------------------------------------- */
+function isoName(id){
+  for(var i=0;i<M3D.list.length;i++) if(M3D.list[i].id===id) return M3D.list[i].n;
+  return id;
+}
+function isoSet(id){
+  M3D.iso=id||null;
+  var c=$('#v3diso');
+  if(c){
+    if(M3D.iso){
+      c.innerHTML='<span>Isolated · '+esc(isoName(M3D.iso))+'</span><button type="button">Show all</button>';
+      c.querySelector('button').onclick=function(){ isoSet(null); };
+      c.classList.add('on');
+    } else { c.classList.remove('on'); c.innerHTML=''; }
+  }
+  if(M3D.vp) M3D.vp.dirty=true;
+}
+/* Frame one component of one assembly: the extent of the faces it drew. */
+function compFocus(gid, cid){
+  var F=M3D.faces, vp=M3D.vp; if(!F||!vp) return;
+  var mn=[1e9,1e9,1e9], mx=[-1e9,-1e9,-1e9], i, j, n=0;
+  for(i=0;i<F.length;i++){
+    var f=F[i]; if(f.gid!==gid || f.cid!==cid || f.kind) continue;
+    for(j=0;j<f.v.length;j++){ var q=f.v[j]; n++;
+      if(q[0]<mn[0])mn[0]=q[0]; if(q[1]<mn[1])mn[1]=q[1]; if(q[2]<mn[2])mn[2]=q[2];
+      if(q[0]>mx[0])mx[0]=q[0]; if(q[1]>mx[1])mx[1]=q[1]; if(q[2]>mx[2])mx[2]=q[2]; }
+  }
+  if(!n) return;
+  var c=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2];
+  var sz=Math.max(mx[0]-mn[0], mx[1]-mn[1], mx[2]-mn[2]);
+  vp.flyTo(c, clamp(sz*3.2, 7, 40));
 }
 
 /* build-stack list, headline and run controls */
@@ -9412,6 +9819,16 @@ function showComp(id){
       '<dt>Spec</dt><dd>'+esc(c.s)+'</dd>'+
       '<dt>Vendors</dt><dd>'+esc(c.v)+'</dd>'+
       '<dt>Service</dt><dd>'+esc(c.mt)+'</dd></dl>';
+  var hf=M3D.vp&&M3D.vp.lastHit, gid=hf&&hf.gid;
+  if(gid){
+    pn.innerHTML+='<div class="iact"><button type="button" data-a="focus">Focus</button>'+
+      '<button type="button" data-a="iso">'+(M3D.iso===gid? 'Show all' : 'Isolate assembly')+'</button></div>';
+    pn.querySelector('[data-a="focus"]').onclick=function(){ compFocus(gid, id); };
+    pn.querySelector('[data-a="iso"]').onclick=function(){
+      isoSet(M3D.iso===gid? null : gid);
+      this.textContent=M3D.iso? 'Show all' : 'Isolate assembly';
+    };
+  }
   pn.querySelector('.ix').onclick=function(){ pn.classList.remove('open'); };
   pn.classList.add('open');
 }
@@ -10913,53 +11330,109 @@ function navSync(){
 /* ---- customer demo mode ------------------------------------------------- */
 /* Runs the configuration the README documents as the worked example, then the
    machine cycle. No new data: every key below exists in the value store. */
-var DEMO={on:false, t:null, seq:0};
+var DEMO={on:false, i:-1, play:false, t:null, keep:null};
 var DEMOCFG={fam:'mark', plat:'markc2i', app:'dual', src:'co2', pw:30, lens:'f254'};
 
+/* Each scene states the whole configuration it shows, built from scratch, so
+   previous, next and skip always land on the same picture whatever came before.
+   Every value is read from the value store at the moment the scene plays. */
+var SCENES=[
+  {n:'Portfolio', step:0, vm:'solid', dwell:4200, say:function(){
+    return Object.keys(FAM).length+' TEAL laser families, '+Object.keys(PLAT).length+' platforms.'; }},
+  {n:'Platform', step:1, vm:'solid', dwell:4200, say:function(){
+    var p=PLAT[DEMOCFG.plat]; return p.n+' — '+p.t+'.'; }},
+  {n:'Application', step:2, vm:'solid', dwell:4200, say:function(){
+    var a=PLAT[DEMOCFG.plat].apps[DEMOCFG.app]; return a.n+' on '+(MAT[a.mat]? MAT[a.mat].n : a.mat)+'.'; }},
+  {n:'Optical train', step:3, vm:'solid', dwell:4800, say:function(){
+    var o=optics(); return SRC[S.src].n+' '+SRC[S.src].wl+' at '+S.pw+' W through '+LENS[S.lens].n+
+      (o? ' — computed spot '+o.spot.toFixed(0)+' µm.' : '.'); }},
+  {n:'Inside the machine', step:5, vm:'cutaway', dwell:4800, say:function(){
+    return 'Near panels and glazing removed, so the process is visible in place.'; }},
+  {n:'Assemblies', step:5, vm:'exploded', dwell:5600, say:function(){
+    return 'Assemblies separated for inspection — not an assembly sequence.'; }},
+  {n:'Run cycle', step:5, vm:'solid', sim:true, dwell:9000, say:function(){
+    return 'The cycle is computed from the marked path and the platform’s scan speed, not scripted.'; }},
+  {n:'Commercial', step:5, vm:'solid', bom:true, dwell:6000, say:function(){
+    var r=priceLines(); return 'Indicative budget '+shortINR(r.lo)+' – '+shortINR(r.hi)+' — estimate, not a quotation.'; }}
+];
+
 function demoSay(s){ var e=$('#demostep'); if(e) e.textContent=s; }
+function demoBar(){
+  var pl=$('#demoPlay'), ct=$('#demoCt');
+  if(pl) pl.textContent=DEMO.play? 'Pause' : (DEMO.i<0? 'Start' : 'Play');
+  if(ct) ct.textContent=DEMO.i<0? SCENES.length+' scenes' : (DEMO.i+1)+' / '+SCENES.length;
+  var pv=$('#demoPrev'), nx=$('#demoNext');
+  if(pv) pv.disabled=DEMO.i<=0;
+  if(nx) nx.disabled=DEMO.i>=SCENES.length-1;
+}
+function demoScene(i){
+  if(i<0 || i>=SCENES.length) return;
+  var sc=SCENES[i];
+  clearTimeout(DEMO.t);
+  DEMO.i=i;
+  try{ if(SIM.on) simStop(); }catch(e){}
+  S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
+  famSel=DEMOCFG.fam;
+  /* choose the platform exactly as a click on its card does: standard content
+     seeded, LaserSuite edition set — one path, so the scene is the real thing */
+  if(sc.step>=1) pickPlatform(DEMOCFG.plat);
+  if(sc.step>=2) S.app=DEMOCFG.app;
+  if(sc.step>=3){ S.src=DEMOCFG.src; S.pw=DEMOCFG.pw; S.lens=DEMOCFG.lens; }
+  reach=sc.step; M3D.vmode=sc.vm; isoSet(null);
+  go(sc.step);
+  try{ buildLayerPanel(); }catch(e){}
+  demoSay(sc.n+' — '+sc.say());
+  if(sc.sim) setTimeout(function(){ try{ if(DEMO.on && DEMO.i===i && simReady()) simStart(); }catch(e){} }, 350);
+  if(sc.bom) setTimeout(function(){ var bm=document.querySelector('.bom'); if(bm) bm.scrollIntoView({block:'center'}); }, 300);
+  demoBar();
+  if(DEMO.play){
+    if(i<SCENES.length-1) DEMO.t=setTimeout(function(){ if(DEMO.on && DEMO.play) demoScene(i+1); }, sc.dwell);
+    else DEMO.t=setTimeout(function(){ DEMO.play=false; demoBar(); demoSay('End of presentation — '+desig()); }, sc.dwell);
+  }
+}
+function demoPlay(){
+  if(!PLAT[DEMOCFG.plat] || !PLAT[DEMOCFG.plat].apps[DEMOCFG.app]){
+    toast('The presentation configuration is not in this value store.','warn'); return; }
+  DEMO.play=!DEMO.play;
+  if(DEMO.play) demoScene(DEMO.i<0 || DEMO.i>=SCENES.length-1? 0 : DEMO.i+1);
+  else { clearTimeout(DEMO.t); demoBar(); }
+}
+/* Any hand on the configurator pauses the show: the presenter has taken control. */
+function demoManual(e){
+  if(!DEMO.on || !DEMO.play) return;
+  if(e.target.closest && e.target.closest('#demobar')) return;
+  DEMO.play=false; clearTimeout(DEMO.t); demoBar();
+  demoSay('Paused — manual control. Play resumes from the next scene.');
+}
 function demoOn(){
-  DEMO.on=true;
+  if(DEMO.on) return;
+  /* The presentation borrows the configurator; it gives back exactly what the
+     user had — selection, step, view mode, camera — and writes no History. */
+  var vp=M3D.vp;
+  DEMO.keep={S:JSON.parse(JSON.stringify(S)), cur:cur, reach:reach, fam:famSel, vm:M3D.vmode,
+             iso:M3D.iso, cam:vp? JSON.parse(JSON.stringify(vp.cam)) : null, touched:vp? vp.touched : false};
+  DEMO.on=true; DEMO.i=-1; DEMO.play=false;
   document.body.classList.add('demo');
-  demoSay('Ready — press Start demo');
-  toast('Demo mode on.');
+  document.addEventListener('pointerdown', demoManual, true);
+  demoSay('Customer presentation — '+SCENES.length+' scenes. Your configuration is kept and restored on exit.');
+  demoBar();
 }
 function demoOff(){
-  DEMO.on=false;
-  clearTimeout(DEMO.t); DEMO.seq++;
+  if(!DEMO.on) return;
+  DEMO.on=false; DEMO.play=false; clearTimeout(DEMO.t);
+  document.removeEventListener('pointerdown', demoManual, true);
   document.body.classList.remove('demo');
-  try{ simStop(); }catch(e){}
-  toast('Demo mode off.');
-}
-function demoRun(){
-  if(!PLAT[DEMOCFG.plat]){ toast('Demo configuration unavailable in this value store.','warn'); return; }
-  var my=++DEMO.seq;
-  var steps=[
-    [0,   'Portfolio — seven TEAL laser families', function(){
-      S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
-      famSel=DEMOCFG.fam; reach=0; go(0);
-    }],
-    [1400,'Platform — '+PLAT[DEMOCFG.plat].n, function(){ pickPlatform(DEMOCFG.plat); reach=1; go(1); }],
-    [1600,'Application — inline PCB marking', function(){ S.app=DEMOCFG.app; reach=2; go(2); }],
-    [1600,'Source, power and objective', function(){
-      S.src=DEMOCFG.src; S.pw=DEMOCFG.pw; S.lens=DEMOCFG.lens; reach=3; go(3);
-    }],
-    [1800,'Integration — platform standard content', function(){ reach=4; go(4); }],
-    [1600,'Specification, optics and budgetary band', function(){ reach=5; go(5); }],
-    [1800,'Running the machine cycle', function(){
-      try{ if(simReady()) simStart(); }catch(e){}
-    }]
-  ];
-  var i=0, acc=0;
-  function fire(){
-    if(my!==DEMO.seq) return;                 // superseded or exited
-    var s=steps[i++];
-    demoSay(s[1]);
-    try{ s[2](); }catch(e){}
-    if(i<steps.length) DEMO.t=setTimeout(fire, steps[i][0]);
-    else demoSay('Demo complete — '+desig());
+  try{ if(SIM.on) simStop(); }catch(e){}
+  var k=DEMO.keep;
+  if(k){
+    S=k.S; famSel=k.fam; reach=k.reach; M3D.vmode=k.vm;
+    go(k.cur);
+    isoSet(k.iso);
+    try{ buildLayerPanel(); }catch(e){}
+    if(k.cam && M3D.vp){ var c=M3D.vp.cam; for(var q in k.cam) c[q]=k.cam[q]; M3D.vp.touched=k.touched; M3D.vp.dirty=true; }
   }
-  demoSay('Starting…');
-  DEMO.t=setTimeout(fire, 400);
+  DEMO.keep=null; DEMO.i=-1;
+  toast('Presentation closed — your configuration is as you left it.');
 }
 
 /* ---- wiring ------------------------------------------------------------- */
@@ -10975,10 +11448,18 @@ function demoRun(){
     openCompare();
   };
   $('#hVal').onclick=openAdmin;
-  $('#hInq').onclick=openInquiry;
+  /* The enquiry is built from a configuration. With none yet, the header's
+     primary action must still lead somewhere: to the advisor, which starts one. */
+  $('#hInq').onclick=function(){
+    if(P() && A()){ openInquiry(); return; }
+    openAdvisor();
+    toast('An enquiry is built from a configuration — describe your process and the advisor will start one.');
+  };
   $('#vmStd').onclick=function(){ if(ENG) setEng(false); };
   $('#vmEng').onclick=function(){ if(!ENG) setEng(true); };
-  $('#demoRun').onclick=demoRun;
+  $('#demoPlay').onclick=demoPlay;
+  $('#demoPrev').onclick=function(){ DEMO.play=false; demoScene(DEMO.i-1); };
+  $('#demoNext').onclick=function(){ DEMO.play=false; demoScene(DEMO.i<0? 0 : DEMO.i+1); };
   $('#demoEnd').onclick=demoOff;
   /* the throughput target: carried in the link, judged in the fit and the run */
   $('#fitTarget').oninput=function(){
@@ -10995,7 +11476,9 @@ function demoRun(){
       if(DEMO.on) demoOff(); else demoOn();
     }
   });
-  if(/(^|[?&#])demo(=|&|$)/.test(location.search+location.hash)) demoOn();
+  /* wait for the configuration in the URL to load, so that is what is restored */
+  if(/(^|[?&#])demo(=|&|$)/.test(location.search+location.hash))
+    (function wait(){ if(BOOTED) demoOn(); else setTimeout(wait, 120); })();
 })();
 
 /* ---- init -------------------------------------------------------------- */
