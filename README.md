@@ -1199,6 +1199,122 @@ Verified under sustained load: seam closing goes at 15.5 s, then the ratio steps
 enters the ladder and keeps every one of them. A genuine panel resize restores
 the full budget and re-evaluates.
 
+## Testing
+
+The site is still `index.html` and `data.json` — no build step. `package.json`
+exists only to run the tests.
+
+```
+npm install
+npx playwright install chromium     # once
+npm test                            # data validator, then the browser suite
+npm run validate                    # data validator alone — no dependencies
+```
+
+`tests/validate-data.mjs` checks every cross-reference in the value store and
+exits non-zero on a critical or high finding; run it after any admin-panel edit
+before publishing a new `data.json`. Its last full report is in
+[`DATA-QUALITY.md`](DATA-QUALITY.md).
+
+`tests/e2e.mjs` serves the repository on a free local port and drives the page in
+headless Chromium: 43 checks across navigation, pricing reconciliation, the BOM,
+fit and considerations, the 3D view, the run cycle, the presentation, layout from
+360 to 1,900 px and accessible names. Each check names the behaviour it protects.
+
+## v11.0 — commercial breakdown, assemblies, presentation
+
+### One itemiser for every price
+
+`price()` was a single number. It is now the total of `priceLines()`, which
+itemises it — platform base, the power, source and objective levers, each added
+module, the software edition and each extra — and the budget band, the BOM, the
+comparison, the RFQ text and the printed sheet all read from it. A line item
+cannot disagree with the total it sums to, because they are one computation.
+
+The arithmetic and its order are exactly those of the old function. Checked
+against the previous implementation across 3,000 configurations — every
+platform, source, power class and objective, with random module, extra and
+software sets — the result is bit-identical in every case.
+
+The specification step shows the breakdown as an engineering table, and it
+exports as CSV and prints on the A4 sheet. Each line is rounded to the rupee by
+the largest-remainder method so the column visibly sums to the displayed total.
+Every priced line is labelled **Estimate**, because Data provenance classes every
+price that way; supplier and part numbers are not in the value store, so they are
+not shown as empty columns.
+
+### Exploded view is an exploded view
+
+"Exploded" used to lift the roof. Every assembly is now separated once the whole
+machine is built, so each one's extent is known before any of them moves. Each
+translates as a rigid body:
+
+| Assembly | Separation |
+|---|---|
+| Floor plan, frame, CE plate | Stay put — the frame is the reference |
+| Through-feed transport | Stays put — it is the line's reference |
+| Status beacon | Rides on the roof |
+| Enclosing shells | Lift clear above the roof |
+| Equipment beside the frame | Moves radially outward |
+| Equipment in the base cabinet | Leaves through the front |
+| Everything in the chamber | Lifts in height order, evenly spaced |
+
+Callout labels travel with their parts, contact shadows stay on the floor and
+thin as parts rise, and a **Separation** control sets the amount. Switching mode
+eases in and out. At zero separation every vertex is bit-identical to the
+assembled build — checked face by face. The panel says what the view is:
+separated for inspection, not an assembly sequence.
+
+### Focus and isolate
+
+Clicking an assembly still opens its description, and now offers **Focus**, which
+flies the camera to that component, and **Isolate assembly**, which ghosts
+everything else and limits clicking to what is isolated. The flight is
+interruptible — a drag or a scroll takes the camera back — and claims the camera
+so automatic framing does not fight it. Esc, Reset view, or removing the isolated
+module ends isolation.
+
+### Presentation mode
+
+The demo overwrote the user's configuration and wrote its own machine into their
+History. It is now an eight-scene presentation — portfolio, platform,
+application, optical train, cutaway, exploded assemblies, the run cycle and the
+commercial breakdown — with Previous, Play/Pause, Next and Exit. Each scene sets
+its whole state from scratch, so a scene is the same however it is reached, and
+chooses the platform through `pickPlatform()`, the same path a click on its card
+takes — so the conveyor, cameras and LaserSuite edition the v10.0 audit seeded
+are all there.
+Touching the configurator pauses the show. Exit restores the selection, step,
+view mode and camera exactly, and nothing is written to History.
+
+### Defects fixed
+
+- **X-ray mode lifted the machine 420 mm off the floor.** The drop-in animation
+  read the ghosted transparency as "not yet arrived", so the frame, cabinet and
+  control cabinet floated 4.2 units up. It now reads arrival only.
+- **The view-mode panel lost Exploded** — a regression from v9.0. The
+  Standard/Engineering toggle reused the class name `.vmode`, which restyled the
+  3D panel's 2×2 mode grid into a pill that overflowed it; X-RAY wrapped and
+  EXPLODED was clipped out of reach. The toggle is now `.dmode`.
+- **The header's primary action was a dead end on a first visit** — another v9.0
+  regression. *Submit enquiry* with nothing configured only raised a toast. It
+  now opens the advisor, which is how a configuration starts.
+- **The health check moved the live view.** It builds every platform through the
+  main viewport; it now builds offscreen, at full separation, and leaves the
+  user's view mode, separation, isolation and selection untouched.
+- The `?demo` kiosk link snapshotted the configuration before reading it from the
+  URL, so Exit would have restored an empty machine.
+
+### Not done, and why
+
+- **Real CAD.** There are no STEP, IGES or GLB assets in the repository, so the
+  machine remains the parametric model the engine builds from the configuration.
+  The assembly bookkeeping is per group, which is where a CAD asset would be
+  swapped in.
+- **Supplier, part number, lead time per line.** Not in the value store.
+- **A language-model assistant.** The advisor is deterministic and says so;
+  connecting a model needs a server to hold the key, which a static site has not.
+
 ---
 
 © Titan Engineering & Automation Limited — A TATA Enterprise.
