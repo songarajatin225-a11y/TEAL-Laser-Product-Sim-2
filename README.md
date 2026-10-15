@@ -20,7 +20,11 @@ record at GitHub Pages.
 ## Notes
 
 - Single self-contained file. The TEAL logo is embedded as a base64 data URI, so
-  there are no asset paths to break when served from a repository subpath.
+  there are no asset paths to break when served from a repository subpath. It is
+  the TEAL lockup — symbol, wordmark and *A TATA Enterprise* — as lossless WebP at
+  711 × 160 with a true alpha channel: exact brand colours, enough resolution for
+  the header at 3× density and the printed sheet, and clean edges where the footer
+  reverses it to white. It appears in the header, the footer and the A4 sheet.
 - Only external request is Google Fonts (Archivo, IBM Plex Sans, IBM Plex Mono).
   System fonts are used as fallback if it is blocked.
 - No build step, no framework, no backend. The only thing kept in the browser
@@ -1410,6 +1414,28 @@ resolution neither ever steps down.
   environment, so the direction was taken from the brief itself.
 - **CAD.** There are still no CAD or glTF assets; the machine is the parametric
   model, and says so.
+
+## v12.1 — new TEAL logo
+
+The header, footer and printed specification carry the new TEAL lockup.
+
+It is embedded as lossless WebP at 711 × 160. A palette PNG would have been
+smaller, but the available encoder flattens alpha to two levels, which gives the
+edges a hard stair-step — worst where the footer reverses the logo to white.
+Lossy WebP was half the size again, but lossless keeps the brand colours exact.
+
+The lockup is 4.4 : 1 where the old logo was 2.4 : 1, so it is 1.8× wider at the
+same height, and the header was re-fitted around it: the logo is 34 px tall on
+desktop and 30 px on a phone, and the centre navigation is slightly tighter. On a
+phone the header drops the value-store icon, which duplicates the floating
+*Values* button, and below 400 px the Compare icon, which is also in the Saved
+drawer — no function is lost. Every width from 360 to 1,900 px keeps at least
+23 px between header groups.
+
+The header test was not catching this. It compared element boxes, and the title
+block may shrink below its non-wrapping text, so the subtitle could run into the
+navigation while the boxes still reported clearance. It now measures what is
+drawn — every visible descendant, text overflow included — and requires 8 px.
 
 ---
 
