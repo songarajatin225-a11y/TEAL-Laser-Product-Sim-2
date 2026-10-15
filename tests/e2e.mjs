@@ -303,12 +303,18 @@ try {
   const bad = [];
   for (let w = 360; w <= 1900; w += 40) {
     await pg.setViewportSize({ width: w, height: 900 }); await pg.waitForTimeout(40);
-    const m = await pg.evaluate(() => { const k = [...document.querySelector('header .wrap').children].filter(x => getComputedStyle(x).display !== 'none');
-      let ov = 0; for (let i = 0; i < k.length - 1; i++) ov = Math.max(ov, k[i].getBoundingClientRect().right - k[i + 1].getBoundingClientRect().left);
-      return { ov, doc: document.documentElement.scrollWidth - document.documentElement.clientWidth }; });
-    if (m.ov > 0.5 || m.doc > 1) bad.push(`${w}px`);
+    /* Measure ink, not boxes: a group may shrink below its non-wrapping text, so
+       the extent is taken over every visible descendant, text overflow included. */
+    const m = await pg.evaluate(() => {
+      const ink = el => { let l = 1e9, r = -1e9; [el, ...el.querySelectorAll('*')].forEach(e => {
+        if (getComputedStyle(e).display === 'none') return; const q = e.getBoundingClientRect(); if (!q.width) return;
+        l = Math.min(l, q.left); r = Math.max(r, e.children.length ? q.right : Math.max(q.right, q.left + e.scrollWidth)); }); return { l, r }; };
+      const k = [...document.querySelector('header .wrap').children].filter(x => getComputedStyle(x).display !== 'none');
+      let gap = 1e9; for (let i = 0; i < k.length - 1; i++) gap = Math.min(gap, ink(k[i + 1]).l - ink(k[i]).r);
+      return { gap, doc: document.documentElement.scrollWidth - document.documentElement.clientWidth }; });
+    if (m.gap < 8 || m.doc > 1) bad.push(`${w}px (gap ${Math.round(m.gap)})`);
   }
-  check('header never overlaps and the page never scrolls sideways, 360–1900 px', bad.length === 0, bad.join(' '));
+  check('header groups keep at least 8 px of clear space and the page never scrolls sideways, 360–1900 px', bad.length === 0, bad.join(' '));
   await pg.setViewportSize({ width: 1600, height: 1000 });
   const unnamed = await pg.$$eval('header button, #dmode button, #demobar button, #v3dctl button',
     e => e.filter(x => !x.textContent.trim() && !x.getAttribute('aria-label') && !x.title).length);
