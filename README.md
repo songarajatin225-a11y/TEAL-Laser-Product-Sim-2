@@ -1226,9 +1226,10 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 89 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 104 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
-kinematics, the run cycle and its scrubbing, the presentation, the machine story,
+kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
+missions, the run cycle and its scrubbing, the presentation, the machine story,
 layout from 320 to 1,900 px and accessible names. Each check names the behaviour it
 protects.
 
@@ -1572,6 +1573,111 @@ the run controls tighten and wrap.
 
 **Still to do:** guided missions and a troubleshooting tutorial were not built. The
 existing presentation mode remains the guided path.
+
+## v14.0 — mechanisms, 3D comparison, engineering assistant, guided missions
+
+### Mechanisms
+
+- **Chamber door:** now a glazed panel that swings outward on its hinge line, through
+  a declared door joint.
+  - **Manual load:** on a hand-loaded machine the operator opens it to load and unload,
+    and the HMI status reads *Open — loading*.
+  - **Guard stoppage:** it is what the stoppage now shows. The door opens, the
+    interlock lamp turns red, and the door closes before the cycle resumes.
+  - **Beam:** the door is shut whenever the beam can fire, and a test checks that.
+- **Conveyor blade stopper:** it has its own joint. It holds the part through the
+  process, drops to release it, and rises once it has passed. Before, it was tied to
+  the clamps.
+- **Energy chains:** both already followed the head and the Z carriage, so nothing
+  changed there.
+- **Inspection lighting:** Layers → *Lighting* adds an inspection mode next to studio
+  lighting. It is flat, bright and glare-free, has no depth fog, and outlines every
+  face, for reading form and fit. The geometry is unchanged.
+
+All door and stopper motion is labelled as animation, not engineering data: the product
+data gives no door angle and no stopper stroke.
+
+### 3D comparison
+
+The comparison dialog now draws the second machine with its differences from the first:
+- **Green:** what B adds.
+- **Red ghost:** what A has and B drops.
+- **Amber:** what both have but build or specify differently.
+
+Both machines are built by the same `mmBuild` as the configurator, with the
+configuration swapped in and back out as the machine story does it. Your selection,
+step, run and view are never touched.
+
+**How "built differently" is decided:** by comparing each part's own face shapes, so
+a part that has only moved does not count.
+- **Moved, not changed:** the e-stop on a wider machine is not flagged.
+- **Changed:** a longer frame member is.
+- **Specification changes:** the parametric model draws a 30 W and a 100 W fibre source
+  alike, so a changed source, power, objective or application is also flagged, with
+  its reason, such as *Fiber (Q-switched) 30 W → Fiber MOPA 100 W*.
+
+**Alongside the view:**
+- the enclosure size change, with a note when the size is estimated
+- the priced lines added, dropped or changed
+- the total difference, labelled an estimate
+
+With three configurations you can choose which pair to compare. A swap button and a
+*Differences only* view are also there.
+
+### Engineering assistant
+
+The explorer gains an **Ask** tab. Answers are computed in the browser from the
+configurator's own data and models. Each says where its number comes from and
+highlights the part concerned in the view.
+
+**What it answers:**
+- spot size and depth of focus, from the optics model
+- field and focal length
+- scan angle, from the ideal f-θ relation
+- source, pulse and power
+- heat load, from wall-plug efficiency
+- cycle time, from the process model or the last simulated cycle
+- price band and lead time
+- Z stroke
+- machine size
+- material absorption
+- laser class, quoted from the platform's specification
+- what any drawn part is and does
+
+**Data gaps:** where the data has none, it says so. The working distance is not the
+focal length, and is not in the data. Platforms without a stated laser class get no
+assumed one.
+
+**Out of scope:** questions outside these topics are declined.
+
+**It is not an AI service:** the page says so, and nothing leaves the browser.
+
+### Guided missions
+
+The new flag button opens five optional missions:
+1. **Find the optical train:** scan head, objective, door interlock.
+2. **Trace the beam:** inspect every part on the path, in order. Picking out of order is
+   explained.
+3. **Configure for a finer mark:** reach a spot-size target computed from the platform's
+   own sources and objectives.
+4. **Run and read a cycle:** cycle time and longest phase, both read from the run.
+5. **Diagnose a stoppage:** the machine stops on one of the faults it can actually
+   suffer. You identify the cause and the recovery, then acknowledge. The stoppage is
+   held until you do.
+
+**Scoring:** each step scores full marks without a hint or a wrong try. The best scores
+are kept in this browser only.
+
+**Your configuration is safe:** a mission works on a copy, like the presentation mode.
+It gives back the configuration, step, view, camera and link exactly, and writes no
+History. With no machine configured, it uses the README's worked example.
+
+### Fixes
+
+- The step and step-back controls stayed visible after a paused run was stopped.
+- On a phone the viewer now grows to the run-cycle height while the explorer or
+  missions panel is open.
+- The narrow-viewer layout allows for the eighth toolbar button.
 
 ---
 

@@ -462,7 +462,7 @@
         "verification": null
       },
       "glb": null,
-      "joint": null
+      "joint": "door"
     },
     "interlock": {
       "name": "Door interlock switch",
@@ -2133,7 +2133,7 @@
         "verification": null
       },
       "glb": null,
-      "joint": null
+      "joint": "stop"
     },
     "conveyorsensor": {
       "name": "Transport sensors",
