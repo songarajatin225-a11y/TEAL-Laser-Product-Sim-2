@@ -27,8 +27,10 @@ record at GitHub Pages.
   reverses it to white. It appears in the header, the footer and the A4 sheet.
 - Only external request is Google Fonts (Archivo, IBM Plex Sans, IBM Plex Mono).
   System fonts are used as fallback if it is blocked.
-- No build step, no framework, no backend. The only thing kept in the browser
-  is a recoverable draft of admin-panel edits — see below.
+- No build step, no framework, no backend. What is kept in the browser — the working
+  configuration and its revisions, saved configurations, the theme and view, a
+  recoverable draft of value-store edits and the Internal workspace's records — stays
+  in that browser and is never sent anywhere. See [`SECURITY.md`](SECURITY.md).
 - Configurations are shareable by URL — state is encoded in the location hash,
   e.g. `#p=markc2i&a=dual&s=co2&w=30&l=f254&f=inline`.
 - **Print / PDF** produces a branded A4 specification sheet.
@@ -43,7 +45,7 @@ library, no CDN, so the page stays a single self-contained file.
 
 | Step | What appears |
 |------|--------------|
-| 01 Family | Floor plan and Class-1 keep-out zone, plus a ghost of the machine |
+| 01 Family | Floor plan and keep-out zone (marked Class 1 only where the platform’s specification says so), plus a ghost of the machine |
 | 02 Platform | Frame, enclosure or guarding, control cabinet, HMI, status beacon — and any modules that are standard content on that platform |
 | 03 Application | Work table, fixture and the workpiece for the selected material |
 | 04 Source | Laser source, chiller, beam delivery, scan head and the f-theta objective — head height and cone angle follow the focal length |
@@ -317,9 +319,9 @@ to the values built into `index.html`, so it never breaks.
 
 ### Option A — the admin panel (no code)
 
-1. Click **⚙ Values**, bottom right (or open `<site-url>/#admin`).
-2. Enter the PIN — `teal2026` by default, changeable under **Pricing rules**.
-3. Edit across five tabs:
+1. Switch the header to **Internal** and click **⚙ Values**, bottom right (or open
+   `<site-url>/#admin`, which switches to the Internal view itself).
+2. Edit across the tabs:
 
 | Tab | What you can change |
 |-----|---------------------|
@@ -327,12 +329,12 @@ to the values built into `index.html`, so it never breaks.
 | Modules | Name, description and price of each automation module |
 | Software & compliance | LaserSuite edition and connectivity package pricing |
 | Sources | Wavelength premium, M², beam diameter, f-theta focal lengths and fields |
-| Pricing rules | Budget band, power scaling, objective uplift, admin PIN |
+| Pricing rules | Budget band, power scaling, objective uplift |
 
 Edits apply to the configurator immediately, so you can see the effect on a
 quoted band while you type.
 
-4. Click **⭳ Export data.json** and commit the downloaded file to the repository,
+3. Click **⭳ Export data.json** and commit the downloaded file to the repository,
    replacing the existing one.
 
 **Export is still the save step** — nothing is published until `data.json` is
@@ -413,8 +415,10 @@ colleague's version before committing it.
 ### A caution about privacy
 
 This is a static site: the configurator runs entirely in the browser, so every
-value in `data.json` is readable by anyone who can load the page. The PIN
-prevents accidental edits; it is not access control. If your cost basis must stay
+value in `data.json` is readable by anyone who can load the page. There is no
+PIN: v15.0 removed it, because a PIN shipped in `data.json` was readable by anyone
+and so protected nothing. Edits in the panel change only the browser they are
+made in until the exported file is committed. If your cost basis must stay
 confidential, keep the repository **private** (GitHub Pages on a private repo
 requires a paid plan), or move the values behind an authenticated API and have
 the page fetch from there instead.
@@ -1226,11 +1230,13 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 104 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 135 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
-layout from 320 to 1,900 px and accessible names. Each check names the behaviour it
+the Customer and Internal views, the three themes, configuration identity and
+revisions, the ten workspace screens, quotation and trial requests, layout from 320
+to 1,900 px and accessible names. Each check names the behaviour it
 protects.
 
 ## v11.0 — commercial breakdown, assemblies, presentation
@@ -1678,6 +1684,163 @@ History. With no machine configured, it uses the README's worked example.
 - On a phone the viewer now grows to the run-cycle height while the explorer or
   missions panel is open.
 - The narrow-viewer layout allows for the eighth toolbar button.
+
+## v15.0 — Customer and Internal views, themes, configuration revisions
+
+### The honest part first
+
+The header has a **Customer / Internal** switch. It changes what is shown, not who
+may see it: the site is static and public, so anyone can switch, and nothing in it
+needs protecting. The Internal view is a **demonstration workspace**:
+
+- It works on the public catalogue and on records typed into this browser.
+- It has no login and no server.
+- Its role selector previews what each role would see. It does not grant anything.
+
+A banner on every Internal screen says so. [`SECURITY.md`](SECURITY.md) sets out
+what a real internal service needs. [`docs/INTERNAL-DATA.md`](docs/INTERNAL-DATA.md)
+gives the data contract that service would serve.
+
+The admin PIN has been removed. It was `teal2026`, shipped in `data.json`, so anyone
+could read it and it protected nothing. The value store now opens from the Internal
+view, without a prompt.
+
+### Header
+
+- **View:** Customer or Internal, as a two-button segmented control. Arrow keys,
+  Home and End work as in any radio group.
+- **Theme:** Light, Dark or System. System follows the operating system, including
+  when the OS changes while the page is open. The theme is applied before first paint,
+  so there is no flash, and a printed sheet is always light.
+- **Actions:** Save, Compare, and the call to action, now **Request a quote**.
+
+The header wraps to two rows on a phone and drops the subtitle first as it narrows.
+
+### Configuration identity
+
+Every configuration gets an ID, `TC-` followed by six hex digits, when its platform
+is chosen. Every change after that makes a new revision.
+
+The bar above the step rail shows:
+- the ID and revision
+- the source configuration, when this one was copied from a shared link
+- when it was autosaved
+- Undo and Redo (Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z), and Save
+
+Each configuration also has a **fingerprint**: an 8-digit hash of the selection. The
+same selection always gives the same fingerprint, whatever its ID, so two documents
+can be checked against each other.
+
+The ID, revision and fingerprint appear on the share link, the printed sheet, the
+BOM CSV, the RFQ, the component register, the DFM report and every request.
+
+Shared links and returning visits:
+- Opening someone else's link and changing anything makes a copy with a new ID,
+  marked "copied from", so two people never write revisions under one ID.
+- A returning visitor is **offered** their unfinished configuration. It is not forced
+  on them, and the landing page stays the story.
+- **Start over** now asks first.
+
+### Customer requests
+
+The specification step offers **Request a quotation** and **Request an application
+trial**. Each opens a form pre-filled from the configuration.
+- Only name, organisation and business email are required.
+- A trial request also needs the material and the target result.
+
+There is no server, so a request is **not sent by the site**. It becomes one of:
+- an email draft
+- a CSV row
+- text to copy
+
+The form says so, and after any of those actions it says *Nothing has been sent by
+this site*. No TEAL enquiry address is configured in this build, so the email draft
+has no addressee. Attachments are listed by name, to be attached to the email.
+
+A copy of the request is kept in this browser. It appears under **Customer
+enquiries** and, for a trial, **Application trials**.
+
+The printed sheet now carries:
+- the configuration identity
+- an assumptions and limitations table
+- recommended next steps
+
+The laser-safety line is now read from the platform's specification. The same
+applies to the specification step and the 3D floor plan. Before this version all
+three called every machine Class 1.
+
+Only 6 of the 22 platforms state a safety entry. Two of those (`markf`, `markm`)
+state "Class 1 per IEC 60825-1", and the handheld cleaner relies on eyewear. Where the
+data has nothing, the page says the specification does not state it. The floor plan
+is marked *Class 1 enclosed zone* only where the specification says Class 1;
+otherwise it is a *keep-out zone*.
+
+### Internal workspace
+
+Ten screens. Each figure shows a chip naming its source: *Catalogue data*,
+*Calculated*, *Simulated*, *User-selected*, *Entered in this browser*, *Estimate*,
+*Missing*, or *SYNTHETIC demo*. Anything not recorded says **Not recorded** or
+**Awaiting input**; nothing is filled in.
+
+| Screen | What it does |
+|---|---|
+| Product Portfolio | Every family and platform from the catalogue, with a lifecycle state (Concept → Deprecated), owner and actions recorded in this browser, and the data gaps the catalogue itself has |
+| Machine Configurator | The configurator, unchanged |
+| Product Engineering | Identity and fingerprint, what the last change affected, the specification by source, fitment, validation findings, CAD status, trial evidence and the revision history |
+| BOM & Costing | Every part the machine has, from the 3D model, solid and cut-away merged. The live viewer docks beside the table: selecting a row highlights the part, and picking a part selects its row. Costs entered by category, with completeness, gross margin and variance to an approved baseline, all shown only to roles that would see them |
+| Components & Suppliers | The component library with its example vendors, which are **not** approved suppliers. Supplier records per component; only a role allowed to approve substitutions can mark one Approved. Category matching never implies compatibility |
+| Application Trials | Trials per platform and application, from Requested to Approved or Rejected. Approval needs an approving role, the inspection results, the acceptance criteria and the achieved result. Sample photos are stored as small JPEGs |
+| Validation & Release | Draft → In Review → Approved → Released → Deprecated per configuration. Review needs an owner; approval needs a reviewer who is not the owner. A released revision is frozen; later edits are shown as differing from it, and it can be restored |
+| Customer Enquiries | Requests prepared in this browser, with status, owner, next action and quote reference, filtered and exportable to CSV |
+| Management Overview | Lifecycle, release readiness, catalogue health, open validation, BOM completeness and variance, pipeline, conversion, lead-time risk, single-source parts, imported vs local value. Each tile names its source and freshness, or says it is not available |
+| Settings & Audit | The access statement, the role preview and its permission matrix, export, import and clearing of the records in this browser, demonstration records, and the audit log |
+
+**Demonstration records** are loaded only when asked for, from Settings:
+- Every one is flagged `demo:true`, prefixed `DEMO` and labelled SYNTHETIC
+  wherever it appears.
+- Demo costs are round fractions of the catalogue estimate, so they cannot be
+  mistaken for supplier prices.
+- Removing them leaves real entries untouched.
+
+All reads and writes go through one adapter (`WSDB`). A service can replace it without
+changing the screens.
+
+### 3D view
+
+| Feature | How it works |
+|---|---|
+| Pan | Right or middle drag, Shift+drag, or a two-finger drag |
+| Side view | A new preset. Every preset re-centres the pan |
+| Overall dimensions | A layer, key D. Width, depth and height are marked "est." unless the specification states them |
+| Lite rendering | A setting for slow devices: lowest geometric detail, 1× pixel density and reduced render quality |
+| BOM link | The BOM link works in both directions (see BOM & Costing above) |
+
+### Fixes
+
+- **HTML escaping did not cover quotes.** `esc()` escaped `&`, `<` and `>` only, so a
+  value written into an attribute could break out of it. A new check imports a
+  workspace file with markup in every field. Against the old `esc()` it found 18
+  elements carrying injected attributes, in the edit forms of Portfolio, BOM, Trials, Release and
+  Enquiries. Related fixes:
+  - `esc()` now escapes both quote characters.
+  - Notifications render their message as text.
+  - Saved-configuration names are escaped.
+  - Imported trial photographs must be image data URLs.
+  - Malformed imported records are dropped instead of breaking a screen.
+- Line and point primitives did not carry their component ID, so outline-only parts
+  (louvres, LEDs, the inspection region) were missing from any scan of the scene.
+- The specification step's print and request buttons could be bound after the step
+  had already changed, which raised a script error. They are now guarded.
+- Opening the comparison no longer writes revisions for the configurations it builds.
+
+### Not done
+
+- **Authentication, server-side roles, shared storage, an audit trail that cannot be
+  edited, and CRM integration** all need a backend. They are specified in
+  `SECURITY.md` and `docs/INTERNAL-DATA.md`, not imitated.
+- **Supplier prices, part numbers, drawing numbers and margins** are TEAL data that
+  this public site must not carry. The screens take them as local input instead.
+- **Real CAD** is still pending approved files, as in v13.0.
 
 ---
 

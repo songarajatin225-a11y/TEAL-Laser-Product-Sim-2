@@ -87,3 +87,14 @@ is in [`assets/cad/COVERAGE.md`](assets/cad/COVERAGE.md), which `npm test` keeps
 | No objective states a working distance | **Needs TEAL** — the objective datasheets |
 | Lead time is held per platform, not per component; prices are not itemised per component | By design of the commercial model — flagged, not changed |
 
+
+## Safety, access and identity data (2026-10-16)
+
+| Finding | Status |
+|---|---|
+| `RULES.adminPin` (`teal2026`) was shipped in the public `data.json` and gated the value store. Anyone could read it, so it protected nothing while implying it did | **Removed** from `data.json` and the page. The value store opens from the Internal view, which is labelled a demonstration. See [`SECURITY.md`](SECURITY.md) |
+| The printed sheet, the specification step and the 3D floor plan called every platform "Class 1 per IEC 60825-1" | **Fixed.** All three read the platform's own `Safety` specification. Where there is none, they say the class is not stated |
+| Only 6 of 22 platforms have a `Safety` specification: `markf` and `markm` (Class 1 per IEC 60825-1), `weldr` (Class 1 cabin per IEC 60825-4), `robo` (Class 1 guarding), `cleanp` (eyewear, beacons, key control) and `roto` (risk assessment to ISO 12100) | **Needs TEAL** — the laser class and safety concept of the other 16 platforms |
+| Every export now carries the configuration ID, revision and fingerprint: the share link, printed sheet, BOM CSV, RFQ, component register, DFM report and requests | Done. Documents can be traced back to the selection they describe |
+
+No catalogue value was changed, apart from the removal of the PIN.
