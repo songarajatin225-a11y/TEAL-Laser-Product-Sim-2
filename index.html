@@ -384,6 +384,80 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
   background:rgba(255,255,255,.07);color:#9FC0D2;display:flex;align-items:center;justify-content:center}
 .v3dinfo .ix:hover{background:rgba(255,255,255,.16);color:#fff}
 .v3dinfo .ix svg{width:11px;height:11px}
+.v3dinfo{max-height:calc(100% - 64px);overflow:auto;overscroll-behavior:contain}
+.v3dinfo a{color:#7FE3E5;text-decoration:underline;text-underline-offset:2px}
+.v3dinfo code{font-family:var(--mono);font-size:10px;color:#9FE8EA}
+.v3dinfo .mut{color:#7F9BAD}
+.v3dinfo .ireg{margin-top:9px;border-top:1px solid rgba(154,196,216,.18);padding-top:7px}
+.v3dinfo .ireg summary{cursor:pointer;font-family:var(--mono);font-size:8.4px;letter-spacing:.14em;
+  text-transform:uppercase;color:#9FC0D2;list-style-position:outside}
+.v3dinfo .ireg summary:hover{color:#00E2E5}
+.v3dinfo .ireg dl{margin-top:7px}
+.v3dinfo .rel{display:inline-block;margin:0 4px 4px 0;padding:2px 7px;border-radius:999px;font-size:10px;
+  border:1px solid rgba(154,196,216,.28);background:rgba(255,255,255,.04);color:#C6DAE4}
+.v3dinfo .rel:hover{border-color:#00D6D9;color:#00E2E5}
+.cst{display:inline-block;padding:0 6px;border-radius:999px;font-size:9.5px;border:1px solid currentColor}
+.c-cad-offered{color:#5CCB6B}.c-cad-unconfirmed{color:#E8B23A}.c-on-request{color:#E8B23A}
+.c-none-found{color:#E8763A}.c-internal-drawing{color:#7FB4D9}.c-not-applicable{color:#7F9BAD}.c-not-searched{color:#B98DE8}
+/* assembly explorer */
+.v3dexp{position:absolute;right:11px;top:11px;bottom:48px;z-index:9;width:262px;max-width:calc(100% - 22px);
+  display:none;flex-direction:column;border-radius:12px;border:1px solid rgba(154,196,216,.26);
+  background:rgba(8,22,34,.94);backdrop-filter:blur(12px);box-shadow:0 14px 38px rgba(0,0,0,.5);color:#C6DAE4}
+.v3dexp.open{display:flex}
+.v3dexp .xhead{display:flex;align-items:center;justify-content:space-between;padding:8px 8px 4px 10px}
+.v3dexp .xtab{display:flex;gap:3px}
+.v3dexp .xtab button{font-family:var(--mono);font-size:8.6px;letter-spacing:.13em;text-transform:uppercase;
+  padding:5px 8px;border-radius:7px;border:1px solid transparent;background:none;color:#8FB0C3}
+.v3dexp .xtab button[aria-selected="true"]{color:#0B1A2A;background:#00D6D9}
+.v3dexp .xx{width:22px;height:22px;border-radius:6px;border:none;background:rgba(255,255,255,.07);color:#9FC0D2;
+  display:flex;align-items:center;justify-content:center}
+.v3dexp .xx svg{width:11px;height:11px}
+.v3dexp .xsrch{padding:4px 10px 6px}
+.v3dexp .xsrch input{width:100%;padding:6px 9px;border-radius:8px;border:1px solid rgba(154,196,216,.28);
+  background:rgba(255,255,255,.05);color:#EAF4F8;font-size:12px}
+.v3dexp .xsrch input:focus{outline:2px solid rgba(0,214,217,.5);outline-offset:0}
+.v3dexp .xbody{flex:1;min-height:0;overflow:auto;padding:0 6px 6px;overscroll-behavior:contain}
+.v3dexp .xgh{display:flex;justify-content:space-between;width:100%;padding:6px 6px 3px;border:none;background:none;
+  font-family:var(--mono);font-size:8.4px;letter-spacing:.13em;text-transform:uppercase;color:#7FB4D9;text-align:left}
+.v3dexp .xgh i{font-style:normal;color:#5F7F93}
+.v3dexp .xgh[aria-expanded="false"] span::after{content:" ▸"}
+.v3dexp .xr{display:flex;align-items:center;gap:4px;border-radius:7px;padding:1px 4px 1px 2px}
+.v3dexp .xr.sel{background:rgba(0,214,217,.16);box-shadow:inset 0 0 0 1px rgba(0,214,217,.45)}
+.v3dexp .xr.off .xn{color:#5F7F93;text-decoration:line-through}
+.v3dexp .xv{flex:none;width:22px;height:22px;border:none;background:none;color:#7F9BAD;border-radius:5px;
+  display:flex;align-items:center;justify-content:center}
+.v3dexp .xv svg{width:13px;height:13px}
+.v3dexp .xv:hover,.v3dexp .xn:hover{color:#00E2E5}
+.v3dexp .xn{flex:1;min-width:0;text-align:left;border:none;background:none;color:#C6DAE4;font-size:11.5px;
+  padding:4px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v3dexp .xs{flex:none;width:7px;height:7px;border-radius:50%;background:currentColor}
+.v3dexp .xs.cad{width:auto;height:auto;border-radius:4px;padding:0 4px;font-size:8px;font-family:var(--mono);
+  background:#5CCB6B;color:#0B1A2A}
+.v3dexp .xfoot{border-top:1px solid rgba(154,196,216,.18);padding:7px 10px 8px;display:flex;flex-direction:column;gap:6px}
+.v3dexp .xfoot>div{display:flex;gap:6px}
+.v3dexp .xfoot button{flex:1;padding:6px 8px;border-radius:8px;border:1px solid rgba(154,196,216,.3);
+  background:rgba(255,255,255,.05);color:#C6DAE4;font-size:11px}
+.v3dexp .xfoot button:hover:not(:disabled){border-color:#00D6D9;color:#00E2E5}
+.v3dexp .xfoot button:disabled{opacity:.4}
+.v3dexp .xcount{font-family:var(--mono);font-size:8.6px;letter-spacing:.1em;color:#7F9BAD}
+.v3dexp .xnote{margin:0;font-size:10px;line-height:1.45;color:#7F9BAD}
+.v3dexp .xnone{margin:14px 6px;font-size:11.5px;color:#9FC0D2}
+.v3dexp .kint{width:100%;border-collapse:collapse;font-size:10.5px;margin:6px 0}
+.v3dexp .kint th{font-family:var(--mono);font-size:8px;letter-spacing:.11em;text-transform:uppercase;color:#6F8DA1;
+  text-align:left;padding:3px 4px;border-bottom:1px solid rgba(154,196,216,.18)}
+.v3dexp .kint td{padding:5px 4px;vertical-align:top;border-bottom:1px solid rgba(154,196,216,.1)}
+.v3dexp .kint td span{display:block;color:#7F9BAD;font-size:9.5px;margin-top:1px}
+.v3dexp .kint td.n{font-family:var(--mono);color:#F2C76E;white-space:nowrap}
+.v3dexp .xbody>.xnote{margin:6px 4px}
+@media(max-width:640px){.v3dexp{left:10px;right:10px;width:auto;top:10px}}
+/* hover label */
+.v3dtip{position:absolute;z-index:10;pointer-events:none;padding:4px 8px;border-radius:7px;font-size:11px;
+  background:rgba(8,22,34,.92);border:1px solid rgba(154,196,216,.3);color:#EAF4F8;white-space:nowrap;
+  transform:translate(12px,12px);display:none}
+.v3dtip.on{display:block}
+.v3dtip i{font-style:normal;color:#7F9BAD;margin-left:6px;font-size:10px}
+/* cycle scrubber */
+.simscrub{width:100%;accent-color:#00D6D9;height:14px;margin:0;cursor:pointer}
 @media(max-width:640px){.v3dinfo{width:auto;left:10px;right:10px;max-width:none}}
 /* The assembly list used to sit at a hard top:54px, which assumed the title
    block was always two lines. A longer designation wraps to three and the two
@@ -562,6 +636,24 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
   .v3dview{padding:2px;gap:1px}
   .v3dview button{padding:4px 6px;font-size:8px;letter-spacing:.06em}
   .v3dctl{gap:4px}
+}
+/* When the viewer is too narrow for the seven tools and the four presets on
+   one row — a phone, or the plate column of a 1125–1155 px window — the presets
+   move up a row and the run panel and inspector make room. The viewer's own
+   width decides (the .narrow class, set by a ResizeObserver), not the window's.
+   Full screen uses the window width. Six tools already overlapped below 390 px. */
+.view.narrow .v3d:not(.full) ~ .v3dview{bottom:48px}
+.view.narrow .v3d:not(.full) .v3drun{padding-bottom:86px}
+.view.narrow .v3d:not(.full) .v3dinfo{bottom:86px}
+/* the run controls gained restart and step-back: on a narrow viewer they
+   tighten, and wrap rather than run off the edge */
+.simrow{flex-wrap:wrap;row-gap:6px}
+.view.narrow .simrow{gap:5px}
+.view.narrow .simspeed{padding:6px 8px}
+@media(max-width:460px){
+  body.v3dlock .v3dview{bottom:52px}
+  .v3d.full .v3drun{padding-bottom:92px}
+  .v3d.full .v3dinfo{bottom:90px}
 }
 @media(prefers-reduced-motion:reduce){
   .v3dstate::before,.simbtn.armed{animation:none}
@@ -1474,6 +1566,8 @@ body.demo #demobar{display:flex}
             <div class="v3dstack" id="v3dstack"></div>
           </div>
           <div class="v3dinfo" id="v3dinfo" role="dialog" aria-label="Component detail"></div>
+          <div class="v3dexp" id="v3dexp" role="dialog" aria-label="Assembly explorer"></div>
+          <div class="v3dtip" id="v3dtip" aria-hidden="true"></div>
           <div class="v3diso" id="v3diso" role="status" aria-live="polite"></div>
           <div class="v3dstat" id="v3dstat"></div>
           <div class="v3drun">
@@ -1482,9 +1576,13 @@ body.demo #demobar{display:flex}
               <div class="simphase" id="simphase"></div>
               <div class="simbreak" id="simbreak"></div>
               <div class="simstats" id="simstats"></div>
+              <input type="range" class="simscrub" id="simScrub" min="0" max="1000" step="1" value="0"
+                     aria-label="Position in the cycle — drag to scrub; scrubbing pauses the run">
             </div>
             <div class="simrow">
               <button class="simspeed" id="simSpeed" title="Playback speed — click to change, then pause">1×</button>
+              <button class="simspeed" id="simRew" title="Restart this cycle" aria-label="Restart this cycle"></button>
+              <button class="simspeed" id="simBack" title="Back one step" aria-label="Back one step" style="display:none"></button>
               <button class="simspeed" id="simStep" title="Advance one step" aria-label="Advance one step" style="display:none">▸|</button>
               <button class="simspeed" id="simLoop" title="Loop or single cycle">↻</button>
               <button class="simspeed" id="simFault" aria-pressed="true" aria-label="Demonstrate stoppages"></button>
@@ -1563,7 +1661,7 @@ body.demo #demobar{display:flex}
   </div>
   <div class="fbot">
     <span>© <span id="yr"></span> Titan Engineering &amp; Automation Ltd — A TATA Enterprise</span>
-    <span id="stamp">Configurator v10.0</span>
+    <span id="stamp">Configurator v13.0</span>
   </div>
 </div></footer>
 
@@ -2536,7 +2634,12 @@ var IC={
  doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>',
  undo:'<path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.1-9.4L3 7"/>',
  redo:'<path d="M21 7v6h-6"/><path d="M20.5 13a9 9 0 1 1-2.1-9.4L21 7"/>',
- grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>'
+ grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+ tree:'<path d="M3 5h6M3 12h6M3 19h6"/><path d="M13 5h8M13 12h8M13 19h8"/><path d="M9 5v14"/>',
+ eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ eyeoff:'<path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-2.9 3.8M6.5 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+ back:'<path d="M19 5 9 12l10 7V5z"/><path d="M5 5v14"/>',
+ rew:'<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>'
 };
 function ico(n,sz){
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '+
@@ -3674,6 +3777,7 @@ function uiSpec(b){
     '<button class="btn" id="dfm">'+ico('doc')+'DFM report (PDF)</button>'+
     '<button class="btn" id="ss">'+ico('wave')+'Simulation summary</button>'+
     '<button class="btn" id="bomx">'+ico('down')+'BOM (CSV)</button>'+
+    '<button class="btn" id="crx">'+ico('down')+'Component register (CSV)</button>'+
     '<button class="btn" id="rq">'+ico('mail')+'Copy RFQ summary</button>'+
     '<button class="btn" id="rs">'+ico('reset')+'Start over</button>';
   b.appendChild(acts);
@@ -3701,6 +3805,12 @@ function uiSpec(b){
     $('#bomx').onclick=function(){
       download('TEAL-BOM-'+desig().replace(/[^A-Za-z0-9-]/g,'')+'.csv', '\ufeff'+bomCSV(), 'text/csv');
       toast('BOM exported — indicative, not a quotation.');
+    };
+    $('#crx').onclick=function(){
+      cadLoad().then(function(){
+        download('TEAL-components-'+desig().replace(/[^A-Za-z0-9-]/g,'')+'.csv', '\ufeff'+compCSV(), 'text/csv');
+        toast('Component register exported — identity, geometry and CAD status per drawn component.');
+      });
     };
   $('#rs').onclick=function(){
       S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
@@ -7208,7 +7318,8 @@ var M3D = {
   /* exploded separation: expA is the drawn amount, eased toward expK while the
      mode is on; iso names the assembly shown solid while the rest is ghosted */
   expA:0, expK:0.7, iso:null, offscreen:false, faces:null,
-  layers:{enc:true, glz:true, cov:true, lit:true, mod:true, util:true, flr:true, beam:true}
+  layers:{enc:true, glz:true, cov:true, lit:true, mod:true, util:true, flr:true, beam:true, kin:false},
+  hide:{}, sel:[], isoSel:false
 };
 
 /* Standard content is fitted whether or not the selection lists it — a link
@@ -7295,8 +7406,16 @@ function grp(b,R,id,fn){
   if(v<1) b.t(0,(1-v)*5.0,0);
   fn(b,R,a);
   b.a=sa; b.eov=se; b.pop();
+  /* Geometry an assembly draws without naming a component belongs to the
+     assembly's own record where it has one — a module is one priced item, the
+     workpiece is the workpiece. Anything else stays unnamed and is reported
+     as an unresolved mapping when picked, never guessed. */
+  var mk=id.indexOf('m_')===0? id.slice(2) : null;
+  var dc=GRP_CID[id] || (mk? (COMPINFO[mk]? mk : 'mod:'+mk) : null);
+  if(dc) for(var q=f0;q<b.f.length;q++) if(!b.f[q].cid && !b.f[q].kind) b.f[q].cid=dc;
   if(R.groups) R.groups.push({id:id, f0:f0, f1:b.f.length, t0:t0, t1:b.tags.length});
 }
+var GRP_CID={part:'workpiece', cert:'ceplate'};
 
 /* ---- exploded separation, isolation bookkeeping -------------------------- */
 /* Runs once the whole machine is built, so every assembly's extent is known
@@ -7383,7 +7502,10 @@ function asmPost(b,R){
   }
   /* tag every face with its assembly so a click can be resolved to one */
   for(i=0;i<G.length;i++) for(var j=G[i].f0;j<G[i].f1;j++) b.f[j].gid=G[i].id;
+  M3D.scene=compScan(b.f);
+  compPost(b);
   M3D.faces=b.f;
+  expRefresh();
   if(M3D.iso){
     var still=false; for(i=0;i<G.length;i++) if(G[i].id===M3D.iso) still=true;
     if(!still) isoSet(null);          /* the isolated module was removed */
@@ -7446,7 +7568,7 @@ function gFrame(b,R,a){
   /* levelling feet, inboard of the skirt */
   b.comp('feet');
   var fx=MW/2-0.9, fz=MD/2-0.9, i3;
-  for(i3=0;i3<4;i3++){ b.push(); b.t(i3<2?-fx:fx,0,i3%2?-fz:fz); b.foot(); b.pop(); }
+  for(i3=0;i3<4;i3++){ b.push(); b.t(i3<2?-fx:fx,0,i3%2?-fz:fz); b.part('feet', function(){ this.foot(); }); b.pop(); }
 
   /* ---- lower cabinet: sheet metal over the frame -------------------- */
   b.comp('cabinet');
@@ -7629,6 +7751,7 @@ function gBench(b,R){
 function gCtrl(b,R){
   var d=R.deliv, ax=(d==='handpiece')? -5.6 : MW/2-1.2, az=(d==='handpiece')? 1.8 : MD/2+0.9;
   var ay=(d==='handpiece')? 5.4 : 6.6;
+  b.comp('hmi');
   b.push(); b.t(ax, ay, az-0.9);
   b.cyl(0.16,0.1,10,{c:C3.chrome,e:null});
   b.push(); b.rx(-1.5708); b.cyl(0.15,1.5,10,{c:C3.chrome,e:null}); b.pop();
@@ -7643,10 +7766,14 @@ function gCtrl(b,R){
   b.line(ln,{c:R.sim.on? C3.tealL : '#5A8FA0',a:.85,lw:1.1,glow:R.sim.on?3:0,add:!!R.sim.on});
   b.pop();
   /* e-stop — mushroom head on a yellow collar, facing the operator */
+  b.comp('estop');
   b.push(); b.t(ax-2.3, ay-1.35, az+0.02); b.rx(-1.5708);
-  b.cyl(0.44,0.18,14,{c:C3.warn,e:null,sp:0.2});
-  b.push(); b.t(0,0.18,0); b.cyl(0.36,0.20,14,{c:C3.red,e:null,sp:0.35,sh:34}); b.pop();
+  b.part('estop', function(){
+    this.cyl(0.44,0.18,14,{c:C3.warn,e:null,sp:0.2});
+    this.push(); this.t(0,0.18,0); this.cyl(0.36,0.20,14,{c:C3.red,e:null,sp:0.35,sh:34}); this.pop();
+  });
   b.pop();
+  b.comp(null);
   b.tag([ax,ay+1.3,az],'HMI · LaserSuite',{dy:-12,c:'#8FD9DC'});
 }
 
@@ -7654,6 +7781,7 @@ function gTower(b,R){
   var d=R.deliv;
   if(d==='handpiece') return;
   var x=-MW/2+1.0, z=-MD/2+1.0, y=TOPY+0.75;
+  b.comp('tower');
   b.push(); b.t(x,y,z);
   b.cyl(0.20,1.0,10,{c:C3.dark,e:null});
   var st=R.tower, i;
@@ -7665,7 +7793,7 @@ function gTower(b,R){
     b.pop();
   }
   b.push(); b.t(0,3.16,0); b.cyl(0.44,0.34,14,{c:C3.dark,e:null}); b.pop();
-  b.pop();
+  b.pop(); b.comp(null);
 }
 
 /* Work table: fabricated base, ground tool plate with T-slots and datum
@@ -7885,12 +8013,14 @@ function srcClass(k){
 }
 function gSource(b,R){
   var col=R.col, d=R.deliv, cls=srcClass(S.src), pw=S.pw||30, i;
+  b.comp('source');
   if(d==='handpiece'){
     b.push(); b.t(-7.5,PLY+3.2,0.6);
     b.box(3.0,1.6,2.2,{c:C3.panelD,top:C3.panel,sp:0.24});
     b.quad([-1.4,0.4,1.11],[1.4,0.4,1.11],[1.4,1.2,1.11],[-1.4,1.2,1.11],{c:col,em:.6,a:.5,e:null});
     b.pop();
     b.tag([-7.5,PLY+5.0,0.6], SRC[S.src].n.toUpperCase(),{dy:-10,c:'#8FD9DC'});
+    b.comp(null);
     return;
   }
   var bx=-MW/2+2.8, by=CAB+0.35, bz=-MD/2+1.6;
@@ -7956,6 +8086,7 @@ function gSource(b,R){
   b.tag([bx, by+3.2, bz], S.pw+' W · '+SRC[S.src].wl, {dy:-10, c:'#8FD9DC'});
 
   /* beam guide from the resonator to the head */
+  b.comp('beamguide');
   var hx=R.headX, hy=R.headY, hz=R.headZ;
   if(cls==='fiber'){
     b.tube([bx+1.9,by+1.4,bz],[hx-1.6,hy+2.1,hz-1.4],0.12,0.12,{c:'#C9A227',e:null,seg:8,sp:0.3});
@@ -7966,6 +8097,7 @@ function gSource(b,R){
 
   /* chiller — sized by the heat load the source actually rejects */
   var wpe=SRC[S.src].wpe||0.3, heat=clamp((pw/wpe)/2600, 0.55, 1.9);
+  b.comp('chiller');
   b.push(); b.t(MW/2-2.4, CAB+0.35, -MD/2+1.4); b.sc(heat,Math.min(heat,1.35),heat);
   b.box(2.6,1.5,1.8,{c:C3.steel,top:C3.panel,sp:0.28});
   b.push(); b.t(0,0.75,0.92); b.rx(1.5708); b.cyl(0.5,0.06,16,{c:C3.dark,e:null});
@@ -7973,6 +8105,7 @@ function gSource(b,R){
   for(j=0;j<4;j++){ b.push(); b.rz(j*1.5708); b.box(0.34,0.03,0.12,{c:C3.chrome,e:null,sp:0.6}); b.pop(); }
   b.pop(); b.pop();
   b.pop();
+  b.comp(null);
   b.tag([MW/2-2.4, CAB+2.4, -MD/2+1.4], 'CHILLER '+Math.round(pw/wpe/1000*10)/10+' kW',{dy:-10,c:'#8FD9DC',al:'right'});
 }
 function gOptics(b,R){
@@ -8015,8 +8148,7 @@ function gZColumn(b,R){
   b.pop();
   b.comp('zservo');
   b.push(); b.t(0.52,CAB+CH-1.1,zc+0.30);
-  b.gearbox();
-  b.push(); b.t(0,0.44,0); b.servo(0.9); b.pop();
+  b.part('zservo', function(){ this.gearbox(); this.push(); this.t(0,0.44,0); this.servo(0.9); this.pop(); });
   b.pop();
   /* end stops and home sensor */
   b.comp('zsensor');
@@ -8166,7 +8298,9 @@ function gScanHead(b,R,hx,hy,hz,flip){
   }
   b.comp(null);
   if(three) b.tag([0,2.9,0],'3-AXIS SCAN HEAD',{dy:-10,c:'#8FD9DC'});
-  else b.tag([0,2.2,0], (S.lens?LENS[S.lens].n:'')+' f'+(S.lens?LENS[S.lens].f:'')+' · WD '+Math.round(wd*100)+' mm',
+  /* The drawn standoff is the focal length; the real working distance is
+     lens-specific and not in the product data, so the label does not claim one. */
+  else b.tag([0,2.2,0], S.lens? LENS[S.lens].n+' · f '+LENS[S.lens].f+' mm · field '+LENS[S.lens].fld+' mm' : 'OBJECTIVE',
              {dy:-10,c:'#8FD9DC'});
   b.pop();
 }
@@ -9073,12 +9207,26 @@ function simFaults(){
 function simPlanCycle(){
   var c=SIM.cyc;
   SIM.grade = (hasMod('visver') && hash01(c*7.3+1.9)>0.90)? 'NG' : 'OK';
-  SIM.pend=null;
+  SIM.pend=null; SIM.plan=null;
   if(SIM.faults===false || c<1) return;
   if(hash01(c*3.7+11)>0.88){
     var fl=simFaults(), f=fl[Math.floor(hash01(c*5.1)*fl.length)%fl.length], at=simPhaseStart(f.at);
-    if(at) SIM.pend={f:f, t:at.t+at.d*f.u};
+    if(at) SIM.pend=SIM.plan={f:f, t:at.t+at.d*f.u};
   }
+}
+/* Move to any point of the current cycle. The cycle's plan is kept, so a
+   stoppage that lies ahead of the new point happens again, exactly where it
+   did — scrubbing back and replaying gives the same run. */
+function simSeek(t){
+  if(!SIM.on || !SIM.phases) return;
+  t=Math.max(0, Math.min(SIM.total-0.001, t));
+  /* a completed single cycle is being replayed: uncount it, so finishing it
+     again counts it once */
+  if(SIM.hold){ SIM.cyc=Math.max(0,SIM.cyc-1); if(SIM.grade==='NG') SIM.ng=Math.max(0,SIM.ng-1); }
+  SIM.fault=null; SIM.fix=''; SIM.msg=''; SIM.msgT=0; SIM.hold=false; SIM.sparks=[];
+  SIM.pend=(SIM.plan && SIM.plan.t>t)? SIM.plan : null;
+  SIM.t=t; simAdvance(0); simHud(); simStatus();
+  if(M3D.vp) M3D.vp.dirty=true;
 }
 /* rate 0 means paused — `||1` would quietly resume it */
 function simRate(){ return SIM.rate==null? 1 : SIM.rate; }
@@ -9157,6 +9305,7 @@ function simCtlSync(){
   if(sp){ sp.textContent = SIM.rate? SIM.rate+'×' : 'II'; sp.classList.toggle('paused', SIM.rate===0);
           sp.title = SIM.rate? 'Playback '+SIM.rate+'× — click to change, then pause' : 'Paused — click to resume'; }
   if(st) st.style.display = SIM.rate===0? 'inline-flex':'none';
+  var bk=$('#simBack'); if(bk) bk.style.display = SIM.rate===0? 'inline-flex':'none';
   if(lp){ lp.textContent = SIM.loop? '↻' : '1';
           lp.title = SIM.loop? 'Looping — click for a single cycle' : 'Single cycle — click to loop';
           lp.classList.toggle('paused', !SIM.loop); }
@@ -9251,6 +9400,7 @@ function mmBuild(b, T, vp){
     var gu=(T*0.16)%1;                       /* traverse with real accel/decel */
     R.headX = lerp(-2.4, 2.4, trapz(gu<0.5? gu*2 : (1-gu)*2, 0.34));
   }
+  kinPose(R);                     /* every animated value through its joint */
   R.headY = headHeight(R);
   R.markX = R.partX;
 
@@ -9309,6 +9459,7 @@ function mmBuild(b, T, vp){
   var _o=optics();
   R.spotR = _o? clamp(0.15+_o.spot/900, 0.17, 0.80) : 0.32;
   /* galvo mirror deflection follows the spot */
+  kinGalvo(R, spot); kinCommit(R);
   R.gx = clamp((spot[0]-R.headX)/2.2, -1, 1);
   R.gy = clamp((spot[2]-R.headZ)/2.2, -1, 1);
   R.armTip=[R.headX-1.4, TY+3.2, R.headZ-0.6];
@@ -9357,6 +9508,7 @@ function mmBuild(b, T, vp){
     b.pop();
     b.tag([-MW/2+1.4, CAB-2.4, MD/2+0.1], 'CE · IEC 60825-1 CLASS 1', {dy:-12, c:'#8FD9DC'});
   });
+  if(R.L('kin') && !R.story && R.exp<0.02) gKin(b,R);
   asmPost(b,R);
 }
 /* ==========================================================================
@@ -9680,21 +9832,353 @@ var COMPINFO = {
     f:'Removes process emissions at source and inhibits the process if flow falls below threshold.',
     m:'Steel cabinet', s:'Flow-monitored, filter-condition signalled to the PLC',
     v:'BOFA, Purex, ULT, Kemper', mt:'Replace filters on the indicated condition, not on a fixed interval.'},
+  workpiece   :{n:'Workpiece', g:'Process',
+    d:'The part being processed, drawn to the application’s stated part envelope.',
+    f:'Carries the mark or weld; its material and geometry set the process window.',
+    m:'Per the selected application', s:'Per the customer drawing', v:'Customer-supplied',
+    mt:'—'},
+  beamguide   :{n:'Beam delivery — fibre or beam guide', g:'Optics',
+    d:'Armoured process fibre (fibre sources) or an enclosed beam guide (free-space sources) from the source to the head.',
+    f:'Carries the beam to the head without exposing it; the fibre’s interlock loop inhibits emission if it is disconnected.',
+    m:'Armoured fibre or enclosed tube', s:'Bend radius per the source manufacturer', v:'Per the source manufacturer',
+    mt:'Never kink or tread on the fibre; inspect the armour at each service.'},
+  ceplate     :{n:'Conformity and laser-class plate', g:'Compliance',
+    d:'Plate carrying the CE marking and the laser product classification.',
+    f:'States the conformity of the machine and its laser class to the operator.',
+    m:'Marked plate', s:'Laser class per IEC 60825-1', v:'—', mt:'Must remain legible.'},
   gascon      :{n:'Process-gas console', g:'Process',
     d:'Regulated gas panel with cylinder connections and flow control.',
     f:'Delivers shield or assist gas at the pressure and flow the process requires.',
     m:'Stainless steel, brass fittings', s:'Regulated per gas, flow-sensed',
     v:'Linde, Air Liquide, Swagelok, Festo', mt:'Leak-test at every cylinder change.'}
 };
-/* Fall back to a sensible group label for anything not individually described. */
+/* Fall back to a sensible group label for anything not individually described.
+   A module is described by its own catalogue record — the same one that prices it. */
 function compInfo(id){
   if(!id) return null;
   if(COMPINFO[id]) return COMPINFO[id];
+  if(id.indexOf('mod:')===0){
+    var k=id.slice(4), m=MOD[k]||EXTRA[k];
+    if(!m) return null;
+    return {n:m.n, g:MOD[k]? (m.g||'Automation module') : 'Option', d:m.d||'',
+      f:'Catalogue module — fitted as one priced item on the configured platform.',
+      m:'—', s:'—', v:'—', mt:'Per the module documentation.', mod:k};
+  }
   var alias={zchain:'cablechain', gantrychain:'cablechain', gantrycolumn:'zcolumn',
     gantrycarriage:'zcarriage', gantrysensor:'zsensor', conveyorleg:'frame',
     headmount:'zcarriage', window:'glazing', guard:'glazing', screen:'hmi',
     cabinet_backplane:'cabinet_backplane'};
   return COMPINFO[alias[id]]||null;
+}
+
+/* ==========================================================================
+   CAD ASSETS — the component manifest and converted CAD geometry
+   assets/cad/manifest.json carries one record per component the model draws:
+   what the product data says about the part's identity, what the public CAD
+   search found, and any converted GLB. It is fetched once the page is idle,
+   and a GLB only when a record names one. A component with CAD is drawn from
+   it wherever its builder calls b.part(); everything else stays parametric,
+   and the inspector says which is which.
+   ========================================================================== */
+var CAD={man:null, state:'idle', mesh:{}, bad:{}, on:true, err:'', p:null};
+var CADSTAT={
+  'cad-offered':'CAD offered for this class of part',
+  'cad-unconfirmed':'Maker found — CAD not confirmed',
+  'on-request':'CAD on request only',
+  'none-found':'No public CAD found',
+  'internal-drawing':'Made to TEAL drawing — project CAD only',
+  'not-applicable':'Not a CAD part',
+  'not-searched':'Not yet searched'};
+var GEOSTAT={
+  'parametric-provisional':'Parametric — illustrative proportions, not CAD',
+  'cad-provisional':'From CAD — identity or placement not verified',
+  'cad-verified-equivalent':'From CAD of a checked equivalent part',
+  'cad-verified-exact':'From CAD of the exact installed part'};
+function cadLoad(){
+  if(CAD.p) return CAD.p;
+  CAD.state='loading';
+  CAD.p=fetch('assets/cad/manifest.json',{cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(m){
+      if(!m || !m.components) throw new Error('no components in the manifest');
+      CAD.man=m; CAD.state='ready';
+      var jobs=[], id;
+      for(id in m.components){
+        var g=m.components[id].glb;
+        if(g && g.file) jobs.push(cadUse(id, g.file, g));
+      }
+      return Promise.all(jobs);
+    })
+    .catch(function(e){ CAD.state='error'; CAD.err=String(e&&e.message||e); })
+    .then(function(){ expRefresh(true); var pn=$('#v3dinfo'); if(pn&&pn.classList.contains('open')&&M3D.card) showComp(M3D.card.cid, M3D.card.hf); });
+  return CAD.p;
+}
+function cadRec(id){ return (CAD.man && CAD.man.components && CAD.man.components[id]) || null; }
+
+/* glTF 2.0 binary, triangles only, with the node hierarchy's transforms applied.
+   Positions come back in metres, as glTF stores them. Treated as untrusted:
+   bounded, checked chunk by chunk, and nothing in it is executed. */
+var GLB_MAX_TRIS=40000;
+function glbParse(buf){
+  var dv=new DataView(buf), off=12, json=null, bin=null;
+  if(buf.byteLength<20 || dv.getUint32(0,true)!==0x46546C67) throw new Error('not a GLB file');
+  if(dv.getUint32(4,true)!==2) throw new Error('GLB version '+dv.getUint32(4,true)+' — only version 2 is read');
+  while(off+8<=buf.byteLength){
+    var len=dv.getUint32(off,true), typ=dv.getUint32(off+4,true);
+    if(off+8+len>buf.byteLength) throw new Error('truncated GLB chunk');
+    if(typ===0x4E4F534A && !json) json=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,off+8,len)));
+    else if(typ===0x004E4942 && !bin) bin=new DataView(buf,off+8,len);
+    off+=8+len;
+  }
+  if(!json || !bin) throw new Error('GLB needs a JSON and a binary chunk');
+  var NC={SCALAR:1,VEC2:2,VEC3:3,VEC4:4};
+  var GET={5120:['getInt8',1],5121:['getUint8',1],5122:['getInt16',2],5123:['getUint16',2],5125:['getUint32',4],5126:['getFloat32',4]};
+  function acc(i){
+    var a=(json.accessors||[])[i], v=a&&(json.bufferViews||[])[a.bufferView], g=a&&GET[a.componentType], n=a&&NC[a.type];
+    if(!a||!v||!g||!n) throw new Error('unsupported accessor '+i);
+    var st=v.byteStride||n*g[1], base=(v.byteOffset||0)+(a.byteOffset||0), out=new Array(a.count*n), k, c;
+    if(base+(a.count-1)*st+n*g[1]>bin.byteLength) throw new Error('accessor '+i+' runs past the buffer');
+    for(k=0;k<a.count;k++) for(c=0;c<n;c++) out[k*n+c]=bin[g[0]](base+k*st+c*g[1], true);
+    return out;
+  }
+  function nodeM(nd){
+    if(nd.matrix){ var g=nd.matrix;            /* glTF is column-major */
+      return [g[0],g[4],g[8],g[12], g[1],g[5],g[9],g[13], g[2],g[6],g[10],g[14], 0,0,0,1]; }
+    var t=nd.translation||[0,0,0], q=nd.rotation||[0,0,0,1], s=nd.scale||[1,1,1];
+    var x=q[0], y=q[1], z=q[2], w=q[3];
+    return [(1-2*(y*y+z*z))*s[0], 2*(x*y-z*w)*s[1], 2*(x*z+y*w)*s[2], t[0],
+            2*(x*y+z*w)*s[0], (1-2*(x*x+z*z))*s[1], 2*(y*z-x*w)*s[2], t[1],
+            2*(x*z-y*w)*s[0], 2*(y*z+x*w)*s[1], (1-2*(x*x+y*y))*s[2], t[2], 0,0,0,1];
+  }
+  var tris=[], names=[];
+  function walk(ni, M, depth){
+    if(depth>32) throw new Error('GLB node hierarchy too deep');
+    var nd=json.nodes[ni]; if(!nd) throw new Error('missing node '+ni);
+    var W=m4m(M, nodeM(nd));
+    if(nd.mesh!=null){
+      var me=json.meshes[nd.mesh]; if(!me) throw new Error('missing mesh '+nd.mesh);
+      names.push(nd.name||me.name||('mesh '+nd.mesh));
+      me.primitives.forEach(function(pr){
+        if(pr.mode!=null && pr.mode!==4) return;             /* triangles only */
+        var P=acc(pr.attributes.POSITION), I=pr.indices!=null? acc(pr.indices) : null;
+        var cnt=I? I.length : P.length/3, k, j;
+        for(k=0;k+2<cnt;k+=3){
+          var t=[];
+          for(j=0;j<3;j++){ var vi=I? I[k+j] : k+j;
+            if(vi*3+2>=P.length) throw new Error('index out of range');
+            t.push(m4p(W,[P[vi*3],P[vi*3+1],P[vi*3+2]])); }
+          tris.push(t);
+          if(tris.length>GLB_MAX_TRIS) throw new Error('more than '+GLB_MAX_TRIS+' triangles — reconvert with a lower --max-tris');
+        }
+      });
+    }
+    (nd.children||[]).forEach(function(c){ walk(c, W, depth+1); });
+  }
+  var sc=json.scenes && json.scenes[json.scene||0], roots=sc? sc.nodes||[] : [];
+  if(!roots.length && json.nodes){
+    var child={}; json.nodes.forEach(function(n){ (n.children||[]).forEach(function(c){ child[c]=1; }); });
+    json.nodes.forEach(function(n,i){ if(!child[i]) roots.push(i); });
+  }
+  roots.forEach(function(r){ walk(r, m4i(), 0); });
+  if(!tris.length) throw new Error('GLB has no triangles');
+  return {tris:tris, names:names, extras:(json.asset&&json.asset.extras)||{}};
+}
+function cadUse(id, url, place){
+  return fetch(url)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.arrayBuffer(); })
+    .then(function(buf){
+      var g=glbParse(buf), pl=place||{}, rd=pl.rotDeg||[0,0,0], t=new B3(), i, j, c;
+      t.rx(rd[0]*Math.PI/180).ry(rd[1]*Math.PI/180).rz(rd[2]*Math.PI/180);
+      var M=t.s[0], tr=[], mn=[1e9,1e9,1e9], mx=[-1e9,-1e9,-1e9];
+      for(i=0;i<g.tris.length;i++){
+        var q=[];
+        for(j=0;j<3;j++){ var p=m4p(M,g.tris[i][j]); q.push(p);
+          for(c=0;c<3;c++){ if(p[c]<mn[c]) mn[c]=p[c]; if(p[c]>mx[c]) mx[c]=p[c]; } }
+        tr.push(q);
+      }
+      /* metres to scene units (1 unit = 100 mm), base centre on the local origin —
+         the convention every parametric primitive is built to */
+      var o=[(mn[0]+mx[0])/2, mn[1], (mn[2]+mx[2])/2], K=10;
+      for(i=0;i<tr.length;i++) for(j=0;j<3;j++){ var v=tr[i][j]; tr[i][j]=[(v[0]-o[0])*K,(v[1]-o[1])*K,(v[2]-o[2])*K]; }
+      CAD.mesh[id]={tris:tr, n:tr.length, names:g.names, src:url, status:pl.status||'cad-provisional',
+        mm:[(mx[0]-mn[0])*1000, (mx[1]-mn[1])*1000, (mx[2]-mn[2])*1000], extras:g.extras, col:pl.color||null};
+      delete CAD.bad[id];
+      if(M3D.vp) M3D.vp.dirty=true;
+      return CAD.mesh[id];
+    })
+    .catch(function(e){ CAD.bad[id]=String(e&&e.message||e); return null; });
+}
+/* Draw a component from its converted CAD where there is one, on the same local
+   frame its parametric geometry would use; otherwise run the parametric builder. */
+B3.prototype.part=function(cid, fn){
+  var m=CAD.on? CAD.mesh[cid] : null;
+  if(!m){ fn.call(this); return this; }
+  var col=m.col||C3.steel, i;
+  for(i=0;i<m.tris.length;i++){
+    var f=this.poly(m.tris[i], {c:col, e:null, sp:0.22, two:true, cull:false});
+    if(f) f.cad=true;
+  }
+  return this;
+};
+
+/* ---- where a component is priced -------------------------------------------- */
+/* Modules are their own priced lines. The source carries the source and power
+   adjustments, the objective the large-field uplift, on top of the platform
+   base. Everything else is inside the platform base and is not itemised. */
+function compPriced(cid, gid){
+  var p=P(), r=p? priceLines() : null; if(!r) return null;
+  function find(id){ for(var i=0;i<r.lines.length;i++) if(r.lines[i].id===id) return r.lines[i]; return null; }
+  var k=(cid&&cid.indexOf('mod:')===0)? cid.slice(4) : (gid&&gid.indexOf('m_')===0)? gid.slice(2) : null;
+  var L=k? find(k) : null;
+  if(L) return {line:L, adj:[]};
+  var adj=[];
+  if(cid==='source'||cid==='laserpsu'||cid==='beamguide') ['ADJ-SRC','ADJ-PWR'].forEach(function(a){ var x=find(a); if(x) adj.push(x); });
+  if(cid==='objective'){ var x=find('ADJ-OBJ'); if(x) adj.push(x); }
+  return {line:find(p.code)||r.lines[0], adj:adj, base:true};
+}
+
+/* ---- the components the model draws right now ----------------------------- */
+/* Read from the faces of the last live build, before anything is hidden, so the
+   explorer and the register list exactly what the view can show. */
+function compKey(f){ return f.cid || ('?'+f.gid); }
+function compScan(F){
+  var seen={}, out=[], i;
+  for(i=0;i<F.length;i++){
+    var f=F[i]; if(f.kind || !f.gid || f.gid==='site') continue;
+    var k=f.gid+'|'+compKey(f);
+    if(seen[k]){ seen[k].n++; continue; }
+    seen[k]={gid:f.gid, cid:f.cid||null, key:compKey(f), n:1, cad:!!f.cad};
+    out.push(seen[k]);
+  }
+  return out;
+}
+/* Hide, highlight and isolate by component — after the assembly pass, so the
+   exploded offsets and the picking ids are already settled. */
+function compPost(b){
+  var H=M3D.hide||{}, sel=(M3D.sel&&M3D.sel.length)? M3D.sel : null, any=false, k;
+  for(k in H) if(H[k]){ any=true; break; }
+  if(!any && !sel) return;
+  var set={}, keep=[], i;
+  if(sel) sel.forEach(function(c){ set[c]=1; });
+  for(i=0;i<b.f.length;i++){
+    var f=b.f[i], ky=f.gid&&f.gid!=='site'? compKey(f) : null;
+    if(ky && H[ky]) continue;
+    if(sel && ky && !f.kind){
+      if(set[ky]){ f.e='rgba(0,226,229,.95)'; f.lw=Math.max(f.lw||0,1.3); f.em=Math.max(f.em||0,0.16); }
+      else if(M3D.isoSel){ f.a*=0.08; f.e='rgba(120,196,224,.14)'; }
+    } else if(sel && M3D.isoSel && f.kind==='path' && ky && !set[ky]) f.a*=0.1;
+    keep.push(f);
+  }
+  b.f.length=0;
+  for(i=0;i<keep.length;i++) b.f.push(keep[i]);
+}
+
+/* ==========================================================================
+   KINEMATICS — every animated mechanism moves through one of these joints,
+   and a joint never leaves its limits. A limit comes from the product data
+   where the data states one; otherwise it is the animation envelope and is
+   labelled as such. Values are in scene units (100 mm) unless stated.
+   ========================================================================== */
+var KIN={
+  z:{n:'Z axis — head height', type:'prismatic', axis:'+Y', parent:'zcolumn', child:'zcarriage',
+     unit:'mm', k:100, lim:[0,2.2], home:2.2},
+  x:{n:'Gantry X traverse', type:'prismatic', axis:'+X', parent:'gantrybridge', child:'gantrycarriage',
+     unit:'mm', k:100, lim:[-2.4,2.4], home:0},
+  transfer:{n:'Part transfer', type:'prismatic', axis:'+X', parent:'tablebase', child:'workpiece',
+     unit:'mm', k:100, lim:[-9,9], home:0},
+  clamp:{n:'Toggle clamps', type:'revolute', axis:'clamp arm', parent:'fixture', child:'clamp',
+     unit:'% closed', k:100, lim:[0,1], home:0},
+  dial:{n:'Index table', type:'revolute', axis:'+Y', parent:'tablebase', child:'fixture',
+     unit:'°', k:180/Math.PI, lim:[0,2*Math.PI], home:0},
+  gx:{n:'Galvo mirror X', type:'revolute', axis:'mirror shaft', parent:'scanhead', child:'galvo',
+     unit:'° mech', k:1, lim:[-12,12], home:0},
+  gy:{n:'Galvo mirror Y', type:'revolute', axis:'mirror shaft', parent:'scanhead', child:'galvo',
+     unit:'° mech', k:1, lim:[-12,12], home:0}
+};
+/* Each build poses its own machine: the live view, the machine story and the
+   health check all pass through here. Only the live view's pose is published
+   to KIN, which the Joints tab and the overlay read — the story's machine is
+   not the configured one. */
+function kinPose(R){
+  var p=R.p, J={}, k;
+  for(k in KIN){ if(!KIN[k].lim0) KIN[k].lim0=KIN[k].lim.slice();
+    J[k]={on:false, q:KIN[k].home, lim:KIN[k].lim0.slice(), basis:'animation envelope', doc:null}; }
+  function set(id, v){
+    var j=J[id]; if(v==null || isNaN(v)) v=KIN[id].home;
+    j.q=Math.min(j.lim[1], Math.max(j.lim[0], v)); j.on=true;
+    return j.q;
+  }
+  R.kin=J; R.kinSet=set;
+  var z=J.z, zs=p&&p.specs? specGet(p,/^z.?axis/i) : null, zm=zs&&/(\d+)\s*mm/.exec(zs.row[1]);
+  if(zm){ var st=+zm[1]/100; z.doc=zm[1]+' mm stroke (product data)';
+          if(st<z.lim[1]){ z.lim=[0,st]; z.basis='product data'; } }
+  R.zLift=set('z', R.zLift);
+  if(R.deliv==='robot'||R.deliv==='handpiece') z.on=false;      /* no Z column on these */
+  if(R.deliv==='gantry') R.headX=set('x', R.headX);
+  var far=MW/2+7.0; J.transfer.lim=[-far,far];
+  R.partX=set('transfer', R.partX||0);
+  R.clamp=set('clamp', R.clamp);
+  if(hasMod('rotoidx')||hasMod('turntbl')) R.dial=set('dial', ((R.dial%(2*Math.PI))+2*Math.PI)%(2*Math.PI));
+}
+/* Galvo mirror angles from the spot position through the ideal f-theta
+   relation r = f·θ: the optical deflection is the field offset over the focal
+   length, and the mirror turns through half of it. */
+function kinGalvo(R, spot){
+  var L=S.lens? LENS[S.lens] : null;
+  if(!R.kin || !L || !spot || R.deliv==='handpiece') return;
+  var lim=(L.fld/2)/L.f/2*180/Math.PI;
+  ['gx','gy'].forEach(function(id){ R.kin[id].lim=[-lim,lim]; R.kin[id].basis='ideal f-θ relation, '+L.n+' / '+L.fld+' mm field'; });
+  R.kinSet('gx', ((spot[0]-R.headX)*100)/L.f/2*180/Math.PI);
+  R.kinSet('gy', ((spot[2]-R.headZ)*100)/L.f/2*180/Math.PI);
+}
+function kinCommit(R){
+  if(!R.kin || R.story || M3D.offscreen) return;
+  var none=!R.p || cur<1, k;                      /* no machine, no joints */
+  for(k in R.kin) if(none) R.kin[k].on=false;
+  for(k in R.kin){ var s2=R.kin[k], j=KIN[k]; j.on=s2.on; j.q=s2.q; j.lim=s2.lim; j.basis=s2.basis; j.doc=s2.doc; }
+}
+function kinFmt(id){
+  var j=KIN[id], v=j.q==null? j.home : j.q;
+  return (j.unit==='mm'? Math.round(v*j.k) : j.unit==='% closed'? Math.round(v*100) : (v*j.k).toFixed(1))+' '+j.unit;
+}
+function kinRange(id){
+  var j=KIN[id], f=function(v){ return j.unit==='mm'? Math.round(v*j.k) : j.unit==='% closed'? Math.round(v*100) : (v*j.k).toFixed(1); };
+  return f(j.lim[0])+' to '+f(j.lim[1])+' '+j.unit;
+}
+/* Engineering overlay: the datum, each active axis with its travel, and the
+   joint values — drawn only with the machine assembled, so nothing it marks
+   has been moved away by the exploded view. */
+function gKin(b,R){
+  var a=C3.warn, o={c:a, a:0.95, lw:1.4}, D=[-MW/2-1.2, 0.02, MD/2+1.2];
+  b.line([[D,[D[0]+2.2,D[1],D[2]]]],{c:'#E8603A',lw:2});
+  b.line([[D,[D[0],D[1]+2.2,D[2]]]],{c:'#5CCB6B',lw:2});
+  b.line([[D,[D[0],D[1],D[2]-2.2]]],{c:'#3E8EF0',lw:2});
+  b.tag([D[0]+2.3,D[1],D[2]],'X',{dy:-4,c:'#E8603A',lead:false});
+  b.tag([D[0],D[1]+2.3,D[2]],'Y',{dy:-4,c:'#5CCB6B',lead:false});
+  b.tag([D[0],D[1],D[2]-2.3],'Z',{dy:-4,c:'#3E8EF0',lead:false});
+  b.tag(D,'DATUM — ILLUSTRATIVE',{dy:16,c:'#9FC0D2',lead:false});
+  if(R.deliv==='handpiece') return;
+  var z=KIN.z, base=R.headY-R.zLift, zx=R.headX+2.0, zz=R.headZ;
+  if(z.on){
+    b.line([[[zx,base+z.lim[0],zz],[zx,base+z.lim[1],zz]]], o);
+    b.line([[[zx-0.25,base+z.lim[0],zz],[zx+0.25,base+z.lim[0],zz]],[[zx-0.25,base+z.lim[1],zz],[zx+0.25,base+z.lim[1],zz]]], o);
+    b.dot([zx,base+R.zLift,zz],0.28,{c:a,a:0.95});
+    b.tag([zx,base+R.zLift,zz],'Z '+kinFmt('z')+' · '+kinRange('z'),{dx:8,dy:-10,c:'#F2C76E'});
+  }
+  if(KIN.x.on){
+    var xy=R.headY+2.9;
+    b.line([[[KIN.x.lim[0],xy,zz],[KIN.x.lim[1],xy,zz]]], o);
+    b.dot([R.headX,xy,zz],0.28,{c:a,a:0.95});
+    b.tag([R.headX,xy,zz],'X '+kinFmt('x'),{dy:-12,c:'#F2C76E'});
+  }
+  if(R.part && KIN.transfer.on){
+    var ty=TY+0.06, tz=(R.partZ||0)+1.6;
+    b.line([[[KIN.transfer.lim[0],ty,tz],[KIN.transfer.lim[1],ty,tz]]], {c:a, a:0.7, lw:1.2, dash:[5,4]});
+    b.dot([R.partX,ty,tz],0.24,{c:a,a:0.95});
+    b.tag([R.partX,ty,tz],'Transfer '+kinFmt('transfer'),{dy:14,c:'#F2C76E'});
+  }
+  if(KIN.gx.on) b.tag([R.headX,R.headY+0.6,R.headZ],
+    'Galvo '+KIN.gx.q.toFixed(1)+'° / '+KIN.gy.q.toFixed(1)+'° · ±'+KIN.gx.lim[1].toFixed(1)+'°',{dx:-8,dy:-8,c:'#F2C76E',al:'right'});
 }
 
 /* ==========================================================================
@@ -9740,7 +10224,15 @@ function m3dInit(){
     bt.classList.toggle('on', open);
   });
   buildLayerPanel();
-  tool('reset','Reset view', function(){ M3D.vp.reset(); isoSet(null); });
+  var expBtn=tool('tree','Assembly explorer — components and joints', function(){ expOpen(); });
+  expBtn.id='expBtn';
+  expInit();
+  /* presets and tools share a row only while the viewer is wide enough for both */
+  var vw=$('.view');
+  function vNarrow(){ if(vw) vw.classList.toggle('narrow', vw.getBoundingClientRect().width<452); }
+  if(window.ResizeObserver && vw) new ResizeObserver(vNarrow).observe(vw);
+  vNarrow();
+  tool('reset','Reset view', function(){ M3D.vp.reset(); isoSet(null); expClear(); });
   tool('wave','2D optical schematic', function(bt){
     M3D.mode = M3D.mode==='3d'? '2d':'3d';
     $('.view').classList.toggle('mode2d', M3D.mode==='2d');
@@ -9761,18 +10253,39 @@ function m3dInit(){
     cv.addEventListener('pointerup', function(e){
       if(!dn) return; dn=false;
       if(Math.abs(e.clientX-dx)>4 || Math.abs(e.clientY-dy)>4) return;
-      showComp(M3D.vp.hit(e.clientX, e.clientY));
+      var id=M3D.vp.hit(e.clientX, e.clientY), hf=M3D.vp.lastHit;
+      if(hf && hf.gid && (e.shiftKey||e.metaKey||e.ctrlKey)){ expSelect(id||('?'+hf.gid), hf.gid, true); return; }
+      showComp(id, hf);
     });
+    /* hover names the part under a mouse pointer — throttled, and never during a drag */
+    var tip=$('#v3dtip'), tq=0, tx=0, ty=0;
+    cv.addEventListener('pointermove', function(e){
+      if(e.pointerType!=='mouse' || e.buttons){ tip.classList.remove('on'); return; }
+      tx=e.clientX; ty=e.clientY;
+      if(tq) return;
+      tq=setTimeout(function(){
+        tq=0;
+        var keep=M3D.vp.lastHit, id=M3D.vp.hit(tx,ty), hf=M3D.vp.lastHit;
+        M3D.vp.lastHit=keep;
+        if(!hf || !hf.gid || hf.gid==='site'){ tip.classList.remove('on'); return; }
+        var ci=compInfo(id), r=cv.getBoundingClientRect();
+        tip.innerHTML=esc(ci? ci.n : 'Unmapped geometry')+'<i>'+esc(isoName(hf.gid))+'</i>';
+        tip.style.left=(tx-r.left)+'px'; tip.style.top=(ty-r.top)+'px';
+        tip.classList.add('on');
+      }, 70);
+    });
+    cv.addEventListener('pointerleave', function(){ tip.classList.remove('on'); });
   })();
   $('#simBtn').onclick=function(){ SIM.on? simStop() : simStart(); };
   /* keyboard: view modes on 1–4, layers on their initials */
-  var LKEY={e:'enc', g:'glz', c:'cov', i:'lit', m:'mod', u:'util', b:'beam', f:'flr'};
+  var LKEY={e:'enc', g:'glz', c:'cov', i:'lit', m:'mod', u:'util', b:'beam', f:'flr', j:'kin'};
   document.addEventListener('keydown', function(e){
     if(adminOpen) return;
     var tag=(e.target.tagName||'').toLowerCase();
     if(tag==='input'||tag==='textarea'||e.metaKey||e.ctrlKey||e.altKey) return;
     if(document.querySelector('#advisor.open, #drawer.open, #compare.open, #inquiry.open')) return;
     if(e.key==='Escape' && M3D.iso){ isoSet(null); return; }
+    if(e.key==='Escape' && ((M3D.sel&&M3D.sel.length)||M3D.isoSel)){ expClear(); return; }
     var k=e.key.toLowerCase(), i=['1','2','3','4'].indexOf(e.key);
     if(i>=0){ M3D.vmode=VMODES[i][0]; buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
     if(LKEY[k]){ M3D.layers[LKEY[k]]=!(M3D.layers[LKEY[k]]!==false); buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
@@ -9801,6 +10314,16 @@ function m3dInit(){
     SIM.rate=0; simResume(); simAdvance(0.10); simCtlSync(); simHud(); simStatus(); M3D.vp.dirty=true;
   };
   $('#simLoop').onclick=function(){ SIM.loop=!SIM.loop; simCtlSync(); };
+  $('#simBack').innerHTML=ico('back');
+  $('#simBack').onclick=function(){ SIM.rate=0; simSeek(SIM.t-0.10); simCtlSync(); };
+  $('#simRew').innerHTML=ico('rew');
+  $('#simRew').onclick=function(){ simSeek(0); simSay('Cycle restarted', 1.2); };
+  var scr=$('#simScrub');
+  scr.addEventListener('input', function(){
+    if(!SIM.on) return;
+    SIM.rate=0; SIM.scrubbing=true; simSeek(this.value/1000*SIM.total); simCtlSync();
+  });
+  scr.addEventListener('change', function(){ SIM.scrubbing=false; });
   $('#simFault').innerHTML=ico('alert');
   $('#simFault').onclick=function(){
     SIM.faults = SIM.faults===false;
@@ -9837,7 +10360,7 @@ function m3dInit(){
 
 var LAYERDEF=[['enc','Enclosure & guarding'],['glz','Glazing'],['cov','Sheet-metal covers'],
               ['lit','Interior lighting'],['mod','Automation modules'],['util','Utilities & routing'],
-              ['beam','Beam & process'],['flr','Floor & safety zone']];
+              ['beam','Beam & process'],['flr','Floor & safety zone'],['kin','Axes & joints']];
 var VMODES=[['solid','Solid'],['cutaway','Cutaway'],['xray','X-ray'],['exploded','Exploded']];
 function buildLayerPanel(){
   var pn=$('#v3dlay'); if(!pn) return;
@@ -9975,30 +10498,227 @@ function m3dSync(){
   M3D.vp.dirty=true;
 }
 
-/* component detail, opened by clicking geometry in the view */
-function showComp(id){
-  var pn=$('#v3dinfo'), c=compInfo(id);
-  if(!c){ pn.classList.remove('open'); pn.innerHTML=''; return; }
-  pn.innerHTML='<button class="ix" aria-label="Close">'+ico('x')+'</button>'+
-    '<div class="ig">'+esc(c.g)+'</div><h4>'+esc(c.n)+'</h4>'+
-    '<p>'+esc(c.d)+'</p><dl>'+
-      '<dt>Function</dt><dd>'+esc(c.f)+'</dd>'+
-      '<dt>Material</dt><dd>'+esc(c.m)+'</dd>'+
-      '<dt>Spec</dt><dd>'+esc(c.s)+'</dd>'+
-      '<dt>Vendors</dt><dd>'+esc(c.v)+'</dd>'+
-      '<dt>Service</dt><dd>'+esc(c.mt)+'</dd></dl>';
-  var hf=M3D.vp&&M3D.vp.lastHit, gid=hf&&hf.gid;
+/* component detail, opened by clicking geometry in the view or a row in the
+   explorer. Geometry that maps to no record says so — no record is guessed. */
+function showComp(id, hf){
+  var pn=$('#v3dinfo'); if(!pn) return;
+  hf=hf || (M3D.vp&&M3D.vp.lastHit) || null;
+  var gid=hf&&hf.gid, c=compInfo(id);
+  if(!c && !gid){ pn.classList.remove('open'); pn.innerHTML=''; M3D.card=null; return; }
+  M3D.card={cid:id||null, hf:hf?{gid:gid}:null};
+  var h='<button class="ix" aria-label="Close">'+ico('x')+'</button>';
+  if(!c){
+    h+='<div class="ig">Unresolved mapping</div><h4>'+esc(isoName(gid))+' · unmapped geometry</h4>'+
+       '<p>Drawn as part of this assembly, but not mapped to a component record. It is shown, not described — '+
+       'no record is guessed for it.</p>';
+  } else {
+    h+='<div class="ig">'+esc(c.g)+'</div><h4>'+esc(c.n)+'</h4>'+
+      '<p>'+esc(c.d)+'</p><dl>'+
+        '<dt>Function</dt><dd>'+esc(c.f)+'</dd>'+
+        '<dt>Material</dt><dd>'+esc(c.m)+'</dd>'+
+        '<dt>Spec</dt><dd>'+esc(c.s)+'</dd>'+
+        '<dt>Vendors</dt><dd>'+esc(c.v)+'</dd>'+
+        '<dt>Service</dt><dd>'+esc(c.mt)+'</dd></dl>'+compRecord(id, gid);
+  }
   if(gid){
-    pn.innerHTML+='<div class="iact"><button type="button" data-a="focus">Focus</button>'+
-      '<button type="button" data-a="iso">'+(M3D.iso===gid? 'Show all' : 'Isolate assembly')+'</button></div>';
-    pn.querySelector('[data-a="focus"]').onclick=function(){ compFocus(gid, id); };
+    h+='<div class="iact"><button type="button" data-a="focus">Focus</button>'+
+      '<button type="button" data-a="iso">'+(M3D.iso===gid? 'Show all' : 'Isolate assembly')+'</button>'+
+      '<button type="button" data-a="exp">Explorer</button></div>';
+  }
+  pn.innerHTML=h;
+  if(gid){
+    pn.querySelector('[data-a="focus"]').onclick=function(){ compFocus(gid, id||null); };
     pn.querySelector('[data-a="iso"]').onclick=function(){
       isoSet(M3D.iso===gid? null : gid);
       this.textContent=M3D.iso? 'Show all' : 'Isolate assembly';
     };
+    pn.querySelector('[data-a="exp"]').onclick=function(){ expOpen(true); };
   }
-  pn.querySelector('.ix').onclick=function(){ pn.classList.remove('open'); };
+  pn.querySelectorAll('[data-rel]').forEach(function(b2){
+    b2.onclick=function(){ var k=b2.getAttribute('data-rel'); expSelect(k, gid, false); };
+  });
+  pn.querySelector('.ix').onclick=function(){ pn.classList.remove('open'); M3D.card=null; };
   pn.classList.add('open');
+  if(CAD.state==='idle') cadLoad();
+}
+/* The engineering record under the description: identity, geometry, CAD
+   search, where it is priced, the joint it moves on and its neighbours. */
+function compRecord(id, gid){
+  var r=cadRec(id), m=CAD.mesh[id], pr=compPriced(id, gid), p=P(), h='', rows='';
+  function row(k,v){ rows+='<dt>'+k+'</dt><dd>'+v+'</dd>'; }
+  row('ID','<code>'+esc(id)+'</code>'+(gid? ' · '+esc(isoName(gid)) : ''));
+  if(id.indexOf('mod:')===0){
+    row('Identity','Catalogue module — the module, not its parts, is the priced item');
+  } else if(r){
+    var idn=r.identity||{};
+    row('Identity', idn.status==='class-only'? 'Manufacturer, model and part number not specified in the product data — vendors above are examples' :
+                    idn.status==='fabricated-to-drawing'? 'Made to the TEAL design — identified by drawing number, not in the product data' :
+                    idn.status==='not-a-part'? 'Not a purchased part' :
+                    esc([idn.manufacturer,idn.model,idn.partNumber].filter(Boolean).join(' · ')));
+  } else row('Identity', CAD.state==='error'? 'Asset manifest unavailable' : CAD.state==='ready'? 'No manifest record' : 'Loading…');
+  row('Geometry', m? esc(GEOSTAT[m.status]||m.status)+' · '+m.n+' triangles · '+m.mm.map(function(v){ return Math.round(v); }).join(' × ')+' mm'
+               : (CAD.bad[id]? 'Parametric — CAD file failed to load ('+esc(CAD.bad[id])+')' : GEOSTAT['parametric-provisional']));
+  if(r && r.cad){
+    var cs=r.cad, links=(cs.candidates||[]).slice(0,3).map(function(x){
+      return '<a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">'+esc(x.source)+'</a>'; }).join('<br>');
+    row('CAD search', '<span class="cst c-'+esc(cs.status)+'">'+esc(CADSTAT[cs.status]||cs.status)+'</span>'+
+        (cs.searched? ' · checked '+esc(cs.searched) : '')+(cs.note? '<br>'+esc(cs.note) : '')+(links? '<br>'+links : ''));
+  }
+  if(pr){
+    var L=pr.line, txt=pr.base? 'Included in the platform base — '+esc(L.n)+' ('+esc(L.id)+')' : esc(L.n)+' · '+(L.kind==='std'? 'standard content' : sINR(Math.round(L.ext)));
+    pr.adj.forEach(function(a){ txt+='<br>'+esc(a.n)+' '+sINR(Math.round(a.ext)); });
+    row('Priced in', txt+'<br><span class="mut">Estimate · not itemised per component</span>');
+    if(p && p.lead) row('Lead time', esc(p.lead)+' weeks — platform level, not per component');
+  }
+  var jid=r&&r.joint;
+  if(jid && KIN[jid] && KIN[jid].on) row('Moves on', esc(KIN[jid].n)+' · '+esc(KIN[jid].type)+' · '+esc(kinRange(jid))+
+       '<br><span class="mut">Limit basis: '+esc(KIN[jid].basis||'—')+'</span>');
+  var me=compInfo(id), seenN={}; if(me) seenN[me.n]=1;
+  var rel=(M3D.scene||[]).filter(function(x){
+    if(x.gid!==gid || !x.cid || x.cid===id) return false;
+    var ci=compInfo(x.cid), nm=ci? ci.n : x.cid; if(seenN[nm]) return false; seenN[nm]=1; return true;
+  }).slice(0,8);
+  if(rel.length) row('Same assembly', rel.map(function(x){ var ci=compInfo(x.cid);
+      return '<button type="button" class="rel" data-rel="'+esc(x.cid)+'">'+esc(ci? ci.n : x.cid)+'</button>'; }).join(''));
+  return '<details class="ireg"><summary>Engineering record</summary><dl>'+rows+'</dl></details>';
+}
+
+/* ---- assembly explorer ------------------------------------------------------ */
+/* Every component the current view draws, by assembly: search it, select one or
+   several, hide any, isolate the selection. It changes only what is drawn —
+   never the configuration, the price or the run. */
+function expOpen(on){
+  var pn=$('#v3dexp'); if(!pn) return;
+  if(on==null) on=!pn.classList.contains('open');
+  pn.classList.toggle('open', on);
+  var bt=$('#expBtn'); if(bt) bt.classList.toggle('on', on);
+  if(on){ cadLoad(); expRefresh(true); var q=pn.querySelector('input'); if(q && matchMedia('(pointer:fine)').matches) q.focus(); }
+}
+function expSelect(key, gid, add){
+  var s=M3D.sel||[], i=s.indexOf(key);
+  if(add){ if(i>=0) s.splice(i,1); else s.push(key); M3D.sel=s.slice(); }
+  else M3D.sel=[key];
+  if(!M3D.sel.length) M3D.isoSel=false;
+  var cid=key.charAt(0)==='?'? null : key;
+  if(!add){ compFocus(gid, cid); showComp(cid, {gid:gid}); }
+  if(M3D.vp) M3D.vp.dirty=true;
+  expRefresh(true);
+}
+function expRefresh(force){
+  var pn=$('#v3dexp'); if(!pn || !pn.classList.contains('open')) return;
+  var list=M3D.scene||[], q=(M3D.expQ||'').toLowerCase().trim(), tab=M3D.expTab||'c';
+  var sig=tab+'#'+q+'#'+list.map(function(x){ return x.gid+'|'+x.key; }).join(',')+'#'+JSON.stringify(M3D.hide||{})+'#'+
+          (M3D.sel||[]).join(',')+'#'+(M3D.isoSel?1:0)+'#'+CAD.state+'#'+Object.keys(CAD.mesh).join(',');
+  if(tab==='j') sig+='#'+Object.keys(KIN).map(function(k){ return KIN[k].on? kinFmt(k) : ''; }).join(',');
+  if(!force && sig===M3D.expSig) return;
+  if(!force && tab==='j' && Date.now()-(M3D.expT||0)<200) return;
+  M3D.expSig=sig; M3D.expT=Date.now();
+  var body=pn.querySelector('.xbody'), foot=pn.querySelector('.xfoot');
+  pn.querySelectorAll('.xtab button').forEach(function(b2){ b2.setAttribute('aria-selected', b2.getAttribute('data-t')===tab? 'true':'false'); });
+  pn.querySelector('.xsrch').style.display = tab==='c'? '' : 'none';
+  foot.style.display = tab==='c'? '' : 'none';
+  if(tab==='j'){ body.innerHTML=kinTable(); return; }
+  var groups={}, order=[], sel={}, H=M3D.hide||{}, shown=0;
+  (M3D.sel||[]).forEach(function(k){ sel[k]=1; });
+  list.forEach(function(x){
+    var ci=x.cid? compInfo(x.cid) : null, nm=ci? ci.n : 'Unmapped geometry';
+    if(q && (nm+' '+(x.cid||'')+' '+isoName(x.gid)).toLowerCase().indexOf(q)<0) return;
+    if(!groups[x.gid]){ groups[x.gid]=[]; order.push(x.gid); }
+    groups[x.gid].push({x:x, nm:nm}); shown++;
+  });
+  if(!shown){ body.innerHTML='<p class="xnone">'+(list.length? 'No component matches “'+esc(q)+'”.' : 'Nothing is drawn yet — choose a platform.')+'</p>'; }
+  else {
+    var h='';
+    order.forEach(function(g){
+      var col=M3D.expCol&&M3D.expCol[g]&&!q;
+      h+='<div class="xg"><button type="button" class="xgh" data-g="'+esc(g)+'" aria-expanded="'+(col?'false':'true')+'">'+
+         '<span>'+esc(isoName(g))+'</span><i>'+groups[g].length+'</i></button>';
+      if(!col) groups[g].forEach(function(e){
+        var x=e.x, r=x.cid? cadRec(x.cid) : null, st=r&&r.cad? r.cad.status : '', off=!!H[x.key];
+        h+='<div class="xr'+(sel[x.key]?' sel':'')+(off?' off':'')+'">'+
+           '<button type="button" class="xv" data-k="'+esc(x.key)+'" aria-pressed="'+(off?'false':'true')+'" aria-label="'+(off?'Show ':'Hide ')+esc(e.nm)+'">'+ico(off?'eyeoff':'eye')+'</button>'+
+           '<button type="button" class="xn" data-k="'+esc(x.key)+'" data-g="'+esc(x.gid)+'">'+esc(e.nm)+'</button>'+
+           (x.cad? '<span class="xs cad" title="Drawn from CAD">CAD</span>' :
+            st? '<span class="xs c-'+esc(st)+'" title="'+esc(CADSTAT[st]||st)+'"></span>' : '')+'</div>';
+      });
+      h+='</div>';
+    });
+    body.innerHTML=h;
+  }
+  var ns=(M3D.sel||[]).length, nh=0, k; for(k in H) if(H[k]) nh++;
+  foot.querySelector('[data-a="iso"]').disabled=!ns;
+  foot.querySelector('[data-a="iso"]').textContent=M3D.isoSel? 'Show context' : 'Isolate selection';
+  foot.querySelector('[data-a="all"]').disabled=!nh && !ns;
+  foot.querySelector('.xcount').textContent=list.length+' drawn'+(ns? ' · '+ns+' selected':'')+(nh? ' · '+nh+' hidden':'');
+}
+function kinTable(){
+  var h='<p class="xnote">Every animated mechanism moves through one of these joints and is clamped to its limits. '+
+        'A limit from the product data says so; otherwise it is the animation envelope.</p><table class="kint"><thead><tr>'+
+        '<th>Joint</th><th>Type</th><th>Now</th><th>Limits</th></tr></thead><tbody>', n=0;
+  Object.keys(KIN).forEach(function(k){
+    var j=KIN[k]; if(!j.on) return; n++;
+    var pa=compInfo(j.parent), ch=compInfo(j.child);
+    h+='<tr><td><b>'+esc(j.n)+'</b><span>'+esc(pa? pa.n : j.parent)+' → '+esc(ch? ch.n : j.child)+'</span></td>'+
+       '<td>'+esc(j.type)+'<span>'+esc(j.axis)+'</span></td><td class="n">'+esc(kinFmt(k))+'</td>'+
+       '<td>'+esc(kinRange(k))+'<span>'+esc(j.basis||'')+(j.doc? ' · '+esc(j.doc) : '')+'</span></td></tr>';
+  });
+  if(!n) return '<p class="xnone">No moving joints on this machine yet — complete the configuration.</p>';
+  return h+'</tbody></table><p class="xnote">Show them in the view with Layers → Axes &amp; joints (key J).</p>';
+}
+function expInit(){
+  var pn=$('#v3dexp'); if(!pn) return;
+  pn.innerHTML='<div class="xhead"><div class="xtab" role="tablist">'+
+      '<button type="button" role="tab" data-t="c" aria-selected="true">Components</button>'+
+      '<button type="button" role="tab" data-t="j" aria-selected="false">Joints</button></div>'+
+      '<button type="button" class="xx" aria-label="Close explorer">'+ico('x')+'</button></div>'+
+    '<div class="xsrch"><input type="search" placeholder="Search components" aria-label="Search components" autocomplete="off"></div>'+
+    '<div class="xbody"></div>'+
+    '<div class="xfoot"><span class="xcount"></span><div>'+
+      '<button type="button" data-a="iso">Isolate selection</button>'+
+      '<button type="button" data-a="all">Show all</button></div>'+
+      '<p class="xnote">Click to inspect · Shift-click to add · lists what the current view mode draws</p></div>';
+  pn.querySelector('.xx').onclick=function(){ expOpen(false); };
+  pn.querySelector('input').oninput=function(){ M3D.expQ=this.value; expRefresh(true); };
+  pn.querySelectorAll('.xtab button').forEach(function(b2){
+    b2.onclick=function(){ M3D.expTab=b2.getAttribute('data-t'); expRefresh(true); };
+  });
+  pn.querySelector('.xbody').addEventListener('click', function(e){
+    var t=e.target.closest('button'); if(!t) return;
+    if(t.classList.contains('xgh')){ var g=t.getAttribute('data-g'); M3D.expCol=M3D.expCol||{}; M3D.expCol[g]=!M3D.expCol[g]; expRefresh(true); return; }
+    var k=t.getAttribute('data-k'); if(!k) return;
+    if(t.classList.contains('xv')){ M3D.hide=M3D.hide||{}; M3D.hide[k]=!M3D.hide[k]; if(!M3D.hide[k]) delete M3D.hide[k]; }
+    else if(t.classList.contains('xn')) { expSelect(k, t.getAttribute('data-g'), e.shiftKey||e.metaKey||e.ctrlKey); return; }
+    if(M3D.vp) M3D.vp.dirty=true;
+    expRefresh(true);
+  });
+  pn.querySelector('[data-a="iso"]').onclick=function(){ M3D.isoSel=!M3D.isoSel; if(M3D.vp) M3D.vp.dirty=true; expRefresh(true); };
+  pn.querySelector('[data-a="all"]').onclick=function(){ expClear(); };
+}
+function expClear(){
+  M3D.hide={}; M3D.sel=[]; M3D.isoSel=false;
+  if(M3D.vp) M3D.vp.dirty=true;
+  expRefresh(true);
+}
+
+/* ---- component register — what the view draws, with each record's status --- */
+function compCSV(){
+  var p=P(); if(!p) return '';
+  var list=M3D.scene||[], seen={}, rows=[['TEAL Laser Equipment Configurator — component register'],
+    ['Designation', desig()], ['Generated', new Date().toISOString().slice(0,10)],
+    ['Status','Engineering visualisation register: identity, geometry, CAD and pricing status of each drawn component. Not a procurement BOM.'],
+    ['Asset manifest', CAD.state==='ready'? 'assets/cad/manifest.json, checked '+(CAD.man._checked||'—') : 'unavailable ('+(CAD.err||CAD.state)+')'], [],
+    ['Component ID','Component','Assembly','Category','Manufacturer','Model','Part number','Identity','Example vendors',
+     'Geometry','CAD search','CAD checked','CAD candidates','Priced in','Basis','Platform lead time (weeks)']];
+  list.forEach(function(x){
+    if(!x.cid || seen[x.cid]) return; seen[x.cid]=1;
+    var c=compInfo(x.cid)||{}, r=cadRec(x.cid), idn=(r&&r.identity)||{}, cs=(r&&r.cad)||{}, pr=compPriced(x.cid, x.gid), m=CAD.mesh[x.cid];
+    rows.push([x.cid, c.n||'', isoName(x.gid), c.g||'', idn.manufacturer||'not specified', idn.model||'not specified',
+      idn.partNumber||'not specified', x.cid.indexOf('mod:')===0? 'catalogue module' : (idn.status||'no record'),
+      (idn.exampleVendors||[]).join('; '), m? m.status : 'parametric-provisional', cs.status||'', cs.searched||'',
+      (cs.candidates||[]).map(function(k){ return k.url; }).join(' '),
+      pr? (pr.base? 'Platform base '+pr.line.id : pr.line.id+' '+pr.line.n) : '', pr? (pr.line.basis||'') : '', p.lead||'']);
+  });
+  return toCSV(rows);
 }
 /* live machine status, the way an HMI would show it */
 function simStatus(){
@@ -10033,7 +10753,8 @@ function simHud(){
     var bd0=$('#simbreak'); if(bd0) bd0.innerHTML='';
     return;
   }
-  var h='', i;
+  var h='', i, sc=$('#simScrub');
+  if(sc && !SIM.scrubbing) sc.value=Math.round(SIM.t/SIM.total*1000);
   for(i=0;i<SIM.phases.length;i++)
     h+='<span class="'+(i<SIM.ph?'done':i===SIM.ph?'on':'')+'" data-ph="'+i+'" title="'+
        esc(SIM.phases[i].n)+' — '+SIM.phases[i].real.toFixed(2)+' s · click to jump">'+esc(SIM.phases[i].n)+'</span>';
@@ -10042,10 +10763,7 @@ function simHud(){
     var t=ev.target.closest('[data-ph]'); if(!t) return;
     var idx=+t.getAttribute('data-ph'), acc=0, j;
     for(j=0;j<idx;j++) acc+=SIM.phases[j].d;
-    /* jumping clears a held stoppage — the scrubbed-to point is a fresh look */
-    SIM.fault=null; SIM.fix=''; SIM.msg=''; SIM.msgT=0; SIM.hold=false;
-    if(SIM.pend && SIM.pend.t<acc) SIM.pend=null;
-    SIM.t=acc+0.001; simAdvance(0); simHud(); simStatus(); M3D.vp.dirty=true;
+    simSeek(acc+0.001);
   };
 
   var cyc=SIM.cycle, rate=3600/cyc, done=SIM.cyc, ok=done-SIM.ng;
@@ -10613,7 +11331,7 @@ function dfmData(){
     ['Depth of focus', '± '+dofMM.toFixed(2)+' mm', 'Part height must stay inside this band'+(af?' (auto Z-focus fitted, so it tracks)':' unless auto Z-focus is fitted')],
     ['Addressable field', fld+' × '+fld+' mm', 'Larger features need field stitching or an axis move'],
     ['Placement accuracy', vis? '± 0.05 mm':'± 0.25 mm', vis? 'With fiducial correction':'Fixture-limited without fiducial vision'],
-    ['Working distance', o.f+' mm', 'Clearance the part and fixture must leave under the objective']
+    ['Effective focal length', o.f+' mm', 'Not the working distance: the clearance under the objective is lens-specific and is not in the product data — take it from the objective datasheet']
   ];
   if(ph) R.limits.push(['Process regime', ph.regime.n, ph.regime.d]);
 
@@ -11980,7 +12698,7 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v10.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v13.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
@@ -11988,6 +12706,9 @@ loadData(function(){
   render();
   try{ m3dInit(); }catch(e){}
   try{ storyInit(); }catch(e){}
+  /* the component manifest is not needed to draw the machine — fetch it once
+     the page has settled; an inspector opened sooner asks for it itself */
+  setTimeout(function(){ try{ cadLoad(); }catch(e){} }, 1500);
   editInit();
   if(wantAdmin){ openAdmin(); return; }
   /* Someone arriving on a shared configuration came for that configuration:
