@@ -1,0 +1,71 @@
+{
+  "source": "test-bracket.step",
+  "sourceBytes": 29536,
+  "sourceSha256": "d54453c8ac9e0cb9f2665739a5bd7a0a2d7357d8b3b9a23bacc0ba6b427d84cb",
+  "componentId": "test-bracket",
+  "glb": "test-bracket.glb",
+  "glbBytes": 16352,
+  "meshSizeMM": 7.2,
+  "axes": "y-up, converted from z-up",
+  "solids": [
+    {
+      "name": "Shapes/Open CASCADE STEP translator 7.8 1/1/Open CASCADE STEP translator 7.8 1.1",
+      "triangles": 544,
+      "cadBoxMM": [
+        [
+          -1e-07,
+          -1e-07,
+          -1e-07
+        ],
+        [
+          60.0000001,
+          30.0000001,
+          40.0000001
+        ]
+      ],
+      "meshBoxMM": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          60.0,
+          30.0,
+          40.0
+        ]
+      ],
+      "deviationMM": 0.0
+    },
+    {
+      "name": "Shapes/Open CASCADE STEP translator 7.8 1/2/Open CASCADE STEP translator 7.8 1.2",
+      "triangles": 272,
+      "cadBoxMM": [
+        [
+          34.9999999,
+          5.9999999,
+          14.9999999
+        ],
+        [
+          45.0000001,
+          24.0000001,
+          25.0000001
+        ]
+      ],
+      "meshBoxMM": [
+        [
+          35.0,
+          6.0,
+          15.0
+        ],
+        [
+          45.0,
+          24.0,
+          25.0
+        ]
+      ],
+      "deviationMM": 0.0
+    }
+  ],
+  "maxDeviationMM": 0.0
+}

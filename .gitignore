@@ -1,1 +1,3 @@
 node_modules/
+# CAD whose licence does not permit public distribution — local use only
+assets/cad/restricted/

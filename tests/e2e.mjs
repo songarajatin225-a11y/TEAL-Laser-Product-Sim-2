@@ -24,7 +24,7 @@ catch { pw = require(join(execSync('npm root -g').toString().trim(), 'playwright
 
 const ROOT = normalize(join(new URL('.', import.meta.url).pathname, '..'));
 const MIME = { '.html': 'text/html', '.json': 'application/json', '.js': 'text/javascript',
-               '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml' };
+               '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.glb': 'model/gltf-binary' };
 const server = createServer(async (req, res) => {
   const p = normalize(join(ROOT, decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html'));
   if (!p.startsWith(ROOT)) { res.writeHead(403).end(); return; }
@@ -154,7 +154,8 @@ try {
   const pick = await pg.evaluate(() => { const vp = M3D.vp, r = vp.cv.getBoundingClientRect(), f = vp._pick.find(x => x.f.gid === 'optic') || vp._pick[0];
     const c = f.s.reduce((a, q) => [a[0] + q[0], a[1] + q[1]], [0, 0]).map(v => v / f.s.length); return { x: r.left + c[0], y: r.top + c[1] }; });
   await pg.mouse.click(pick.x, pick.y); await pg.waitForTimeout(300);
-  check('clicking an assembly opens its detail panel with Focus and Isolate', (await pg.$$('#v3dinfo .iact button')).length === 2);
+  check('clicking an assembly opens its detail panel with Focus and Isolate',
+    (await pg.$$('#v3dinfo [data-a="focus"]')).length === 1 && (await pg.$$('#v3dinfo [data-a="iso"]')).length === 1);
   await pg.click('#v3dinfo [data-a="iso"]'); await pg.waitForTimeout(300);
   const iso = await pg.evaluate(() => ({ iso: M3D.iso, others: Math.max(...M3D.faces.filter(f => f.gid && f.gid !== M3D.iso && f.gid !== 'site' && !f.kind).map(f => f.a)),
                                          pickable: [...new Set(M3D.vp._pick.map(x => x.f.gid))] }));
@@ -177,6 +178,137 @@ try {
   pg = await open(C2I, { deviceScaleFactor: 2 });               // a retina panel, where downshifting matters
   const dpr = await pg.evaluate(() => { const vp = M3D.vp; vp._warm = 1e9; vp.dprCap = 1.25; vp.resize(); vp.resize(); return [vp.dprMax, vp.dpr]; });
   check('an adaptive resolution downshift survives resize()', dpr[0] === 2 && dpr[1] === 1.25, dpr.join(' → '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
+  sec('Components, CAD assets and kinematics');
+  pg = await open('#p=markf&m=visfid.fume.conveyor');
+  await pg.evaluate(() => { document.querySelector('#v3d').scrollIntoView(); M3D.vp.spin = false; });
+  await pg.waitForTimeout(700);
+  const man = await pg.evaluate(async () => { await cadLoad(); return { state: CAD.state, n: Object.keys(CAD.man.components).length }; });
+  check('the component manifest loads after boot', man.state === 'ready' && man.n > 60, JSON.stringify(man));
+  const map = await pg.evaluate(() => {
+    const sc = M3D.scene, ids = sc.filter(x => x.cid && x.cid.indexOf('mod:') !== 0).map(x => x.cid);
+    const alias = { zchain: 1, gantrychain: 1, gantrycolumn: 1, gantrycarriage: 1, gantrysensor: 1, conveyorleg: 1, headmount: 1, window: 1, guard: 1 };
+    return { noRecord: [...new Set(ids.filter(id => !cadRec(id) && !alias[id]))], noInfo: [...new Set(sc.filter(x => x.cid && !compInfo(x.cid)).map(x => x.cid))],
+             have: ['source', 'tower', 'hmi', 'estop', 'chiller', 'workpiece', 'fume'].filter(id => sc.some(x => x.cid === id)) };
+  });
+  check('every component the model draws has a description and a manifest record', !map.noRecord.length && !map.noInfo.length, JSON.stringify(map));
+  check('the source, chiller, beacon, HMI, e-stop, workpiece and modules can be picked by name', map.have.length === 7, map.have.join(' '));
+  const card = await pg.evaluate(() => { showComp('scanhead', { gid: 'optic' }); const d = document.querySelector('#v3dinfo details'); d.open = true; return d.innerText; });
+  check('the inspector states identity, geometry, CAD search and pricing basis without claiming a part number',
+    /not specified in the product data/.test(card) && /Parametric/.test(card) && /CAD on request only/.test(card) && /platform base/.test(card), card.slice(0, 200));
+  const un = await pg.evaluate(() => { showComp(null, { gid: 'optic' }); return document.querySelector('#v3dinfo').innerText; });
+  check('geometry without a record is reported as an unresolved mapping, not guessed', /Unresolved mapping/i.test(un) && /no record is guessed/.test(un));
+  const st0 = await pg.evaluate(() => JSON.stringify([S, cur, price()]));
+  await pg.click('#expBtn'); await pg.waitForTimeout(250);
+  await pg.fill('#v3dexp input', 'servo'); await pg.waitForTimeout(150);
+  const found = await pg.$$eval('#v3dexp .xn', b => b.map(x => x.textContent));
+  check('the explorer search narrows the component list', found.length >= 1 && found.every(t => /servo/i.test(t)), found.join(' | '));
+  await pg.fill('#v3dexp input', ''); await pg.waitForTimeout(150);
+  const hid = await pg.evaluate(async () => {
+    const n0 = M3D.faces.filter(f => f.cid === 'feet').length;
+    document.querySelector('#v3dexp .xv[data-k="feet"]').click(); M3D.vp.dirty = true;
+    await new Promise(r => setTimeout(r, 250));
+    return { n0, n1: M3D.faces.filter(f => f.cid === 'feet').length, listed: !!document.querySelector('#v3dexp .xr.off .xn[data-k="feet"]') };
+  });
+  check('hiding a component removes its geometry but keeps it listed', hid.n0 > 0 && hid.n1 === 0 && hid.listed, JSON.stringify(hid));
+  const ms = await pg.evaluate(async () => {
+    document.querySelector('#v3dexp .xn[data-k="plenum"]').click();
+    document.querySelector('#v3dexp .xn[data-k="frame"]').dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }));
+    document.querySelector('#v3dexp [data-a="iso"]').click(); M3D.vp.dirty = true;
+    await new Promise(r => setTimeout(r, 250));
+    const F = M3D.faces.filter(f => !f.kind && f.gid && f.gid !== 'site');
+    return { sel: M3D.sel.slice(), hi: F.filter(f => f.cid === 'plenum' || f.cid === 'frame').every(f => /0,226,229/.test(f.e || '')),
+             ghost: Math.max(...F.filter(f => f.cid !== 'plenum' && f.cid !== 'frame').map(f => f.a)) };
+  });
+  check('shift-click multi-selects; isolating the selection highlights it and ghosts the rest',
+    ms.sel.join() === 'plenum,frame' && ms.hi && ms.ghost < 0.1, JSON.stringify(ms));
+  await pg.click('#v3dexp [data-a="all"]'); await pg.waitForTimeout(250);
+  const clr = await pg.evaluate(() => ({ st: JSON.stringify([S, cur, price()]), hidden: Object.keys(M3D.hide).length, sel: M3D.sel.length,
+    feet: M3D.faces.filter(f => f.cid === 'feet').length }));
+  check('Show all restores everything, and the explorer never touched the configuration or price',
+    clr.hidden === 0 && clr.sel === 0 && clr.feet > 0 && clr.st === st0);
+
+  const glb = await pg.evaluate(async () => {
+    const rep = await (await fetch('tests/fixtures/cad/test-bracket.report.json')).json();
+    const g = glbParse(await (await fetch('tests/fixtures/cad/test-bracket.glb')).arrayBuffer());
+    const mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
+    g.tris.forEach(t => t.forEach(p => { for (let c = 0; c < 3; c++) { mn[c] = Math.min(mn[c], p[c]); mx[c] = Math.max(mx[c], p[c]); } }));
+    let bad = ''; try { glbParse(new ArrayBuffer(64)); } catch (e) { bad = e.message; }
+    return { tris: g.tris.length, want: rep.solids.reduce((a, s) => a + s.triangles, 0), parts: g.names.length,
+             mm: mx.map((v, i) => Math.round((v - mn[i]) * 1000 * 100) / 100), bad };
+  });
+  check('a converted GLB parses with its triangles, parts and true size (synthetic 60 × 40 × 30 mm fixture)',
+    glb.tris === glb.want && glb.parts === 2 && glb.mm.join() === '60,40,30', JSON.stringify(glb));
+  check('a file that is not a GLB is refused', /not a GLB/.test(glb.bad), glb.bad);
+  const swap = await pg.evaluate(async () => {
+    const count = () => { const b = new B3(); b.q = 1; b.lod = 1; mmBuild(b, M3D.vp.T, null);
+      const F = b.f.filter(f => f.cid === 'feet' && !f.kind); return { all: F.length, cad: F.filter(f => f.cad).length,
+        ys: Math.max(...F.map(f => Math.max(...f.v.map(v => v[1])))) }; };
+    const before = count();
+    await cadUse('feet', 'tests/fixtures/cad/test-bracket.glb', { status: 'cad-provisional' });
+    const withCad = count(), m = CAD.mesh.feet;
+    delete CAD.mesh.feet;
+    const after = count();
+    return { before, withCad, after, n: m.n };
+  });
+  check('a component with CAD is drawn from it at every instance, and reverts to parametric without it',
+    swap.withCad.cad === swap.n * 4 && swap.withCad.all === swap.withCad.cad && Math.abs(swap.withCad.ys - 0.4) < 1e-6 &&
+    swap.after.cad === 0 && swap.after.all === swap.before.all, JSON.stringify(swap));
+
+  const kin = await pg.evaluate(async () => {
+    reach = 5; go(5); SIM.rate = 6; simStart();
+    const out = { bad: [], seen: {} };
+    for (let i = 0; i < 90; i++) {
+      await new Promise(r => setTimeout(r, 30));
+      Object.keys(KIN).forEach(k => { const j = KIN[k]; if (!j.on) return; out.seen[k] = 1;
+        if (j.q < j.lim[0] - 1e-9 || j.q > j.lim[1] + 1e-9) out.bad.push(k + '=' + j.q); });
+    }
+    simStop();
+    const p = P(), keep = JSON.stringify(p.specs);
+    specSet(p, 'Z-axis', '150 mm motorised'); render();
+    const b = new B3(); SIM.on = true; SIM.phases = simPhases(); SIM.total = SIM.phases.reduce((a, x) => a + x.d, 0);
+    SIM.ph = 0; SIM.u = 0.5; mmBuild(b, 0, null); SIM.on = false;
+    out.zMax = KIN.z.lim[1]; out.zq = KIN.z.q; out.basis = KIN.z.basis;
+    p.specs = JSON.parse(keep); render();
+    return out;
+  });
+  check('every joint stays inside its limits through a running cycle', !kin.bad.length && kin.seen.z && kin.seen.gx && kin.seen.clamp, JSON.stringify(kin));
+  check('a Z stroke stated in the product data limits the Z joint', kin.zMax === 1.5 && kin.zq <= 1.5 && kin.basis === 'product data', JSON.stringify(kin));
+  const ovl = await pg.evaluate(() => {
+    const tags = () => { const b = new B3(); mmBuild(b, 0, M3D.vp); return b.tags.map(t => t.t).join(' | '); };
+    const off = tags(); M3D.layers.kin = true; const on = tags(); M3D.layers.kin = false; return { off: /DATUM/.test(off), on: /DATUM/.test(on) && /Galvo/.test(on) };
+  });
+  check('the axes and joints overlay is off by default and labels the datum and galvo angles when on', !ovl.off && ovl.on, JSON.stringify(ovl));
+
+  const seek = await pg.evaluate(() => {
+    SIM.faults = false; SIM.loop = true; simStart(); SIM.rate = 0;
+    const pose = () => JSON.stringify([R3D.headY, R3D.partX, R3D.clamp, R3D.spot, SIM.ph].map(v => typeof v === 'number' ? +v.toFixed(6) : v));
+    const build = () => { const b = new B3(); mmBuild(b, 0, null); };
+    const T = SIM.total * 0.62;
+    for (let t = 0; t < T - 1e-9; t += 0.05) simAdvance(Math.min(0.05, T - t));
+    build(); const played = pose(), tp = SIM.t;
+    simSeek(0); simSeek(T); build(); const sought = pose();
+    document.querySelector('#simBack').click(); const back = SIM.t;
+    document.querySelector('#simStep').click(); const fwd = SIM.t;
+    SIM.faults = true; SIM.plan = SIM.pend = { f: simFaults()[0], t: SIM.t + 0.05 };
+    simAdvance(0.1); const f1 = SIM.fault; simSeek(SIM.plan.t - 0.2); const pend = !!SIM.pend; simAdvance(0.3); const f2 = SIM.fault;
+    document.querySelector('#simRew').click(); const rew = SIM.t;
+    SIM.loop = false; SIM.fault = null; SIM.pend = SIM.plan = null; SIM.faults = false; const c0 = SIM.cyc;
+    simSeek(SIM.total - 0.05); simAdvance(0.2); const c1 = SIM.cyc, held = SIM.hold;
+    simSeek(SIM.total * 0.5); simAdvance(SIM.total); const c2 = SIM.cyc;
+    simStop();
+    return { same: played === sought, tp: +tp.toFixed(4), T: +T.toFixed(4), back: +(T - back).toFixed(3), fwd: +(fwd - back).toFixed(3), f1, pend, f2, rew, c0, c1, c2, held };
+  });
+  check('seeking to a point gives the same machine pose as playing to it', seek.same && Math.abs(seek.tp - seek.T) < 1e-6, JSON.stringify(seek));
+  check('step back and step forward move a paused run by one tenth of a second', seek.back === 0.1 && seek.fwd === 0.1, JSON.stringify(seek));
+  check('a stoppage replays at the same point after scrubbing back', seek.f1 === 'interlock' && seek.pend && seek.f2 === 'interlock', JSON.stringify(seek));
+  check('restart rewinds the cycle; replaying a finished single cycle counts it once', seek.rew === 0 && seek.c1 === seek.c0 + 1 && seek.held && seek.c2 === seek.c1, JSON.stringify(seek));
+  const csv = await pg.evaluate(async () => { await cadLoad(); return compCSV(); });
+  check('the component register exports identity, geometry and CAD status per drawn component',
+    /Component ID,Component,Assembly/.test(csv) && /scanhead/.test(csv) && /not specified/.test(csv) && /parametric-provisional/.test(csv), csv.slice(0, 160));
+  check('no script errors in the component, CAD and kinematics checks', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
 
   /* ------------------------------------------------------------------ */
@@ -315,6 +447,26 @@ try {
     if (m.gap < 8 || m.doc > 1) bad.push(`${w}px (gap ${Math.round(m.gap)})`);
   }
   check('header groups keep at least 8 px of clear space and the page never scrolls sideways, 360–1900 px', bad.length === 0, bad.join(' '));
+  const bar = [];
+  for (let w = 320; w <= 1900; w += 20) {
+    await pg.setViewportSize({ width: w, height: 900 }); await pg.waitForTimeout(30);
+    const o = await pg.evaluate(() => { const a = document.querySelector('#v3dview').getBoundingClientRect(), c = document.querySelector('#v3dctl').getBoundingClientRect(),
+      v = document.querySelector('#v3d').getBoundingClientRect();
+      const apart = c.left - a.right >= 4 || a.top - c.bottom >= 4 || c.top - a.bottom >= 4;
+      return { apart, inside: a.left >= v.left && c.right <= v.right + 0.5 }; });
+    if (!o.apart || !o.inside) bar.push(w + 'px');
+  }
+  check('the camera presets and the view tools never overlap, 320–1900 px', bar.length === 0, bar.join(' '));
+  await pg.evaluate(() => { reach = 5; go(5); simStart(); SIM.rate = 0; simCtlSync(); });
+  const runBad = [];
+  for (let w = 320; w <= 1900; w += 40) {
+    await pg.setViewportSize({ width: w, height: 900 }); await pg.waitForTimeout(30);
+    const o = await pg.evaluate(() => { const v = document.querySelector('#v3d').getBoundingClientRect();
+      return [...document.querySelectorAll('.simrow button')].filter(b => b.offsetParent).every(b => { const r = b.getBoundingClientRect(); return r.left >= v.left - 0.5 && r.right <= v.right + 0.5; }); });
+    if (!o) runBad.push(w + 'px');
+  }
+  check('every run control stays inside the viewer while paused, 320–1900 px', runBad.length === 0, runBad.join(' '));
+  await pg.evaluate(() => simStop()); await pg.setViewportSize({ width: 1600, height: 1000 });
   await pg.setViewportSize({ width: 1600, height: 1000 });
   const unnamed = await pg.$$eval('header button, #dmode button, #demobar button, #v3dctl button',
     e => e.filter(x => !x.textContent.trim() && !x.getAttribute('aria-label') && !x.title).length);

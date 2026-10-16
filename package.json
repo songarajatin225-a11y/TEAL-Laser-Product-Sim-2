@@ -4,8 +4,9 @@
   "description": "TEAL Laser Equipment Configurator. The site is index.html and data.json; this file exists only to run the tests.",
   "type": "module",
   "scripts": {
-    "test": "node tests/validate-data.mjs && node tests/e2e.mjs",
-    "validate": "node tests/validate-data.mjs"
+    "test": "node tests/validate-data.mjs && node tools/cad/report.mjs --check && node tests/e2e.mjs",
+    "validate": "node tests/validate-data.mjs",
+    "coverage": "node tools/cad/report.mjs"
   },
   "devDependencies": {
     "playwright": "1.56.1"

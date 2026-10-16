@@ -71,3 +71,19 @@ One rule is hard-coded rather than held as data: the large-field objective uplif
 applies to the key `f420` by name inside `priceLines()`. If objectives are renamed
 or another large-field objective is added, that rule will not follow. Moving it to
 a per-objective field in `LENS` would make it data.
+
+## Engineering data (2026-10-16)
+
+The machine model was audited against the data behind it. The component-level picture
+is in [`assets/cad/COVERAGE.md`](assets/cad/COVERAGE.md), which `npm test` keeps current.
+
+| Finding | Status |
+|---|---|
+| The DFM report labelled the objective's focal length as its "working distance", and the 3D callout read "WD = f" | **Fixed.** The data holds focal length and field only, so the working distance is not shown |
+| About 30 % of the drawn geometry carried no component ID, including the laser source, chiller, beacon, HMI, e-stop, workpiece and most modules, so it could not be inspected | **Fixed.** What remains unmapped is reported as unresolved |
+| No bought-in component has a manufacturer, model or part number; 48 are specified by class and example vendors only | **Needs TEAL** — an engineering BOM |
+| 14 components are fabricated to TEAL drawings that are not in the data | **Needs TEAL** — drawing numbers, and CAD for the 3D model |
+| Only 1 of 18 platforms with a Z column states its Z stroke (`markf`, 300 mm) | **Needs TEAL** — the other strokes |
+| No objective states a working distance | **Needs TEAL** — the objective datasheets |
+| Lead time is held per platform, not per component; prices are not itemised per component | By design of the commercial model — flagged, not changed |
+

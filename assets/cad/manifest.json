@@ -1,0 +1,3116 @@
+{
+  "_comment": "Component-to-asset manifest for the TEAL configurator. One record per component the 3D model can draw (the ids are the COMPINFO keys in index.html). Edit by hand; tools/cad/report.mjs regenerates COVERAGE.md from it and the test suite checks both.",
+  "_checked": "2026-10-15",
+  "vocabulary": {
+    "identity.status": {
+      "class-only": "Product data names the class of part and example vendors only",
+      "fabricated-to-drawing": "Made to the TEAL design",
+      "not-a-part": "Label, region or customer part"
+    },
+    "geometry.status": {
+      "parametric-provisional": "Drawn by the parametric builder — illustrative proportions",
+      "cad-provisional": "From CAD, identity or placement not verified",
+      "cad-verified-equivalent": "From CAD of a checked equivalent part",
+      "cad-verified-exact": "From CAD of the exact installed part"
+    },
+    "cad.status": {
+      "cad-offered": "Search confirmed a CAD download or configurator for this class of part",
+      "cad-unconfirmed": "Manufacturer or distributor page found; CAD not confirmed",
+      "on-request": "CAD stated as available on request, or no public CAD",
+      "none-found": "Searched; no CAD found",
+      "internal-drawing": "Fabricated to drawing — only the TEAL project CAD can supply it",
+      "not-applicable": "Not a CAD part",
+      "not-searched": "Not searched in this pass"
+    },
+    "cad.verification": {
+      "verified-exact": "Manufacturer and part number matched; geometry consistent with documentation",
+      "verified-equivalent": "Different model, interfaces and dimensions checked",
+      "provisional-reference": "Useful geometry, identity or accuracy uncertain",
+      "rejected": "Incorrect, unidentifiable or unsuitable"
+    }
+  },
+  "machine": {
+    "note": "No public CAD of any TEAL machine was found. TEAL is Titan Engineering & Automation Limited (a TATA enterprise). No complete enclosed fibre-marking machine assembly was found in public libraries either.",
+    "candidates": [
+      {
+        "source": "Industrial Automation India — Titan Engineering and Automation Limited (TEAL)",
+        "url": "https://www.industrialautomationindia.in/directory/titan-engineering-and-automation-limited-teal",
+        "kind": "directory",
+        "access": "Company listing; no CAD"
+      }
+    ]
+  },
+  "blockers": {
+    "network": "This build environment’s egress policy refuses connections to every CAD library and manufacturer host tried (HTTP 403 on CONNECT); the web-fetch tool could not resolve download.beckhoff.com. No file could be downloaded.",
+    "hostsRefused": [
+      "www.traceparts.com",
+      "b2b.partcommunity.com",
+      "www.3dcontentcentral.com",
+      "grabcad.com",
+      "www.hiwin.tw",
+      "www.hiwin.de",
+      "www.scanlab.de",
+      "www.raylase.de",
+      "www.igus.com",
+      "www.misumi-ec.com",
+      "cad.misumi-ec.com",
+      "www.thk.com",
+      "www.item24.com",
+      "www.sick.com",
+      "www.festo.com",
+      "www.smc.eu",
+      "www.basler.com",
+      "www.thorlabs.com",
+      "www.ipgphotonics.com",
+      "www.rittal.com",
+      "www.elesa.com",
+      "www.mcmaster.com",
+      "download.beckhoff.com",
+      "www.damencnc.com",
+      "www.minitecframing.com",
+      "www.yaskawa.eu.com",
+      "www.destaco.com",
+      "octopart.com",
+      "www.edmundoptics.com"
+    ],
+    "identity": "The product data does not name the installed manufacturer, model or part number for any bought-in component, so no downloaded file could be verified as the exact part even if it were obtained."
+  },
+  "components": {
+    "base": {
+      "name": "Welded steel base frame",
+      "category": "Structure",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "feet": {
+      "name": "Levelling feet",
+      "category": "Structure",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Elesa",
+          "Halder",
+          "Norelem"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "Elesa offers STEP per product code from the product page; guest users receive models by e-mail. The datasheet asks that the source be credited when drawings are reproduced.",
+        "candidates": [
+          {
+            "source": "Elesa — CAD download service",
+            "url": "https://www.elesa.com/en/CatalogoMediaServicesUS/cad-download",
+            "kind": "manufacturer",
+            "access": "STEP from product page; guest e-mail delivery"
+          },
+          {
+            "source": "Elesa+Ganter GN 343.1 datasheet",
+            "url": "https://www.elesa-ganter.es/siteassets/PDF/ES/GN%20343.1.pdf",
+            "kind": "manufacturer",
+            "access": "PDF datasheet",
+            "note": "Levelling element family matching the M16–M20 class."
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "cabinet": {
+      "name": "Lower cabinet",
+      "category": "Structure",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "door": {
+      "name": "Service door",
+      "category": "Structure",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "Panel is fabricated to drawing. Hinge and lock hardware (Dirak, Emka, Southco) not searched in this pass.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "nameplate": {
+      "name": "Machine nameplate",
+      "category": "Compliance",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "not-a-part",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-applicable",
+        "searched": "2026-10-15",
+        "note": "Marked plate — artwork, not CAD.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "brandplate": {
+      "name": "Branding plate",
+      "category": "Structure",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "not-a-part",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": ""
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-applicable",
+        "searched": "2026-10-15",
+        "note": "Marked plate — artwork, not CAD.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "vent": {
+      "name": "Ventilation louvre",
+      "category": "Thermal",
+      "assemblies": [],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Pfannenberg",
+          "Rittal"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "lines/markers only — not pickable"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "As the cabinet fan.",
+        "candidates": [
+          {
+            "source": "Distrelec — Rittal SK filter fan 3243060",
+            "url": "https://www.distrelec.ch/en/rittal-sk-series-filter-fan-323-323mm-rittal-3243060/p/30490730",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "frame": {
+      "name": "Chamber frame — T-slot extrusion",
+      "category": "Structure",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "item",
+          "Bosch Rexroth",
+          "Minitec"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "Profile cross-sections only; the chamber frame assembly itself is fabricated to drawing.",
+        "candidates": [
+          {
+            "source": "MiniTec — Profile 45 × 45 F (20.1033)",
+            "url": "https://www.minitecframing.com/Products/Aluminum_Profiles/Aluminum_Profile_Catalog_Pages/20.1033_Aluminum_Profile_45x45F.html",
+            "kind": "manufacturer",
+            "access": "STEP listed on the catalogue page",
+            "note": "Slot 10 — matches the stated section."
+          },
+          {
+            "source": "Bosch Rexroth — strut profile 45 × 45",
+            "url": "https://store.boschrexroth.com/en/xk/STRUT-PROFILE_3842990642",
+            "kind": "manufacturer",
+            "access": "3D CAD link on the store page"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "glazing": {
+      "name": "Laser-safe glazing",
+      "category": "Safety",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "Flat panel cut to drawing; the filter grade is a material specification, not a geometry.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "chamberdoor": {
+      "name": "Chamber access door",
+      "category": "Safety",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "interlock": {
+      "name": "Door interlock switch",
+      "category": "Safety",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Euchner",
+          "Pilz",
+          "Schmersal",
+          "Sick"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "Manufacturer product page found; CAD download not confirmed by search.",
+        "candidates": [
+          {
+            "source": "Euchner — CES-AR-C01",
+            "url": "https://www.euchner.com/en-us/products/transponder-coded-safety-switches-without-guard-locking/safety-switch-ces-ar2/safety-switch-ces-ar-c01/",
+            "kind": "manufacturer",
+            "access": "Downloads section — CAD not confirmed"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "warnlabel": {
+      "name": "Laser warning label",
+      "category": "Compliance",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "not-a-part",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": ""
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-applicable",
+        "searched": "2026-10-15",
+        "note": "Label — artwork to IEC 60825-1.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "aperturelabel": {
+      "name": "Aperture label",
+      "category": "Compliance",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "not-a-part",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": ""
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-applicable",
+        "searched": "2026-10-15",
+        "note": "Label — artwork to IEC 60825-1.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "rearpanel": {
+      "name": "Rear service panel",
+      "category": "Structure",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "Panel is fabricated to drawing. Connector inserts (Harting, Phoenix Contact) not searched in this pass.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "plenum": {
+      "name": "Top plenum",
+      "category": "Thermal",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "light": {
+      "name": "Chamber LED lighting",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Waldmann",
+          "Banner"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "Distributor listings only; no CAD seen.",
+        "candidates": [
+          {
+            "source": "Distrelec — Waldmann LED machine light 112544000",
+            "url": "https://www.distrelec.ch/en/waldmann-led-machine-light-24-ac-dc-24-ac-dc-24-dc-ip67-196mm-arm-length-waldmann-112544000-00001328/p/30490977",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "cablechain": {
+      "name": "Energy chain",
+      "category": "Motion",
+      "assemblies": [],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "igus",
+          "Kabelschlepp",
+          "Murrplastik"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "lines/markers only — not pickable"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "igus configurators export free 3D CAD (STEP among the formats) without registration, per igus.",
+        "candidates": [
+          {
+            "source": "igus — e-chain configurator",
+            "url": "https://www.igus.eu/energy-chain/configurator/energy-chain-configurator",
+            "kind": "manufacturer",
+            "access": "Free STEP after configuration"
+          },
+          {
+            "source": "igus — QuickCad 3D configurator",
+            "url": "https://igus.ca/info/energy-chains-quickcad-3d-cad-configurator",
+            "kind": "manufacturer",
+            "access": "11 3D formats"
+          },
+          {
+            "source": "igus blog — free CAD library",
+            "url": "https://blog.igus.eu/?p=15280",
+            "kind": "manufacturer",
+            "access": "Describes STEP/IGES/DWG export"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "zcolumn": {
+      "name": "Z-axis column",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "zrail": {
+      "name": "Linear guide rail",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "THK",
+          "HIWIN",
+          "Bosch Rexroth",
+          "NSK"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "Exact size, length and accuracy class are not in the product data (size 20–25, class H). The reseller file is not a manufacturer release.",
+        "candidates": [
+          {
+            "source": "HIWIN — configurator (3D CAD, drawings)",
+            "url": "https://www.hiwin.com/en/",
+            "kind": "manufacturer",
+            "access": "Configurator generates 3D CAD"
+          },
+          {
+            "source": "Damen CNC — HIWIN HGR25R rail, STEP AP214",
+            "url": "https://www.damencnc.com/en/hiwin-profile-rails-hgr25r-price-m-incl-green-caps/a379",
+            "kind": "reseller",
+            "access": "STEP listed (reseller-hosted)",
+            "note": "Reseller file — licence not established; would be a provisional reference at best."
+          },
+          {
+            "source": "RS — THK SHS25 rail listings",
+            "url": "https://uk.rs-online.com/web/p/linear-guide-rails/0619880",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "zbearing": {
+      "name": "Bearing block",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "THK",
+          "HIWIN",
+          "Bosch Rexroth"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "As the rail — block type and preload are not specified beyond class.",
+        "candidates": [
+          {
+            "source": "HIWIN — configurator (3D CAD, drawings)",
+            "url": "https://www.hiwin.com/en/",
+            "kind": "manufacturer",
+            "access": "Configurator generates 3D CAD"
+          },
+          {
+            "source": "Damen CNC — HIWIN HGR25R rail, STEP AP214",
+            "url": "https://www.damencnc.com/en/hiwin-profile-rails-hgr25r-price-m-incl-green-caps/a379",
+            "kind": "reseller",
+            "access": "STEP listed (reseller-hosted)",
+            "note": "Reseller file — licence not established; would be a provisional reference at best."
+          },
+          {
+            "source": "RS — THK SHS25 rail listings",
+            "url": "https://uk.rs-online.com/web/p/linear-guide-rails/0619880",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "zscrew": {
+      "name": "Ball screw",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "NSK",
+          "THK",
+          "HIWIN",
+          "Bosch Rexroth"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "HIWIN states its configurator generates 3D CAD for ballscrews; the file format was not confirmed.",
+        "candidates": [
+          {
+            "source": "HIWIN — configurator",
+            "url": "https://www.hiwin.com/en/",
+            "kind": "manufacturer",
+            "access": "Configurator generates 3D CAD"
+          },
+          {
+            "source": "HIWIN Japan — CAD downloads (ipros)",
+            "url": "https://pr.mono.ipros.com/en/hiwin/product/category/49669",
+            "kind": "manufacturer",
+            "access": "3D zip archives, format not stated"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "zservo": {
+      "name": "Servo motor and gearbox",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Yaskawa",
+          "Panasonic",
+          "Delta",
+          "Siemens",
+          "Beckhoff"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "Motor frame size and options are not in the product data.",
+        "candidates": [
+          {
+            "source": "Yaskawa Europe — SGM7G-44A6A21 (example product page)",
+            "url": "https://www.yaskawa.eu.com/products/motion-control/productdetail/product/sgm7g-44a6a21_5795",
+            "kind": "manufacturer",
+            "access": "STEP 2D/3D data package listed"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "zsensor": {
+      "name": "Home and limit sensors",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Sick",
+          "Balluff",
+          "ifm",
+          "Omron"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "Manufacturer product pages not reached by search. A third-party model of a SICK sensor exists but is rejected: not a manufacturer release, accuracy unverified.",
+        "candidates": [
+          {
+            "source": "RS — SICK IME12 inductive sensor",
+            "url": "https://int.rsdelivers.com/product/sick/ime12-04bpsvw2s/sick-ime12-04bpsvw2s-threaded-barrel-inductive-m12/2093465",
+            "kind": "distributor",
+            "access": "Technical documents — CAD not confirmed"
+          },
+          {
+            "source": "CGTrader — SICK 1060232 model (third party)",
+            "url": "https://www.cgtrader.com/3d-models/industrial/industrial-part/sensor-indutivo-sick-1060232-inductive-sensor",
+            "kind": "library",
+            "access": "Seller-made model",
+            "note": "Rejected: not a manufacturer release; accuracy unverified."
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "zcarriage": {
+      "name": "Z carriage",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": "z"
+    },
+    "gantrybridge": {
+      "name": "Gantry bridge",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": "x"
+    },
+    "gantryrail": {
+      "name": "Gantry guide rail",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "THK",
+          "HIWIN"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "Size 25, class H stated; length and block type not specified.",
+        "candidates": [
+          {
+            "source": "HIWIN — configurator (3D CAD, drawings)",
+            "url": "https://www.hiwin.com/en/",
+            "kind": "manufacturer",
+            "access": "Configurator generates 3D CAD"
+          },
+          {
+            "source": "Damen CNC — HIWIN HGR25R rail, STEP AP214",
+            "url": "https://www.damencnc.com/en/hiwin-profile-rails-hgr25r-price-m-incl-green-caps/a379",
+            "kind": "reseller",
+            "access": "STEP listed (reseller-hosted)",
+            "note": "Reseller file — licence not established; would be a provisional reference at best."
+          },
+          {
+            "source": "RS — THK SHS25 rail listings",
+            "url": "https://uk.rs-online.com/web/p/linear-guide-rails/0619880",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "gantrydrive": {
+      "name": "Belt drive",
+      "category": "Motion",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Gates",
+          "Continental ContiTech",
+          "Optibelt"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "No AT10 CAD found; Gates distributors publish IGES for other pitches only.",
+        "candidates": [
+          {
+            "source": "Gates — timing belt pulleys",
+            "url": "https://www.gates.com/us/en/power-transmission/power-transmission-components/timing-belt-pulleys.html",
+            "kind": "manufacturer",
+            "access": "No CAD download seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "scanhead": {
+      "name": "Galvanometer scan head",
+      "category": "Optics",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Scanlab",
+          "Raylase",
+          "Novanta/Cambridge Technology"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "on-request",
+        "searched": "2026-10-15",
+        "note": "No public CAD found for SCANLAB, RAYLASE or Novanta heads. Coherent states STEP files are available on request for its PHF scanner.",
+        "candidates": [
+          {
+            "source": "SCANLAB — basiCube",
+            "url": "https://scanlab.de/en/products/scan-systems/basicube",
+            "kind": "manufacturer",
+            "access": "No public CAD found"
+          },
+          {
+            "source": "Novanta Photonics — VERSIA 2-axis scan head",
+            "url": "https://novantaphotonics.com/?p=14906",
+            "kind": "manufacturer",
+            "access": "No public CAD found"
+          },
+          {
+            "source": "Coherent — PHF compact galvo scanner datasheet",
+            "url": "https://www.coherent.com/resources/datasheet/lasers/compact-series-galvo-scanner-phf-series-ds.pdf",
+            "kind": "manufacturer",
+            "access": "STEP on request"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "galvo": {
+      "name": "Galvo mirror pair",
+      "category": "Optics",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Scanlab",
+          "Raylase",
+          "Novanta"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "on-request",
+        "searched": "2026-10-15",
+        "note": "Internal to the scan head — comes with the head CAD, if released.",
+        "candidates": [
+          {
+            "source": "SCANLAB — basiCube",
+            "url": "https://scanlab.de/en/products/scan-systems/basicube",
+            "kind": "manufacturer",
+            "access": "No public CAD found"
+          },
+          {
+            "source": "Novanta Photonics — VERSIA 2-axis scan head",
+            "url": "https://novantaphotonics.com/?p=14906",
+            "kind": "manufacturer",
+            "access": "No public CAD found"
+          },
+          {
+            "source": "Coherent — PHF compact galvo scanner datasheet",
+            "url": "https://www.coherent.com/resources/datasheet/lasers/compact-series-galvo-scanner-phf-series-ds.pdf",
+            "kind": "manufacturer",
+            "access": "STEP on request"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": "galvo"
+    },
+    "objective": {
+      "name": "F-theta objective",
+      "category": "Optics",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Sill Optics",
+          "Linos/Excelitas",
+          "Jenoptik",
+          "Thorlabs"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "Distributor product pages carry a downloads section; CAD content was not confirmed. Focal length and field come from the configuration, but no part number is specified.",
+        "candidates": [
+          {
+            "source": "Edmund Optics — Sill Optics S4LFT1163-081 (163 mm, 532/1064 nm)",
+            "url": "https://www.edmundoptics.com/p/sill-optics-163mm-fl-102-x-102mm-scan-area-532-1064nm-f-theta-scanning-lens-s4lft1163-081/54675/",
+            "kind": "distributor",
+            "access": "Product downloads — CAD not confirmed"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "collimator": {
+      "name": "Collimator / beam expander",
+      "category": "Optics",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Sill Optics",
+          "Optogama",
+          "Jenoptik"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "on-request",
+        "searched": "2026-10-15",
+        "note": "Only 2D PDF drawings found, marked for information only.",
+        "candidates": [
+          {
+            "source": "Optogama MEX13 v2 drawing (hosted by 4lasers)",
+            "url": "https://4lasers.com/storage/app/media/Items/31276/MEX13-v2%20v2.3.pdf",
+            "kind": "distributor",
+            "access": "PDF drawing only"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "fibreconn": {
+      "name": "Process fibre connector",
+      "category": "Optics",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "IPG",
+          "Optoskand",
+          "Coherent"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "Coherent (formerly Optoskand) publishes QBH dimensional drawings as PDF; no 3D model found.",
+        "candidates": [
+          {
+            "source": "Coherent — QBH fibre optic cable 1030–1090 nm datasheet",
+            "url": "https://www.coherent.com/resources/datasheet/components-and-accessories/qbh-fiber-optic-cable-1030-1090nm-ds.pdf",
+            "kind": "manufacturer",
+            "access": "PDF dimensional drawing"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "airassist": {
+      "name": "Air-assist / cross-jet nozzle",
+      "category": "Process",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "SMC",
+          "Festo",
+          "Norgren"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-searched",
+        "searched": null,
+        "note": "Cross-jet nozzles are commonly made to drawing; catalogue nozzles (SMC, Festo, Norgren) not searched in this pass.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "heightsensor": {
+      "name": "Standoff / height sensor",
+      "category": "Process",
+      "assemblies": [
+        "optic"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Keyence",
+          "Micro-Epsilon",
+          "Precitec"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "Keyence downloads require registration; CAD for the relevant model was not confirmed. Micro-Epsilon and Precitec not searched.",
+        "candidates": [
+          {
+            "source": "Keyence — LJ-G downloads",
+            "url": "https://www.keyence.com/products/measure/laser-2d/lj-g/downloads",
+            "kind": "manufacturer",
+            "access": "Registration required"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "headleds": {
+      "name": "Head status indicators",
+      "category": "Electrical",
+      "assemblies": [],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "lines/markers only — not pickable"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-searched",
+        "searched": null,
+        "note": "Indicator LEDs on the head housing — drawn as markers.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "vision": {
+      "name": "Machine vision camera",
+      "category": "Vision",
+      "assemblies": [
+        "m_visfid"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Basler",
+          "Cognex",
+          "Keyence",
+          "IDS",
+          "Omron"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "Basler publishes a CAD package for the ace 2 to blaze bracket that contains a 3D volume model of the camera; the camera model and interface are not specified (GigE or USB3, 2–5 MP).",
+        "candidates": [
+          {
+            "source": "Basler — ace 2 to blaze mounting bracket CAD",
+            "url": "https://www.baslerweb.com/en/downloads/document-downloads/basler-ace-2-to-blaze-mounting-bracket-cad-technical-drawing/",
+            "kind": "manufacturer",
+            "access": "CAD package; format not confirmed"
+          },
+          {
+            "source": "Basler — ace 2 documentation",
+            "url": "https://docs.baslerweb.com/basler-ace-2",
+            "kind": "manufacturer",
+            "access": "Dimensions in docs"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "ringlight": {
+      "name": "LED ring light",
+      "category": "Vision",
+      "assemblies": [
+        "m_visfid"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "CCS",
+          "Effilux",
+          "Advanced Illumination",
+          "Metaphase"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "Only 3D-printable mount files for CCS ring lights were found — mounts, not the light body.",
+        "candidates": [
+          {
+            "source": "Edmund Optics — CCS high-angle LED ring lights",
+            "url": "https://www.edmundoptics.com/f/ccs-high-angle-led-ring-lights/39867/",
+            "kind": "distributor",
+            "access": "Mount files only"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "visionfov": {
+      "name": "Inspection region",
+      "category": "Vision",
+      "assemblies": [],
+      "identity": {
+        "status": "not-a-part",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": ""
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "lines/markers only — not pickable"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-applicable",
+        "searched": "2026-10-15",
+        "note": "An inspection region, not a part.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "tablebase": {
+      "name": "Work table base",
+      "category": "Structure",
+      "assemblies": [
+        "table"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "toolplate": {
+      "name": "Tool plate",
+      "category": "Fixturing",
+      "assemblies": [
+        "table"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "fixture": {
+      "name": "Fixture plate",
+      "category": "Fixturing",
+      "assemblies": [
+        "table"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "Designed per part — exists only in the project CAD.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "locator": {
+      "name": "Locator pins",
+      "category": "Fixturing",
+      "assemblies": [
+        "table"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Misumi",
+          "Halder",
+          "Norelem"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "MISUMI generates 2D/3D CAD for configured pins; format and login were not confirmed.",
+        "candidates": [
+          {
+            "source": "MISUMI — locating pins",
+            "url": "https://uk.misumi-ec.com/en/products/recommended-products/locating-pins/",
+            "kind": "manufacturer",
+            "access": "Configurable 2D/3D CAD"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "clamp": {
+      "name": "Pneumatic toggle clamp",
+      "category": "Fixturing",
+      "assemblies": [
+        "table"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Destaco",
+          "SMC",
+          "Halder",
+          "Kosmek"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "Some DESTACO pages offer \"Download CAD\", others \"Request CAD\"; the clamp model is not specified.",
+        "candidates": [
+          {
+            "source": "DESTACO — 812 series pneumatic clamp accessory 305208-M",
+            "url": "https://destaco.com/clamping/Pneumatic/Pneumatic-Toggle-Clamp/standard-pneumatic-clamps-812/productdetails.305208-M.html",
+            "kind": "manufacturer",
+            "access": "Download CAD / View 3D"
+          },
+          {
+            "source": "DESTACO — 802-U-1190",
+            "url": "https://destaco.com/clamping/Pneumatic/Pneumatic-Toggle-Clamp/standard-pneumatic-clamps-802/productdetails.802-U-1190.html",
+            "kind": "manufacturer",
+            "access": "Request CAD"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": "clamp"
+    },
+    "partsensor": {
+      "name": "Part-present sensor",
+      "category": "Process",
+      "assemblies": [
+        "table"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Sick",
+          "ifm",
+          "Banner",
+          "Omron"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "As the home sensors.",
+        "candidates": [
+          {
+            "source": "RS — SICK IME12 inductive sensor",
+            "url": "https://int.rsdelivers.com/product/sick/ime12-04bpsvw2s/sick-ime12-04bpsvw2s-threaded-barrel-inductive-m12/2093465",
+            "kind": "distributor",
+            "access": "Technical documents — CAD not confirmed"
+          },
+          {
+            "source": "CGTrader — SICK 1060232 model (third party)",
+            "url": "https://www.cgtrader.com/3d-models/industrial/industrial-part/sensor-indutivo-sick-1060232-inductive-sensor",
+            "kind": "library",
+            "access": "Seller-made model",
+            "note": "Rejected: not a manufacturer release; accuracy unverified."
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "conveyor": {
+      "name": "Edge-belt conveyor",
+      "category": "Handling",
+      "assemblies": [
+        "m_conveyor"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Nutek",
+          "JT Automation",
+          "Simplimatic"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "on-request",
+        "searched": "2026-10-15",
+        "note": "No public CAD found; brochures and distributor listings only.",
+        "candidates": [
+          {
+            "source": "DKSH — Nutek conveyors",
+            "url": "https://technology-products.dksh.com/product/nutek-traverser-shuttle-conveyor-standard-series/",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "conveyordrive": {
+      "name": "Conveyor drive",
+      "category": "Handling",
+      "assemblies": [
+        "m_conveyor"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "SEW-Eurodrive",
+          "Bonfiglioli",
+          "Oriental Motor"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "SEW DriveConfigurator offers 2D/3D CAD from the configuration cart; STEP not confirmed.",
+        "candidates": [
+          {
+            "source": "SEW-EURODRIVE — online support / product configurator",
+            "url": "https://kz.sew-eurodrive.com/en_us/online_support/",
+            "kind": "manufacturer",
+            "access": "CAD in the configuration cart"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "stopper": {
+      "name": "Blade stopper",
+      "category": "Handling",
+      "assemblies": [
+        "m_conveyor"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "SMC",
+          "Festo"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "SMC catalogue CAD is generated per part number (CADENAS); format not confirmed. Festo datasheet only.",
+        "candidates": [
+          {
+            "source": "SMC — stopper cylinder catalogue",
+            "url": "https://www.smcworld.com/webcatalog/s3s/en-jp/list/RSH-E",
+            "kind": "manufacturer",
+            "access": "CADENAS-generated 2D/3D"
+          },
+          {
+            "source": "Festo STA/STAF datasheet",
+            "url": "https://www.landefeld.com/shop/media/festo/gruppendatenblaetter/sta_en.pdf",
+            "kind": "distributor",
+            "access": "PDF datasheet"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "conveyorsensor": {
+      "name": "Transport sensors",
+      "category": "Handling",
+      "assemblies": [
+        "m_conveyor"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Sick",
+          "Omron",
+          "Banner"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "As the home sensors.",
+        "candidates": [
+          {
+            "source": "RS — SICK IME12 inductive sensor",
+            "url": "https://int.rsdelivers.com/product/sick/ime12-04bpsvw2s/sick-ime12-04bpsvw2s-threaded-barrel-inductive-m12/2093465",
+            "kind": "distributor",
+            "access": "Technical documents — CAD not confirmed"
+          },
+          {
+            "source": "CGTrader — SICK 1060232 model (third party)",
+            "url": "https://www.cgtrader.com/3d-models/industrial/industrial-part/sensor-indutivo-sick-1060232-inductive-sensor",
+            "kind": "library",
+            "access": "Seller-made model",
+            "note": "Rejected: not a manufacturer release; accuracy unverified."
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "cabinet_backplane": {
+      "name": "Electrical back panel",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "fabricated-to-drawing",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "internal-drawing",
+        "searched": "2026-10-15",
+        "note": "",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "breaker": {
+      "name": "Main disconnect and breakers",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Schneider",
+          "ABB",
+          "Siemens",
+          "Eaton"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "Distributor listings only.",
+        "candidates": [
+          {
+            "source": "RS — ABB S302 MCB",
+            "url": "https://twen.rs-online.com/web/p/mcbs/0203691",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "psu": {
+      "name": "24 V power supply",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Phoenix Contact",
+          "Puls",
+          "Mean Well",
+          "Siemens"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "Distributor listing links to TraceParts for the QUINT supply; TraceParts terms restrict commercial use.",
+        "candidates": [
+          {
+            "source": "Automa — Phoenix Contact QUINT 2866763",
+            "url": "https://automa.net/product/phoenix-contact/2866763-63ce7b51ca04b4f259627f71",
+            "kind": "distributor",
+            "access": "TraceParts link"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "plc": {
+      "name": "PLC",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Siemens",
+          "Beckhoff",
+          "Omron",
+          "Mitsubishi",
+          "Rockwell"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "Distributor lists a 3D rendering (PDF) for S7-1200 CPUs; a STEP route was not confirmed.",
+        "candidates": [
+          {
+            "source": "Steiner Electric — Siemens S7-1200F CPU 6ES7212-1AF40-0XB0",
+            "url": "https://steinerelectric.com/Product/Siemens-6ES72121AF400XB0-S7-1200F-CPU-967138",
+            "kind": "distributor",
+            "access": "3D rendering PDF"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "servodrive": {
+      "name": "Servo drives",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Yaskawa",
+          "Panasonic",
+          "Delta",
+          "Beckhoff",
+          "Siemens"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "Drive rating is not in the product data.",
+        "candidates": [
+          {
+            "source": "Yaskawa Europe — SERVOPACK SGD7S-R70A00A (example)",
+            "url": "https://www.yaskawa.eu.com/products/motion-control/productdetail/product/sgd7s-r70a00a_1756",
+            "kind": "manufacturer",
+            "access": "3D data package CAD/CAE listed"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "ipc": {
+      "name": "Industrial PC",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Beckhoff",
+          "Advantech",
+          "Siemens",
+          "Kontron"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "A search result lists zipped STEP files for the Beckhoff C6015 in Beckhoff’s public download directory. The directory itself could not be fetched from this environment, so the files are unverified.",
+        "candidates": [
+          {
+            "source": "Beckhoff — C60xx technical drawings directory",
+            "url": "https://download.beckhoff.com/download/Technical_Drawings/Industrial_PC/Control_cabinet_Industrial_PCs/C60xx",
+            "kind": "manufacturer",
+            "access": "Zipped STEP per variant (per search result)"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "laserpsu": {
+      "name": "Laser supply",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "IPG",
+          "Coherent",
+          "Synrad",
+          "Trumpf"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "Part of the laser source supply — follows the source manufacturer.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "ethernet": {
+      "name": "Ethernet switch",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Siemens Scalance",
+          "Phoenix Contact",
+          "Moxa",
+          "Hirschmann"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "Datasheets only.",
+        "candidates": [
+          {
+            "source": "GlobalSpec — Moxa EDS-305 datasheet",
+            "url": "https://datasheets.globalspec.com/ds/moxa/eds-305/9bd71ee7-5a99-4243-a84b-ff20fbf8e6c3",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "safetyrelay": {
+      "name": "Safety relay",
+      "category": "Safety",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Pilz",
+          "Sick",
+          "Schmersal",
+          "Euchner"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "Pilz publishes EPLAN macros; a STEP download was not confirmed.",
+        "candidates": [
+          {
+            "source": "Pilz — PNOZ p1p (eShop 773300)",
+            "url": "https://www.pilz.com/eshop/p/773300",
+            "kind": "manufacturer",
+            "access": "EPLAN macros; STEP not confirmed"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "terminals": {
+      "name": "Terminal blocks",
+      "category": "Electrical",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Phoenix Contact",
+          "Weidmüller",
+          "Wago"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "As the power supply.",
+        "candidates": [
+          {
+            "source": "Automa — Phoenix Contact QUINT 2866763",
+            "url": "https://automa.net/product/phoenix-contact/2866763-63ce7b51ca04b4f259627f71",
+            "kind": "distributor",
+            "access": "TraceParts link"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "cabinetfan": {
+      "name": "Cabinet cooling fan",
+      "category": "Thermal",
+      "assemblies": [
+        "frame"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Rittal",
+          "Pfannenberg",
+          "Ebm-papst"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "Distributor listings only.",
+        "candidates": [
+          {
+            "source": "Distrelec — Rittal SK filter fan 3243060",
+            "url": "https://www.distrelec.ch/en/rittal-sk-series-filter-fan-323-323mm-rittal-3243060/p/30490730",
+            "kind": "distributor",
+            "access": "No CAD seen"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "tower": {
+      "name": "Status beacon",
+      "category": "Safety",
+      "assemblies": [
+        "tower"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Patlite",
+          "Werma",
+          "Auer",
+          "Banner"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "STEP via Octopart partner sites (TraceParts, eCADm, CADFILES); partner terms may require an account.",
+        "candidates": [
+          {
+            "source": "Octopart — Werma 69531055 CleanSIGN",
+            "url": "https://octopart.com/part/werma/69531055",
+            "kind": "distributor",
+            "access": "Partner STEP links"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "estop": {
+      "name": "Emergency stop",
+      "category": "Safety",
+      "assemblies": [
+        "ctrl"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Schneider Harmony",
+          "Siemens Sirius",
+          "Pilz",
+          "Eaton"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-offered",
+        "searched": "2026-10-15",
+        "note": "STEP via TraceParts links on distributor pages; TraceParts terms restrict commercial use.",
+        "candidates": [
+          {
+            "source": "Automa — Schneider XB4BS9445",
+            "url": "https://automa.net/product/schneider-electric/xb4bs9445-63a379c0ca04b4f2592aef6f",
+            "kind": "distributor",
+            "access": "TraceParts link"
+          },
+          {
+            "source": "Octopart — Schneider ZBY9130T legend plate",
+            "url": "https://octopart.com/part/schneider-electric/ZBY9130T",
+            "kind": "distributor",
+            "access": "Partner STEP links"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "hmi": {
+      "name": "HMI pendant",
+      "category": "Electrical",
+      "assemblies": [
+        "ctrl"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Siemens",
+          "Beckhoff",
+          "Advantech",
+          "Elo"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "cad-unconfirmed",
+        "searched": "2026-10-15",
+        "note": "A distributor lists a 3D rendering (PDF) for a Siemens Unified Comfort Panel; no STEP confirmed.",
+        "candidates": [
+          {
+            "source": "Steiner Electric — Siemens MTP2200 Unified Comfort Panel",
+            "url": "https://www.steinerelectric.com/Product/Siemens-6AV21283XB360AX1-MTP2200Unified-Comfort-Panel21-5-1354006",
+            "kind": "distributor",
+            "access": "3D rendering PDF"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "source": {
+      "name": "Laser source",
+      "category": "Optics",
+      "assemblies": [
+        "source"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "IPG",
+          "Coherent",
+          "Synrad",
+          "nLIGHT",
+          "Trumpf",
+          "Han’s"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "No public STEP or outline drawing found for IPG YLP marking sources; catalogue data only. The source model is not specified beyond class, wavelength and power.",
+        "candidates": [
+          {
+            "source": "DirectIndustry — IPG YLP series catalogue",
+            "url": "https://pdf.directindustry.com/pdf/ipg-photonics-corporation/ylp-series-01-to-2mj-pulsed-ytterbium-fiber-lasers/29249-91598.html",
+            "kind": "distributor",
+            "access": "Catalogue only"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "chiller": {
+      "name": "Chiller",
+      "category": "Thermal",
+      "assemblies": [
+        "source"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Termotek",
+          "Laird",
+          "SMC",
+          "Riedel"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "Nothing found for Termotek; other vendors not searched.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "fume": {
+      "name": "Fume extraction",
+      "category": "Environment",
+      "assemblies": [
+        "m_fume"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "BOFA",
+          "Purex",
+          "ULT",
+          "Kemper"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "Distributor lists BOFA AD 350 envelope (H 590 × W 465 × L 405 mm); no CAD found.",
+        "candidates": [
+          {
+            "source": "Flume — BOFA AD 350",
+            "url": "https://www.flume.de/en/tools-supplies/facilities-compressed-air-and-vacuum/clean-room/extraction-system-extraction-accessories/mobile-extraction-system/fume-extraction-system-bofa-ad-350-for-laser-engraving-system-imp-l100/346036",
+            "kind": "distributor",
+            "access": "Dimensions only"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "workpiece": {
+      "name": "Workpiece",
+      "category": "Process",
+      "assemblies": [
+        "part"
+      ],
+      "identity": {
+        "status": "not-a-part",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": "Made to the TEAL design; identity is the TEAL drawing number, not in the product data."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-applicable",
+        "searched": "2026-10-15",
+        "note": "Customer part — its geometry comes from the customer drawing.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": "transfer"
+    },
+    "beamguide": {
+      "name": "Beam delivery — fibre or beam guide",
+      "category": "Optics",
+      "assemblies": [
+        "source"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Per the source manufacturer"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "none-found",
+        "searched": "2026-10-15",
+        "note": "As the fibre connector — the fibre is supplied with the source.",
+        "candidates": [
+          {
+            "source": "Coherent — QBH fibre optic cable 1030–1090 nm datasheet",
+            "url": "https://www.coherent.com/resources/datasheet/components-and-accessories/qbh-fiber-optic-cable-1030-1090nm-ds.pdf",
+            "kind": "manufacturer",
+            "access": "PDF dimensional drawing"
+          }
+        ],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "ceplate": {
+      "name": "Conformity and laser-class plate",
+      "category": "Compliance",
+      "assemblies": [
+        "cert"
+      ],
+      "identity": {
+        "status": "not-a-part",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [],
+        "note": ""
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-applicable",
+        "searched": "2026-10-15",
+        "note": "Marked plate — artwork, not CAD.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    },
+    "gascon": {
+      "name": "Process-gas console",
+      "category": "Process",
+      "assemblies": [
+        "m_gascon"
+      ],
+      "identity": {
+        "status": "class-only",
+        "manufacturer": null,
+        "model": null,
+        "partNumber": null,
+        "exampleVendors": [
+          "Linde",
+          "Air Liquide",
+          "Swagelok",
+          "Festo"
+        ],
+        "note": "The product data specifies the class of part, not a manufacturer, model or part number."
+      },
+      "geometry": {
+        "status": "parametric-provisional",
+        "drawn": [
+          "solid",
+          "cutaway",
+          "xray"
+        ],
+        "note": "Drawn by the configurator’s parametric builder; proportions are illustrative, not from CAD."
+      },
+      "cad": {
+        "status": "not-searched",
+        "searched": null,
+        "note": "Gas panel components (Swagelok, Festo) not searched in this pass.",
+        "candidates": [],
+        "downloaded": false,
+        "file": null,
+        "verification": null
+      },
+      "glb": null,
+      "joint": null
+    }
+  }
+}

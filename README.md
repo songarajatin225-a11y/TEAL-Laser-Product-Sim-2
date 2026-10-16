@@ -1211,8 +1211,9 @@ exists only to run the tests.
 ```
 npm install
 npx playwright install chromium     # once
-npm test                            # data validator, then the browser suite
+npm test                            # data validator, CAD coverage check, then the browser suite
 npm run validate                    # data validator alone — no dependencies
+npm run coverage                    # regenerate assets/cad/COVERAGE.md from the manifest
 ```
 
 `tests/validate-data.mjs` checks every cross-reference in the value store and
@@ -1220,10 +1221,16 @@ exits non-zero on a critical or high finding; run it after any admin-panel edit
 before publishing a new `data.json`. Its last full report is in
 [`DATA-QUALITY.md`](DATA-QUALITY.md).
 
+`tools/cad/report.mjs --check` fails if `assets/cad/COVERAGE.md` no longer matches the
+manifest, if a component in the 3D model has no manifest record (or the reverse), or if a
+record names a GLB that is missing or claims an exact match without a part number.
+
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 66 checks across navigation, pricing reconciliation, the BOM,
-fit and considerations, the 3D view, the run cycle, the presentation, the machine story, layout from
-360 to 1,900 px and accessible names. Each check names the behaviour it protects.
+headless Chromium: 89 checks across navigation, pricing reconciliation, the BOM,
+fit and considerations, the 3D view, the component explorer, CAD loading,
+kinematics, the run cycle and its scrubbing, the presentation, the machine story,
+layout from 320 to 1,900 px and accessible names. Each check names the behaviour it
+protects.
 
 ## v11.0 — commercial breakdown, assemblies, presentation
 
@@ -1436,6 +1443,135 @@ The header test was not catching this. It compared element boxes, and the title
 block may shrink below its non-wrapping text, so the subtitle could run into the
 navigation while the boxes still reported clearance. It now measures what is
 drawn — every visible descendant, text overflow included — and requires 8 px.
+
+## v13.0 — component register, CAD pipeline and kinematics
+
+This release makes the 3D model accountable, part by part. For each part it now states
+what the model is, what it is not, and what it would take to make it real CAD.
+
+**The model is not a validated digital twin.** Every one of the 69 components it can draw
+is parametric geometry with illustrative proportions. The product data names the class
+of each bought-in part, with example vendors, but never the installed manufacturer,
+model or part number. The fabricated assemblies exist only in TEAL's own CAD.
+[`assets/cad/COVERAGE.md`](assets/cad/COVERAGE.md) gives the counts.
+
+### CAD discovery
+
+Of the 69 components, 7 are not CAD parts: labels, plates, an inspection region and the
+customer's workpiece. Another 3 were not searched: the air-assist nozzle, the head LEDs and
+the gas console. The other 59 were searched in manufacturer portals, distributors, TraceParts,
+GrabCAD and similar libraries. The results:
+- 17 classes have a manufacturer or distributor that publishes CAD for parts of that class.
+- 12 have a maker page where CAD could not be confirmed.
+- 4 have CAD on request only.
+- 12 have no public CAD.
+- 14 are made to TEAL drawing.
+
+No public CAD of any TEAL machine exists.
+
+No file could be downloaded, because this build environment's network policy refuses
+every CAD and manufacturer host. Nothing here claims otherwise. Each component's search
+result, candidate links, licence notes and the blocked hosts are in
+[`assets/cad/manifest.json`](assets/cad/manifest.json) and
+[`assets/cad/SOURCES_AND_LICENSES.md`](assets/cad/SOURCES_AND_LICENSES.md).
+
+**Licences:** TraceParts and GrabCAD content may not be published commercially without
+permission. `assets/cad/restricted/` is git-ignored for such files.
+
+### Pipeline
+
+- **Conversion:** `tools/cad/step2glb.py` converts a STEP file to GLB through OpenCASCADE
+  (the gmsh wheel).
+  - It refuses a file without the ISO-10303-21 header, or over 200 MB.
+  - It keeps one node per solid, writes positions in metres, and converts Z-up to Y-up.
+  - It writes a report comparing each solid's CAD bounding box with its mesh bounding box.
+  - It was tested on a synthetic two-solid fixture (`tests/fixtures/cad/`, clearly not a
+    machine part): 60 × 40 × 30 mm in, 60 × 40 × 30 mm out, 0.000 mm deviation.
+- **Loading in the site:** the site reads GLB with its own parser. Node transforms are
+  applied, and size and triangle limits are enforced.
+- **Placement:** a component whose manifest record names a GLB is drawn from it wherever
+  its builder calls `b.part()`, on the same local frame as the parametric part, at every
+  instance. Today that is the levelling feet, the Z servo and the e-stop. Without CAD it
+  falls back to parametric geometry.
+
+### Mapping fixes
+
+- **Missing component IDs:** about 30 % of the drawn faces carried no component ID, so
+  clicking them did nothing. That included the laser source, chiller, status beacon,
+  HMI, e-stop, workpiece and most automation modules. They now resolve. A module is
+  described by its own catalogue record, the same one that prices it.
+- **Unresolved geometry:** what still maps to no record is reported as an unresolved
+  mapping, never given a guessed record. That covers the floor plan, beam effects and
+  the handpiece bench.
+- **Working distance:** the DFM report and the objective callout showed the focal length
+  as the "working distance". The data has no working distances, so they now show the
+  focal length, labelled as such.
+
+### Inspector
+
+The component inspector now has an **Engineering record** section showing:
+- the component ID and assembly
+- identity status
+- geometry status
+- CAD search result with links
+- where the part is priced: platform base, module line or adjustment
+- the platform lead time
+- the joint it moves on
+- the other parts of its assembly
+
+**Component register:** a new CSV on the summary page lists the same record for every
+drawn component.
+
+### Assembly explorer
+
+The new tree button opens the explorer, listing what the current view mode draws. You
+can:
+- search
+- click to inspect and fly to a part
+- shift-click to multi-select
+- hide parts
+- isolate the selection
+
+Hovering names the part under the pointer. None of this touches the configuration or the
+price.
+
+### Kinematics
+
+Every animated mechanism now moves through a declared joint and is clamped to its limits:
+- the Z axis
+- the gantry X traverse
+- part transfer
+- the toggle clamps
+- the index table
+- the two galvo mirrors
+
+The Z stroke comes from the product data where it is stated, which is one platform.
+Elsewhere the limits are labelled as the animation envelope.
+
+The galvo mirror angles come from the ideal f-θ relation, r = f·θ. The mirror turns
+through half the optical angle, so with an F254 objective and a 175 mm field the limit
+is ±9.9° mechanical.
+
+The **Joints** tab tabulates the joints. Layers → *Axes & joints* (key J) draws the
+datum, the travels and the live values.
+
+### Run cycle
+
+- **New controls:** restart, step back, and a scrubber across the whole cycle.
+- **Repeatable seeking:** seeking reproduces exactly the pose that playing to the same
+  instant gives.
+- **Repeatable stoppages:** a stoppage ahead of the new point happens again where it did.
+- **Counting:** replaying a finished single cycle counts it once.
+
+### Layout
+
+Two layout faults are fixed. The camera presets used to overlap the view tools below
+390 px, and in the 1,125–1,155 px two-column layout. The run controls also overflowed
+on a phone. The presets now move up a row whenever the viewer itself is too narrow, and
+the run controls tighten and wrap.
+
+**Still to do:** guided missions and a troubleshooting tutorial were not built. The
+existing presentation mode remains the guided path.
 
 ---
 
