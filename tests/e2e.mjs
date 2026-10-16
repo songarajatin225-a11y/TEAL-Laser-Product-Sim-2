@@ -312,6 +312,112 @@ try {
   await pg.close();
 
   /* ------------------------------------------------------------------ */
+  sec('Mechanisms, comparison, assistant and missions');
+  pg = await open('#p=markf&m=fume');
+  await pg.evaluate(() => { document.querySelector('#v3d').scrollIntoView(); M3D.vp.spin = false; });
+  await pg.waitForTimeout(500);
+  const mech = await pg.evaluate(() => {
+    const pose = () => { const b = new B3(); mmBuild(b, 0, null); };
+    SIM.faults = false; SIM.loop = true; simStart(); SIM.rate = 0;
+    const L = simPhaseStart('LOAD'), P2 = simPhaseStart('PROCESS');
+    simSeek(L.t + L.d * 0.5); pose(); const load = KIN.door.q, st = (simStatus(), document.querySelector('#v3dstat').innerText);
+    simSeek(P2.t + P2.d * 0.5); pose(); const proc = KIN.door.q, beam = R3D.beamOn;
+    SIM.faults = true; SIM.plan = SIM.pend = { f: simFaults()[0], t: SIM.t + 0.01 }; simAdvance(0.02); simAdvance(0.8); pose();
+    const fault = { k: SIM.fault, q: KIN.door.q, lim: KIN.door.lim[1] };
+    simAdvance(2.0); pose(); const after = { k: SIM.fault, q: KIN.door.q };
+    simStop(); SIM.faults = true;
+    return { load, st: /Open — loading/i.test(st), proc, beam, fault, after };
+  });
+  check('a hand-loaded machine opens its chamber door to load, and the status says so', mech.load > 1 && mech.st, JSON.stringify(mech));
+  check('the door is shut whenever the beam can fire', mech.proc === 0, JSON.stringify(mech));
+  check('a guard stoppage swings the door open on its joint, inside its limit, and closes it before resuming',
+    mech.fault.k === 'interlock' && mech.fault.q > 0.5 && mech.fault.q <= mech.fault.lim && mech.after.k === null && mech.after.q < 0.02, JSON.stringify(mech));
+  const stop = await pg.evaluate(() => {
+    S.mods.conveyor = true; render(); SIM.faults = false; simStart(); SIM.rate = 0;
+    const b = () => { const x = new B3(); mmBuild(x, 0, null); return KIN.stop.q; };
+    const P2 = simPhaseStart('PROCESS'), U = simPhaseStart('UNLOAD');
+    simSeek(P2.t + P2.d * 0.5); const proc = b(); simSeek(U.t + U.d * 0.4); const unl = b(); simSeek(U.t + U.d * 0.99); const end = b();
+    simStop(); delete S.mods.conveyor; render(); SIM.faults = true;
+    return { proc, unl, end };
+  });
+  check('the conveyor blade stopper holds the part through the process, drops to release it, and rises again',
+    stop.proc === 1 && stop.unl === 0 && stop.end > 0.9, JSON.stringify(stop));
+  const lum = await pg.evaluate(async () => {
+    const vp = M3D.vp, mean = () => { const c = vp.cv, x = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let t = 0;
+      for (let i = 0; i < x.length; i += 16) t += x[i] * 0.2126 + x[i + 1] * 0.7152 + x[i + 2] * 0.0722; return t / (x.length / 16); };
+    const geo = () => { const b = new B3(); mmBuild(b, 0, null); return b.f.length; };
+    vp.paint(1); const a = mean(), ga = geo();
+    vp.light = 'inspection'; vp.paint(1); const b = mean(), gb = geo();
+    vp.light = 'studio'; vp.paint(1);
+    return { a: +a.toFixed(1), b: +b.toFixed(1), same: ga === gb };
+  });
+  check('inspection lighting brightens the view without changing the geometry', lum.b > lum.a + 3 && lum.same, JSON.stringify(lum));
+
+  const cmp3 = await pg.evaluate(async () => {
+    const before = JSON.stringify([S, cur, reach]);
+    saveCfg('Base'); const a = SAVED[0].id;
+    const keep = JSON.parse(JSON.stringify(S));
+    S.src = 'mopa'; S.pw = powersFor(P(), 'mopa').slice(-1)[0]; S.mods.visfid = true; render();
+    saveCfg('With vision'); const b = SAVED[0].id;
+    S = keep; famSel = PLAT[S.plat].fam; render();
+    const mid = JSON.stringify([S, cur, reach]);
+    CMP = [a, b]; openCompare(); await new Promise(r => setTimeout(r, 400));
+    const D = CMP3.diff, txt = document.querySelector('#cmp3list').innerText;
+    const out = { add: Object.keys(D.add).sort().join(), rem: Object.keys(D.rem).length, srcWhy: D.why.source || '', lines: D.lines.map(l => l.l.id).sort().join(),
+      live: !!CMP3.vp, txt: /Added in B/i.test(txt) && /Built differently/i.test(txt), same: mid === JSON.stringify([S, cur, reach]) };
+    CMP = [a, a]; openCompare(); await new Promise(r => setTimeout(r, 200));
+    const D2 = CMP3.diff; out.ident = Object.keys(D2.add).length + Object.keys(D2.rem).length + Object.keys(D2.chg).length;
+    closeOverlay('#compare'); out.closed = CMP3.vp === null;
+    SAVED.splice(0, 2); Store.set('teal.saved', SAVED); CMP = [];
+    out.restored = before === JSON.stringify([S, cur, reach]);
+    return out;
+  });
+  check('the 3D comparison shows what B adds, what it drops, and what is specified differently, with the reason',
+    cmp3.add.includes('vision') && cmp3.rem === 0 && /MOPA/.test(cmp3.srcWhy) && /visfid/.test(cmp3.lines) && cmp3.txt && cmp3.live, JSON.stringify(cmp3));
+  check('two identical configurations compare with no differences', cmp3.ident === 0, JSON.stringify(cmp3));
+  check('comparing never changes the configuration, and closing it stops its viewport', cmp3.same && cmp3.closed && cmp3.restored, JSON.stringify(cmp3));
+
+  const ask = await pg.evaluate(() => {
+    const st = JSON.stringify(S), o = optics();
+    const spot = askAnswer('what is the spot size?'), wd = askAnswer('working distance?'), out = askAnswer('tell me a joke'),
+          safe = askAnswer('is it safe?'), heat = askAnswer('what is the heat load');
+    const r = askRun('What does the chiller do?');
+    return { spot: spot.h.includes(o.spot.toFixed(0) + ' µm') && /optics model/.test(spot.basis),
+             wd: /not in the product data/.test(wd.h), out: /outside what I can work out/.test(out.h) && !out.cid,
+             safe: safe.h.includes(specGet(P(), /safety/i).row[1]), heat: heat.cid === 'chiller' && heat.h.includes(num(physics().heat_kW)),
+             sel: M3D.sel.join() === 'chiller' && r.cid === 'chiller', same: st === JSON.stringify(S) };
+  });
+  check('the assistant computes answers from the configurator’s own models and says where they come from', ask.spot && ask.heat && ask.safe, JSON.stringify(ask));
+  check('the assistant states data gaps and declines what it cannot work out', ask.wd && ask.out, JSON.stringify(ask));
+  check('asking highlights the part concerned and leaves the configuration alone', ask.sel && ask.same, JSON.stringify(ask));
+
+  const mis = await pg.evaluate(async () => {
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    const snap = () => JSON.stringify([S, cur, reach, famSel, M3D.vmode, localStorage.getItem('teal.hist'), location.hash]);
+    const before = snap(), R = {};
+    misStart('find'); ['scanhead', 'objective', 'interlock'].forEach(c => showComp(c, { gid: 'optic' })); misAnswer(MIS.opts.findIndex(o => o.ok));
+    R.find = MIS.done && MIS.score === 100; misEnd(true);
+    misStart('trace'); showComp('objective', { gid: 'optic' }); R.wrong = /before/.test(MIS.fb);
+    ['source', 'beamguide', 'collimator', 'scanhead', 'objective', 'workpiece'].forEach(c => showComp(c, { gid: 'optic' }));
+    misAnswer(MIS.opts.findIndex(o => o.ok)); R.trace = MIS.done && MIS.score < 100; misEnd(true);
+    misStart('config'); const t = MIS.data.target, s0 = optics().spot;
+    S.lens = P().lens.slice().sort((a, b) => LENS[a].f - LENS[b].f)[0]; render();
+    R.config = s0 > t && optics().spot <= t && MIS.i === 1; misEnd(true);
+    misStart('cycle'); simStart(); SIM.rate = 8; for (let i = 0; i < 120 && MIS.i < 2; i++) await wait(100);
+    misAnswer(MIS.opts.findIndex(o => o.ok)); misAnswer(MIS.opts.findIndex(o => o.ok)); R.cycle = MIS.done; misEnd(true);
+    misStart('fault'); SIM.rate = 4; for (let i = 0; i < 150 && MIS.i < 1; i++) await wait(100);
+    await wait(900); R.held = !!SIM.fault && SIM.faultHold;
+    misAnswer(MIS.opts.findIndex(o => o.ok)); misAnswer(MIS.opts.findIndex(o => o.ok));
+    document.querySelector('#v3dmis [data-a="act"]').click(); await wait(1000); R.fault = MIS.done && !SIM.fault; misEnd(true);
+    R.same = before === snap();
+    return R;
+  });
+  check('every mission runs to completion and scores hints and wrong tries', mis.find && mis.trace && mis.wrong && mis.config && mis.cycle, JSON.stringify(mis));
+  check('the stoppage mission holds the fault until it is diagnosed and acknowledged', mis.held && mis.fault, JSON.stringify(mis));
+  check('missions give back the configuration, step, view, History and link exactly', mis.same, JSON.stringify(mis));
+  check('no script errors in mechanisms, comparison, assistant or missions', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+  /* ------------------------------------------------------------------ */
   sec('Simulation and presentation');
   pg = await open('#p=markf&a=metal&s=mopa&w=50&l=f420');
   await pg.evaluate(() => { reach = 5; go(5); SIM.rate = 8; simStart(); });

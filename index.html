@@ -449,7 +449,50 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .v3dexp .kint td span{display:block;color:#7F9BAD;font-size:9.5px;margin-top:1px}
 .v3dexp .kint td.n{font-family:var(--mono);color:#F2C76E;white-space:nowrap}
 .v3dexp .xbody>.xnote{margin:6px 4px}
+.v3dexp .xask{display:flex;gap:6px;margin:6px 4px}
+.v3dexp .xask input{flex:1;min-width:0;padding:6px 9px;border-radius:8px;border:1px solid rgba(154,196,216,.28);
+  background:rgba(255,255,255,.05);color:#EAF4F8;font-size:12px}
+.v3dexp .xask button{padding:6px 10px;border-radius:8px;border:none;background:#00D6D9;color:#0B1A2A;font-size:11.5px;font-weight:600}
+.v3dexp .xchips{display:flex;flex-wrap:wrap;gap:4px;margin:2px 4px 8px}
+.v3dexp .xchips button{padding:3px 8px;border-radius:999px;border:1px solid rgba(154,196,216,.28);background:none;color:#9FC0D2;font-size:10.5px}
+.v3dexp .xchips button:hover{border-color:#00D6D9;color:#00E2E5}
+.v3dexp .xqa{margin:0 4px 9px;padding:8px 9px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(154,196,216,.14)}
+.v3dexp .xq{margin:0 0 4px;font-size:11px;color:#7FE3E5;font-weight:600}
+.v3dexp .xa{margin:0;font-size:11.5px;line-height:1.5;color:#D6E6EE}
+.v3dexp .xa b{color:#fff}
+.v3dexp .xb{margin:4px 0 0;font-family:var(--mono);font-size:8.4px;letter-spacing:.08em;text-transform:uppercase;color:#6F8DA1}
 @media(max-width:640px){.v3dexp{left:10px;right:10px;width:auto;top:10px}}
+/* guided missions */
+.v3dmis{position:absolute;left:12px;top:11px;z-index:9;width:292px;max-width:calc(100% - 24px);max-height:calc(100% - 70px);
+  overflow:auto;display:none;padding:11px 12px;border-radius:12px;border:1px solid rgba(154,196,216,.26);
+  background:rgba(8,22,34,.94);backdrop-filter:blur(12px);box-shadow:0 14px 38px rgba(0,0,0,.5);color:#C6DAE4}
+.v3dmis.open{display:block}
+.v3d.mission .v3dstack{visibility:hidden}
+.v3dmis .mhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.v3dmis .mhead b{font-size:13px;color:#EAF4F8}
+.v3dmis .mx{width:22px;height:22px;padding:0;border-radius:6px;border:none;background:rgba(255,255,255,.07);color:#9FC0D2;display:flex;align-items:center;justify-content:center}
+.v3dmis .mx svg{width:11px;height:11px}
+.v3dmis .mnote{margin:0 0 8px;font-size:10.5px;line-height:1.45;color:#7F9BAD}
+.v3dmis .mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid rgba(154,196,216,.12)}
+.v3dmis .mrow b{display:block;font-size:12px;color:#EAF4F8}
+.v3dmis .mrow span{display:block;font-size:10.5px;color:#8FB0C3;line-height:1.35}
+.v3dmis button{font-size:11px;padding:6px 10px;border-radius:8px;border:1px solid rgba(154,196,216,.3);background:rgba(255,255,255,.05);color:#C6DAE4;flex:none}
+.v3dmis button:hover:not(:disabled){border-color:#00D6D9;color:#00E2E5}
+.v3dmis .mprog{display:flex;gap:4px;margin:2px 0 6px}
+.v3dmis .mprog i{flex:1;height:3px;border-radius:2px;background:rgba(154,196,216,.2)}
+.v3dmis .mprog i.d{background:#00D6D9}.v3dmis .mprog i.c{background:#F2C76E}
+.v3dmis .mstep{margin:0;font-family:var(--mono);font-size:8.6px;letter-spacing:.12em;text-transform:uppercase;color:#6F8DA1}
+.v3dmis .mt{margin:4px 0 8px;font-size:12.5px;line-height:1.5;color:#EAF4F8}
+.v3dmis .mopts{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.v3dmis .mopts button{text-align:left;font-size:11.5px}
+.v3dmis .mopts button.no{opacity:.4;text-decoration:line-through}
+.v3dmis .mopts button.go{background:#00D6D9;color:#0B1A2A;border-color:#00D6D9;font-weight:600;text-align:center}
+.v3dmis .mfb{margin:0 0 8px;font-size:11.5px;line-height:1.45;color:#F2C76E}
+.v3dmis .mfb.ok{color:#5CCB6B}
+.v3dmis .mhint{margin:0 0 8px;font-size:11px;line-height:1.45;color:#9FC0D2;border-left:2px solid #00D6D9;padding-left:8px}
+.v3dmis .mdone{margin:6px 0;font-size:13px;color:#EAF4F8}
+.v3dmis .mdone b{color:#5CCB6B}
+.v3dmis .mfoot{display:flex;justify-content:space-between;gap:8px}
 /* hover label */
 .v3dtip{position:absolute;z-index:10;pointer-events:none;padding:4px 8px;border-radius:7px;font-size:11px;
   background:rgba(8,22,34,.92);border:1px solid rgba(154,196,216,.3);color:#EAF4F8;white-space:nowrap;
@@ -505,12 +548,12 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .lrow.on i{background:#00D6D9;border-color:#00D6D9}
 .lrow.on i::after{content:'';width:6px;height:3px;border-left:1.6px solid #06202B;
   border-bottom:1.6px solid #06202B;transform:rotate(-45deg) translate(0,-1px)}
-.vmode{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:2px}
-.vmode button{font-family:var(--mono);font-size:8.4px;letter-spacing:.09em;text-transform:uppercase;
+.vmode,.lmode{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:2px}
+.vmode button,.lmode button{font-family:var(--mono);font-size:8.4px;letter-spacing:.09em;text-transform:uppercase;
   padding:5px 4px;border-radius:6px;border:1px solid rgba(154,196,216,.24);background:none;
   color:#88A9BD;font-weight:600;transition:all .15s var(--ease)}
-.vmode button:hover{color:#DDEFF5;border-color:rgba(154,196,216,.5)}
-.vmode button.on{background:rgba(0,214,217,.18);color:#00E2E5;border-color:rgba(0,226,229,.45)}
+.vmode button:hover,.lmode button:hover{color:#DDEFF5;border-color:rgba(154,196,216,.5)}
+.vmode button.on,.lmode button.on{background:rgba(0,214,217,.18);color:#00E2E5;border-color:rgba(0,226,229,.45)}
 .v3dctl button{width:29px;height:29px;display:inline-flex;align-items:center;justify-content:center;
   border-radius:8px;border:1px solid rgba(154,196,216,.22);background:rgba(9,24,37,.62);
   color:#9FC0D2;padding:0;backdrop-filter:blur(8px);transition:all .18s var(--ease)}
@@ -611,7 +654,7 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
   .v3dstack{display:none}
   .v3dname b{font-size:10.5px}
   /* on a phone the run gets a taller stage, so the telemetry sits under the machine */
-  .v3d.running{aspect-ratio:4/5}
+  .v3d.running,.v3d.paneled{aspect-ratio:4/5}
 }
 /* The panel is a size container: in the nameplate column (or a phone) the run
    shows the five figures that matter and the key status rows; expanded, all. */
@@ -802,6 +845,33 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 /* ---------- compare ---------- */
 #compare{position:fixed;inset:0;z-index:92;background:var(--page);overflow:auto;display:none}
 #compare.open{display:block}
+/* 3D comparison */
+.c3{margin:0 0 22px}
+.c3head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.c3head h3{margin:0;font-size:15px}
+.c3ctl{display:flex;flex-wrap:wrap;gap:6px}
+.c3ctl button{padding:6px 11px;border-radius:999px;border:1px solid var(--rule);background:#fff;font-size:12px;color:var(--ink)}
+.c3ctl button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.c3wrap{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(240px,1fr);gap:14px}
+.c3view{position:relative;height:440px;border-radius:12px;overflow:hidden;background:#0B2033}
+.c3view canvas{width:100%;height:100%;display:block;touch-action:none}
+.c3leg{position:absolute;left:10px;bottom:10px;display:flex;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.1em;text-transform:uppercase;color:#C6DAE4}
+.c3leg span{display:inline-flex;align-items:center;gap:5px;background:rgba(8,22,34,.8);padding:3px 7px;border-radius:999px}
+.c3leg span::before{content:"";width:9px;height:9px;border-radius:2px}
+.c3leg .add::before{background:#3FB866}.c3leg .rem::before{background:#E5484D}.c3leg .chg::before{background:#E8A33A}
+.c3list{font-size:12.5px;line-height:1.45;max-height:440px;overflow:auto}
+.c3list .c3pair{margin:0 0 10px;color:var(--ink)}
+.c3list .c3pair span{color:var(--mut, #5A6B78);font-family:var(--mono);font-size:10.5px}
+.c3g{margin-bottom:10px}
+.c3g h5{margin:0 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.c3g h5 i{font-style:normal;opacity:.6}
+.c3g.add h5{color:#23864A}.c3g.rem h5{color:#C23A3F}.c3g.chg h5{color:#A8701A}
+.c3g ul{margin:0;padding-left:16px}.c3g p{margin:0;opacity:.7}
+.c3p{list-style:none;padding:0!important}
+.c3p li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--rule);padding:3px 0}
+.c3t,.c3n{margin:6px 0 0;font-size:11.5px;opacity:.8}
+@media(max-width:820px){.c3wrap{grid-template-columns:1fr}.c3view{height:340px}.c3list{max-height:none}}
 table.cmp{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--rule);
   border-radius:var(--r);overflow:hidden;box-shadow:var(--sh1)}
 table.cmp th{background:var(--navy);color:#fff;padding:16px 16px;text-align:left;vertical-align:top}
@@ -1464,6 +1534,7 @@ body.demo #demobar{display:flex}
   #compare.open{display:block!important;position:static;background:#fff}
   #compare.open .ahead{background:#fff;color:#000;position:static;box-shadow:none}
   #compare.open .ahead .btn{display:none}
+  #compare.open .c3{display:none}
   #compare.open table.cmp th{background:#EDF0F1;color:#000}
   #sheet{display:block!important;font-family:var(--sans);color:#000;font-size:10.5pt}
   #sheet .sh{display:flex;justify-content:space-between;align-items:flex-end;
@@ -1567,6 +1638,7 @@ body.demo #demobar{display:flex}
           </div>
           <div class="v3dinfo" id="v3dinfo" role="dialog" aria-label="Component detail"></div>
           <div class="v3dexp" id="v3dexp" role="dialog" aria-label="Assembly explorer"></div>
+          <div class="v3dmis" id="v3dmis" role="region" aria-label="Guided missions" aria-live="polite"></div>
           <div class="v3dtip" id="v3dtip" aria-hidden="true"></div>
           <div class="v3diso" id="v3diso" role="status" aria-live="polite"></div>
           <div class="v3dstat" id="v3dstat"></div>
@@ -1661,7 +1733,7 @@ body.demo #demobar{display:flex}
   </div>
   <div class="fbot">
     <span>© <span id="yr"></span> Titan Engineering &amp; Automation Ltd — A TATA Enterprise</span>
-    <span id="stamp">Configurator v13.0</span>
+    <span id="stamp">Configurator v14.0</span>
   </div>
 </div></footer>
 
@@ -2639,7 +2711,8 @@ var IC={
  eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
  eyeoff:'<path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-2.9 3.8M6.5 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
  back:'<path d="M19 5 9 12l10 7V5z"/><path d="M5 5v14"/>',
- rew:'<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>'
+ rew:'<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>',
+ flag:'<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>'
 };
 function ico(n,sz){
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '+
@@ -3367,6 +3440,7 @@ function stepReady(i){
   return !!S.plat && !!S.app && !!S.src && !!S.lens && S.pw!=null;
 }
 function render(){
+  misEvent('config');
   var guard=0;
   while(cur>0 && !stepReady(cur) && guard++<10) cur--;
   reach=Math.max(0,Math.min(reach,STEPS.length-1));
@@ -4203,6 +4277,7 @@ function saveCfg(name){
 function pushHist(){
   var p=P(); if(!p) return;
   if(typeof DEMO!=='undefined' && DEMO.on) return;   /* a presentation is not the user's work */
+  if(typeof MIS!=='undefined' && MIS.on) return;     /* nor is a mission */
   var d=desig();
   HIST = HIST.filter(function(x){ return x.desig!==d; });
   HIST.unshift({id:'h'+Date.now(), ts:Date.now(), desig:d, plat:p.n, st:snapshot(),
@@ -4256,9 +4331,164 @@ function openCompare(){
       return '<td'+cls+'>'+c[r[1]]+'</td>'; }).join('')+'</tr>';
   });
   t+='</table>';
-  $('#cmpBody').innerHTML='<p class="anote">Rows where the configurations differ are highlighted. The lowest indicative band is marked — it is not necessarily the right machine.</p>'+t;
+  $('#cmpBody').innerHTML='<div class="c3" id="cmp3"></div>'+
+    '<p class="anote">Rows where the configurations differ are highlighted. The lowest indicative band is marked — it is not necessarily the right machine.</p>'+t;
   $('#compare').classList.add('open'); document.body.style.overflow='hidden';
+  try{ cmp3Open(recs); }catch(e){ var h3=$('#cmp3'); if(h3) h3.innerHTML='<p class="anote">The 3D comparison could not be drawn: '+esc(e.message)+'</p>'; }
 }
+
+/* ---- comparison in 3D --------------------------------------------------------- */
+/* Two configurations, one machine: B as built, with what B adds over A in green,
+   what A has and B drops as a red ghost, and what both have but build
+   differently in amber. Both machines come from the configurator's own
+   mmBuild, with the configuration swapped in and back out the way the machine
+   story does it — the user's selection, step, run and view are never touched. */
+var CMP3={vp:null, recs:[], a:0, b:1, diff:null, only:false};
+function cfgState(st){
+  return {plat:st.plat, app:st.app, src:st.src, pw:st.pw, lens:st.lens,
+          mods:JSON.parse(JSON.stringify(st.mods||{})), sw:st.sw||'desktop',
+          extra:JSON.parse(JSON.stringify(st.extra||{})), notes:st.notes||'', target:st.target||null};
+}
+function withCfg(st, fn){
+  var kS=S, kC=cur, kSn=M3D.seen, kL=M3D.list, kF=famSel, kOn=SIM.on, r;
+  S=cfgState(st); cur=STEPS.length-1; famSel=PLAT[st.plat].fam; SIM.on=false;
+  try{
+    machineDims();
+    var g=mmGroups(), seen={};
+    g.forEach(function(x){ seen[x.id]=0; x.t=0; });
+    M3D.seen=seen; M3D.list=g;
+    r=fn();
+  } finally {
+    S=kS; cur=kC; M3D.seen=kSn; M3D.list=kL; famSel=kF; SIM.on=kOn;
+    try{ machineDims(); }catch(e){}
+  }
+  return r;
+}
+/* Per component: how many faces it draws and a fingerprint of their shapes.
+   Each face is measured from its own first vertex, so a part that has only
+   moved — the e-stop on a wider machine — matches, and a part that is built
+   differently — a longer frame member, a larger objective — does not. */
+function cmpScan(st){
+  return withCfg(st, function(){
+    var b=new B3(); b.q=1; b.lod=1; mmBuild(b, 0, CMP3.vp);
+    var m={};
+    b.f.forEach(function(f){
+      if(f.kind || !f.cid) return;
+      var e=m[f.cid]||(m[f.cid]={n:0, h:0, f:[]}), j, o=f.v[0];
+      e.n++; e.f.push(f); e.h+=f.v.length*1000;
+      for(j=1;j<f.v.length;j++){ var v=f.v[j];
+        e.h+=Math.round((v[0]-o[0])*100)*0.73+Math.round((v[1]-o[1])*100)*0.31+Math.round((v[2]-o[2])*100)*0.17; }
+    });
+    return {m:m, price:priceLines(), name:desig(), dims:machineDims()};
+  });
+}
+function hexMix(a, b, t){
+  if(typeof a!=='string' || a.charAt(0)!=='#' || a.length!==7) return b;
+  var x=rgb3(a), y=rgb3(b), h='#', i;
+  for(i=0;i<3;i++){ var v=Math.round(x[i]+(y[i]-x[i])*t); h+=(v<16?'0':'')+v.toString(16); }
+  return h;
+}
+function cmpDiff(A, B, sa, sb){
+  var D={add:{}, rem:{}, chg:{}, same:{}, remF:[], why:{}}, k;
+  for(k in B.m){ if(!A.m[k]) D.add[k]=1; else if(A.m[k].n!==B.m[k].n || Math.abs(A.m[k].h-B.m[k].h)>1e-6) D.chg[k]=1; else D.same[k]=1; }
+  /* the parametric model draws some different parts alike — a 30 W and a 100 W
+     fibre source share a rack — so a different specification counts as a
+     change whatever the geometry says, with the reason stated */
+  function spec(id, a, b){ if(a!==b && B.m[id] && A.m[id]){ D.chg[id]=1; delete D.same[id]; D.why[id]=a+' → '+b; } }
+  if(sa && sb){
+    spec('source', SRC[sa.src].n+' '+sa.pw+' W', SRC[sb.src].n+' '+sb.pw+' W');
+    spec('objective', LENS[sa.lens].n+' ('+LENS[sa.lens].fld+' mm field)', LENS[sb.lens].n+' ('+LENS[sb.lens].fld+' mm field)');
+    var pa=PLAT[sa.plat], pb=PLAT[sb.plat];
+    spec('workpiece', (pa.apps[sa.app]||{n:sa.app}).n, (pb.apps[sb.app]||{n:sb.app}).n);
+  }
+  for(k in A.m) if(!B.m[k]){
+    D.rem[k]=1;
+    A.m[k].f.forEach(function(f){
+      var g={}, q; for(q in f) g[q]=f[q];
+      g.c='#E5484D'; g.a=Math.min(0.32, f.a); g.e='rgba(229,72,77,.75)'; g.lw=0.8; g.em=0.1; g.two=true; g.cull=false;
+      D.remF.push(g);
+    });
+  }
+  /* priced lines: what B adds, drops or prices differently */
+  var la={}, lb={}, P2=[];
+  (A.price? A.price.lines : []).forEach(function(l){ la[l.id]=l; });
+  (B.price? B.price.lines : []).forEach(function(l){ lb[l.id]=l; });
+  for(k in lb) if(!la[k]) P2.push({k:'add', l:lb[k], d:lb[k].ext});
+  for(k in la) if(!lb[k]) P2.push({k:'rem', l:la[k], d:-la[k].ext});
+  for(k in lb) if(la[k] && Math.abs(la[k].ext-lb[k].ext)>0.5) P2.push({k:'chg', l:lb[k], d:lb[k].ext-la[k].ext});
+  D.lines=P2;
+  D.total=(B.price? B.price.total : 0)-(A.price? A.price.total : 0);
+  D.dims=[A.dims, B.dims];
+  return D;
+}
+function cmp3Build(b, T, vp){
+  var B=CMP3.recs[CMP3.b], D=CMP3.diff; if(!B || !D) return;
+  withCfg(B.st, function(){ mmBuild(b, 0, vp); });
+  var only=CMP3.only;
+  b.f.forEach(function(f){
+    if(f.kind==='shadow' || f.floor) return;
+    var k=f.cid;
+    if(k && D.add[k]){ if(!f.kind){ f.c=hexMix(f.c,'#3FB866',0.55); f.e='rgba(63,184,102,.95)'; f.lw=1.1; f.em=Math.max(f.em||0,0.14); } }
+    else if(k && D.chg[k]){ if(!f.kind){ f.c=hexMix(f.c,'#E8A33A',0.5); f.e='rgba(232,163,58,.95)'; f.lw=1.0; } }
+    else if(only){ f.a*=0.10; if(!f.kind) f.e='rgba(140,170,190,.18)'; }
+  });
+  for(var i=0;i<D.remF.length;i++) b.f.push(D.remF[i]);
+}
+function cmp3Pair(a, b){
+  CMP3.a=a; CMP3.b=b;
+  var A=cmpScan(CMP3.recs[a].st), B=cmpScan(CMP3.recs[b].st);
+  CMP3.diff=cmpDiff(A, B, CMP3.recs[a].st, CMP3.recs[b].st);
+  if(CMP3.vp){ CMP3.vp.reset && CMP3.vp.reset(); CMP3.vp.dirty=true; }
+  cmp3Text();
+}
+function cmp3Text(){
+  var box=$('#cmp3list'); if(!box) return;
+  var D=CMP3.diff, A=CMP3.recs[CMP3.a], B=CMP3.recs[CMP3.b];
+  function names(o){ var seen={}, out=[];
+    Object.keys(o).forEach(function(k){ var c=compInfo(k), n=(c? c.n : k)+(D.why[k]? ' — '+D.why[k] : ''); if(!seen[n]){ seen[n]=1; out.push(n); } });
+    return out.sort(); }
+  function ul(t, cls, arr){ return '<div class="c3g '+cls+'"><h5>'+t+' <i>'+arr.length+'</i></h5>'+
+      (arr.length? '<ul>'+arr.map(function(n){ return '<li>'+esc(n)+'</li>'; }).join('')+'</ul>' : '<p>None</p>')+'</div>'; }
+  var lines=D.lines.map(function(x){ return '<li><span>'+esc(x.k==='add'?'Added':x.k==='rem'?'Removed':'Changed')+' · '+esc(x.l.n)+'</span><b>'+
+      (x.d>=0?'+':'−')+sINR(Math.abs(Math.round(x.d))).replace('−','')+'</b></li>'; }).join('');
+  var da=D.dims[0], db=D.dims[1], dimTxt=function(d){ return inr(d.w)+' × '+inr(d.d)+' × '+inr(d.h)+' mm'+(d.stated?'':' est.'); };
+  var encl=(da.w!==db.w||da.d!==db.d||da.h!==db.h)?
+    '<p class="c3t">Enclosure: '+esc(dimTxt(da))+' → '+esc(dimTxt(db))+(da.stated&&db.stated? '' : ' — an estimated size follows power, field and the modules it must contain')+'</p>' : '';
+  box.innerHTML='<p class="c3pair"><b>A</b> '+esc(A.name||A.desig)+' <span>'+esc(A.desig)+'</span><br><b>B</b> '+esc(B.name||B.desig)+' <span>'+esc(B.desig)+'</span></p>'+
+    encl+ul('Added in B', 'add', names(D.add))+ul('Dropped from A', 'rem', names(D.rem))+ul('Built differently', 'chg', names(D.chg))+
+    '<div class="c3g"><h5>Price lines</h5>'+(lines? '<ul class="c3p">'+lines+'</ul>' : '<p>No priced line differs.</p>')+
+    '<p class="c3t">Indicative total, B − A: <b>'+(D.total>=0?'+':'−')+sINR(Math.abs(Math.round(D.total))).replace('−','')+'</b> · estimate, not a quotation</p></div>'+
+    '<p class="c3n">“Built differently” means the part is in both machines but drawn differently — usually a different platform, source, power or objective. Geometry is the parametric model, not CAD.</p>';
+}
+function cmp3Open(recs){
+  var host=$('#cmp3'); if(!host) return;
+  CMP3.recs=recs; CMP3.only=false;
+  var pairs=[]; for(var i=0;i<recs.length;i++) for(var j=i+1;j<recs.length;j++) pairs.push([i,j]);
+  host.innerHTML='<div class="c3head"><h3>Differences in 3D</h3><div class="c3ctl">'+
+      (pairs.length>1? pairs.map(function(p,k){ return '<button type="button" data-p="'+k+'"'+(k===0?' class="on"':'')+'>'+
+        String.fromCharCode(65+p[0])+' vs '+String.fromCharCode(65+p[1])+'</button>'; }).join('') : '')+
+      '<button type="button" data-a="swap">Swap A ↔ B</button>'+
+      '<button type="button" data-a="only" aria-pressed="false">Differences only</button></div></div>'+
+    '<div class="c3wrap"><div class="c3view"><canvas id="cmp3cv" aria-label="Machine B with its differences from machine A"></canvas>'+
+      '<div class="c3leg"><span class="add">Added in B</span><span class="rem">Dropped from A</span><span class="chg">Built differently</span></div></div>'+
+      '<div class="c3list" id="cmp3list"></div></div>';
+  var cv=$('#cmp3cv');
+  if(CMP3.vp) CMP3.vp.dead=true;
+  CMP3.vp=new Viewport(cv, cmp3Build, {yaw:-0.62, pitch:0.32, dist:47, ty:8.4, fov:0.62, minD:14, maxD:110,
+    spin:false, tags:false, view:{vmode:'solid', layers:{enc:true,glz:true,cov:true,lit:true,mod:true,util:true,flr:true,beam:false},
+    xk:0, expA:0, isoW:{_:1}}});
+  CMP3.vp.view=CMP3.vp.o.view;
+  host.onclick=function(ev){
+    var t=ev.target.closest('button'); if(!t) return;
+    if(t.hasAttribute('data-p')){
+      host.querySelectorAll('[data-p]').forEach(function(x){ x.classList.toggle('on', x===t); });
+      var p=pairs[+t.getAttribute('data-p')]; cmp3Pair(p[0], p[1]);
+    } else if(t.getAttribute('data-a')==='swap') cmp3Pair(CMP3.b, CMP3.a);
+    else if(t.getAttribute('data-a')==='only'){ CMP3.only=!CMP3.only; t.setAttribute('aria-pressed', CMP3.only?'true':'false'); t.classList.toggle('on', CMP3.only); CMP3.vp.dirty=true; }
+  };
+  cmp3Pair(0, 1);
+}
+function cmp3Close(){ if(CMP3.vp){ CMP3.vp.dead=true; CMP3.vp=null; } }
 
 /* ---- drawer: saved + history ------------------------------------------ */
 var DTAB='saved';
@@ -4587,7 +4817,7 @@ function advResults(b, r){
 }
 
 /* ---- overlay close wiring --------------------------------------------- */
-function closeOverlay(sel){ $(sel).classList.remove('open'); document.body.style.overflow=''; }
+function closeOverlay(sel){ $(sel).classList.remove('open'); document.body.style.overflow=''; if(sel==='#compare') cmp3Close(); }
 
 /* ============================ ADMIN PANEL ==============================
    Edits mutate the live data objects, so the configurator updates instantly.
@@ -6657,8 +6887,11 @@ Viewport.prototype.paint = function(T){
   var fs=(H*0.5-ins*0.40)/Math.tan(cam.fov*0.5);
   var L1=LIGHT1, L2=LIGHT2, L3=LIGHT3;
   var HV=v3n(v3s(L1, fwd));                       /* Blinn half-vector, camera-facing */
-  var fogA=this.o.fogA==null? cam.dist*0.60 : this.o.fogA;
-  var fogB=this.o.fogB==null? cam.dist*2.30 : this.o.fogB;
+  /* Inspection lighting: flat, bright and glare-free, no depth fog, every face
+     outlined — for reading form and fit rather than for presentation */
+  var insp=this.light==='inspection';
+  var fogA=insp? 1e6 : this.o.fogA==null? cam.dist*0.60 : this.o.fogA;
+  var fogB=insp? 2e6 : this.o.fogB==null? cam.dist*2.30 : this.o.fogB;
   var fogC=rgb3(this.o.fog||'#0B2033');
   var mx=W+90, my=H+90;
 
@@ -6733,13 +6966,14 @@ Viewport.prototype.paint = function(T){
        no ray is cast — but they stop parts reading as though they float. */
     var ao  = f.floor? 1 : 0.62+0.38*clamp(ctr[1]/5.5,0,1);
     if(!f.floor) ao *= 0.80+0.20*(nn[1]*0.5+0.5);
-    var kk  = (0.26 + 0.62*lam + 0.20*fil + 0.10*bnc) * ao;
+    var kk  = insp? (0.50 + 0.42*lam + 0.22*fil + 0.08*bnc) * (f.floor? 1 : 0.90+0.10*(nn[1]*0.5+0.5))
+                  : (0.26 + 0.62*lam + 0.20*fil + 0.10*bnc) * ao;
 
     /* Blinn specular, and a fresnel rim that makes glazing read as glass */
     var spc=0, frs=0;
     if(f.sp){
       var hd=Math.max(0, v3d(nn,HV));
-      spc = f.sp * Math.pow(hd, f.sh||28);
+      spc = f.sp * Math.pow(hd, f.sh||28) * (insp? 0.3 : 1);
     }
     if(f.fr){
       var vd=1-Math.abs(v3d(nn, v3n(toEye)));
@@ -6779,7 +7013,7 @@ Viewport.prototype.paint = function(T){
   emit(glassy);
 
   /* ---- vignette ---- */
-  if(this.quality>0.6){
+  if(this.quality>0.6 && !insp){
     var vg=ctx.createRadialGradient(cx,H*0.46,H*0.28,cx,H*0.5,H*0.95);
     vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(2,8,15,.42)');
     ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
@@ -6908,6 +7142,9 @@ Viewport.prototype.drawFace = function(it, fogA, fogB, fogC, fs){
   ctx.fillStyle='rgba('+(r0>255?255:r0|0)+','+(g0>255?255:g0|0)+','+(b0>255?255:b0|0)+','+alpha+')';
   ctx.fill();
   if(ff.e){ ctx.strokeStyle=ff.e; ctx.lineWidth=ff.lw||0.7; ctx.stroke(); }
+  else if(this.light==='inspection' && ff.a>0.5 && !ff.floor){
+    ctx.strokeStyle='rgba(6,16,26,.62)'; ctx.lineWidth=0.6; ctx.stroke();
+  }
   else if(this.fine && ff.a>0.9){
     /* Two abutting polygons each anti-alias their shared edge independently, so
        the half-covered pixels do not sum to full cover and the background shows
@@ -7657,25 +7894,31 @@ function gFrame(b,R,a){
     b.comp('glazing');
     var gl=MT('glazing',{two:true,cull:false});
     if(!R.L('glz')) gl.a=0;
+    /* the front glazing leaves the door opening to the door itself */
+    var dhw=Math.min(3.4, MW/2-0.5);
     if(!R.cut){
-      b.quad([-MW/2+0.3,0.25,MD/2],[MW/2-0.3,0.25,MD/2],[MW/2-0.3,CH-0.3,MD/2],[-MW/2+0.3,CH-0.3,MD/2],gl);
+      b.quad([-MW/2+0.3,0.25,MD/2],[-dhw,0.25,MD/2],[-dhw,CH-0.3,MD/2],[-MW/2+0.3,CH-0.3,MD/2],gl);
+      b.quad([dhw,0.25,MD/2],[MW/2-0.3,0.25,MD/2],[MW/2-0.3,CH-0.3,MD/2],[dhw,CH-0.3,MD/2],gl);
       b.quad([MW/2,0.25,MD/2-0.3],[MW/2,0.25,-MD/2+0.3],[MW/2,CH-0.3,-MD/2+0.3],[MW/2,CH-0.3,MD/2-0.3],gl);
     }
     b.quad([-MW/2,0.25,-MD/2+0.3],[-MW/2,0.25,MD/2-0.3],[-MW/2,CH-0.3,MD/2-0.3],[-MW/2,CH-0.3,-MD/2+0.3],gl);
     if(!R.cut){
-      /* inspection door: frame, handle, hinges, interlock switch */
+      /* inspection door: a glazed panel swinging outward on its hinge line (the
+         door joint), its handle, the fixed hinges and the interlock switch */
       b.comp('chamberdoor');
-      b.line([[[-3.4,0.3,MD/2+0.02],[-3.4,CH-0.35,MD/2+0.02]],
-              [[3.4,0.3,MD/2+0.02],[3.4,CH-0.35,MD/2+0.02]],
-              [[-3.4,CH-0.35,MD/2+0.02],[3.4,CH-0.35,MD/2+0.02]],
-              [[-3.4,0.3,MD/2+0.02],[3.4,0.3,MD/2+0.02]]],{c:'rgba(180,220,235,.55)',lw:1.2});
-      b.push(); b.t(3.05,CH*0.48,MD/2+0.12); b.handle(1.5); b.pop();
-      b.push(); b.t(-3.4,CH*0.30,MD/2+0.04); b.hinge(); b.pop();
-      b.push(); b.t(-3.4,CH*0.70,MD/2+0.04); b.hinge(); b.pop();
+      var dw=dhw*2, da=R.doorA||0;
+      b.push(); b.t(-dhw,0,MD/2+0.02); b.ry(-da);
+      b.quad([0,0.3,0],[dw,0.3,0],[dw,CH-0.35,0],[0,CH-0.35,0], MT('glazing',{two:true,cull:false,a:gl.a}));
+      b.line([[[0,0.3,0],[0,CH-0.35,0]],[[dw,0.3,0],[dw,CH-0.35,0]],
+              [[0,CH-0.35,0],[dw,CH-0.35,0]],[[0,0.3,0],[dw,0.3,0]]],{c:'rgba(180,220,235,.55)',lw:1.2});
+      b.push(); b.t(dw-0.35,CH*0.48,0.10); b.handle(1.5); b.pop();
+      b.pop();
+      b.push(); b.t(-dhw,CH*0.30,MD/2+0.04); b.hinge(); b.pop();
+      b.push(); b.t(-dhw,CH*0.70,MD/2+0.04); b.hinge(); b.pop();
       b.comp('interlock');
-      b.push(); b.t(-3.4,CH-0.72,MD/2+0.10);
+      b.push(); b.t(-dhw,CH-0.72,MD/2+0.10);
       b.box(0.30,0.46,0.20,MT('warnY'));
-      b.dot([0,0.10,0.14],0.10,{c:R.sim.on?C3.green:C3.warn,a:.95});
+      b.dot([0,0.10,0.14],0.10,{c:da>0.02? C3.red : R.sim.on?C3.green:C3.warn,a:.95});
       b.pop();
       /* laser warning label beside the door */
       b.comp('warnlabel');
@@ -8504,7 +8747,7 @@ MODG.conveyor=function(b,R){
   /* blade stopper at the process position */
   b.comp('stopper');
   b.push(); b.t(MW/2-1.0, y+0.30, -1.35);
-  b.box(0.18,0.55*(1-(R.clamp||0)*0.55),0.6,MT('stainless'));
+  b.box(0.18,0.12+0.43*(R.stop==null? 1 : R.stop),0.6,MT('stainless'));
   b.pop();
   /* inbound and outbound presence sensors */
   b.comp('conveyorsensor');
@@ -9155,9 +9398,11 @@ function simStart(){
   simSay('Interlocks closed · beam enabled', 1.6);
   M3D.vp && (M3D.vp.dirty=true);
   simCtlSync(); m3dSync(); simHud();
+  misEvent('simstart');
 }
 function simStop(){
   SIM.on=false; SIM.sparks=[]; SIM.msg=''; SIM.fault=null; SIM.pend=null;
+  simCtlSync();
   M3D.vp && (M3D.vp.dirty=true);
   m3dSync(); simHud();
   /* simHud clears the telemetry and returns early once the run is off, so the
@@ -9244,8 +9489,10 @@ function simAdvance(d){
      stepping must not count parts that never ran */
   if(SIM.hold) return;
   if(SIM.fault){
-    /* a stoppage holds the cycle exactly where it happened until it is cleared */
-    SIM.faultT-=d;
+    /* a stoppage holds the cycle exactly where it happened until it is cleared;
+       a mission holds it until the operator acknowledges it */
+    SIM.faultEl=(SIM.faultEl||0)+d;
+    if(!SIM.faultHold) SIM.faultT-=d;
     if(SIM.faultT<=0){ SIM.fault=null; SIM.fix=''; simSay('Reset acknowledged — resuming the cycle', 1.4); }
     return;
   }
@@ -9254,13 +9501,15 @@ function simAdvance(d){
   if(SIM.pend && before<SIM.pend.t && SIM.t>=SIM.pend.t){
     var f=SIM.pend.f;
     SIM.t=SIM.pend.t; SIM.pend=null;          /* stop exactly where it happens */
-    SIM.fault=f.k; SIM.faultT=2.6; SIM.msg=f.m; SIM.msgT=0;
+    SIM.fault=f.k; SIM.faultT=2.6; SIM.faultEl=0; SIM.msg=f.m; SIM.msgT=0;
     SIM.fix=f.fix+' — typically '+f.mttr+' s on a real machine';
     SIM.stops=(SIM.stops||0)+1;
+    misEvent('fault', f.k);
   }
   if(SIM.t>=SIM.total){
     SIM.t-=SIM.total; SIM.cyc++;
     if(SIM.grade==='NG') SIM.ng++;
+    misEvent('cycle');
     if(!SIM.loop){
       SIM.t=SIM.total-0.001; SIM.rate=0; SIM.hold=true; simSay('Single cycle complete', 1e9);
       simCtlSync(); simHud(); return;
@@ -9304,8 +9553,9 @@ function simCtlSync(){
   var sp=$('#simSpeed'), st=$('#simStep'), lp=$('#simLoop'), fb=$('#simFault');
   if(sp){ sp.textContent = SIM.rate? SIM.rate+'×' : 'II'; sp.classList.toggle('paused', SIM.rate===0);
           sp.title = SIM.rate? 'Playback '+SIM.rate+'× — click to change, then pause' : 'Paused — click to resume'; }
-  if(st) st.style.display = SIM.rate===0? 'inline-flex':'none';
-  var bk=$('#simBack'); if(bk) bk.style.display = SIM.rate===0? 'inline-flex':'none';
+  /* stepping needs a paused run — a stopped machine has nothing to step */
+  if(st) st.style.display = SIM.on && SIM.rate===0? 'inline-flex':'none';
+  var bk=$('#simBack'); if(bk) bk.style.display = SIM.on && SIM.rate===0? 'inline-flex':'none';
   if(lp){ lp.textContent = SIM.loop? '↻' : '1';
           lp.title = SIM.loop? 'Looping — click for a single cycle' : 'Single cycle — click to loop';
           lp.classList.toggle('paused', !SIM.loop); }
@@ -9384,6 +9634,16 @@ function mmBuild(b, T, vp){
     R.shut = (k==='PROCESS'||k==='VERIFY')? 0 : easeIO(u)*0.6;
   } else if(p && S.src && cur>=3){
     R.beamIdle = true;
+  }
+  /* chamber door: the operator opens it to load and unload by hand, and it is
+     what the guard stoppage demonstrates. Blade stopper: up to stop the part,
+     dropped to release it, up again once it has passed. */
+  R.doorA=0; R.stop=1;
+  if(SIM.on){
+    var hand=loadKind()==='hand', door=function(v){ return Math.min(1, v/0.18, (1-v)/0.18); };
+    if(hand && (k==='LOAD'||k==='UNLOAD')) R.doorA=1.45*easeIO(Math.max(0,door(u)));
+    if(SIM.fault==='interlock'){ var el=SIM.faultEl||0; R.doorA=1.2*easeIO(clamp(Math.min(el/0.6, SIM.faultT/0.6),0,1)); }
+    if(k==='UNLOAD') R.stop = u<0.75? 1-easeIO(Math.min(1,u/0.08)) : easeIO(Math.min(1,(u-0.75)/0.2));
   }
   R.armA=[0,0,0,0]; R.armB=[0,0,0,0];
   if(R.deliv==='robot'){
@@ -10093,7 +10353,11 @@ var KIN={
   gx:{n:'Galvo mirror X', type:'revolute', axis:'mirror shaft', parent:'scanhead', child:'galvo',
      unit:'° mech', k:1, lim:[-12,12], home:0},
   gy:{n:'Galvo mirror Y', type:'revolute', axis:'mirror shaft', parent:'scanhead', child:'galvo',
-     unit:'° mech', k:1, lim:[-12,12], home:0}
+     unit:'° mech', k:1, lim:[-12,12], home:0},
+  door:{n:'Chamber door', type:'revolute', axis:'+Y hinge line', parent:'frame', child:'chamberdoor',
+     unit:'°', k:180/Math.PI, lim:[0,1.66], home:0},
+  stop:{n:'Blade stopper', type:'prismatic', axis:'+Y', parent:'conveyor', child:'stopper',
+     unit:'% raised', k:100, lim:[0,1], home:1}
 };
 /* Each build poses its own machine: the live view, the machine story and the
    health check all pass through here. Only the live view's pose is published
@@ -10119,6 +10383,8 @@ function kinPose(R){
   R.partX=set('transfer', R.partX||0);
   R.clamp=set('clamp', R.clamp);
   if(hasMod('rotoidx')||hasMod('turntbl')) R.dial=set('dial', ((R.dial%(2*Math.PI))+2*Math.PI)%(2*Math.PI));
+  if(R.deliv!=='handpiece' && R.deliv!=='robot') R.doorA=set('door', R.doorA||0);
+  if(hasMod('conveyor')) R.stop=set('stop', R.stop==null? 1 : R.stop);
 }
 /* Galvo mirror angles from the spot position through the ideal f-theta
    relation r = f·θ: the optical deflection is the field offset over the focal
@@ -10137,13 +10403,14 @@ function kinCommit(R){
   for(k in R.kin) if(none) R.kin[k].on=false;
   for(k in R.kin){ var s2=R.kin[k], j=KIN[k]; j.on=s2.on; j.q=s2.q; j.lim=s2.lim; j.basis=s2.basis; j.doc=s2.doc; }
 }
+function kinNum(j, v){ return (j.unit==='mm'||j.unit.charAt(0)==='%'||j.unit==='°')? Math.round(v*j.k) : (v*j.k).toFixed(1); }
 function kinFmt(id){
   var j=KIN[id], v=j.q==null? j.home : j.q;
-  return (j.unit==='mm'? Math.round(v*j.k) : j.unit==='% closed'? Math.round(v*100) : (v*j.k).toFixed(1))+' '+j.unit;
+  return kinNum(j,v)+' '+j.unit;
 }
 function kinRange(id){
-  var j=KIN[id], f=function(v){ return j.unit==='mm'? Math.round(v*j.k) : j.unit==='% closed'? Math.round(v*100) : (v*j.k).toFixed(1); };
-  return f(j.lim[0])+' to '+f(j.lim[1])+' '+j.unit;
+  var j=KIN[id];
+  return kinNum(j,j.lim[0])+' to '+kinNum(j,j.lim[1])+' '+j.unit;
 }
 /* Engineering overlay: the datum, each active axis with its travel, and the
    joint values — drawn only with the machine assembled, so nothing it marks
@@ -10224,12 +10491,15 @@ function m3dInit(){
     bt.classList.toggle('on', open);
   });
   buildLayerPanel();
-  var expBtn=tool('tree','Assembly explorer — components and joints', function(){ expOpen(); });
+  var expBtn=tool('tree','Assembly explorer — components, joints and questions', function(){ expOpen(); });
   expBtn.id='expBtn';
   expInit();
+  var misBtn=tool('flag','Guided missions', function(){ var pn=$('#v3dmis'); pn.classList.toggle('open'); misDraw(); });
+  misBtn.id='misBtn';
+  misInit();
   /* presets and tools share a row only while the viewer is wide enough for both */
   var vw=$('.view');
-  function vNarrow(){ if(vw) vw.classList.toggle('narrow', vw.getBoundingClientRect().width<452); }
+  function vNarrow(){ if(vw) vw.classList.toggle('narrow', vw.getBoundingClientRect().width<492); }
   if(window.ResizeObserver && vw) new ResizeObserver(vNarrow).observe(vw);
   vNarrow();
   tool('reset','Reset view', function(){ M3D.vp.reset(); isoSet(null); expClear(); });
@@ -10382,6 +10652,14 @@ function buildLayerPanel(){
     };
     pn.appendChild(sp);
   }
+  pn.appendChild(el('h5','','Lighting'));
+  var lt=el('div','lmode');
+  [['studio','Studio'],['inspection','Inspection']].forEach(function(m){
+    var b3=el('button', (M3D.light||'studio')===m[0]?'on':'', m[1]);
+    b3.onclick=function(){ M3D.light=m[0]; if(M3D.vp){ M3D.vp.light=m[0]; M3D.vp.dirty=true; } buildLayerPanel(); };
+    lt.appendChild(b3);
+  });
+  pn.appendChild(lt);
   pn.appendChild(el('h5','','Layers'));
   LAYERDEF.forEach(function(L){
     var on=M3D.layers[L[0]]!==false;
@@ -10540,6 +10818,7 @@ function showComp(id, hf){
   pn.querySelector('.ix').onclick=function(){ pn.classList.remove('open'); M3D.card=null; };
   pn.classList.add('open');
   if(CAD.state==='idle') cadLoad();
+  misEvent('inspect', id||null);
 }
 /* The engineering record under the description: identity, geometry, CAD
    search, where it is priced, the joint it moves on and its neighbours. */
@@ -10592,6 +10871,7 @@ function expOpen(on){
   if(on==null) on=!pn.classList.contains('open');
   pn.classList.toggle('open', on);
   var bt=$('#expBtn'); if(bt) bt.classList.toggle('on', on);
+  v3dPaneled();
   if(on){ cadLoad(); expRefresh(true); var q=pn.querySelector('input'); if(q && matchMedia('(pointer:fine)').matches) q.focus(); }
 }
 function expSelect(key, gid, add){
@@ -10609,6 +10889,8 @@ function expRefresh(force){
   var list=M3D.scene||[], q=(M3D.expQ||'').toLowerCase().trim(), tab=M3D.expTab||'c';
   var sig=tab+'#'+q+'#'+list.map(function(x){ return x.gid+'|'+x.key; }).join(',')+'#'+JSON.stringify(M3D.hide||{})+'#'+
           (M3D.sel||[]).join(',')+'#'+(M3D.isoSel?1:0)+'#'+CAD.state+'#'+Object.keys(CAD.mesh).join(',');
+  /* the Ask tab redraws only when the conversation changes, so typing survives */
+  if(tab==='a') sig='a#'+ASK.log.length+'#'+(ASK.log[0]? ASK.log[0].q : '');
   if(tab==='j') sig+='#'+Object.keys(KIN).map(function(k){ return KIN[k].on? kinFmt(k) : ''; }).join(',');
   if(!force && sig===M3D.expSig) return;
   if(!force && tab==='j' && Date.now()-(M3D.expT||0)<200) return;
@@ -10618,6 +10900,7 @@ function expRefresh(force){
   pn.querySelector('.xsrch').style.display = tab==='c'? '' : 'none';
   foot.style.display = tab==='c'? '' : 'none';
   if(tab==='j'){ body.innerHTML=kinTable(); return; }
+  if(tab==='a'){ body.innerHTML=askPane(); var inp=body.querySelector('.xask input'); if(inp && matchMedia('(pointer:fine)').matches) inp.focus(); return; }
   var groups={}, order=[], sel={}, H=M3D.hide||{}, shown=0;
   (M3D.sel||[]).forEach(function(k){ sel[k]=1; });
   list.forEach(function(x){
@@ -10669,7 +10952,8 @@ function expInit(){
   var pn=$('#v3dexp'); if(!pn) return;
   pn.innerHTML='<div class="xhead"><div class="xtab" role="tablist">'+
       '<button type="button" role="tab" data-t="c" aria-selected="true">Components</button>'+
-      '<button type="button" role="tab" data-t="j" aria-selected="false">Joints</button></div>'+
+      '<button type="button" role="tab" data-t="j" aria-selected="false">Joints</button>'+
+      '<button type="button" role="tab" data-t="a" aria-selected="false">Ask</button></div>'+
       '<button type="button" class="xx" aria-label="Close explorer">'+ico('x')+'</button></div>'+
     '<div class="xsrch"><input type="search" placeholder="Search components" aria-label="Search components" autocomplete="off"></div>'+
     '<div class="xbody"></div>'+
@@ -10682,8 +10966,12 @@ function expInit(){
   pn.querySelectorAll('.xtab button').forEach(function(b2){
     b2.onclick=function(){ M3D.expTab=b2.getAttribute('data-t'); expRefresh(true); };
   });
+  pn.querySelector('.xbody').addEventListener('submit', function(e){
+    e.preventDefault(); var inp=e.target.querySelector('input'); if(inp && inp.value.trim()) askRun(inp.value.trim());
+  });
   pn.querySelector('.xbody').addEventListener('click', function(e){
     var t=e.target.closest('button'); if(!t) return;
+    if(t.hasAttribute('data-q')){ askRun(t.getAttribute('data-q')); return; }
     if(t.classList.contains('xgh')){ var g=t.getAttribute('data-g'); M3D.expCol=M3D.expCol||{}; M3D.expCol[g]=!M3D.expCol[g]; expRefresh(true); return; }
     var k=t.getAttribute('data-k'); if(!k) return;
     if(t.classList.contains('xv')){ M3D.hide=M3D.hide||{}; M3D.hide[k]=!M3D.hide[k]; if(!M3D.hide[k]) delete M3D.hide[k]; }
@@ -10698,6 +10986,389 @@ function expClear(){
   M3D.hide={}; M3D.sel=[]; M3D.isoSel=false;
   if(M3D.vp) M3D.vp.dirty=true;
   expRefresh(true);
+}
+
+/* ==========================================================================
+   ENGINEERING ASSISTANT — questions about the configured machine, answered by
+   the configurator's own data and models in the browser. It matches the
+   question to a topic with plain rules, computes the answer from the same
+   functions the rest of the page uses (optics, physics, process model, price,
+   kinematics, component library) and highlights the part it is about. It is
+   not an AI service: anything outside its topics, it says so.
+   ========================================================================== */
+var ASK={log:[]};
+/* words people use for a part, mapped to the component record */
+var ASKWORDS=[
+  [/scan ?head|scanner|galvo(?!.*angle)/,'scanhead'], [/mirror/,'galvo'], [/f.?theta|objective|lens/,'objective'],
+  [/collimat|beam expander/,'collimator'], [/fib(re|er) (connector|cable)|qbh/,'fibreconn'], [/beam (guide|delivery)|process fib/,'beamguide'],
+  [/camera|vision/,'vision'], [/ring ?light/,'ringlight'], [/e-?stop|emergency/,'estop'], [/beacon|tower|stack light/,'tower'],
+  [/hmi|pendant|screen/,'hmi'], [/interlock/,'interlock'], [/door/,'chamberdoor'], [/glaz|window|viewing/,'glazing'],
+  [/chiller|cooling unit/,'chiller'], [/fume|extract/,'fume'], [/clamp/,'clamp'], [/locator|pin/,'locator'],
+  [/fixture/,'fixture'], [/conveyor|belt/,'conveyor'], [/stopper/,'stopper'], [/servo|motor/,'zservo'],
+  [/ball ?screw/,'zscrew'], [/rail|guide/,'zrail'], [/energy chain|drag chain|cable chain/,'cablechain'],
+  [/plc/,'plc'], [/safety relay/,'safetyrelay'], [/power supply|psu/,'psu'], [/industrial pc|ipc|computer/,'ipc'],
+  [/height sensor|standoff sensor/,'heightsensor'], [/air.?assist|nozzle|cross.?jet/,'airassist'],
+  [/feet|levell?ing/,'feet'], [/frame|extrusion/,'frame'], [/cabinet/,'cabinet'], [/workpiece|part\b/,'workpiece'],
+  [/laser source|source|resonator|laser\b/,'source']
+];
+function askFind(q){
+  for(var i=0;i<ASKWORDS.length;i++) if(ASKWORDS[i][0].test(q)) return ASKWORDS[i][1];
+  var best=null, bl=0, k;
+  for(k in COMPINFO){ var n=COMPINFO[k].n.toLowerCase(); if(q.indexOf(n)>=0 && n.length>bl){ best=k; bl=n.length; } }
+  return best;
+}
+function askDrawn(cid){ var sc=M3D.scene||[]; for(var i=0;i<sc.length;i++) if(sc[i].cid===cid) return sc[i]; return null; }
+function askAnswer(q0){
+  var q=String(q0||'').toLowerCase().trim(), p=P(), o=null, ph=null, pm=null, s=S.src? SRC[S.src] : null, L=S.lens? LENS[S.lens] : null;
+  try{ o=optics(); }catch(e){} try{ ph=physics(); }catch(e){} try{ pm=procModel(); }catch(e){}
+  function A2(h, cid, basis){ return {h:h, cid:cid||null, basis:basis}; }
+  if(!q) return A2('Ask about the configured machine — spot size, depth of focus, field, source, cycle time, price, heat load, scan angle, Z travel, or what any part is and does.', null, 'help');
+  if(!p) return A2('No machine is configured yet. Choose a family and platform first, then ask about it.', null, 'help');
+  var need=function(what){ return A2('That depends on the '+what+', which is not chosen yet.', null, 'help'); };
+  var comp=askFind(q);
+  /* "what does the chiller do?" is about the part, not its numbers */
+  if(comp && /what (does|do|is|are)\b|where is|what.*for\b|explain|describe/.test(q) &&
+     !/spot|depth|angle|heat load|stroke|size|price|cost|time|power|wavelength|field|material|distance|pulse|class/.test(q)) return askPart(comp);
+
+  if(/spot|focus(ed)? (size|diameter)|beam (size|diameter|waist)/.test(q)){
+    if(!o) return need('source and objective');
+    return A2('Focused spot ≈ <b>'+o.spot.toFixed(0)+' µm</b>, from d = 4·λ·f·M² / (π·D) with λ '+esc(s.wl)+', f '+L.f+' mm ('+esc(L.n)+'), M² '+s.m2+
+      ' and a '+s.dia+' mm beam at the objective. It is a diffraction-limited estimate; the real spot also depends on alignment and lens quality.', 'objective', 'computed — optics model');
+  }
+  if(/depth of (focus|field)|\bdof\b|rayleigh/.test(q)){
+    if(!o) return need('source and objective');
+    return A2('Depth of focus ± <b>'+(o.dof/1000).toFixed(2)+' mm</b> — the Rayleigh range, where the spot grows to √2 × its waist. To hold the spot within 5 % the window is ± '+
+      (o.dof5/1000).toFixed(2)+' mm.'+(hasMod('autofoc')? ' Auto Z-focus is fitted, so the head tracks part height.' : ' Part height must stay inside it unless auto Z-focus is fitted.'), 'objective', 'computed — optics model');
+  }
+  if(/working distance|stand.?off|clearance under/.test(q)){
+    if(!L) return need('objective');
+    return A2('The working distance is <b>not in the product data</b>. It is lens-specific and is not the focal length — take it from the '+esc(L.n)+' objective datasheet. The focal length is '+L.f+' mm.', 'objective', 'product data — gap stated');
+  }
+  if(/focal length/.test(q)){
+    if(!L) return need('objective');
+    return A2('The '+esc(L.n)+' objective has an effective focal length of <b>'+L.f+' mm</b> and a '+L.fld+' × '+L.fld+' mm field.', 'objective', 'product data');
+  }
+  if(/scan (angle|range)|galvo.*angle|mirror angle|deflection/.test(q)){
+    if(!L) return need('objective');
+    var lim=(L.fld/2)/L.f/2*180/Math.PI;
+    return A2('Each galvo mirror turns through about <b>± '+lim.toFixed(1)+'° mechanical</b> to cover the '+L.fld+' mm field with the '+esc(L.n)+' objective — '+
+      'the ideal f-θ relation r = f·θ gives the optical angle, and a mirror deflects the beam through twice its own rotation.', 'galvo', 'computed — ideal f-θ relation');
+  }
+  if(/field|scan area|marking area|work(ing)? area/.test(q)){
+    if(!L) return need('objective');
+    return A2('Addressable field <b>'+L.fld+' × '+L.fld+' mm</b> with the '+esc(L.n)+' objective. Larger features need field stitching or an axis move.', 'objective', 'product data');
+  }
+  if(/pulse|repetition|frequency|khz|\bns\b|duration/.test(q)){
+    if(!s) return need('source');
+    return A2(s.n+' ('+esc(s.wl)+'): '+(s.mode==='cw'? 'continuous wave — no pulses.' :
+      'pulse duration '+s.tau+' '+(s.tauU||'ns')+(s.tauRange? ' (adjustable '+s.tauRange[0]+'–'+s.tauRange[1]+')' : '')+(s.frep? ', repetition '+s.frep[0]+'–'+s.frep[1]+' kHz' : '')+'.')+
+      (ph&&ph.Ep_mJ!=null? ' At '+S.pw+' W that is about '+num(ph.Ep_mJ)+' mJ per pulse at '+num(ph.frep_khz)+' kHz.' : ''), 'source', 'product data, computed pulse energy');
+  }
+  if(/wavelength|which laser|what laser|laser type|source/.test(q) && !/power supply/.test(q)){
+    if(!s) return need('source');
+    return A2('<b>'+s.n+'</b>, '+esc(s.wl)+', '+(s.mode==='cw'? 'continuous wave' : 'pulsed')+', beam quality M² '+s.m2+', configured at '+S.pw+' W.', 'source', 'product data');
+  }
+  if(/power|watt/.test(q) && !/power supply/.test(q)){
+    if(!s) return need('source');
+    return A2('Configured at <b>'+S.pw+' W</b> average. This platform offers '+powersFor(p,S.src).join(', ')+' W for the '+esc(s.n)+'.', 'source', 'product data');
+  }
+  if(/heat|chiller|cool/.test(q)){
+    if(!ph) return need('source and power');
+    return A2('About <b>'+num(ph.heat_kW)+' kW</b> of heat to reject at '+S.pw+' W — the source’s wall-plug draw less the optical output. '+esc(ph.cool)+'.', 'chiller', 'computed — wall-plug efficiency');
+  }
+  if(/cycle|throughput|per hour|parts?\/h|how fast|takt|rate/.test(q)){
+    var ran=SIM.cycle && SIM.forKey===simKey();
+    if(ran) return A2('The last simulated cycle took <b>'+fmtS(SIM.cycle)+'</b>, about '+Math.round(3600/SIM.cycle)+' parts/h, of which '+fmtS(SIM.procS)+' is processing. '+
+      'It is simulated from the process model and the handling phases — not a measured cycle time.', 'workpiece', 'computed — process model and simulation');
+    if(pm) return A2('Processing the configured mark takes about <b>'+fmtS(pm.t)+'</b> ('+Math.round(pm.len)+' mm of path at '+Math.round(pm.v)+' mm/s). Run the simulation for the full cycle including handling. '+
+      'Both are modelled, not measured.', 'workpiece', 'computed — process model');
+    return need('application');
+  }
+  if(/lead ?time|delivery|how long.*(build|deliver)/.test(q)){
+    return A2('Indicative lead time <b>'+(p.lead||'—')+' weeks</b> from order for the '+esc(p.n)+' — held per platform, not per component.', null, 'product data');
+  }
+  if(/price|cost|budget|how much|quote/.test(q)){
+    var pr=priceLines(); if(!pr) return need('platform');
+    return A2('Indicative band <b>'+shortINR(pr.lo)+' – '+shortINR(pr.hi)+'</b> ex-works ('+pr.lines.length+' lines in the commercial breakdown). Every line is an estimate — not a quotation and not TEAL procurement data.', null, 'estimate');
+  }
+  if(/z.?axis|z travel|stroke|head height/.test(q)){
+    var z=KIN.z;
+    return A2(z.doc? 'The product data gives a <b>'+z.doc.replace(' (product data)','')+'</b>. The animation uses '+kinRange('z')+'.' :
+      'The product data gives <b>no Z stroke</b> for the '+esc(p.n)+'. The animation uses '+kinRange('z')+', labelled as the animation envelope.', 'zcarriage', z.doc? 'product data' : 'product data — gap stated');
+  }
+  if(/how big|dimension|footprint|size of (the )?machine|machine size/.test(q)){
+    var dm=machineDims();
+    return A2('About <b>'+inr(dm.w)+' × '+inr(dm.d)+' × '+inr(dm.h)+' mm</b> (W × D × H)'+(dm.stated? ', as stated in the specification.' : ' — estimated from power, field and fitted modules; the specification does not state it.'), 'frame', dm.stated? 'product data' : 'estimate');
+  }
+  if(/material|absorb|steel|aluminium|alumin|substrate/.test(q)){
+    var a=A(), m=a? MAT[a.mat] : null; if(!m) return need('application');
+    var band=s? (s.um<0.4? 'uv' : s.um<0.6? 'green' : s.um>5? 'co2' : 'ir') : null;
+    return A2('The application works <b>'+esc(m.n)+'</b>'+(band&&m.a&&m.a[band]!=null? ', which absorbs about '+Math.round(m.a[band]*100)+' % at '+s.wl : '')+'. '+esc(a.w||''), 'workpiece', 'product data');
+  }
+  if(/safe|class|iec|60825/.test(q)){
+    var sg=specGet(p,/safety|laser class/i);
+    if(!sg) return A2('The specification of the '+esc(p.n)+' states <b>no laser class</b>. Take it from the machine’s risk assessment and conformity documentation.', null, 'product data — gap stated');
+    return A2('The specification states: <b>'+esc(sg.row[1])+'</b>. On an enclosed machine the coded door interlock removes beam-enable whenever the guard opens.', askDrawn('interlock')? 'interlock' : null, 'product data');
+  }
+  if(comp) return askPart(comp);
+  return A2('That is outside what I can work out from the configurator. I answer from its own data and models: spot size, depth of focus, field, focal and working distance, scan angle, source, pulse, power, heat load, cycle time, lead time, price, Z travel, machine size, material, safety class — and what any drawn part is and does.', null, 'help');
+}
+function askPart(comp){
+  var c=compInfo(comp), d=askDrawn(comp);
+  if(!c) return {h:'No component record matches that.', cid:null, basis:'help'};
+  return {h:'<b>'+esc(c.n)+'</b> — '+esc(c.d)+' '+esc(c.f)+(c.s&&c.s!=='—'? ' Spec: '+esc(c.s)+'.' : '')+
+    (d? '' : ' <i>It is not drawn in this configuration.</i>'), cid:d? comp : null, basis:'component library'};
+}
+function askRun(q){
+  var r=askAnswer(q);
+  ASK.log.unshift({q:q, r:r});
+  if(ASK.log.length>12) ASK.log.length=12;
+  if(r.cid){
+    var d=askDrawn(r.cid);
+    if(d){ M3D.sel=[r.cid]; M3D.isoSel=false; compFocus(d.gid, r.cid); if(M3D.vp) M3D.vp.dirty=true; }
+  }
+  expRefresh(true);
+  return r;
+}
+function askPane(){
+  var chips=['What is the spot size?','Depth of focus?','What scan angle do the mirrors need?','Heat load?','Cycle time?','What does the interlock do?','Working distance?'];
+  var h='<p class="xnote">Answers are computed in your browser from this configurator’s data and models — no AI service is involved. Each says where its number comes from.</p>'+
+    '<form class="xask"><input type="text" placeholder="Ask about this machine" aria-label="Ask about this machine" autocomplete="off"><button type="submit">Ask</button></form>'+
+    '<div class="xchips">'+chips.map(function(c){ return '<button type="button" data-q="'+esc(c)+'">'+esc(c)+'</button>'; }).join('')+'</div>';
+  h+=ASK.log.map(function(e){
+    return '<div class="xqa"><p class="xq">'+esc(e.q)+'</p><p class="xa">'+e.r.h+'</p><p class="xb">'+esc(e.r.basis)+(e.r.cid? ' · highlighted in the view' : '')+'</p></div>';
+  }).join('');
+  return h;
+}
+
+/* ==========================================================================
+   GUIDED MISSIONS — optional exercises on the configured machine: find parts,
+   trace the beam, configure for a target, read a cycle, diagnose a stoppage.
+   A mission borrows the configurator the way the presentation does: it keeps
+   the user's configuration, step, view and camera, works on a copy, writes no
+   History, and gives everything back exactly when it ends. Scores are kept in
+   this browser only.
+   ========================================================================== */
+var MIS={on:false, m:null, i:0, keep:null, st:[], opts:null, fb:'', done:false, data:{}};
+var MISBEST=Store.get('teal.missions', {});
+function misName(cid){ var c=compInfo(cid); return c? c.n : 'that part'; }
+function misPick(a, n){ /* a fixed shuffle, so a mission reads the same every time */
+  var o=a.slice(), i, j, t; for(i=o.length-1;i>0;i--){ j=Math.floor(hash01(i*7.7+n*3.1)*(i+1)); t=o[i]; o[i]=o[j]; o[j]=t; } return o; }
+var MISSIONS=[
+  {id:'find', n:'Find the optical train', d:'Locate the scan head, the objective and the door interlock.',
+   steps:function(){ return [
+     {k:'do', t:'Find and inspect the <b>galvanometer scan head</b> — the unit that steers the beam across the field.',
+      hint:'Open the explorer (tree button under the view) and search “scan”, or click the head above the work table.',
+      ok:function(e,d){ return e==='inspect' && (d==='scanhead'||d==='galvo'); }},
+     {k:'do', t:'Now the <b>F-theta objective</b> — the lens that focuses the beam flat across the field.',
+      hint:'It is the lens at the bottom of the scan head, facing the part.', ok:function(e,d){ return e==='inspect' && d==='objective'; }},
+     {k:'do', t:'Last: the <b>door interlock switch</b> — what makes the enclosure safe to stand at.',
+      hint:'It sits at the top of the chamber door, on the hinge side. Search “interlock” in the explorer.', ok:function(e,d){ return e==='inspect' && d==='interlock'; }},
+     {k:'quiz', t:'Which part sets the size of the marking field?', opts:function(){ return [
+       {t:'The F-theta objective', ok:true}, {t:'The laser source'}, {t:'The door interlock'}, {t:'The chiller'}]; },
+      why:'The field belongs to the objective: its focal length and the angle the mirrors can reach fix it, r = f·θ.'}
+   ]; }},
+  {id:'trace', n:'Trace the beam', d:'Inspect every part on the beam path, in the order the light meets them.',
+   steps:function(){
+     var chain=[[['source'],'the laser source'],[['beamguide','fibreconn'],'the beam delivery'],[['collimator'],'the collimator'],
+                [['scanhead','galvo'],'the scan head'],[['objective'],'the objective'],[['workpiece'],'the workpiece']];
+     var on={}; (M3D.scene||[]).forEach(function(x){ if(x.cid) on[x.cid]=1; });
+     chain=chain.filter(function(c){ return c[0].some(function(k){ return on[k]; }); });
+     var all={}; chain.forEach(function(c){ c[0].forEach(function(k){ all[k]=1; }); });
+     var st=chain.map(function(c,i){ return {k:'do',
+       t:i===0? 'Start where the light starts: inspect <b>'+c[1]+'</b>.' : 'The beam leaves '+chain[i-1][1]+'. Where does it go next? Inspect it.',
+       hint:'Next on the path is '+c[1]+'.',
+       ok:function(e,d){ return e==='inspect' && c[0].indexOf(d)>=0; },
+       wrong:function(e,d){ if(e!=='inspect' || !d) return null;
+         return all[d]? 'Not yet — the beam reaches '+c[1]+' before the '+misName(d).toLowerCase()+'.' : 'The '+misName(d).toLowerCase()+' is not on the beam path.'; }}; });
+     var L=S.lens? LENS[S.lens] : null;
+     if(L) st.push({k:'quiz', t:'This objective is f '+L.f+' mm with a '+L.fld+' mm field. Fit a longer focal-length objective and the field…',
+       opts:function(){ return [{t:'gets larger', ok:true},{t:'gets smaller'},{t:'stays the same'},{t:'only the spot changes'}]; },
+       why:'The field grows with focal length for the same mirror angle (r = f·θ) — and so does the spot, which is the trade-off.'});
+     return st; }},
+  {id:'config', n:'Configure for a finer mark', d:'Change source and objective until the spot meets a target.', sandbox:true,
+   init:function(){
+     var p=P(), best=1e9, worst=null, wf=-1;
+     (p.lens||[]).forEach(function(lk){ var Lx=LENS[lk]; if(Lx && Lx.f>wf){ wf=Lx.f; worst=lk; } });
+     (p.src||[]).forEach(function(sk){ var s=SRC[sk]; if(!s) return; (p.lens||[]).forEach(function(lk){ var Lx=LENS[lk]; if(!Lx) return;
+       best=Math.min(best, 4*s.um*Lx.f*s.m2/(Math.PI*s.dia)); }); });
+     S.src=p.dsrc; S.pw=p.dpw; S.lens=worst||S.lens; render();
+     MIS.data.target=Math.ceil(best*1.08);
+   },
+   steps:function(){ return [
+     {k:'do', t:function(){ var o=optics(); return 'Reach a focused spot of <b>'+MIS.data.target+' µm or smaller</b>. It is '+(o? o.spot.toFixed(0) : '—')+
+        ' µm now. Change the source or the objective in the configurator — your own configuration is restored when you leave.'; },
+      hint:'Spot d = 4·λ·f·M² / (π·D): a shorter focal length or a shorter wavelength shrinks it. Try the objectives on the Optics step.',
+      ok:function(e){ var o=optics(); return e==='config' && o && o.spot<=MIS.data.target; },
+      note:function(e){ var o=optics(); return e==='config' && o? 'Spot now '+o.spot.toFixed(0)+' µm — target '+MIS.data.target+' µm.' : null; }},
+     {k:'quiz', t:'Which change makes the spot smaller?', opts:function(){ return [
+       {t:'A shorter focal-length objective', ok:true},{t:'A longer focal-length objective'},{t:'More laser power'},{t:'A larger field'}]; },
+      why:'Spot size scales with wavelength, focal length and M², not with power: d = 4·λ·f·M² / (π·D).'}
+   ]; }},
+  {id:'cycle', n:'Run and read a cycle', d:'Run the simulation and read its result like an operator would.', sandbox:true,
+   steps:function(){ return [
+     {k:'do', t:'Start the simulation — <b>Start simulation</b> under the view.', hint:'The orange button at the bottom of the viewer.',
+      ok:function(e){ return e==='simstart'; }},
+     {k:'do', t:'Let one full cycle run through every phase. Watch the phase strip and the HMI status.', hint:'Speed it up with the 1× button if you like.',
+      ok:function(e){ return e==='cycle'; }},
+     {k:'quiz', t:'What was the simulated cycle time?', opts:function(){ var c=SIM.cycle||1;
+        return misPick([{t:fmtS(c), ok:true},{t:fmtS(c*0.5)},{t:fmtS(c*1.6)},{t:fmtS(c*2.4)}], 3); },
+      why:function(){ return 'It is in the CYCLE reading: '+fmtS(SIM.cycle)+' — '+Math.round(3600/SIM.cycle)+' parts/h. Simulated from the process model and handling, not measured.'; }},
+     {k:'quiz', t:'Which phase took the longest?', opts:function(){
+        var ph=SIM.phases.slice().sort(function(a,b){ return b.real-a.real; }).slice(0,4);
+        return misPick(ph.map(function(x,i){ return {t:x.n, ok:i===0}; }), 5); },
+      why:function(){ var ph=SIM.phases.slice().sort(function(a,b){ return b.real-a.real; })[0];
+        return ph.n+', at '+ph.real.toFixed(2)+' s — hover a phase in the strip to see each one.'; }}
+   ]; }},
+  {id:'fault', n:'Diagnose a stoppage', d:'The machine will stop. Find out why and bring it back.', sandbox:true,
+   init:function(){
+     var fl=simFaults(), n=(MISBEST._faultRuns||0); MISBEST._faultRuns=n+1; Store.set('teal.missions', MISBEST);
+     var f=fl[n%fl.length]; MIS.data.f=f;
+     SIM.faults=true; SIM.loop=true; simStart(); SIM.rate=1; simCtlSync();
+     var at=simPhaseStart(f.at);
+     if(at){ SIM.pend=SIM.plan={f:f, t:at.t+at.d*f.u}; SIM.faultHold=true; }
+   },
+   steps:function(){ var ALL=[
+       {k:'interlock', t:'The guard interlock opened', fix:'Close the guard, acknowledge and reset'},
+       {k:'extract', t:'Extraction flow fell below threshold', fix:'Restore extraction flow and check the filter'},
+       {k:'nopart', t:'No part arrived at the load station', fix:'Waiting for upstream supply'},
+       {k:'source', t:'The laser source over-heated', fix:'Power-cycle the laser source'}];
+     return [
+     {k:'do', t:'Watch the machine. Something will stop it — when it does, read the HMI status panel and the message bar.',
+      hint:'Keep the simulation running; the stop comes within the first cycle.', ok:function(e){ return e==='fault'; }},
+     {k:'quiz', t:'What stopped the machine?', opts:function(){ return ALL.map(function(x){ return {t:x.t, ok:x.k===MIS.data.f.k}; }); },
+      why:function(){ return 'The message bar said: “'+MIS.data.f.m+'”.'; }},
+     {k:'quiz', t:'What brings it back?', opts:function(){ return ALL.map(function(x){ return {t:x.fix, ok:x.k===MIS.data.f.k}; }); },
+      why:function(){ return MIS.data.f.fix+' — typically '+MIS.data.f.mttr+' s on a real machine. Stoppages here are demonstrations, not reliability figures.'; }},
+     {k:'act', t:'Acknowledge the stoppage and reset at the HMI.', btn:'Acknowledge & reset',
+      run:function(){ SIM.faultHold=false; SIM.faultT=Math.min(SIM.faultT, 0.6); }}
+   ]; }}
+];
+function misKeep(){
+  var vp=M3D.vp;
+  return {S:JSON.parse(JSON.stringify(S)), cur:cur, reach:reach, fam:famSel, vm:M3D.vmode, iso:M3D.iso,
+          sel:(M3D.sel||[]).slice(), hide:JSON.parse(JSON.stringify(M3D.hide||{})), isoSel:M3D.isoSel,
+          sim:{faults:SIM.faults, loop:SIM.loop, rate:SIM.rate},
+          cam:vp? JSON.parse(JSON.stringify(vp.cam)) : null, touched:vp? vp.touched : false};
+}
+function misStart(id){
+  var m=MISSIONS.filter(function(x){ return x.id===id; })[0]; if(!m) return;
+  if(MIS.on) misEnd(true);
+  if(typeof DEMO!=='undefined' && DEMO.on) demoOff();
+  MIS.keep=misKeep(); MIS.on=true; MIS.m=m; MIS.i=0; MIS.fb=''; MIS.done=false; MIS.data={}; MIS.opts=null;
+  try{ if(SIM.on) simStop(); }catch(e){}
+  /* every mission needs a complete machine: the user's, or the worked example */
+  if(!simReady()){
+    var ex=storyConfig().S;
+    if(ex){ S=JSON.parse(JSON.stringify(ex)); famSel=PLAT[S.plat].fam; }
+    reach=STEPS.length-1; cur=STEPS.length-1; render();
+  }
+  M3D.sel=[]; M3D.hide={}; M3D.isoSel=false;
+  $('#v3d').classList.add('mission');
+  var card=$('#v3dinfo'); if(card){ card.classList.remove('open'); M3D.card=null; }
+  MIS.st=[];
+  if(m.init) m.init();
+  MIS.st=m.steps().map(function(x){ x.hint0=false; x.bad=0; return x; });
+  misDraw();
+}
+function misEnd(quiet){
+  if(!MIS.on) return;
+  /* still on while the user's state is put back, so re-rendering their own
+     specification step does not record it in History again */
+  MIS.done=true; SIM.faultHold=false;
+  try{ if(SIM.on) simStop(); }catch(e){}
+  var k=MIS.keep;
+  if(k){
+    S=k.S; famSel=k.fam; reach=k.reach; M3D.vmode=k.vm;
+    SIM.faults=k.sim.faults; SIM.loop=k.sim.loop; SIM.rate=k.sim.rate;
+    go(k.cur); isoSet(k.iso);
+    M3D.sel=k.sel; M3D.hide=k.hide; M3D.isoSel=k.isoSel;
+    try{ buildLayerPanel(); simCtlSync(); }catch(e){}
+    if(k.cam && M3D.vp){ var c=M3D.vp.cam; for(var q in k.cam) c[q]=k.cam[q]; M3D.vp.touched=k.touched; M3D.vp.dirty=true; }
+  }
+  MIS.keep=null; MIS.m=null; MIS.on=false;
+  $('#v3d').classList.remove('mission');
+  misDraw();
+  if(!quiet) toast('Mission closed — your configuration is as you left it.');
+}
+function misStep(){ return MIS.on && !MIS.done? MIS.st[MIS.i] : null; }
+function misNext(msg){
+  MIS.fb=msg||''; MIS.opts=null; MIS.i++;
+  if(MIS.i>=MIS.st.length){
+    MIS.done=true;
+    var sc=Math.round(100*MIS.st.reduce(function(a,x){ return a+Math.max(0, 1-(x.hint0?0.5:0)-(x.bad?0.5:0)); },0)/MIS.st.length);
+    MIS.score=sc;
+    if(!(MISBEST[MIS.m.id]>=sc)){ MISBEST[MIS.m.id]=sc; Store.set('teal.missions', MISBEST); }
+  }
+  misDraw();
+}
+/* events from the configurator: a part inspected, the configuration changed,
+   the run started, a cycle completed, a stoppage happened */
+function misEvent(e, d){
+  var st=misStep(); if(!st || st.k!=='do') return;
+  if(st.ok(e,d)){ misNext('✓ '+(e==='inspect'? misName(d) : 'Done')+'.'); return; }
+  var w=st.wrong? st.wrong(e,d) : null;
+  if(w){ st.bad++; MIS.fb=w; misDraw(); return; }
+  var n=st.note? st.note(e,d) : null;
+  if(n){ MIS.fb=n; misDraw(); }
+}
+function misAnswer(ix){
+  var st=misStep(); if(!st || st.k!=='quiz' || !MIS.opts) return;
+  var o=MIS.opts[ix]; if(!o) return;
+  var why=typeof st.why==='function'? st.why() : st.why;
+  if(o.ok) misNext('✓ Right. '+why);
+  else { st.bad++; MIS.fb='Not quite — try again.'; o.no=true; misDraw(); }
+}
+/* a phone's viewer grows to the run-cycle height while a side panel needs it */
+function v3dPaneled(){
+  var v=$('#v3d'), e=$('#v3dexp'), m=$('#v3dmis'); if(!v) return;
+  v.classList.toggle('paneled', !!((e&&e.classList.contains('open'))||(m&&m.classList.contains('open'))));
+}
+function misDraw(){
+  var pn=$('#v3dmis'); if(!pn) return;
+  v3dPaneled();
+  var bt=$('#misBtn'); if(bt) bt.classList.toggle('on', pn.classList.contains('open'));
+  var h='<div class="mhead"><b>'+(MIS.on? esc(MIS.m.n) : 'Guided missions')+'</b><button type="button" class="mx" aria-label="Close missions">'+ico('x')+'</button></div>';
+  if(!MIS.on){
+    h+='<p class="mnote">Optional exercises on this machine. A mission works on a copy — your configuration, view and History are left exactly as they are.</p>';
+    MISSIONS.forEach(function(m){
+      var b=MISBEST[m.id];
+      h+='<div class="mrow"><div><b>'+esc(m.n)+'</b><span>'+esc(m.d)+'</span></div>'+
+         '<button type="button" data-m="'+m.id+'">'+(b!=null? 'Again · best '+b+' %' : 'Start')+'</button></div>';
+    });
+  } else if(MIS.done){
+    h+='<p class="mdone">Mission complete — <b>'+MIS.score+' %</b></p>'+(MIS.fb? '<p class="mfb ok">'+MIS.fb+'</p>' : '')+
+       '<p class="mnote">Full marks for each step done without a hint or a wrong try.</p>'+
+       '<div class="mfoot"><button type="button" data-a="list">More missions</button><button type="button" data-a="end">Finish</button></div>';
+  } else {
+    var st=MIS.st[MIS.i], n=MIS.st.length;
+    h+='<div class="mprog" aria-hidden="true">'+MIS.st.map(function(x,i){ return '<i class="'+(i<MIS.i?'d':i===MIS.i?'c':'')+'"></i>'; }).join('')+'</div>'+
+       '<p class="mstep">Step '+(MIS.i+1)+' of '+n+'</p><p class="mt">'+(typeof st.t==='function'? st.t() : st.t)+'</p>';
+    if(st.k==='quiz'){
+      if(!MIS.opts) MIS.opts=st.opts();
+      h+='<div class="mopts">'+MIS.opts.map(function(o,i){ return '<button type="button" data-o="'+i+'"'+(o.no?' class="no" disabled':'')+'>'+esc(o.t)+'</button>'; }).join('')+'</div>';
+    }
+    if(st.k==='act') h+='<div class="mopts"><button type="button" data-a="act" class="go">'+esc(st.btn)+'</button></div>';
+    if(MIS.fb) h+='<p class="mfb'+(/^✓/.test(MIS.fb)?' ok':'')+'">'+esc(MIS.fb)+'</p>';
+    if(st.hint0 && st.hint) h+='<p class="mhint">'+esc(st.hint)+'</p>';
+    h+='<div class="mfoot">'+(st.hint && !st.hint0? '<button type="button" data-a="hint">Hint</button>' : '<span></span>')+'<button type="button" data-a="end">Exit mission</button></div>';
+  }
+  pn.innerHTML=h;
+}
+function misInit(){
+  var pn=$('#v3dmis'); if(!pn) return;
+  pn.addEventListener('click', function(e){
+    var t=e.target.closest('button'); if(!t) return;
+    if(t.classList.contains('mx')){ if(MIS.on) misEnd(); pn.classList.remove('open'); misDraw(); return; }
+    if(t.hasAttribute('data-m')){ misStart(t.getAttribute('data-m')); return; }
+    if(t.hasAttribute('data-o')){ misAnswer(+t.getAttribute('data-o')); return; }
+    var a=t.getAttribute('data-a'), st=misStep();
+    if(a==='hint' && st){ st.hint0=true; misDraw(); }
+    else if(a==='act' && st && st.k==='act'){ st.run(); misNext('✓ Reset acknowledged — the machine resumes.'); }
+    else if(a==='list'){ misEnd(true); misDraw(); }
+    else if(a==='end'){ misEnd(); }
+  });
+  misDraw();
 }
 
 /* ---- component register — what the view draws, with each record's status --- */
@@ -10732,7 +11403,8 @@ function simStatus(){
   el2.innerHTML=
     row('Machine', fault? 'Halted':'Running', fault?'bad':'ok', 1)+
     row('Laser', beamOn? 'Emission' : fault? 'Inhibited' : 'Standby', beamOn?'warn':fault?'bad':'', 1)+
-    row('Door', fault==='interlock'? 'Open':'Closed & locked', fault==='interlock'?'bad':'ok', 1)+
+    row('Door', fault==='interlock'? 'Open' : (R3D.doorA||0)>0.02? 'Open — loading' : 'Closed & locked',
+        fault==='interlock'?'bad':(R3D.doorA||0)>0.02?'warn':'ok', 1)+
     row('X / Z', axis.toFixed(0)+' / '+Math.round((R3D.headY||0)*100)+' mm')+
     row('Cycle', Math.round(SIM.t/SIM.total*100)+' %')+
     row('E-stop','Released','ok')+
@@ -12698,7 +13370,7 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v13.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v14.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
