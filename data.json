@@ -3958,7 +3958,6 @@
     "band_hi": 1.12,
     "pw_up": 0.42,
     "pw_dn": 0.22,
-    "lens_uplift": 1.03,
-    "adminPin": "teal2026"
+    "lens_uplift": 1.03
   }
 }

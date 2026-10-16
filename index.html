@@ -6,6 +6,17 @@
 <title>TEAL Laser Equipment Configurator — Titan Engineering &amp; Automation</title>
 <meta name="description" content="Configure a TEAL laser system: platform, source, beam delivery, automation and software. Generates a model designation, optical data and an indicative ex-works budget." />
 <meta name="theme-color" content="#00B7BA" />
+<script>
+/* Theme before first paint, so a dark-theme visitor never sees a white flash.
+   "system" follows the operating system; the choice is kept in this browser. */
+(function(){
+  var t='system';
+  try{ var v=JSON.parse(localStorage.getItem('teal.theme')); if(v==='light'||v==='dark') t=v; }catch(e){}
+  var dark = t==='dark' || (t==='system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme', dark? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme-pref', t);
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;680;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -43,6 +54,32 @@
   --glass-edge-d:inset 0 1px 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(0,0,0,.20);
   --glass-lift:0 8px 26px rgba(11,26,42,.14), 0 2px 6px rgba(11,26,42,.07);
   --glass-lift-d:0 10px 30px rgba(11,26,42,.30), 0 2px 8px rgba(11,26,42,.20);
+  --card-tint:#FBFEFE; --amber-line:#E8D3AE;
+  --field:#FFFFFF; --overlay:rgba(11,26,42,.42);
+  color-scheme:light;
+}
+/* ---------- dark theme ----------------------------------------------------
+   One set of token values; every surface, rule and text colour in the page
+   reads these, so the theme switches without touching a component. The 3D
+   viewer, the story and the HUD panels were already dark and stay as they are. */
+:root[data-theme="dark"]{
+  --page:#0D141B; --card:#141E28; --card-2:#18242F; --card-tint:#172630;
+  --ink:#E4ECF1; --ink-2:#A8B9C5; --ink-3:#8DA0AE;
+  --rule:#273644; --rule-2:#1F2C38;
+  --teal:#1FC4C7; --teal-deep:#5FD6D9; --teal-wash:#10292E; --teal-line:#1F5559;
+  --grey:#9AA3AA;
+  --cta:#D45A1C; --cta-h:#E86A28; --cta-wash:#2E1C12;
+  --amber:#E2A54C; --amber-wash:#2B2210; --amber-line:#5C4724;
+  --ok:#43C08C;
+  --crit:#F0685E; --crit-wash:#33191A;
+  --field:#0F1820; --overlay:rgba(0,0,0,.6);
+  --sh1:0 1px 2px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.25);
+  --sh2:0 4px 12px rgba(0,0,0,.40),0 2px 4px rgba(0,0,0,.25);
+  --sh3:0 14px 32px rgba(0,0,0,.50),0 4px 10px rgba(0,0,0,.30);
+  --glass-light:rgba(20,30,40,.80);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.30);
+  --glass-lift:0 8px 26px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.30);
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -61,7 +98,7 @@ h1,h2,h3,h4{font-family:var(--disp);letter-spacing:-.018em;margin:0}
 .skip:focus{left:0}
 
 /* ---------- sticky header ---------- */
-header.site{position:sticky;top:0;z-index:70;background:#fff;
+header.site{position:sticky;top:0;z-index:70;background:var(--card);
   border-bottom:1px solid transparent;transition:box-shadow .28s var(--ease),border-color .28s var(--ease),background .28s}
 header.site.stuck{
   background:var(--glass-light);
@@ -83,7 +120,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:2
   color:var(--ink-3);text-align:right;line-height:1.7}
 .hmeta b{color:var(--ink-2);font-weight:600}
 @media(max-width:1080px){.hmeta{display:none}}
-.hb{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--rule);
+.hb{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);
   border-radius:var(--r-pill);padding:9px 16px;font-size:13px;font-weight:550;color:var(--ink-2);
   transition:all .2s var(--ease)}
 .hb:hover{border-color:var(--teal);color:var(--teal-deep);background:var(--teal-wash);transform:translateY(-1px)}
@@ -92,9 +129,9 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:2
 
 /* ---------- step rail ---------- */
 main{padding:32px 0 40px;min-height:60vh}
-.rail{display:flex;background:#fff;border:1px solid var(--rule);border-radius:var(--r);
+.rail{display:flex;background:var(--card);border:1px solid var(--rule);border-radius:var(--r);
   box-shadow:var(--sh1);overflow:hidden;margin-bottom:26px}
-.rail button{flex:1 1 0;background:#fff;border:none;border-right:1px solid var(--rule-2);
+.rail button{flex:1 1 0;background:var(--card);border:none;border-right:1px solid var(--rule-2);
   padding:14px 14px 13px;text-align:left;transition:background .2s var(--ease);min-width:0;position:relative}
 .rail button::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;
   background:var(--teal);transform:scaleX(0);transform-origin:left;transition:transform .34s var(--ease)}
@@ -104,7 +141,7 @@ main{padding:32px 0 40px;min-height:60vh}
 .rail .n{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink-3);display:block;font-weight:500}
 .rail .l{font-size:13.5px;font-weight:600;display:block;margin-top:2px;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
-.rail .done{background:#FCFDFD}
+.rail .done{background:var(--card-tint)}
 .rail .done .n{color:var(--teal-deep)}
 .rail .done::after{transform:scaleX(1);background:var(--teal-line)}
 .rail .on{background:var(--teal-wash)!important}
@@ -118,9 +155,9 @@ main{padding:32px 0 40px;min-height:60vh}
 
 /* ---------- 12-col shell ---------- */
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:start}
-.stage{grid-column:span 7;background:#fff;border:1px solid var(--rule);border-radius:var(--r-lg);
+.stage{grid-column:span 7;background:var(--card);border:1px solid var(--rule);border-radius:var(--r-lg);
   box-shadow:var(--sh1);overflow:hidden}
-.plate{grid-column:span 5;position:sticky;top:calc(var(--hdr) + 18px);background:#fff;
+.plate{grid-column:span 5;position:sticky;top:calc(var(--hdr) + 18px);background:var(--card);
   border:1px solid var(--rule);border-radius:var(--r-lg);box-shadow:var(--sh2);overflow:hidden}
 @media(max-width:1120px){
   .grid{grid-template-columns:1fr;gap:20px}
@@ -140,11 +177,11 @@ main{padding:32px 0 40px;min-height:60vh}
 
 /* ---------- option cards ---------- */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:14px}
-.opt{display:flex;flex-direction:column;text-align:left;background:#fff;border:1px solid var(--rule);
+.opt{display:flex;flex-direction:column;text-align:left;background:var(--card);border:1px solid var(--rule);
   border-radius:var(--r);padding:18px 18px 16px;box-shadow:var(--sh1);position:relative;height:100%;
   transition:transform .24s var(--ease),box-shadow .24s var(--ease),border-color .2s var(--ease)}
 .opt:hover{transform:translateY(-3px);box-shadow:var(--sh3);border-color:var(--teal-line)}
-.opt.sel{border-color:var(--teal);box-shadow:var(--sh2),inset 0 0 0 1px var(--teal);background:#FBFEFE}
+.opt.sel{border-color:var(--teal);box-shadow:var(--sh2),inset 0 0 0 1px var(--teal);background:var(--card-tint)}
 .opt.sel::before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:3px;
   background:var(--teal);border-radius:0 3px 3px 0}
 .opt .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
@@ -157,7 +194,7 @@ main{padding:32px 0 40px;min-height:60vh}
   padding-top:11px;border-top:1px solid var(--rule-2)}
 
 /* ---------- recommendation / callouts ---------- */
-.reco{border:1px solid var(--teal-line);background:linear-gradient(180deg,var(--teal-wash),#fff);
+.reco{border:1px solid var(--teal-line);background:linear-gradient(180deg,var(--teal-wash),var(--card));
   border-radius:var(--r);padding:16px 18px;margin-bottom:20px;font-size:13.5px;line-height:1.6;
   box-shadow:var(--sh1)}
 .reco b{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--teal-deep)}
@@ -168,7 +205,7 @@ main{padding:32px 0 40px;min-height:60vh}
   margin-bottom:13px;flex-wrap:wrap}
 .recobox .rt{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;
   color:var(--teal-deep);font-weight:600}
-.recoi{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;background:#fff;
+.recoi{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;background:var(--card);
   border:1px solid var(--teal-line);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:8px;
   box-shadow:var(--sh1);transition:box-shadow .2s var(--ease)}
 .recoi:hover{box-shadow:var(--sh2)}
@@ -194,7 +231,7 @@ main{padding:32px 0 40px;min-height:60vh}
   padding-bottom:14px;border-bottom:1px solid var(--rule-2)}
 .indl{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--ink-3);font-weight:600;margin-right:3px}
-.indc{background:#fff;border:1px solid var(--rule);border-radius:var(--r-pill);padding:7px 13px;
+.indc{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-pill);padding:7px 13px;
   font-size:12px;font-weight:550;color:var(--ink-2);box-shadow:var(--sh1);transition:all .18s var(--ease)}
 .indc:hover{border-color:var(--teal);color:var(--teal-deep)}
 .indc.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
@@ -203,10 +240,10 @@ main{padding:32px 0 40px;min-height:60vh}
 .indtags em{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;
   background:var(--card-2);border:1px solid var(--rule-2);color:var(--ink-3);
   border-radius:var(--r-pill);padding:2px 8px}
-.opt.sel .indtags em{background:#fff;border-color:var(--teal-line);color:var(--teal-deep)}
+.opt.sel .indtags em{background:var(--card);border-color:var(--teal-line);color:var(--teal-deep)}
 
 /* ---------- process physics panel ---------- */
-.phys{border:1px solid var(--rule);border-radius:var(--r);background:#fff;box-shadow:var(--sh1);
+.phys{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);box-shadow:var(--sh1);
   margin-top:6px;overflow:hidden}
 .phh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;
   background:var(--navy);color:#fff;flex-wrap:wrap}
@@ -215,9 +252,9 @@ main{padding:32px 0 40px;min-height:60vh}
   color:#7FF0F2;border-radius:var(--r-pill);padding:4px 13px;font-weight:600}
 /* rules are drawn by the cells rather than painted through the gaps, so an
    incomplete last row ends cleanly instead of leaving a grey filler cell */
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));background:#fff;
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));background:var(--card);
   margin:0 -1px -1px 0}
-.pcell{background:#fff;padding:14px 16px;border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
+.pcell{background:var(--card);padding:14px 16px;border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
 .pcell .pl{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink-3);display:block;font-weight:600}
 .pcell .pv{font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink);display:block;
@@ -231,7 +268,7 @@ main{padding:32px 0 40px;min-height:60vh}
   margin-bottom:11px;font-weight:600}
 .field>.lab .v{font-family:var(--mono);font-size:15px;color:var(--teal-deep);font-weight:600;letter-spacing:-.01em}
 .seg{display:flex;flex-wrap:wrap;gap:8px}
-.seg button{background:#fff;border:1px solid var(--rule);border-radius:var(--r-pill);padding:10px 17px;
+.seg button{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-pill);padding:10px 17px;
   font-family:var(--mono);font-size:11.5px;color:var(--ink-2);box-shadow:var(--sh1);font-weight:500;
   transition:all .2s var(--ease)}
 .seg button:hover{border-color:var(--teal);color:var(--teal-deep);transform:translateY(-1px)}
@@ -239,14 +276,14 @@ main{padding:32px 0 40px;min-height:60vh}
 
 .mods{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 @media(max-width:700px){.mods{grid-template-columns:1fr}}
-.mod{display:flex;gap:13px;align-items:flex-start;background:#fff;border:1px solid var(--rule);
+.mod{display:flex;gap:13px;align-items:flex-start;background:var(--card);border:1px solid var(--rule);
   border-radius:var(--r);padding:15px 16px;text-align:left;box-shadow:var(--sh1);
   transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s var(--ease)}
 .mod:hover:not(.std){border-color:var(--teal-line);transform:translateY(-2px);box-shadow:var(--sh2)}
-.mod.on{border-color:var(--teal);background:#FBFEFE}
+.mod.on{border-color:var(--teal);background:var(--card-tint)}
 .mod.std{opacity:.85;cursor:default;background:var(--card-2)}
 .mod .bx{width:19px;height:19px;border:1.5px solid var(--rule);border-radius:5px;flex:0 0 auto;
-  margin-top:1px;display:grid;place-items:center;color:transparent;background:#fff;transition:all .2s var(--ease)}
+  margin-top:1px;display:grid;place-items:center;color:transparent;background:var(--card);transition:all .2s var(--ease)}
 .mod.on .bx{background:var(--teal);border-color:var(--teal);color:#fff}
 .mod .bx svg{width:11px;height:11px}
 .mod .tt{font-size:14px;font-weight:620;display:block;line-height:1.3;letter-spacing:-.012em}
@@ -262,7 +299,7 @@ main{padding:32px 0 40px;min-height:60vh}
   border-top:1px solid var(--rule-2);background:var(--card-2)}
 @media(max-width:640px){.nav{padding:16px 20px}}
 .btn{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:600;letter-spacing:-.005em;
-  padding:12px 22px;border-radius:var(--r-pill);border:1px solid var(--rule);background:#fff;
+  padding:12px 22px;border-radius:var(--r-pill);border:1px solid var(--rule);background:var(--card);
   color:var(--ink-2);box-shadow:var(--sh1);transition:all .22s var(--ease)}
 .btn svg{width:15px;height:15px;flex:0 0 auto}
 .btn:hover{border-color:var(--teal);color:var(--teal-deep);transform:translateY(-2px);box-shadow:var(--sh2)}
@@ -314,7 +351,7 @@ main{padding:32px 0 40px;min-height:60vh}
 .optgrid div{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);display:flex;
   justify-content:space-between;gap:8px}
 .optgrid div b{color:var(--ink);font-weight:600}
-.budget{padding:20px;border-top:2px solid var(--navy);background:linear-gradient(180deg,#fff,var(--card-2))}
+.budget{padding:20px;border-top:2px solid var(--navy);background:linear-gradient(180deg,var(--card),var(--card-2))}
 .budget .bl{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
   color:var(--ink-3);margin-bottom:6px;font-weight:600}
 .budget .bv{font-size:27px;font-weight:700;letter-spacing:-.035em;line-height:1.1;font-variant-numeric:tabular-nums}
@@ -707,7 +744,7 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 /* ---------- family cards with 3D visuals ---------- */
 .famgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 @media(max-width:640px){.famgrid{grid-template-columns:1fr}}
-.fcard{display:flex;flex-direction:column;text-align:left;background:#fff;border:1px solid var(--rule);
+.fcard{display:flex;flex-direction:column;text-align:left;background:var(--card);border:1px solid var(--rule);
   border-radius:var(--r-lg);padding:0;box-shadow:var(--sh1);position:relative;height:100%;overflow:hidden;
   transition:transform .24s var(--ease),box-shadow .24s var(--ease),border-color .2s var(--ease)}
 .fcard:hover{transform:translateY(-3px);box-shadow:var(--sh3);border-color:var(--teal-line)}
@@ -751,7 +788,7 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 /* ---------- summary ---------- */
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:760px){.sgrid{grid-template-columns:1fr}}
-.sc{border:1px solid var(--rule);border-radius:var(--r);padding:18px 19px;background:#fff;box-shadow:var(--sh1)}
+.sc{border:1px solid var(--rule);border-radius:var(--r);padding:18px 19px;background:var(--card);box-shadow:var(--sh1)}
 .sc h4{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
   color:var(--teal-deep);margin:0 0 12px;font-weight:600;padding-bottom:9px;border-bottom:1px solid var(--rule-2)}
 .sc .li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:13px}
@@ -762,22 +799,22 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
   background:var(--amber-wash);border-left:3px solid var(--amber);border-radius:0 var(--r) var(--r) 0}
 .disc b{color:var(--amber)}
 .notes{margin-top:16px;border:1px solid var(--rule);border-radius:var(--r);padding:18px 19px;
-  background:#fff;box-shadow:var(--sh1)}
+  background:var(--card);box-shadow:var(--sh1)}
 .nlab{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
   color:var(--teal-deep);font-weight:600;display:block;margin-bottom:10px}
 .notes textarea{width:100%;border:1px solid var(--rule);border-radius:var(--r-sm);padding:12px 14px;
-  font-family:var(--sans);font-size:13.5px;resize:vertical;background:#fff;color:var(--ink);line-height:1.6}
+  font-family:var(--sans);font-size:13.5px;resize:vertical;background:var(--card);color:var(--ink);line-height:1.6}
 .notes textarea:focus{outline:2px solid var(--teal);outline-offset:-1px;border-color:var(--teal)}
 .nhint{font-size:11.5px;color:var(--ink-3);display:block;margin-top:8px}
 
 /* ---------- search ---------- */
 .srch{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
 .srch input{flex:1 1 280px;padding:13px 16px;border:1px solid var(--rule);border-radius:var(--r-pill);
-  font-family:var(--sans);font-size:14px;background:#fff;color:var(--ink);box-shadow:var(--sh1);
+  font-family:var(--sans);font-size:14px;background:var(--card);color:var(--ink);box-shadow:var(--sh1);
   transition:all .2s var(--ease)}
 .srch input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.14)}
 .srch input::placeholder{color:var(--ink-3)}
-.sall{background:#fff;border:1px solid var(--rule);border-radius:var(--r-pill);padding:12px 18px;
+.sall{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-pill);padding:12px 18px;
   font-size:12.5px;font-weight:550;color:var(--ink-2);white-space:nowrap;box-shadow:var(--sh1);transition:all .2s var(--ease)}
 .sall:hover{border-color:var(--teal);color:var(--teal-deep)}
 .sall.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
@@ -815,8 +852,8 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .dx:hover{background:rgba(255,255,255,.22)}
 .dx:active{transform:scale(.92)}
 .dx svg{width:15px;height:15px}
-.dtabs{display:flex;gap:8px;padding:16px 22px;background:#fff;border-bottom:1px solid var(--rule);flex-wrap:wrap}
-.dtabs button{background:#fff;border:1px solid var(--rule);border-radius:var(--r-pill);padding:8px 16px;
+.dtabs{display:flex;gap:8px;padding:16px 22px;background:var(--card);border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.dtabs button{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-pill);padding:8px 16px;
   font-size:12.5px;font-weight:550;color:var(--ink-2);transition:all .2s var(--ease)}
 .dtabs button:hover{border-color:var(--teal)}
 .dtabs button.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
@@ -824,7 +861,7 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .dtabs .cmpb:disabled{opacity:.42;pointer-events:none}
 .dbody{flex:1;overflow:auto;padding:18px 22px}
 .dempty{color:var(--ink-2);font-size:13.5px;line-height:1.7;padding:40px 8px;text-align:center}
-.dcard{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:16px 17px;
+.dcard{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:16px 17px;
   margin-bottom:11px;box-shadow:var(--sh1);transition:all .2s var(--ease)}
 .dcard:hover{box-shadow:var(--sh2);transform:translateY(-1px)}
 .dcard.sel{border-color:var(--teal);box-shadow:var(--sh2),inset 0 0 0 1px var(--teal)}
@@ -850,7 +887,7 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .c3head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .c3head h3{margin:0;font-size:15px}
 .c3ctl{display:flex;flex-wrap:wrap;gap:6px}
-.c3ctl button{padding:6px 11px;border-radius:999px;border:1px solid var(--rule);background:#fff;font-size:12px;color:var(--ink)}
+.c3ctl button{padding:6px 11px;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-size:12px;color:var(--ink)}
 .c3ctl button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .c3wrap{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(240px,1fr);gap:14px}
 .c3view{position:relative;height:440px;border-radius:12px;overflow:hidden;background:#0B2033}
@@ -872,7 +909,7 @@ body.v3dlock .v3dctl{right:16px;bottom:16px}
 .c3p li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--rule);padding:3px 0}
 .c3t,.c3n{margin:6px 0 0;font-size:11.5px;opacity:.8}
 @media(max-width:820px){.c3wrap{grid-template-columns:1fr}.c3view{height:340px}.c3list{max-height:none}}
-table.cmp{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--rule);
+table.cmp{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);border:1px solid var(--rule);
   border-radius:var(--r);overflow:hidden;box-shadow:var(--sh1)}
 table.cmp th{background:var(--navy);color:#fff;padding:16px 16px;text-align:left;vertical-align:top}
 table.cmp th .cn{font-size:14.5px;font-weight:650;display:block;letter-spacing:-.016em}
@@ -881,7 +918,7 @@ table.cmp th .cd{font-family:var(--mono);font-size:10.5px;color:#93A8B8;display:
 table.cmp td{padding:12px 16px;border-bottom:1px solid var(--rule-2);font-size:13px;vertical-align:top}
 table.cmp td.pk{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink-3);white-space:nowrap;font-weight:600;background:var(--card-2)}
-table.cmp tr.df td{background:#FAFDFD}
+table.cmp tr.df td{background:var(--card-tint)}
 table.cmp tr.df td.pk{color:var(--teal-deep);background:var(--teal-wash)}
 table.cmp td.best{color:var(--teal-deep);font-weight:700}
 table.cmp tr:last-child td{border-bottom:none}
@@ -904,7 +941,7 @@ table.cmp tr:last-child td{border-bottom:none}
 .fl{position:relative;display:block}
 .fl.wide{grid-column:1/-1}
 .fl input,.fl textarea{width:100%;border:1px solid var(--rule);border-radius:var(--r-sm);
-  padding:22px 14px 9px;font-family:var(--sans);font-size:14px;background:#fff;color:var(--ink);
+  padding:22px 14px 9px;font-family:var(--sans);font-size:14px;background:var(--card);color:var(--ink);
   transition:all .2s var(--ease)}
 .fl textarea{padding-top:26px;line-height:1.6;resize:vertical}
 .fl input:focus,.fl textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.14)}
@@ -953,12 +990,12 @@ table.cmp tr:last-child td{border-bottom:none}
 .abanner{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;
   border:1px solid var(--teal-line);background:var(--teal-wash);border-radius:var(--r);
   padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.55;color:var(--ink-2)}
-.abanner.warn{border-color:#E8D3AE;background:var(--amber-wash)}
+.abanner.warn{border-color:var(--amber-line);background:var(--amber-wash)}
 .abanner b{color:var(--ink)}
 .abanner .btn{flex:0 0 auto}
 .asearchres{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
 .asearchres .anote{grid-column:1/-1;margin:0 0 4px}
-.ares{display:flex;flex-direction:column;gap:3px;text-align:left;background:#fff;
+.ares{display:flex;flex-direction:column;gap:3px;text-align:left;background:var(--card);
   border:1px solid var(--rule);border-radius:var(--r);padding:13px 15px;box-shadow:var(--sh1);
   transition:all .18s var(--ease)}
 .ares:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:var(--sh2)}
@@ -976,12 +1013,12 @@ table.cmp tr:last-child td{border-bottom:none}
 .ahead .btn.pri{background:var(--cta);border-color:var(--cta)}
 .ahead .btn.pri:hover{background:var(--cta-h);border-color:var(--cta-h)}
 .atabs{max-width:1320px;margin:0 auto;padding:22px 28px 0;display:flex;gap:8px;flex-wrap:wrap}
-.atabs button{background:#fff;border:1px solid var(--rule);border-radius:var(--r-pill);padding:10px 18px;
+.atabs button{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-pill);padding:10px 18px;
   font-size:12.5px;font-weight:550;color:var(--ink-2);box-shadow:var(--sh1);transition:all .2s var(--ease)}
 .atabs button:hover{border-color:var(--teal);color:var(--teal-deep)}
 .atabs button.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
 .abody{max-width:1320px;margin:0 auto;padding:22px 28px 90px}
-.atbl{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--rule);
+.atbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);border:1px solid var(--rule);
   border-radius:var(--r);overflow:hidden;box-shadow:var(--sh1)}
 .atbl th{background:var(--card-2);font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
   text-transform:uppercase;color:var(--ink-2);text-align:left;padding:12px 14px;
@@ -991,11 +1028,11 @@ table.cmp tr:last-child td{border-bottom:none}
 .atbl .nm{font-size:13.5px;font-weight:620}
 .atbl .ky{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
 .atbl input,.atbl select{font-family:var(--mono);font-size:12.5px;padding:8px 11px;border:1px solid var(--rule);
-  border-radius:var(--r-sm);background:#fff;color:var(--ink);width:100%;max-width:220px;transition:all .18s}
+  border-radius:var(--r-sm);background:var(--card);color:var(--ink);width:100%;max-width:220px;transition:all .18s}
 .atbl input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.13)}
 .atbl input.num{max-width:140px;text-align:right;font-variant-numeric:tabular-nums}
 .atbl .calc{font-family:var(--mono);font-size:11.5px;color:var(--teal-deep);white-space:nowrap;font-weight:600}
-.anote{font-size:13px;color:var(--ink-2);background:#fff;border-left:3px solid var(--teal);
+.anote{font-size:13px;color:var(--ink-2);background:var(--card);border-left:3px solid var(--teal);
   padding:14px 17px;border-radius:0 var(--r) var(--r) 0;margin-bottom:18px;line-height:1.65;box-shadow:var(--sh1)}
 .anote code{font-family:var(--mono);font-size:11.5px;background:var(--teal-wash);padding:2px 6px;border-radius:4px;color:var(--teal-deep)}
 .awarn{font-size:13px;color:var(--ink-2);background:var(--amber-wash);border-left:3px solid var(--amber);
@@ -1009,7 +1046,7 @@ table.cmp tr:last-child td{border-bottom:none}
 /* ---------- admin: master-detail editor ---------- */
 .amd{display:grid;grid-template-columns:308px 1fr;gap:20px;align-items:start}
 @media(max-width:1000px){.amd{grid-template-columns:1fr}}
-.apane{background:#fff;border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--sh1);
+.apane{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--sh1);
   overflow:hidden;position:sticky;top:104px;max-height:calc(100vh - 130px);display:flex;flex-direction:column}
 @media(max-width:1000px){.apane{position:static;max-height:none}}
 .apane .ptitle{padding:13px 16px;border-bottom:1px solid var(--rule-2);background:var(--card-2);
@@ -1035,7 +1072,7 @@ table.cmp tr:last-child td{border-bottom:none}
 .aadd:hover{background:var(--teal);color:#fff;border-style:solid}
 .aadd svg{width:14px;height:14px}
 
-.aedit{background:#fff;border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--sh1);padding:24px 26px}
+.aedit{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--sh1);padding:24px 26px}
 @media(max-width:640px){.aedit{padding:18px 16px}}
 .aedit .eh{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
   padding-bottom:16px;border-bottom:1px solid var(--rule-2);margin-bottom:20px;flex-wrap:wrap}
@@ -1051,14 +1088,14 @@ table.cmp tr:last-child td{border-bottom:none}
 .frow .fv{min-width:0}
 .frow .fh2{font-size:11.5px;color:var(--ink-3);margin-top:5px;line-height:1.5}
 .ain{width:100%;border:1px solid var(--rule);border-radius:var(--r-sm);padding:9px 12px;
-  font-family:var(--sans);font-size:13.5px;background:#fff;color:var(--ink);transition:all .18s}
+  font-family:var(--sans);font-size:13.5px;background:var(--card);color:var(--ink);transition:all .18s}
 .ain:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.13)}
 .ain.mono{font-family:var(--mono);font-size:12.5px}
 .ain.num2{max-width:170px;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
 textarea.ain{resize:vertical;line-height:1.6}
 select.ain{cursor:pointer}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
-.chipb{background:#fff;border:1px solid var(--rule);border-radius:var(--r-pill);padding:7px 14px;
+.chipb{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-pill);padding:7px 14px;
   font-family:var(--mono);font-size:11.5px;color:var(--ink-2);transition:all .18s}
 .chipb:hover{border-color:var(--teal)}
 .chipb.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
@@ -1076,7 +1113,7 @@ select.ain{cursor:pointer}
   padding:6px;display:grid;place-items:center;transition:all .18s}
 .rowdel:hover{border-color:var(--cta);color:var(--cta);background:var(--cta-wash)}
 .rowdel svg{width:13px;height:13px}
-.hlth{border:1px solid var(--rule);border-radius:var(--r);background:#fff;padding:14px 16px;
+.hlth{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);padding:14px 16px;
   margin-bottom:9px;box-shadow:var(--sh1);display:flex;gap:12px;align-items:flex-start}
 .hlth svg{width:17px;height:17px;flex:0 0 auto;margin-top:1px}
 .hlth.err{border-left:3px solid var(--cta)} .hlth.err svg{color:var(--cta)}
@@ -1105,14 +1142,14 @@ select.ain{cursor:pointer}
 .advhead p{margin:7px 0 0;font-size:13.5px;color:#A9BCC9;line-height:1.55;max-width:56ch}
 .advbody{padding:24px 26px 26px;overflow:auto;flex:1;min-height:0}
 .advin textarea{width:100%;border:1px solid var(--rule);border-radius:var(--r);padding:15px 16px;
-  font-family:var(--sans);font-size:15px;line-height:1.6;background:#fff;color:var(--ink);resize:vertical;
+  font-family:var(--sans);font-size:15px;line-height:1.6;background:var(--card);color:var(--ink);resize:vertical;
   box-shadow:var(--sh1);transition:all .2s var(--ease)}
 .advin textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.14)}
 .advrow{margin-top:18px}
 .advl{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
   color:var(--ink-3);font-weight:600;display:block;margin-bottom:9px}
 .advchips{display:flex;flex-wrap:wrap;gap:7px}
-.advchip{background:#fff;border:1px solid var(--rule);border-radius:var(--r-pill);padding:8px 15px;
+.advchip{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-pill);padding:8px 15px;
   font-size:12.5px;font-weight:550;color:var(--ink-2);box-shadow:var(--sh1);transition:all .18s var(--ease)}
 .advchip:hover{border-color:var(--teal);color:var(--teal-deep);transform:translateY(-1px)}
 .advchip.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
@@ -1121,7 +1158,7 @@ select.ain{cursor:pointer}
 .advsep span{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
   color:var(--ink-3);font-weight:600;white-space:nowrap}
 .advsep::after{content:'';flex:1;height:1px;background:var(--rule)}
-.advres{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:18px 20px;
+.advres{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:18px 20px;
   margin-bottom:11px;box-shadow:var(--sh1);transition:box-shadow .2s var(--ease)}
 .advres:hover{box-shadow:var(--sh2)}
 .advres.first{border-color:var(--teal);box-shadow:var(--sh2),inset 0 0 0 1px var(--teal)}
@@ -1141,7 +1178,7 @@ select.ain{cursor:pointer}
 .ara{margin-top:14px;padding-top:13px;border-top:1px solid var(--rule-2)}
 .advmods{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 @media(max-width:600px){.advmods{grid-template-columns:1fr}}
-.advmod{background:#fff;border:1px solid var(--rule);border-radius:var(--r-sm);padding:12px 14px;box-shadow:var(--sh1)}
+.advmod{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-sm);padding:12px 14px;box-shadow:var(--sh1)}
 .advmod .amn{font-size:13.5px;font-weight:620;display:block}
 .advmod .amd{font-size:12px;color:var(--ink-2);display:block;margin-top:3px;line-height:1.45}
 .advnote{font-size:12px;color:var(--ink-3);margin-top:11px;line-height:1.55}
@@ -1154,16 +1191,16 @@ select.ain{cursor:pointer}
 .advlog{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
 .bubwrap{display:flex;flex-direction:column;gap:9px;align-items:flex-start}
 .bub{max-width:82%;padding:13px 17px;border-radius:var(--r-lg);font-size:14px;line-height:1.6}
-.bub.bot{background:#fff;border:1px solid var(--rule);color:var(--ink);
+.bub.bot{background:var(--card);border:1px solid var(--rule);color:var(--ink);
   border-bottom-left-radius:5px;box-shadow:var(--sh1)}
-.bub.bot.low{background:var(--amber-wash);border-color:#E8D3AE}
+.bub.bot.low{background:var(--amber-wash);border-color:var(--amber-line)}
 .bub.user{background:var(--teal);color:#fff;align-self:flex-end;border-bottom-right-radius:5px;
   box-shadow:0 2px 8px rgba(0,183,186,.22);font-weight:500}
 .bubchips{display:flex;flex-wrap:wrap;gap:7px;padding-left:2px}
 .advinput{display:flex;gap:10px;align-items:flex-end;margin-top:20px;padding-top:18px;
   border-top:1px solid var(--rule)}
 .advinput textarea{flex:1;border:1px solid var(--rule);border-radius:var(--r);padding:12px 15px;
-  font-family:var(--sans);font-size:14.5px;line-height:1.55;background:#fff;color:var(--ink);
+  font-family:var(--sans);font-size:14.5px;line-height:1.55;background:var(--card);color:var(--ink);
   resize:vertical;box-shadow:var(--sh1);transition:all .2s var(--ease)}
 .advinput textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.14)}
 .advinput .btn{flex:0 0 auto}
@@ -1174,7 +1211,7 @@ select.ain{cursor:pointer}
 
 /* ---------- provenance ---------- */
 .provsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:22px}
-.provcard{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:16px 17px 15px 20px;
+.provcard{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:16px 17px 15px 20px;
   box-shadow:var(--sh1);position:relative}
 .provcard .pvdot{position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0}
 .provcard .pvn{font-size:14px;font-weight:650;display:block;letter-spacing:-.014em}
@@ -1216,20 +1253,20 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
    transparency or higher contrast, every glass surface becomes fully opaque —
    the same escape hatch as Apple's .identity glass style. */
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more){
-  header.site.stuck{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;
+  header.site.stuck{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none;
     box-shadow:var(--sh2);border-bottom-color:var(--rule)}
   #adminBtn{background:var(--navy);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--sh3)}
   #adminBtn:hover{background:var(--navy-2)}
-  #toTop{background:#fff;border:1px solid var(--rule);color:var(--ink);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--sh2)}
+  #toTop{background:var(--card);border:1px solid var(--rule);color:var(--ink);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--sh2)}
   .toast{background:var(--navy);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--sh3)}
   #drawer,#inquiry{background:rgba(11,26,42,.62);-webkit-backdrop-filter:none;backdrop-filter:none}
   .dx{background:rgba(255,255,255,.18);-webkit-backdrop-filter:none;backdrop-filter:none}
 }
 /* No backdrop-filter support: the tints alone still carry the text safely. */
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  header.site.stuck{background:#fff}
+  header.site.stuck{background:var(--card)}
   #adminBtn{background:var(--navy)}
-  #toTop{background:#fff;border:1px solid var(--rule)}
+  #toTop{background:var(--card);border:1px solid var(--rule)}
   .toast{background:var(--navy)}
 }
 
@@ -1264,6 +1301,161 @@ footer.site{background:var(--navy);color:#fff;padding:44px 0 26px;margin-top:44p
 .hnav button[aria-current="page"]::after{content:"";position:absolute;left:11px;right:11px;
   bottom:-13px;height:2px;background:var(--teal);border-radius:2px}
 @media(max-width:1360px){.hnav{display:none}}
+
+/* ---------- configuration identity bar ---------- */
+.reqref{margin:0 0 10px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2)}
+.reqdone{margin:10px 0 0;font-size:13px;color:var(--ok)}
+.reqdone:empty{display:none}
+.fl.fsel select{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:var(--r-sm);padding:18px 12px 6px}
+.fl.fsel span{top:6px!important;font-size:10.5px!important}
+.fl.fatt input{padding-top:22px}
+.fl.fatt span{top:6px!important;font-size:10.5px!important}
+.cfgbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:-8px 0 12px;padding:8px 12px;
+  border:1px solid var(--rule);border-radius:var(--r);background:var(--card);font-size:12.5px;color:var(--ink-2)}
+.cfgbar .cb-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.cfgbar .cb-id{font-family:var(--mono);font-size:13px;color:var(--ink);letter-spacing:.04em}
+.cfgbar .cb-rev{font-family:var(--mono);font-size:12px;color:var(--teal-deep)}
+.cfgbar .cb-from,.cfgbar .cb-save{font-size:11.5px;color:var(--ink-3)}
+.cfgbar .cb-sp{flex:1}
+.cfgbar button{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--card);color:var(--ink-2);
+  border-radius:var(--r-pill);padding:5px 10px;font-size:12px;font-weight:550}
+.cfgbar button svg{width:14px;height:14px}
+.cfgbar button:hover:not(:disabled){border-color:var(--teal);color:var(--teal-deep)}
+.cfgbar button:disabled{opacity:.4;cursor:default}
+@media(max-width:560px){.cfgbar .cb-save,.cfgbar .cb-from{display:none}.cfgbar button span{display:none}}
+
+/* ---------- internal workspace ---------- */
+.wsbar{position:sticky;top:var(--hdr);z-index:65;background:var(--card);border-bottom:1px solid var(--rule);box-shadow:var(--sh1)}
+.wsbar .wsdemo{margin:0;padding:6px 0 0;font-size:11.5px;color:var(--amber)}
+.wsbar .wsdemo b{font-weight:650}
+.wsbarrow{display:flex;align-items:center;gap:14px}
+.wsnav{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:thin;padding:4px 0 6px}
+.wsnav button{flex:none;border:none;background:none;padding:7px 11px;border-radius:var(--r-sm);font-size:13px;font-weight:550;
+  color:var(--ink-2);white-space:nowrap}
+.wsnav button:hover{background:var(--card-2);color:var(--ink)}
+.wsnav button[aria-current="page"]{background:var(--teal-wash);color:var(--teal-deep);font-weight:650}
+.wsrolel{flex:none;display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+.wsrolel select,.wsform select,.wsfilt select,.wst select{font:inherit;font-size:12.5px;color:var(--ink);background:var(--field);
+  border:1px solid var(--rule);border-radius:var(--r-sm);padding:5px 7px}
+@media(max-width:760px){.wsbarrow{flex-direction:column;align-items:stretch;gap:0}.wsrolel{padding-bottom:6px}}
+body.view-internal main{padding-top:20px}
+.ws .wsbody{display:flex;flex-direction:column;gap:18px}
+.wsp{background:var(--card);border:1px solid var(--rule);border-radius:var(--r-lg);box-shadow:var(--sh1);padding:18px 20px}
+.wsph{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:12px}
+.wsph h3{font-size:17px;font-weight:650}
+.wsph p{margin:4px 0 0;font-size:13px;line-height:1.55;color:var(--ink-2);max-width:880px}
+.wsph .btn{flex:none}
+.warnt{color:var(--crit)}
+.wstw{overflow-x:auto;border:1px solid var(--rule-2);border-radius:var(--r)}
+.wst{width:100%;border-collapse:collapse;font-size:12.5px}
+.wst th{position:sticky;top:0;background:var(--card-2);text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.wst td{padding:8px 10px;border-bottom:1px solid var(--rule-2);vertical-align:top;color:var(--ink)}
+.wst tr:last-child td{border-bottom:none}
+.wst td.n,.wst th.n{text-align:right;white-space:nowrap}
+.wst .sub,.wsp .sub{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.45}
+.wst td.sub{display:table-cell}
+.wst .mono,.wsdl .mono{font-family:var(--mono)}
+.wst td.acts{white-space:nowrap;text-align:right}
+.wst td.acts button,.wsph button.small{border:1px solid var(--rule);background:var(--card);color:var(--ink-2);border-radius:var(--r-pill);
+  padding:4px 10px;font-size:12px;margin-left:4px}
+.wst td.acts button:hover{border-color:var(--teal);color:var(--teal-deep)}
+.wst tr.cur td{background:var(--teal-wash)}
+.wst tr.no td{color:var(--ink-3)}
+.wst tr.l1 td{background:var(--card-2);font-size:12.5px}
+.wst tr.l2{cursor:pointer}
+.wst tr.l2:hover td{background:var(--card-tint)}
+.wst tr.l2.on td{background:var(--teal-wash);box-shadow:inset 0 0 0 0 transparent}
+.wst tr.l2:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+.wst details summary{cursor:pointer;color:var(--teal-deep);font-size:12px}
+.wst details ul{margin:6px 0 0;padding-left:16px;font-size:12px}
+.wst input{font:inherit;font-size:12px;color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:6px;padding:4px 6px}
+.wsna{color:var(--ink-3);font-style:italic;font-size:12px}
+.wsdash{color:var(--ink-3)}
+.wst.bom td{padding:6px 10px}
+.dc{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:5px;
+  border:1px solid currentColor;white-space:nowrap;line-height:1.3}
+.dc-user{color:var(--teal-deep)}.dc-mfr{color:#3E7CC8}.dc-calc{color:#8B5CC2}.dc-sim{color:#B07A1C}
+.dc-meas{color:var(--ok)}.dc-appr{color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent)}
+.dc-miss{color:var(--crit)}.dc-local{color:var(--ink-2)}.dc-est{color:var(--amber)}
+.dc-demo{color:#fff;background:#B3261E;border-color:#B3261E}
+:root[data-theme="dark"] .dc-mfr{color:#7FB0F0}:root[data-theme="dark"] .dc-calc{color:#B996E6}:root[data-theme="dark"] .dc-sim{color:#E0B158}
+.dcleg{gap:6px!important}
+.wsfilt{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin-bottom:12px}
+.wsfilt label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--ink-3);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.wsfilt label.grow{flex:1;min-width:200px}
+.wsfilt .grow{flex:1}
+.wsfilt input{font:inherit;font-family:var(--sans);letter-spacing:0;text-transform:none;font-size:13px;color:var(--ink);background:var(--field);
+  border:1px solid var(--rule);border-radius:var(--r-sm);padding:6px 9px}
+.wsform{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px 14px}
+.wsform label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}
+.wsform label.wide,.wsform .wide{grid-column:1/-1}
+.wsform label.chk{flex-direction:row;align-items:center;gap:8px}
+.wsform input,.wsform textarea{font:inherit;font-size:13px;color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:var(--r-sm);padding:7px 9px}
+.wsform input:focus,.wsform textarea:focus,.wsform select:focus,.wsfilt input:focus{outline:2px solid var(--teal-line);outline-offset:0;border-color:var(--teal)}
+.wsbtns{display:flex;flex-wrap:wrap;gap:8px}
+.wsph-x,.wsph figure{margin:0}
+.wsform .wsph{display:flex;gap:8px;flex-wrap:wrap}
+.wsform .wsph figure{position:relative}
+.wsform .wsph img{width:120px;height:90px;object-fit:cover;border-radius:6px;border:1px solid var(--rule)}
+.wsform .wsph button{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.6);color:#fff}
+.wsdl{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;margin:0;font-size:13px}
+.wsdl dt{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-top:2px}
+.wsdl dd{margin:0;color:var(--ink)}
+.wsgrid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.wsgrid3 h4{font-size:12px;margin-bottom:6px;color:var(--ink-2)}
+.wsgrid3 ul{margin:0;padding-left:16px;font-size:12.5px}
+.wsgrid3 li.add{color:var(--ok)}.wsgrid3 li.rem{color:var(--crit)}.wsgrid3 li.chg{color:var(--amber)}
+@media(max-width:820px){.wsgrid3{grid-template-columns:1fr}}
+.wswarn{margin:0;padding-left:18px;font-size:13px}
+.wswarn li{margin-bottom:4px}.wswarn li.bad{color:var(--crit)}.wswarn li.warn{color:var(--amber)}
+.wsinline{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0;padding:0;list-style:none;font-size:13px}
+.wsempty{padding:20px;text-align:center;color:var(--ink-2)}
+.wsempty p{margin:0 0 12px}
+.wsnone{text-align:center;color:var(--ink-3);padding:18px!important}
+.wsnotes{margin:0;padding-left:18px;font-size:13px;line-height:1.6}
+.wsbomlay{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:16px;align-items:start}
+.wsbomside{position:sticky;top:calc(var(--hdr) + 92px)}
+.wsdock .view{border-radius:var(--r);overflow:hidden}
+@media(max-width:1100px){.wsbomlay{grid-template-columns:1fr}.wsbomside{position:static;order:-1}}
+.wstiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.wstile{border:1px solid var(--rule);border-radius:var(--r);padding:14px;background:var(--card)}
+.wstile h4{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+.wstile .v{font-size:19px;font-weight:650;color:var(--ink);line-height:1.3}
+.wstile .src{margin:8px 0 0;font-size:11px;color:var(--ink-3)}
+.wsbars{list-style:none;margin:0;padding:0;font-size:12px;font-weight:500}
+.wsbars li{display:grid;grid-template-columns:130px 1fr 26px;align-items:center;gap:8px;margin-bottom:4px}
+.wsbars i{display:block;height:6px;border-radius:3px;background:var(--rule-2);position:relative}
+.wsbars i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);border-radius:3px;background:var(--teal)}
+.wsbars b{text-align:right}
+
+/* ---------- view and theme switches ---------------------------------------
+   Customer / Internal is a presentation switch, not a security boundary: the
+   site is static and public, so the Internal workspace holds only public
+   catalogue data and records typed into this browser (see SECURITY.md). */
+.hmode{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.vsw,.tsw{display:inline-flex;align-items:center;padding:3px;gap:2px;border-radius:var(--r-pill);
+  background:var(--card-2);border:1px solid var(--rule)}
+.vsw button{border:none;background:none;padding:6px 14px;border-radius:var(--r-pill);font-size:12.5px;
+  font-weight:600;color:var(--ink-2);white-space:nowrap;transition:background .2s var(--ease),color .2s var(--ease)}
+.vsw button:hover{color:var(--ink)}
+.vsw button[aria-checked="true"]{background:var(--ink);color:var(--card)}
+.vsw button[data-view="internal"][aria-checked="true"]{background:var(--amber);color:#160F04}
+.tsw button{border:none;background:none;width:30px;height:28px;border-radius:var(--r-pill);display:flex;
+  align-items:center;justify-content:center;color:var(--ink-3);transition:background .2s var(--ease),color .2s var(--ease)}
+.tsw button svg{width:14px;height:14px}
+.tsw button:hover{color:var(--ink)}
+.tsw button[aria-checked="true"]{background:var(--card);color:var(--teal-deep);box-shadow:var(--sh1)}
+/* Customers see the catalogue, never the value store that edits it */
+body.view-customer #hVal,body.view-customer #adminBtn{display:none!important}
+/* On a phone the switches take a second header row, so neither shrinks
+   to a cryptic icon. The row is part of the sticky header. */
+@media(max-width:760px){
+  :root{--hdr:108px}
+  header .wrap{flex-wrap:wrap;height:auto;row-gap:0}
+  .lock,.hact{height:62px}
+  .hmode{order:3;width:100%;height:46px;justify-content:space-between;border-top:1px solid var(--rule-2)}
+}
 body.in-story .hnav button[aria-current="page"]{color:var(--ink-2);font-weight:550}
 body.in-story .hnav button[aria-current="page"]::after{opacity:0}
 
@@ -1280,6 +1472,13 @@ body.in-story .hnav button[aria-current="page"]::after{opacity:0}
    and the header gives up the two icons that are duplicated elsewhere: the value
    store has its floating button, and Compare lives in the Saved drawer. */
 @media(max-width:560px){.lock img{height:30px} #hVal{display:none}}
+@media(max-width:1180px){#hSave{display:none}}
+/* The centre of the header is the view and theme switches now, so the title
+   gives way first: the catalogue line below 1,240 px, the title below 1,080 px.
+   The static catalogue meta has no room left and is not shown. */
+.hmeta{display:none!important}
+@media(max-width:1240px){.lock .s{display:none}}
+@media(max-width:1080px){.lock .div,.lock h1{display:none}}
 @media(max-width:400px){#hCmp{display:none}}
 
 /* ---------- standard / engineering view ---------- */
@@ -1291,7 +1490,7 @@ body.in-story .hnav button[aria-current="page"]::after{opacity:0}
 .dmode button{background:none;border:0;border-radius:var(--r-pill);padding:5px 12px;
   font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
   font-weight:600;color:var(--ink-3);transition:all .2s var(--ease)}
-.dmode button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:var(--sh1)}
+.dmode button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--sh1)}
 .adv-only{display:none}
 body.eng .adv-only{display:block}
 body.eng tr.adv-only{display:table-row}
@@ -1323,7 +1522,7 @@ body.eng tr.adv-only{display:table-row}
   border-top:1px solid var(--rule-2)}
 .fittgt label{font-size:12.5px;color:var(--ink-2);font-weight:520}
 .fittgt input{width:96px;padding:7px 10px;border:1px solid var(--rule);border-radius:var(--r-sm);
-  font-family:var(--mono);font-size:12.5px;color:var(--ink);background:#fff;font-variant-numeric:tabular-nums}
+  font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--card);font-variant-numeric:tabular-nums}
 .fittgt input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,183,186,.14)}
 .fittgt span{font-size:11px;color:var(--ink-3)}
 .fitfoot{font-size:11px;color:var(--ink-3);line-height:1.5;margin-top:8px;
@@ -1466,7 +1665,7 @@ header.site{animation:hdrIn .6s var(--ease) both}
 .story.sty-static .sty-scene>*{opacity:1;transform:none}
 
 /* ---------- commercial breakdown (BOM) ---------- */
-.bom{margin-top:24px;border:1px solid var(--rule);border-radius:var(--r);background:#fff;box-shadow:var(--sh1)}
+.bom{margin-top:24px;border:1px solid var(--rule);border-radius:var(--r);background:var(--card);box-shadow:var(--sh1)}
 .bomh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
   padding:16px 18px;border-bottom:1px solid var(--rule)}
 .bomt{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--ink-2)}
@@ -1568,8 +1767,15 @@ body.demo #demobar{display:flex}
         <div class="s">Laser &amp; Photonics Vertical · 2026 Portfolio</div>
       </div>
     </div>
-    <nav class="hnav" id="hnav" aria-label="Sections"></nav>
+    <div class="hmode" id="hmode">
+      <div class="vsw" id="vsw" role="radiogroup" aria-label="Workspace view">
+        <button type="button" role="radio" data-view="customer" aria-checked="true">Customer</button>
+        <button type="button" role="radio" data-view="internal" aria-checked="false">Internal</button>
+      </div>
+      <div class="tsw" id="tsw" role="radiogroup" aria-label="Colour theme"></div>
+    </div>
     <div class="hact">
+      <button class="hb hb-ico" id="hSave" aria-label="Save configuration" title="Save configuration"></button>
       <button class="hb hb-adv" id="openAdvisor" aria-haspopup="dialog"></button>
       <button class="hb hb-ico" id="openSaved" aria-haspopup="dialog"
               aria-label="Saved and history" title="Saved &amp; history"></button>
@@ -1583,6 +1789,15 @@ body.demo #demobar{display:flex}
   </div>
 </header>
 
+<div class="wsbar" id="wsbar" hidden>
+  <div class="wrap">
+    <p class="wsdemo"><b>Internal workspace — demonstration.</b> Not access-controlled: it shows the public catalogue and records typed into this browser.</p>
+    <div class="wsbarrow">
+      <nav class="wsnav" id="wsnav" aria-label="Internal workspace"></nav>
+      <label class="wsrolel">Role preview <select id="wsrole" aria-label="Role preview — not a permission"></select></label>
+    </div>
+  </div>
+</div>
 <main>
 <section class="story" id="story" aria-label="Machine overview">
   <div class="sty-stage" id="styStage">
@@ -1601,7 +1816,8 @@ body.demo #demobar{display:flex}
     <div class="sty-bar" aria-hidden="true"><i id="styBar"></i></div>
   </div>
 </section>
-<div class="wrap">
+<div class="wrap" id="cfgwrap">
+  <div class="cfgbar" id="cfgbar" role="status" aria-live="polite" hidden></div>
   <div class="rail" id="rail" role="tablist" aria-label="Configuration steps"></div>
   <div class="grid">
     <section class="stage">
@@ -1702,6 +1918,7 @@ body.demo #demobar{display:flex}
     </aside>
   </div>
 </div>
+<section class="wrap ws" id="ws" aria-label="Internal workspace" hidden></section>
 </main>
 
 <footer class="site"><div class="wrap">
@@ -1733,7 +1950,7 @@ body.demo #demobar{display:flex}
   </div>
   <div class="fbot">
     <span>© <span id="yr"></span> Titan Engineering &amp; Automation Ltd — A TATA Enterprise</span>
-    <span id="stamp">Configurator v14.0</span>
+    <span id="stamp">Configurator v15.0</span>
   </div>
 </div></footer>
 
@@ -1790,9 +2007,9 @@ body.demo #demobar{display:flex}
 </div>
 
 <!-- inquiry -->
-<div id="inquiry" role="dialog" aria-modal="true" aria-label="Submit enquiry">
+<div id="inquiry" role="dialog" aria-modal="true" aria-label="Request a quotation or trial">
   <div class="mwin">
-    <div class="mhead"><h3>Submit enquiry</h3><button class="dx" id="inqX" aria-label="Close enquiry"></button></div>
+    <div class="mhead"><h3>Request a quotation</h3><button class="dx" id="inqX" aria-label="Close request"></button></div>
     <div class="mbody" id="inqBody"></div>
   </div>
 </div>
@@ -2599,8 +2816,7 @@ var RECO = [
 var RULES = {
   band_lo:0.90, band_hi:1.12,     // budget band applied to the computed value
   pw_up:0.42,   pw_dn:0.22,       // power scaling above / below platform default
-  lens_uplift:1.03,               // uplift for the largest objective
-  adminPin:'teal2026'             // cosmetic gate only — see README
+  lens_uplift:1.03                // uplift for the largest objective
 };
 
 var EXTRA = {
@@ -2644,7 +2860,7 @@ function loadData(cb){
   var done=false, t=setTimeout(function(){ if(!done){done=true;fin();} }, 3500);
   fetch('data.json',{cache:'no-store'})
     .then(function(r){ return r.ok? r.json() : null; })
-    .then(function(d){ if(!done){ done=true; clearTimeout(t); if(d) applyData(d,'data.json'); fin(); } })
+    .then(function(d){ if(!done){ done=true; clearTimeout(t); if(d){ applyData(d,'data.json'); if(d._updated) DATA_REV=d._updated; } fin(); } })
     .catch(function(){ if(!done){ done=true; clearTimeout(t); fin(); } });
 }
 
@@ -2712,7 +2928,11 @@ var IC={
  eyeoff:'<path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-2.9 3.8M6.5 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
  back:'<path d="M19 5 9 12l10 7V5z"/><path d="M5 5v14"/>',
  rew:'<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>',
- flag:'<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>'
+ flag:'<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+ moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+ monitor:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+ save:'<path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/>'
 };
 function ico(n,sz){
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '+
@@ -3214,7 +3434,8 @@ function sheetBOM(){
 function bomCSV(){
   var B=bomRows(); if(!B) return '';
   var rows=[['TEAL Laser Equipment Configurator — indicative commercial breakdown'],
-            ['Designation', desig()], ['Generated', new Date().toISOString().slice(0,10)],
+            ['Designation', desig()], ['Configuration', cfgRef()+' · fingerprint '+cfgHash()], ['Catalogue revision', DATA_REV],
+            ['Generated', new Date().toISOString().slice(0,10)],
             ['Status','ESTIMATE — not a quotation. Prices are not TEAL procurement data.'], [],
             ['Item','Description','Kind','Qty','Unit INR','Extended INR','Basis','Note']];
   B.rows.forEach(function(x){ var l=x.l;
@@ -3439,6 +3660,265 @@ function stepReady(i){
   if(k==='app')  return !!S.plat;
   return !!S.plat && !!S.app && !!S.src && !!S.lens && S.pw!=null;
 }
+/* ==========================================================================
+   THEME — Light, Dark or System. The early script in <head> sets the theme
+   before first paint; this keeps it in step with the header switch, the
+   operating system and printing (a printed sheet is always light).
+   ========================================================================== */
+var THEME={pref:'system', mq:null};
+var THEMES=[['light','Light theme','sun'],['dark','Dark theme','moon'],['system','Follow the system theme','monitor']];
+function themeApply(pref){
+  if(THEMES.every(function(t){ return t[0]!==pref; })) pref='system';
+  THEME.pref=pref;
+  var dark = pref==='dark' || (pref==='system' && !!(THEME.mq && THEME.mq.matches)), r=document.documentElement;
+  r.setAttribute('data-theme', dark? 'dark' : 'light');
+  r.setAttribute('data-theme-pref', pref);
+  var m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute('content', dark? '#0D141B' : '#00B7BA');
+  Store.set('teal.theme', pref);
+  hdrSync();
+}
+function themeInit(){
+  THEME.mq = window.matchMedia? matchMedia('(prefers-color-scheme: dark)') : null;
+  var pref=document.documentElement.getAttribute('data-theme-pref')||'system';
+  if(THEME.mq){
+    var f=function(){ if(THEME.pref==='system') themeApply('system'); };
+    if(THEME.mq.addEventListener) THEME.mq.addEventListener('change', f); else if(THEME.mq.addListener) THEME.mq.addListener(f);
+  }
+  window.addEventListener('beforeprint', function(){ document.documentElement.setAttribute('data-theme','light'); });
+  window.addEventListener('afterprint', function(){ themeApply(THEME.pref); });
+  themeApply(pref);
+}
+
+/* ==========================================================================
+   VIEW — Customer or Internal. This is presentation, not access control: the
+   site is static and public, so anyone can switch, and nothing confidential
+   is in it to protect. The Internal workspace works on the public catalogue
+   and on records typed into this browser; SECURITY.md sets out what a real
+   internal service needs (authentication, server-side roles, protected
+   storage, audit) and docs/INTERNAL-DATA.md the contract it would serve.
+   ========================================================================== */
+var VIEW={v:'customer', sec:'portfolio'};
+var WSEC=[['portfolio','Product Portfolio'],['cfg','Machine Configurator'],['eng','Product Engineering'],
+  ['bom','BOM & Costing'],['comp','Components & Suppliers'],['trials','Application Trials'],
+  ['release','Validation & Release'],['enq','Customer Enquiries'],['mgmt','Management Overview'],['settings','Settings & Audit']];
+/* Role preview: what each role would see once a server enforces it. Here it
+   only filters the screen — anyone can pick any role, and it says so. */
+var ROLES={
+  sales:{n:'Sales', sec:['portfolio','cfg','eng','trials','enq','settings']},
+  appeng:{n:'Application Engineer', sec:['portfolio','cfg','eng','comp','trials','release','enq','settings'], approveTrial:true},
+  design:{n:'Design Engineer', sec:['portfolio','cfg','eng','bom','comp','trials','release','settings'], approveSub:true},
+  pm:{n:'Product Manager', sec:WSEC.map(function(x){ return x[0]; }), cost:true, margin:true, approve:true},
+  procurement:{n:'Procurement', sec:['portfolio','cfg','bom','comp','mgmt','settings'], cost:true, editCost:true},
+  finance:{n:'Finance', sec:['portfolio','cfg','bom','mgmt','settings'], cost:true, margin:true, editCost:true},
+  management:{n:'Management', sec:['portfolio','cfg','eng','bom','release','enq','mgmt','settings'], cost:true, margin:true},
+  admin:{n:'Administrator', sec:WSEC.map(function(x){ return x[0]; }), cost:true, margin:true, editCost:true, approve:true, approveTrial:true, approveSub:true}
+};
+var ROLE={cur:'pm'};
+function can(f){ var r=ROLES[ROLE.cur]||{}; return !!r[f]; }
+function canSee(sec){ var r=ROLES[ROLE.cur]; return !!r && r.sec.indexOf(sec)>=0; }
+
+function hdrSync(){
+  var v=$('#vsw'), t=$('#tsw');
+  if(v) v.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-checked', b.getAttribute('data-view')===VIEW.v? 'true':'false');
+    b.tabIndex = b.getAttribute('data-view')===VIEW.v? 0 : -1; });
+  if(t) t.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-theme')===THEME.pref;
+    b.setAttribute('aria-checked', on? 'true':'false'); b.tabIndex = on? 0 : -1; });
+}
+/* radio-group keyboard: arrows move and select, as a segmented control should */
+function segKeys(box, attr, pick){
+  box.addEventListener('keydown', function(e){
+    var bs=[].slice.call(box.querySelectorAll('button')), i=bs.indexOf(document.activeElement); if(i<0) return;
+    var d = (e.key==='ArrowRight'||e.key==='ArrowDown')? 1 : (e.key==='ArrowLeft'||e.key==='ArrowUp')? -1 : 0;
+    if(e.key==='Home') d=-i; if(e.key==='End') d=bs.length-1-i;
+    if(!d && e.key!=='Home') return;
+    e.preventDefault(); var n=bs[(i+d+bs.length)%bs.length]; pick(n.getAttribute(attr)); n.focus();
+  });
+}
+function viewSet(v, sec){
+  if(v!=='internal') v='customer';
+  var was=VIEW.v; VIEW.v=v; if(sec) VIEW.sec=sec;
+  Store.set('teal.view', {v:v, sec:VIEW.sec, role:ROLE.cur});
+  document.body.classList.toggle('view-internal', v==='internal');
+  document.body.classList.toggle('view-customer', v!=='internal');
+  hdrSync();
+  wsShow();
+  if(was!==v && BOOTED){
+    toast(v==='internal'? 'Internal workspace — a demonstration on public data, not access-controlled.' : 'Customer view.');
+    if(v==='internal') scrollTo(0,0); else setTimeout(function(){ toWork(true); }, 0);
+  }
+}
+function wsShow(){
+  var internal=VIEW.v==='internal', bar=$('#wsbar'), ws=$('#ws'), cfgWrap=$('#cfgwrap'), story=$('#story');
+  if(internal && !canSee(VIEW.sec)) VIEW.sec='cfg';
+  var cfg=!internal || VIEW.sec==='cfg';
+  if(bar) bar.hidden=!internal;
+  if(ws) ws.hidden=cfg;
+  if(cfgWrap) cfgWrap.hidden=!cfg;
+  if(story) story.hidden=internal;
+  document.body.classList.toggle('ws-open', !cfg);
+  wsNav();
+  if(!cfg) wsRender();
+  else { wsDock(null); if(M3D.vp){ M3D.vp.resize(); M3D.vp.dirty=true; } }
+}
+function wsNav(){
+  var n=$('#wsnav'); if(!n) return;
+  n.innerHTML=WSEC.filter(function(x){ return canSee(x[0]); }).map(function(x){
+    return '<button type="button" data-sec="'+x[0]+'"'+(VIEW.sec===x[0]?' aria-current="page"':'')+'>'+esc(x[1])+'</button>'; }).join('');
+  var rs=$('#wsrole');
+  if(rs && !rs.options.length){
+    rs.innerHTML=Object.keys(ROLES).map(function(k){ return '<option value="'+k+'">'+esc(ROLES[k].n)+'</option>'; }).join('');
+  }
+  if(rs) rs.value=ROLE.cur;
+}
+function shellInit(){
+  var tsw=$('#tsw');
+  tsw.innerHTML=THEMES.map(function(t){ return '<button type="button" role="radio" data-theme="'+t[0]+'" aria-label="'+t[1]+'" title="'+t[1]+'">'+ico(t[2])+'</button>'; }).join('');
+  tsw.onclick=function(e){ var b=e.target.closest('[data-theme]'); if(b) themeApply(b.getAttribute('data-theme')); };
+  segKeys(tsw, 'data-theme', themeApply);
+  var vsw=$('#vsw');
+  vsw.onclick=function(e){ var b=e.target.closest('[data-view]'); if(b) viewSet(b.getAttribute('data-view')); };
+  segKeys(vsw, 'data-view', function(v){ viewSet(v); });
+  var hs=$('#hSave'); if(hs){ hs.innerHTML=ico('save'); hs.onclick=function(){ cfgSave(); }; }
+  $('#wsnav').onclick=function(e){ var b=e.target.closest('[data-sec]'); if(b){ viewSet('internal', b.getAttribute('data-sec')); scrollTo(0,0); } };
+  $('#wsrole').onchange=function(){ ROLE.cur=this.value; wsAudit('role preview', ROLE.cur, ROLES[ROLE.cur].n); viewSet('internal'); };
+  var st=Store.get('teal.view', null);
+  if(st && ROLES[st.role]) ROLE.cur=st.role;
+  if(st && st.sec) VIEW.sec=st.sec;
+  themeInit();
+  viewSet(st && st.v==='internal'? 'internal' : 'customer');
+}
+/* ==========================================================================
+   CONFIGURATION IDENTITY — every configuration has an ID and a revision.
+   The ID is assigned the first time a platform is chosen and stays with the
+   configuration; every change makes a new revision. Exports, the share link,
+   enquiries and saved copies all carry the ID and revision, so a document can
+   always be traced back to the exact selection it describes. The working
+   copy is autosaved in this browser; undo and redo step through revisions.
+   ========================================================================== */
+var CFG={id:null, rev:0, hist:[], ptr:-1, from:null, shared:false, last:'', mute:0, restoring:false, at:0, offer:null};
+function cfgNewId(){
+  var a=new Uint8Array(3), h='', i;
+  try{ crypto.getRandomValues(a); }catch(e){ for(i=0;i<3;i++) a[i]=Math.random()*256|0; }
+  for(i=0;i<3;i++) h+=(a[i]<16?'0':'')+a[i].toString(16);
+  return 'TC-'+h.toUpperCase();
+}
+function cfgKey(){ return JSON.stringify(snapshot()); }
+/* A short content fingerprint — the same selection always gives the same one,
+   whatever its ID — so two documents can be checked against each other. */
+function cfgHash(str){
+  var h=2166136261, i; str=str||cfgKey();
+  for(i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619)>>>0; }
+  return ('0000000'+h.toString(16)).slice(-8).toUpperCase();
+}
+function cfgRef(){ return CFG.id? CFG.id+' r'+CFG.rev : '—'; }
+function cfgTrack(){
+  if(!CFG.ready || CFG.mute || (typeof DEMO!=='undefined' && DEMO.on) || (typeof MIS!=='undefined' && MIS.on)) return;
+  if(!S.plat){ cfgBar(); return; }
+  var k=cfgKey();
+  if(k===CFG.last){ cfgBar(); return; }
+  CFG.last=k;
+  if(CFG.restoring){ CFG.restoring=false; cfgPersist(); cfgBar(); return; }
+  if(!CFG.id || CFG.shared){
+    /* a configuration opened from someone else's link becomes a copy of it on
+       the first change, so two people never write revisions under one ID */
+    if(CFG.shared){ CFG.from=CFG.id+' r'+CFG.rev; CFG.shared=false; }
+    CFG.id=cfgNewId(); CFG.hist=[]; CFG.ptr=-1; CFG.rev=0;
+  }
+  var max=CFG.hist.reduce(function(a,x){ return Math.max(a,x.rev); }, 0);
+  CFG.hist=CFG.hist.slice(0, CFG.ptr+1);                 /* a change after undo drops the redo branch */
+  CFG.rev=max+1;
+  CFG.hist.push({rev:CFG.rev, ts:Date.now(), snap:k});
+  if(CFG.hist.length>60) CFG.hist.shift();
+  CFG.ptr=CFG.hist.length-1;
+  cfgPersist(); cfgBar();
+  try{ writeHash(); }catch(e){}                           /* the link names the revision */
+}
+function cfgPersist(){
+  CFG.at=Date.now();
+  try{ localStorage.setItem('teal.cfg', JSON.stringify({id:CFG.id, rev:CFG.rev, from:CFG.from, hist:CFG.hist, ptr:CFG.ptr, at:CFG.at})); CFG.saveOk=true; }
+  catch(e){ CFG.saveOk=false; }
+}
+function cfgApply(snap, meta){
+  var st=JSON.parse(snap); CFG.restoring=true; CFG.last='';
+  restore(st);
+  if(meta){ CFG.id=meta.id; CFG.rev=meta.rev; }
+  writeHash();
+}
+function cfgUndo(){
+  if(CFG.ptr<=0) return;
+  CFG.ptr--; var h=CFG.hist[CFG.ptr]; cfgApply(h.snap, {id:CFG.id, rev:h.rev});
+  toast('Back to '+cfgRef()+'.');
+}
+function cfgRedo(){
+  if(CFG.ptr>=CFG.hist.length-1) return;
+  CFG.ptr++; var h=CFG.hist[CFG.ptr]; cfgApply(h.snap, {id:CFG.id, rev:h.rev});
+  toast('Forward to '+cfgRef()+'.');
+}
+function cfgSave(){
+  var p=P(); if(!p){ toast('Choose a platform first — there is nothing to save yet.','warn'); return; }
+  var nm=prompt('Name this configuration:', p.n+' — '+(A()? A().n : desig()));
+  if(nm===null) return;
+  saveCfg(nm.trim()||null);
+}
+/* the bar above the step rail: identity, revision, autosave, undo / redo */
+function cfgBar(){
+  var b=$('#cfgbar'); if(!b) return;
+  if(CFG.offer && !S.plat){
+    var o=CFG.offer;
+    b.innerHTML='<span class="cb-k">Unfinished configuration</span><span>'+esc(o.id+' r'+o.rev)+' · '+esc(new Date(o.at).toLocaleString())+'</span>'+
+      '<span class="cb-sp"></span><button type="button" data-c="restore">Restore it</button><button type="button" data-c="dismiss">Dismiss</button>';
+    b.hidden=false; return;
+  }
+  if(!CFG.id || !S.plat){ b.hidden=true; return; }
+  var t=CFG.at? new Date(CFG.at) : null;
+  b.innerHTML='<span class="cb-k">Configuration</span><b class="cb-id" title="Content fingerprint '+cfgHash()+'">'+esc(CFG.id)+'</b>'+
+    '<span class="cb-rev">Revision '+CFG.rev+'</span>'+(CFG.from? '<span class="cb-from">copied from '+esc(CFG.from)+'</span>' : '')+
+    '<span class="cb-save">'+(CFG.saveOk===false? 'Not autosaved — browser storage is unavailable' : t? 'Autosaved '+t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '')+'</span>'+
+    '<span class="cb-sp"></span>'+
+    '<button type="button" data-c="undo" aria-label="Undo — previous revision" title="Undo (Ctrl+Z)"'+(CFG.ptr<=0?' disabled':'')+'>'+ico('undo')+'</button>'+
+    '<button type="button" data-c="redo" aria-label="Redo — next revision" title="Redo (Ctrl+Shift+Z)"'+(CFG.ptr>=CFG.hist.length-1?' disabled':'')+'>'+ico('redo')+'</button>'+
+    '<button type="button" data-c="save">'+ico('save')+'<span>Save</span></button>';
+  b.hidden=false;
+}
+function cfgLoadRecord(r){
+  if(r.cfgId){
+    CFG.id=r.cfgId; CFG.rev=r.rev; CFG.from=null; CFG.shared=false;
+    CFG.hist=[{rev:r.rev, ts:r.ts, snap:JSON.stringify(r.st)}]; CFG.ptr=0;
+    CFG.restoring=true; CFG.last='';
+  } else { CFG.id=null; CFG.hist=[]; CFG.ptr=-1; CFG.last=''; }
+  restore(r.st); writeHash();
+}
+function cfgInit(hadHash, q){
+  CFG.ready=true;
+  var b=$('#cfgbar');
+  b.onclick=function(e){
+    var t=e.target.closest('[data-c]'); if(!t) return;
+    var c=t.getAttribute('data-c');
+    if(c==='undo') cfgUndo(); else if(c==='redo') cfgRedo(); else if(c==='save') cfgSave();
+    else if(c==='restore' && CFG.offer){ var o=CFG.offer; CFG.offer=null; CFG.hist=o.hist||[]; CFG.ptr=o.ptr; CFG.from=o.from||null;
+      var h=CFG.hist[CFG.ptr]; if(h){ cfgApply(h.snap, {id:o.id, rev:h.rev}); toast('Restored '+cfgRef()+'.'); } }
+    else if(c==='dismiss'){ CFG.offer=null; cfgBar(); }
+  };
+  document.addEventListener('keydown', function(e){
+    if(adminOpen || !(e.metaKey||e.ctrlKey) || e.key.toLowerCase()!=='z') return;
+    var tag=(e.target.tagName||'').toLowerCase(); if(tag==='input'||tag==='textarea'||tag==='select') return;
+    if(document.querySelector('#advisor.open, #drawer.open, #compare.open, #inquiry.open')) return;
+    e.preventDefault(); e.shiftKey? cfgRedo() : cfgUndo();
+  });
+  var saved=null; try{ saved=JSON.parse(localStorage.getItem('teal.cfg')); }catch(e){}
+  if(hadHash){
+    /* a shared link names the configuration it came from */
+    if(q && /^TC-[0-9A-F]{6}$/.test(q.id||'') && +q.r>0){ CFG.id=q.id; CFG.rev=+q.r; CFG.shared=!(saved && saved.id===q.id); }
+    if(saved && saved.id===CFG.id){ CFG.hist=saved.hist||[]; CFG.ptr=Math.min(saved.ptr, CFG.hist.length-1); CFG.from=saved.from||null; CFG.shared=false; }
+    CFG.last=cfgKey();
+    if(!CFG.id){ CFG.last=''; }
+    if(CFG.id && !CFG.hist.length){ CFG.hist=[{rev:CFG.rev, ts:Date.now(), snap:CFG.last}]; CFG.ptr=0; }
+  } else if(saved && saved.id && saved.hist && saved.hist.length){
+    CFG.offer=saved;                                      /* offered, never forced: the landing stays the story */
+  }
+  cfgTrack(); cfgBar();
+}
+
 function render(){
   misEvent('config');
   var guard=0;
@@ -3471,6 +3951,8 @@ function render(){
   rail(); sync();
   try{ fitSync(); navSync(); }catch(e){}
   try{ storySync(); }catch(e){}
+  try{ cfgTrack(); }catch(e){}
+  if(typeof VIEW!=='undefined' && VIEW.v==='internal' && VIEW.sec!=='cfg') try{ wsRender(); }catch(e){}
 }
 
 function uiFam(b){
@@ -3810,7 +4292,7 @@ function uiSpec(b){
       li('Heat to reject', num(ph.heat_kW)+' kW')+
       li('Cooling', ph.cool)+
       li('Beam delivery', MOTIONLBL(p.deliv))+
-      li('Laser safety', 'Class 1 enclosure per IEC 60825-1')+
+      li('Laser safety', (function(){ var sf=specGet(p,/safety|laser class/i); return sf? esc(sf.row[1]) : 'Not stated in the specification — set by the machine’s risk assessment'; })())+
       li('Eyewear', 'OD set by the Laser Safety Officer per IEC 60825-1')));
   }
   g.appendChild(el('div','sc','<h4>Integration</h4>'+
@@ -3845,7 +4327,8 @@ function uiSpec(b){
   var acts=el('div','acts');
   acts.innerHTML='<button class="btn pri" id="pr">'+ico('print')+'Print / PDF specification</button>'+
     '<button class="btn" id="sv">'+ico('star')+'Save configuration</button>'+
-    '<button class="btn" id="iq">'+ico('mail')+'Submit enquiry</button>'+
+    '<button class="btn" id="iq">'+ico('mail')+'Request a quotation</button>'+
+    '<button class="btn" id="tq">'+ico('doc')+'Request an application trial</button>'+
     '<button class="btn" id="cp">'+ico('copy')+'Copy designation</button>'+
     '<button class="btn" id="lk">'+ico('link')+'Copy shareable link</button>'+
     '<button class="btn" id="dfm">'+ico('doc')+'DFM report (PDF)</button>'+
@@ -3865,12 +4348,14 @@ function uiSpec(b){
   sheet(p,a,o,lo,hi,mk,ex,sd);
 
   setTimeout(function(){
+    if(!$('#pr')) return;            /* the step changed before the buttons were bound */
     $('#pr').onclick=function(){window.print();};
     $('#sv').onclick=function(){
       var nm=prompt('Name this configuration:', p.n+' — '+(a?a.n:''));
       if(nm===null) return; saveCfg(nm.trim()||null);
     };
     $('#iq').onclick=openInquiry;
+    $('#tq').onclick=openTrial;
     bindCopy('#cp', desig(), ico('copy')+'Copy designation');
     bindCopy('#lk', location.origin+location.pathname+'#'+encodeState(), ico('link')+'Copy shareable link');
     bindCopy('#rq', rfq(p,a,o,lo,hi,mk,ex,sd), ico('mail')+'Copy RFQ summary');
@@ -3887,6 +4372,9 @@ function uiSpec(b){
       });
     };
   $('#rs').onclick=function(){
+      if(!confirm('Start over? This clears '+cfgRef()+' from the configurator. Saved configurations are kept; save this one first if you want it.')) return;
+      CFG.id=null; CFG.rev=0; CFG.hist=[]; CFG.ptr=-1; CFG.last=''; CFG.from=null; CFG.shared=false;
+      try{ localStorage.removeItem('teal.cfg'); }catch(e){}
       S={plat:null,app:null,src:null,pw:null,lens:null,mods:{},sw:'desktop',extra:{},notes:''};
       famSel=null; reach=0; PQ=''; SEARCH_ALL=false; IFILT=null; location.hash=''; go(0);
     };
@@ -3908,6 +4396,7 @@ function rfq(p,a,o,lo,hi,mk,ex,sd){
   L.push('ENQUIRY — TEAL LASER EQUIPMENT');
   L.push('Titan Engineering & Automation Ltd · Laser & Photonics Vertical');
   L.push('');
+  L.push('Configuration     : '+cfgRef()+' · fingerprint '+cfgHash()+' · catalogue '+DATA_REV);
   L.push('Model designation : '+desig());
   L.push('Family            : '+FAM[p.fam].n+' (Catalogue Ch. '+FAM[p.fam].ch+')');
   L.push('Platform          : '+p.n+' — '+p.t);
@@ -4006,7 +4495,8 @@ function sheet(p,a,o,lo,hi,mk,ex,sd){
     }
     pr2('Source wall-plug', num(ph.wall_kW)+' kW at '+((ph.src.wpe||0.25)*100).toFixed(0)+' % efficiency');
     pr2('Heat to reject', num(ph.heat_kW)+' kW — '+ph.cool);
-    pr2('Laser safety', 'Class 1 enclosure per IEC 60825-1; eyewear OD set by the Laser Safety Officer');
+    var sfg=specGet(p,/safety|laser class/i);
+    pr2('Laser safety', sfg? sfg.row[1]+' (platform specification)' : 'Laser class not stated in the specification — set by the machine’s risk assessment');
   }
   var sd2=standardsFor(), st='';
   sd2.forEach(function(k){ st+='<tr><td class="k">'+STD[k].n+'</td><td>'+STD[k].d+' — '+STD[k].s+'</td></tr>'; });
@@ -4026,7 +4516,9 @@ function sheet(p,a,o,lo,hi,mk,ex,sd){
    '<div class="sh"><div><h1>Laser Equipment Specification</h1>'+
    '<div class="mono" style="font-size:8pt;letter-spacing:.12em">LASER &amp; PHOTONICS VERTICAL · BENGALURU</div></div>'+
    '<img src="'+LOGO+'" alt="TEAL — A TATA Enterprise"/></div>'+
-   '<div class="mono" style="font-size:13pt;font-weight:600;margin-bottom:10px">'+desig()+'</div>'+
+   '<div class="mono" style="font-size:13pt;font-weight:600;margin-bottom:4px">'+desig()+'</div>'+
+   '<div class="mono" style="font-size:8.5pt;margin-bottom:10px">Configuration '+esc(cfgRef())+' · fingerprint '+cfgHash()+
+     ' · catalogue '+esc(DATA_REV)+' · generated '+new Date().toISOString().slice(0,10)+'</div>'+
    '<table><tr><th colspan="2">Configuration</th></tr>'+rows+'</table>'+
    '<table><tr><th colspan="2">Platform specification</th></tr>'+pr+'</table>'+
    (pe? '<table><tr><th colspan="2">Process &amp; energy — computed</th></tr>'+pe+'</table>':'')+
@@ -4035,6 +4527,16 @@ function sheet(p,a,o,lo,hi,mk,ex,sd){
    '<table><tr><th colspan="2">Commercial</th></tr>'+cm+
    '<tr><td class="k">Indicative ex-works budget</td><td><b>'+shortINR(lo)+' – '+shortINR(hi)+' (INR)</b></td></tr></table>'+
    sheetBOM()+
+   '<table><tr><th colspan="2">Assumptions and limitations</th></tr>'+
+     '<tr><td class="k">Optical figures</td><td>Diffraction-limited estimates from the source class and objective — not measured.</td></tr>'+
+     '<tr><td class="k">Working distance</td><td>Not in the product data; taken from the objective datasheet during engineering.</td></tr>'+
+     '<tr><td class="k">Machine envelope</td><td>'+(machineDims().stated? 'As stated in the platform specification.' : 'Estimated from power, field and modules — not a drawing dimension.')+'</td></tr>'+
+     '<tr><td class="k">Process result</td><td>Not validated for this part until an application trial is completed and approved.</td></tr>'+
+     '<tr><td class="k">Budget</td><td>Indicative band from a parametric model; scope of supply is confirmed in a formal proposal.</td></tr></table>'+
+   '<table><tr><th colspan="2">Recommended next steps</th></tr>'+
+     '<tr><td class="k">1</td><td>Request an application trial on your parts, quoting configuration '+esc(cfgRef())+'.</td></tr>'+
+     '<tr><td class="k">2</td><td>Request a quotation; TEAL confirms scope of supply, delivery and price in a formal proposal.</td></tr>'+
+     '<tr><td class="k">3</td><td>Agree acceptance criteria and the site requirements (power, air, extraction, floor space).</td></tr></table>'+
    '<div class="foot"><b>Indicative only — not a quotation.</b> Budgetary estimates generated from a parametric model for early '+
    'scoping. Specifications are indicative for standard configurations and are finalised against the customer\'s part, process and '+
    'factory conditions during application engineering. Performance on specific parts is confirmed through trials at the TEAL '+
@@ -4110,6 +4612,7 @@ function encodeState(){
   if(mk.length)q.push('m='+mk.join('.')); if(S.sw)q.push('f='+S.sw);
   if(ex.length)q.push('x='+ex.join('.'));
   if(S.target>0)q.push('t='+Math.round(S.target));
+  if(typeof CFG!=='undefined' && CFG.id && CFG.rev) q.push('id='+CFG.id, 'r='+CFG.rev);
   return q.join('&');
 }
 var hashLock=false;
@@ -4118,9 +4621,11 @@ function writeHash(){
   var h=encodeState();
   if(h && ('#'+h)!==location.hash){ hashLock=true; history.replaceState(null,'','#'+h); hashLock=false; }
 }
+var READQ=null;
 function readHash(){
   var h=location.hash.replace(/^#/,''); if(!h) return false;
   var q={}; h.split('&').forEach(function(kv){ var i=kv.indexOf('='); if(i>0) q[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1)); });
+  READQ=q;
   if(!q.p||!PLAT[q.p]) return false;
   var p=PLAT[q.p];
   S.plat=q.p; famSel=p.fam;
@@ -4178,7 +4683,7 @@ var Store={
 /* ---- toasts (replace blocking alerts) --------------------------------- */
 function toast(msg, kind){
   var w=$('#toasts');
-  var t=el('div','toast'+(kind?' '+kind:''), ico(kind==='warn'?'alert':'check')+'<span>'+msg+'</span>');
+  var t=el('div','toast'+(kind?' '+kind:''), ico(kind==='warn'?'alert':'check')+'<span>'+esc(msg)+'</span>');
   w.appendChild(t);
   setTimeout(function(){ t.classList.add('go'); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },320); }, 3600);
 }
@@ -4268,7 +4773,7 @@ function restore(st){
 }
 function saveCfg(name){
   var p=P(); if(!p) return;
-  var rec={id:'c'+Date.now(), name:name|| (p.n+' — '+desig()), ts:Date.now(), fav:false, st:snapshot(),
+  var rec={id:'c'+Date.now(), name:name|| (p.n+' — '+desig()), ts:Date.now(), fav:false, st:snapshot(), cfgId:CFG.id, rev:CFG.rev,
            desig:desig(), plat:p.n, band:shortINR(price()*RULES.band_lo)+' – '+shortINR(price()*RULES.band_hi)};
   SAVED.unshift(rec); Store.set('teal.saved', SAVED);
   toast('Saved “'+rec.name+'”'+(Store.ok?'':' — this session only'));
@@ -4303,6 +4808,8 @@ function openCompare(){
   var recs=cmpRecords();
   if(recs.length<2){ toast('Select at least two configurations to compare.','warn'); return; }
   var keep=snapshot(), keepCur=cur, keepReach=reach, keepFam=famSel;
+  CFG.mute++;
+  try{
   var cols=recs.map(function(r){
     restore(r.st);
     var p=P(), o=optics(), v=price(), std=p.std||[], add=[];
@@ -4316,6 +4823,7 @@ function openCompare(){
       band:shortINR(v*RULES.band_lo)+' – '+shortINR(v*RULES.band_hi), raw:v};
   });
   restore(keep); cur=keepCur; reach=keepReach; famSel=keepFam; render();
+  } finally { CFG.mute--; }
 
   var rows=[['Family','fam'],['Platform','plat'],['Application','app'],['Source','src'],['Average power','pw'],
             ['Objective','lens'],['Field','fld'],['Spot ⌀','spot'],['Depth of focus','dof'],
@@ -4344,6 +4852,12 @@ function openCompare(){
    mmBuild, with the configuration swapped in and back out the way the machine
    story does it — the user's selection, step, run and view are never touched. */
 var CMP3={vp:null, recs:[], a:0, b:1, diff:null, only:false};
+/* An offscreen 'viewport' for scans: its own view state, so a build through it
+   never writes the live view's faces, scene list or joint state. */
+function scanVp(vm){
+  return {o:{}, gids:true, view:{vmode:vm||'solid', layers:{enc:true,glz:true,cov:true,lit:true,mod:true,util:true,flr:true,beam:true},
+    xk:vm==='xray'? 1 : 0, expA:0, isoW:{_:1}}};
+}
 function cfgState(st){
   return {plat:st.plat, app:st.app, src:st.src, pw:st.pw, lens:st.lens,
           mods:JSON.parse(JSON.stringify(st.mods||{})), sw:st.sw||'desktop',
@@ -4370,7 +4884,7 @@ function withCfg(st, fn){
    differently — a longer frame member, a larger objective — does not. */
 function cmpScan(st){
   return withCfg(st, function(){
-    var b=new B3(); b.q=1; b.lod=1; mmBuild(b, 0, CMP3.vp);
+    var b=new B3(); b.q=1; b.lod=1; mmBuild(b, 0, CMP3.vp || scanVp('solid'));
     var m={};
     b.f.forEach(function(f){
       if(f.kind || !f.cid) return;
@@ -4513,16 +5027,16 @@ function renderDrawer(){
   list.forEach(function(r){
     var sel=CMP.indexOf(r.id)>=0;
     var c=el('div','dcard'+(sel?' sel':''));
-    c.innerHTML='<div class="dh"><span class="dn">'+(r.name||r.plat)+'</span>'+
+    c.innerHTML='<div class="dh"><span class="dn">'+esc(r.name||r.plat)+'</span>'+
       (DTAB==='saved'?'<button class="fav'+(r.fav?' on':'')+'" title="Favourite" aria-label="Favourite">★</button>':'')+'</div>'+
-      '<div class="dd">'+r.desig+'</div><div class="db">'+r.band+'</div>'+
+      '<div class="dd">'+esc(r.desig)+'</div>'+(r.cfgId? '<div class="dd">'+esc(r.cfgId+' · r'+r.rev)+'</div>' : '')+'<div class="db">'+esc(r.band)+'</div>'+
       '<div class="dt">'+new Date(r.ts).toLocaleString()+'</div>'+
       '<div class="da">'+
         '<button class="lnk ld">Load</button>'+
         '<button class="lnk lc">'+(sel?'✓ In compare':'Compare')+'</button>'+
         (DTAB==='saved'?'<button class="lnk lx">Delete</button>':'')+
       '</div>';
-    c.querySelector('.ld').onclick=function(){ restore(r.st); closeDrawer(); toast('Loaded '+r.desig); };
+    c.querySelector('.ld').onclick=function(){ cfgLoadRecord(r); closeDrawer(); toast('Loaded '+(r.cfgId? r.cfgId+' r'+r.rev : r.desig)); };
     c.querySelector('.lc').onclick=function(){ toggleCmp(r.id); };
     var f=c.querySelector('.fav');
     if(f) f.onclick=function(){ r.fav=!r.fav; Store.set('teal.saved',SAVED); renderDrawer(); };
@@ -4539,16 +5053,35 @@ function openDrawer(tab){ if(tab)DTAB=tab; $('#drawer').classList.add('open'); r
 function closeDrawer(){ $('#drawer').classList.remove('open'); }
 
 /* ---- inquiry ----------------------------------------------------------- */
-function inquiryText(f){
+function inquiryText(f, id){
   var p=P(), a=A(), o=optics(), v=price();
   var L=[];
-  L.push('ENQUIRY — TEAL LASER EQUIPMENT');
+  L.push((f.kind==='trial'? 'APPLICATION TRIAL REQUEST' : 'QUOTATION REQUEST')+' — TEAL LASER EQUIPMENT');
+  if(id) L.push('Reference     : '+id);
+  L.push('Configuration : '+cfgRef()+' (fingerprint '+cfgHash()+')');
   L.push('');
   L.push('Contact       : '+f.name+(f.company?', '+f.company:''));
   L.push('Email         : '+f.email);
+  if(f.country) L.push('Country       : '+f.country);
   if(f.phone) L.push('Phone         : '+f.phone);
-  if(f.qty)   L.push('Quantity      : '+f.qty);
-  if(f.when)  L.push('Timeline      : '+f.when);
+  if(f.kind==='trial'){
+    L.push('');
+    L.push('TRIAL');
+    L.push('Material      : '+f.mat+(f.thick? ', '+f.thick+' mm' : ''));
+    if(f.geo)  L.push('Shape         : '+f.geo);
+    L.push('Target result : '+f.tgt);
+    if(f.insp) L.push('Inspection    : '+f.insp);
+    if(f.samples) L.push('Samples       : '+f.samples);
+  } else {
+    if(f.app)    L.push('Application   : '+f.app);
+    if(f.mat)    L.push('Material      : '+f.mat);
+    if(f.proc)   L.push('Process       : '+f.proc);
+    if(f.qty)    L.push('Quantity      : '+f.qty);
+    if(f.target) L.push('Throughput    : '+f.target);
+    if(f.when)   L.push('Delivery      : '+f.when);
+    if(f.budget) L.push('Budget        : '+f.budget);
+  }
+  if(f.att && f.att.length) L.push('Attachments   : '+f.att.join('; ')+' (attached to this email by the sender)');
   L.push('');
   L.push('Model         : '+desig());
   L.push('Platform      : '+p.n+' — '+p.t);
@@ -4567,14 +5100,16 @@ function inquiryText(f){
   L.push('Configuration link: '+location.origin+location.pathname+'#'+encodeState());
   return L.join('\n');
 }
-function inquiryCSV(f){
+function inquiryCSV(f, id){
   var p=P(), o=optics(), v=price();
   var std=p.std||[], add=[]; for(var k in S.mods){ if(S.mods[k]&&std.indexOf(k)<0) add.push(MOD[k].n); }
   var ex=[]; for(var e in S.extra){ if(S.extra[e]&&EXTRA[e]&&std.indexOf(e)<0) ex.push(EXTRA[e].n); }
-  var head=['Date','Name','Company','Email','Phone','Quantity','Timeline','Designation','Family','Platform',
+  var head=['Reference','Type','Configuration','Fingerprint','Date','Name','Company','Email','Country','Phone','Quantity','Timeline','Throughput','Budget',
+            'Material','Thickness_mm','Shape','Target_result','Inspection','Samples','Attachments','Designation','Family','Platform',
             'Application','Source','Wavelength','Power_W','Objective','Field_mm','Spot_um','Added_modules',
             'Software','Connectivity','Indicative_low_INR','Indicative_high_INR','Notes','Message','Link'];
-  var row=[new Date().toISOString().slice(0,10), f.name, f.company||'', f.email, f.phone||'', f.qty||'', f.when||'',
+  var row=[id||'', f.kind==='trial'?'trial':'quotation', cfgRef(), cfgHash(), new Date().toISOString().slice(0,10), f.name, f.company||'', f.email, f.country||'', f.phone||'',
+           f.qty||'', f.when||'', f.target||'', f.budget||'', f.mat||'', f.thick||'', f.geo||'', f.tgt||'', f.insp||'', f.samples||'', (f.att||[]).join('; '),
            desig(), FAM[p.fam].n, p.n, A().n, SRC[S.src].n, SRC[S.src].wl, S.pw, o.lens, o.fld, o.spot.toFixed(0),
            add.join('; ')||'None', SW[S.sw].n, ex.join('; ')||'Standard',
            Math.round(v*RULES.band_lo), Math.round(v*RULES.band_hi), S.notes||'', f.msg||'',
@@ -4588,61 +5123,111 @@ function download(name, text, mime){
   document.body.appendChild(a); a.click();
   setTimeout(function(){ URL.revokeObjectURL(a.href); document.body.removeChild(a); },200);
 }
-function openInquiry(){
+/* ---- requests: quotation or application trial ---------------------------- */
+/* There is no server behind this static site, so nothing is "submitted": the
+   request is built from the configuration and handed to the customer as an
+   email draft, a CSV row or text to paste. Nothing is reported as sent. The
+   request is also kept in this browser so it can be followed up. */
+var CONTACT={email:''};          /* TEAL enquiry address — not configured in this build */
+var REQ={kind:'quote'};
+function openInquiry(){ openRequest('quote'); }
+function openTrial(){ openRequest('trial'); }
+function openRequest(kind){
   if(!P()||!A()){ toast('Complete a configuration first.','warn'); return; }
-  $('#inqBody').innerHTML=
-   '<p class="anote">This builds a complete enquiry from the current configuration. On a static site there is no server to receive it, so it is delivered as an email draft, a CSV row for your pipeline, or plain text you can paste.</p>'+
-   '<div class="fgrid">'+
-   /* The control comes before its label so `input:focus + span` can float it;
-      a blank placeholder makes :placeholder-shown mean "empty" on every field. */
-   '<label class="fl"><input id="iq_name" type="text" autocomplete="name" placeholder=" " required><span>Name <i>*</i></span></label>'+
-   '<label class="fl"><input id="iq_co" type="text" autocomplete="organization" placeholder=" "><span>Company</span></label>'+
-   '<label class="fl"><input id="iq_em" type="email" autocomplete="email" placeholder=" " required><span>Email <i>*</i></span></label>'+
-   '<label class="fl"><input id="iq_ph" type="tel" autocomplete="tel" placeholder=" "><span>Phone</span></label>'+
-   '<label class="fl"><input id="iq_qt" type="text" placeholder="e.g. 1 machine"><span>Quantity</span></label>'+
-   '<label class="fl"><input id="iq_wh" type="text" placeholder="e.g. Q3 FY27"><span>Timeline</span></label>'+
-   '<label class="fl wide"><textarea id="iq_ms" rows="3" placeholder="Parts, takt time, existing line, anything relevant"></textarea><span>Message</span></label>'+
-   '</div>'+
-   '<div class="ferr" id="iq_err" role="alert"></div>'+
-   '<div class="acts" style="margin-top:14px">'+
-     '<button class="btn pri" id="iq_mail">'+ico('mail')+'Open email draft</button>'+
-     '<button class="btn" id="iq_csv">'+ico('down')+'Download CSV row</button>'+
-     '<button class="btn" id="iq_cp">'+ico('copy')+'Copy as text</button>'+
-   '</div>';
+  var trial=kind==='trial', a=A(), m=MAT[a.mat]||{n:''};
+  REQ.kind=kind;
+  $('#inquiry .mhead h3').textContent= trial? 'Request an application trial' : 'Request a quotation';
+  function f(id, label, o){ o=o||{};
+    var ctl=o.area? '<textarea id="'+id+'" rows="'+(o.rows||3)+'" placeholder="'+esc(o.ph||' ')+'">'+esc(o.v||'')+'</textarea>'
+      : o.sel? '<select id="'+id+'">'+o.sel.map(function(x){ return '<option'+(x===o.v?' selected':'')+'>'+esc(x)+'</option>'; }).join('')+'</select>'
+      : '<input id="'+id+'" type="'+(o.type||'text')+'"'+(o.ac? ' autocomplete="'+o.ac+'"' : '')+' placeholder="'+esc(o.ph||' ')+'" value="'+esc(o.v||'')+'">';
+    return '<label class="fl'+(o.wide?' wide':'')+(o.sel?' fsel':'')+'">'+ctl+'<span>'+esc(label)+(o.req?' <i>*</i>':'')+'</span></label>'; }
+  var h='<p class="anote">'+(trial? 'Tell TEAL’s application laboratory what to test. ' : '')+
+    'This site has no server, so the request is <b>not sent from here</b>: it becomes an email draft, a CSV row or text to paste, and you send it. '+
+    (CONTACT.email? '' : 'No TEAL enquiry address is configured in this build — address the email to your TEAL contact. ')+
+    'Only name, organisation and email are required.</p>'+
+    '<p class="reqref">Configuration <b>'+esc(cfgRef())+'</b> · '+esc(desig())+' · fingerprint '+cfgHash()+'</p>'+
+    '<div class="fgrid">'+
+    f('iq_name','Name',{req:1, ac:'name'})+f('iq_co','Organisation',{req:1, ac:'organization'})+
+    f('iq_em','Business email',{req:1, type:'email', ac:'email'})+f('iq_cty','Country',{ac:'country-name'})+
+    f('iq_ph','Phone (optional)',{type:'tel', ac:'tel'})+
+    (trial?
+      f('iq_mat','Material and grade',{req:1, v:m.n, ph:'e.g. SS 316L, anodised Al 6061'})+f('iq_th','Thickness (mm)',{ph:'e.g. 0.5'})+
+      f('iq_geo','Component shape',{ph:'e.g. flat plate 40 × 20 mm, cylinder Ø12'})+f('iq_tgt','Target result',{req:1, ph:'e.g. 2D code grade A, 0.2 mm deep'})+
+      f('iq_insp','Inspection requirement',{ph:'e.g. ISO/IEC 29158 grade, cross-section'})+
+      f('iq_smp','Samples',{sel:['Can send samples','Need to discuss','No samples yet']})
+    :
+      f('iq_app','Application',{v:a.n})+f('iq_mat','Material and component details',{v:m.n})+
+      f('iq_proc','Required process',{v:a.d})+f('iq_qt','Quantity',{ph:'e.g. 1 machine'})+
+      f('iq_tp','Target throughput',{v:S.target>0? S.target+' parts/h' : '', ph:'e.g. 600 parts/h'})+
+      f('iq_wh','Required delivery',{ph:'e.g. Q3 FY27'})+f('iq_bud','Budget (optional)',{ph:'Only if you wish to share it'}))+
+    f('iq_ms', trial? 'Anything else the laboratory should know' : 'Message',{area:1, wide:1})+
+    '<label class="fl wide fatt"><input id="iq_att" type="file" multiple><span>Technical attachments — names are listed in the request; attach the files to your email</span></label>'+
+    '</div><div class="ferr" id="iq_err" role="alert"></div>'+
+    '<div class="acts" style="margin-top:14px">'+
+      '<button class="btn pri" id="iq_mail">'+ico('mail')+'Open email draft</button>'+
+      '<button class="btn" id="iq_csv">'+ico('down')+'Download CSV row</button>'+
+      '<button class="btn" id="iq_cp">'+ico('copy')+'Copy as text</button>'+
+    '</div><p class="reqdone" id="iq_done" role="status" aria-live="polite"></p>';
+  $('#inqBody').innerHTML=h;
   $('#inquiry').classList.add('open'); document.body.style.overflow='hidden';
   setTimeout(function(){ var n=$('#iq_name'); if(n) n.focus(); },60);
-
+  function val(id){ var e=$('#'+id); return e? e.value.trim() : ''; }
   function read(){
-    return {name:$('#iq_name').value.trim(), company:$('#iq_co').value.trim(), email:$('#iq_em').value.trim(),
-            phone:$('#iq_ph').value.trim(), qty:$('#iq_qt').value.trim(), when:$('#iq_wh').value.trim(),
-            msg:$('#iq_ms').value.trim()};
+    var att=$('#iq_att'), names=att&&att.files? [].map.call(att.files, function(x){ return x.name; }) : [];
+    return {kind:kind, name:val('iq_name'), company:val('iq_co'), email:val('iq_em'), country:val('iq_cty'), phone:val('iq_ph'),
+      app:val('iq_app')||a.n, mat:val('iq_mat'), proc:val('iq_proc'), qty:val('iq_qt'), target:val('iq_tp'), when:val('iq_wh'), budget:val('iq_bud'),
+      thick:val('iq_th'), geo:val('iq_geo'), tgt:val('iq_tgt'), insp:val('iq_insp'), samples:val('iq_smp'), msg:val('iq_ms'), att:names};
   }
   function valid(f){
     var e=[];
     if(!f.name) e.push('Name is required.');
+    if(!f.company) e.push('Organisation is required.');
     if(!f.email) e.push('Email is required.');
     else if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email)) e.push('That email address does not look right.');
+    if(trial && !f.mat) e.push('Say which material to test.');
+    if(trial && !f.tgt) e.push('Say what result the trial must achieve.');
     $('#iq_err').textContent=e.join(' ');
     $('#iq_err').style.display=e.length?'block':'none';
     return !e.length;
   }
+  var made=null;
+  function record(f, how){
+    if(!made) made=reqRecord(f);                         /* one request, however it is delivered */
+    $('#iq_done').innerHTML='Prepared as <b>'+esc(made)+'</b> — '+how+' <b>Nothing has been sent by this site</b>; it is sent when you send it.';
+    return made;
+  }
   $('#iq_mail').onclick=function(){
     var f=read(); if(!valid(f)) return;
-    var sub='Enquiry — '+desig()+' — '+(f.company||f.name);
-    location.href='mailto:?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(inquiryText(f));
-    toast('Email draft opened.');
+    var id=record(f,'the email draft is open in your mail app.');
+    var sub=(trial?'Application trial request':'Quotation request')+' — '+cfgRef()+' — '+desig()+' — '+f.company;
+    location.href='mailto:'+encodeURIComponent(CONTACT.email||'')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(inquiryText(f, id));
   };
   $('#iq_csv').onclick=function(){
     var f=read(); if(!valid(f)) return;
-    download('enquiry-'+desig()+'.csv', inquiryCSV(f), 'text/csv');
-    toast('CSV downloaded.');
+    var id=record(f,'the CSV row is downloaded.');
+    download((trial?'trial-':'enquiry-')+id+'.csv', inquiryCSV(f, id), 'text/csv');
   };
   $('#iq_cp').onclick=function(){
     var f=read(); if(!valid(f)) return;
-    var txt=inquiryText(f);
-    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt);
-    toast('Enquiry copied.');
+    var id=record(f,'the text is on your clipboard.');
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(inquiryText(f, id));
   };
+}
+/* the same request, kept in this browser so it can be followed up */
+function reqRecord(f){
+  var d=wsData(), id=wsId(f.kind==='trial'?'TRQ':'EQ');
+  d.enquiries.unshift({id:id, type:f.kind, ts:Date.now(), updated:Date.now(), org:f.company, name:f.name, email:f.email, country:f.country, phone:f.phone,
+    cfg:cfgRef(), hash:cfgHash(), desig:desig(), app:f.app, qty:f.qty, when:f.when, target:f.target, budget:f.budget, status:'New',
+    process:f.proc, material:f.mat, thick:f.thick, shape:f.geo, result:f.tgt, inspection:f.insp, samples:f.samples, message:f.msg, attachments:(f.att||[]).join('; '), note:'Prepared in this browser — not sent by the site'});
+  if(f.kind==='trial'){
+    var a=A();
+    d.trials.unshift({id:id, plat:S.plat, app:S.app, appName:a? a.n : '', material:f.mat, thick:f.thick, geom:f.geo, req:f.tgt, inspect:'', accept:f.insp,
+      srcName:SRC[S.src].n+' '+SRC[S.src].wl+' '+S.pw+' W', optics:LENS[S.lens].n, cfg:cfgRef(), ref:f.company, status:'Requested', created:Date.now(), updated:Date.now()});
+  }
+  wsAudit(f.kind==='trial'? 'trial request prepared' : 'quotation request prepared', id, cfgRef());
+  wsSave();
+  return id;
 }
 
 
@@ -4765,7 +5350,8 @@ function renderAdvisor(){
     b.scrollTop=b.scrollHeight;
   },0);
 }
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+/* safe in text and in quoted attribute values alike */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 function advResults(b, r){
   b.appendChild(el('div','advsep','<span>'+r.top.length+' suggestion'+(r.top.length>1?'s':'')+'</span>'));
@@ -5885,9 +6471,6 @@ function aPricing(b){
   b.appendChild(t);
   b.appendChild(el('div','agrp','Access'));
   var t2=tbl(['Setting','Key','Value','Note']);
-  row(t2,['<span class="nm">Admin PIN</span>','<span class="ky">adminPin</span>',
-    ain(RULES.adminPin,function(v){RULES.adminPin=v;}),
-    'Cosmetic gate only — readable in the page source']);
   b.appendChild(t2);
   b.appendChild(el('div','awarn','<b>This is not access control.</b> The configurator runs entirely in the browser, so every value here '+
     'is visible to anyone who views the page source. The PIN prevents accidental edits, nothing more. If these prices must stay '+
@@ -6217,12 +6800,12 @@ function aHealth(b){
   });
 }
 
+/* There is no PIN: a password in public JavaScript protects nothing, and the
+   values are the public data.json anyway. The value store belongs to the
+   Internal view, and edits stay in this browser until data.json is exported
+   and committed. */
 function openAdmin(){
-  if(RULES.adminPin){
-    var v=prompt('Enter the admin PIN to edit values:');
-    if(v===null) return;
-    if(v!==RULES.adminPin){ toast('Incorrect PIN.','warn'); return; }
-  }
+  if(VIEW.v!=='internal') viewSet('internal');
   adminOpen=true; $('#admin').classList.add('open'); renderAdmin();
   document.body.style.overflow='hidden';
 }
@@ -6641,13 +7224,13 @@ B3.prototype.line = function(paths, o){
   }
   if(!out.length) return null;
   var f={kind:'path', v:out, c:o.c||C3.teal, a:(o.a==null?1:o.a)*this.a,
-         lw:o.lw||1, glow:o.glow||0, add:!!o.add, dash:o.dash||null};
+         lw:o.lw||1, glow:o.glow||0, add:!!o.add, dash:o.dash||null, cid:this.cid};
   this.f.push(f); return f;
 };
 /* Additive point sprite — spatter, LEDs, the process spot. */
 B3.prototype.dot = function(p,r,o){
   o=o||{};
-  var f={kind:'dot', v:[this.pt(p)], c:o.c||C3.teal, a:(o.a==null?1:o.a)*this.a, r:r, add:o.add!==false};
+  var f={kind:'dot', v:[this.pt(p)], c:o.c||C3.teal, a:(o.a==null?1:o.a)*this.a, r:r, add:o.add!==false, cid:this.cid};
   if(f.a>0.004) this.f.push(f);
   return f;
 };
@@ -6727,12 +7310,14 @@ Viewport.prototype.resize = function(){
   this.cv.width=Math.round(w*d); this.cv.height=Math.round(h*d);
 };
 Viewport.prototype.bindOrbit = function(){
-  var self=this, down=false, lx=0, ly=0, pts={}, pd=0;
+  var self=this, down=false, lx=0, ly=0, pts={}, pd=0, pan=false, mid=null;
   function pos(e){ return {x:e.clientX, y:e.clientY}; }
+  this.cv.addEventListener('contextmenu', function(e){ e.preventDefault(); });
   this.cv.addEventListener('pointerdown', function(e){
     self.fly=null;                              /* the user takes the camera back */
     pts[e.pointerId]=pos(e);
     if(Object.keys(pts).length===1){ down=true; lx=e.clientX; ly=e.clientY;
+      pan = e.button===1 || e.button===2 || e.shiftKey;
       self.cv.setPointerCapture(e.pointerId); self.cv.parentNode.classList.add('dragging'); }
     self.idle=0; self.dirty=true;
   });
@@ -6742,11 +7327,13 @@ Viewport.prototype.bindOrbit = function(){
     var ids=Object.keys(pts);
     if(ids.length>=2){
       var a=pts[ids[0]], b=pts[ids[1]];
-      var d=Math.hypot(a.x-b.x, a.y-b.y);
+      var d=Math.hypot(a.x-b.x, a.y-b.y), m={x:(a.x+b.x)/2, y:(a.y+b.y)/2};
       if(pd) self.zoom(self.cam.dist*(pd/d) - self.cam.dist);
-      pd=d; self.idle=0; self.dirty=true; return;
+      if(mid) self.pan(m.x-mid.x, m.y-mid.y);          /* two fingers move together: pan */
+      pd=d; mid=m; self.idle=0; self.dirty=true; self.touched=true; return;
     }
     if(!down) return;
+    if(pan){ self.pan(e.clientX-lx, e.clientY-ly); lx=e.clientX; ly=e.clientY; self.idle=0; self.dirty=true; self.touched=true; return; }
     self.cam.yaw   -= (e.clientX-lx)*0.0085;
     self.cam.pitch += (e.clientY-ly)*0.0062;
     self.cam.pitch = clamp(self.cam.pitch, -0.10, 1.24);
@@ -6754,13 +7341,31 @@ Viewport.prototype.bindOrbit = function(){
   });
   function up(e){
     delete pts[e.pointerId];
-    if(!Object.keys(pts).length){ down=false; pd=0; self.cv.parentNode.classList.remove('dragging'); }
+    if(Object.keys(pts).length<2){ mid=null; pd=0; }
+    if(!Object.keys(pts).length){ down=false; pd=0; pan=false; self.cv.parentNode.classList.remove('dragging'); }
   }
   this.cv.addEventListener('pointerup', up);
   this.cv.addEventListener('pointercancel', up);
   this.cv.addEventListener('wheel', function(e){
     e.preventDefault(); self.fly=null; self.zoom(e.deltaY*0.035); self.idle=0; self.dirty=true; self.touched=true;
   },{passive:false});
+};
+/* Lite rendering for modest hardware: lowest detail, pixel ratio 1, no seam
+   closing, no blur. Nothing is removed from the machine — it is drawn plainer. */
+Viewport.prototype.setLite = function(on){
+  this.lite=!!on;
+  if(on){ this.fine=false; this.dprCap=1; this.quality=0.5; }
+  else { this.fine=true; this.dprCap=this.dprMax; this.quality=1; this._capFail=0; }
+  this.resize(); this.dirty=true;
+};
+/* Move the camera's target across the screen plane, so the machine follows the
+   pointer at the depth of the target. */
+Viewport.prototype.pan = function(dx, dy){
+  var c=this.cam, cp=Math.cos(c.pitch), sp=Math.sin(c.pitch), sy=Math.sin(c.yaw), cy=Math.cos(c.yaw);
+  var fwd=[-sy*cp, -sp, -cy*cp], rgt=v3n([cy, 0, -sy]), up=v3x(rgt, fwd);
+  var k=2*c.dist*Math.tan((c.fov||0.6)/2)/Math.max(1,this.H);
+  c.tx-=(dx*rgt[0]-dy*up[0])*k; c.ty-=(dx*rgt[1]-dy*up[1])*k; c.tz-=(dx*rgt[2]-dy*up[2])*k;
+  c.ty=clamp(c.ty, -2, 40);
 };
 Viewport.prototype.zoom = function(d){
   this.cam.dist = clamp(this.cam.dist + d, this.o.minD||12, this.o.maxD||95);
@@ -6782,6 +7387,8 @@ Viewport.prototype.preset = function(p){
   var c=this.cam;
   if(p==='iso'){ c.yaw=-0.62; c.pitch=0.36; c.dist=this.home.dist; c.ty=this.home.ty; }
   if(p==='front'){ c.yaw=0; c.pitch=0.14; c.dist=this.home.dist*0.94; c.ty=this.home.ty; }
+  if(p==='side'){ c.yaw=1.5708; c.pitch=0.14; c.dist=this.home.dist*0.94; c.ty=this.home.ty; }
+  c.tx=this.home.tx||0; c.tz=this.home.tz||0;
   if(p==='top'){ c.yaw=-0.30; c.pitch=1.14; c.dist=this.home.dist*1.02; c.ty=this.home.ty*0.6; }
   if(p==='work'){ c.yaw=-0.86; c.pitch=0.50; c.dist=this.home.dist*0.44; c.ty=this.home.ty*1.32; }
   this.touched=false; this.dirty=true;
@@ -6838,7 +7445,8 @@ Viewport.prototype.frame = function(now){
         this.dprCap=Math.max(this.dprMin,this.dprCap-0.25); this.resize();
       }
       else if(this.quality>0.55) this.quality=0.55;
-    } else if(fr<19 && ms<6){               /* at rate with headroom to spare */
+    } else if(this.lite){ this._good=0; }           /* lite holds its settings */
+    else if(fr<19 && ms<6){               /* at rate with headroom to spare */
       /* Restore slowly: a single fast sample straight after a downshift would
          otherwise oscillate. A level that has already failed is not tried again
          until the panel is genuinely resized — stepping up into a known-slow
@@ -7209,6 +7817,7 @@ function MT(n, over){
    stays smooth at 60 fps while full screen still shows the engineering. */
 function lodOf(vp){
   if(!vp) return 1;
+  if(vp.lite) return 0;
   var big = vp.W>900, near = vp.cam.dist < 34;
   if(vp.W<380) return 0;
   if(big && vp.cam.dist<26) return 2;
@@ -7555,7 +8164,7 @@ var M3D = {
   /* exploded separation: expA is the drawn amount, eased toward expK while the
      mode is on; iso names the assembly shown solid while the rest is ghosted */
   expA:0, expK:0.7, iso:null, offscreen:false, faces:null,
-  layers:{enc:true, glz:true, cov:true, lit:true, mod:true, util:true, flr:true, beam:true, kin:false},
+  layers:{enc:true, glz:true, cov:true, lit:true, mod:true, util:true, flr:true, beam:true, kin:false, dim:false},
   hide:{}, sel:[], isoSel:false
 };
 
@@ -7567,7 +8176,7 @@ function modName(k){ return (MOD[k]&&MOD[k].n) || (EXTRA[k]&&EXTRA[k].n) || k; }
 
 /* ---- which sub-assemblies belong in the scene right now ----------------- */
 function mmGroups(){
-  var p=P(), g=[{id:'site', n:'Floor plan & Class-1 zone'}], k;
+  var p=P(), g=[{id:'site', n:'Floor plan & keep-out zone'}], k;
   if(!p || cur<1) return g;
   g.push({id:'frame', n:(p.deliv==='handpiece'?'Mobile system & work bench':
                          p.deliv==='robot'?'Cell frame & guarding':'Machine frame & enclosure')});
@@ -7735,6 +8344,7 @@ function asmPost(b,R){
   if(R.story){                       /* extents for the story camera; nothing shared */
     var bx={}; for(i=0;i<G.length;i++) if(G[i].box) bx[G[i].id]=G[i].box;
     if(R.vp) R.vp.boxes=bx;
+    if(R.vp && R.vp.gids) for(i=0;i<G.length;i++) for(var j0=G[i].f0;j0<G[i].f1;j0++) b.f[j0].gid=G[i].id;
     return;
   }
   /* tag every face with its assembly so a click can be resolved to one */
@@ -7766,11 +8376,13 @@ function gFloor(b,R){
   b.quad([-X,0,-X],[X,0,-X],[X,0,X],[-X,0,X],{c:C3.floor,e:null,two:true,cull:false,floor:true,sp:0.05});
   for(i=-X;i<=X;i+=2.5) ln.push([[-X,0.01,i],[X,0.01,i]], [[i,0.01,-X],[i,0.01,X]]);
   var gf=b.line(ln,{c:C3.grid,a:.55,lw:.7}); if(gf) gf.floor=true;
-  /* Class-1 keep-out zone around the machine footprint */
+  /* keep-out zone around the machine footprint — called Class 1 only where the
+     platform's own specification says so */
   var w=MW/2+3.4, d=MD/2+3.0;
   var zf=b.line([[[-w,0.02,-d],[w,0.02,-d],[w,0.02,d],[-w,0.02,d],[-w,0.02,-d]]],
          {c:C3.warn,a:.42,lw:1.4,dash:[6,5]}); if(zf) zf.floor=true;
-  b.tag([-w,0.02,d],'CLASS 1 ENCLOSED ZONE',{dy:14,c:'rgba(232,178,58,.75)',lead:false});
+  var sf=R.p? specGet(R.p,/safety|laser class/i) : null;
+  b.tag([-w,0.02,d], sf && /class 1/i.test(sf.row[1])? 'CLASS 1 ENCLOSED ZONE' : 'KEEP-OUT ZONE',{dy:14,c:'rgba(232,178,58,.75)',lead:false});
 }
 
 function gFrame(b,R,a){
@@ -9769,6 +10381,7 @@ function mmBuild(b, T, vp){
     b.tag([-MW/2+1.4, CAB-2.4, MD/2+0.1], 'CE · IEC 60825-1 CLASS 1', {dy:-12, c:'#8FD9DC'});
   });
   if(R.L('kin') && !R.story && R.exp<0.02) gKin(b,R);
+  if(R.L('dim') && !R.story && R.exp<0.02 && p && cur>=1) gDims(b,R);
   asmPost(b,R);
 }
 /* ==========================================================================
@@ -10412,6 +11025,19 @@ function kinRange(id){
   var j=KIN[id];
   return kinNum(j,j.lim[0])+' to '+kinNum(j,j.lim[1])+' '+j.unit;
 }
+/* Overall dimensions, measured from the drawn envelope. A footprint the
+   specification states is labelled as such; anything else says "est." — the
+   enclosure is then sized from power, field and modules, not from a drawing. */
+function gDims(b,R){
+  var dm=machineDims(), e=dm.stated? '' : ' est.', c={c:'#9FE3E6', a:0.9, lw:1.2}, o=1.4, t=0.35;
+  var x0=-MW/2, x1=MW/2, z0=-MD/2, z1=MD/2, h=TOPY;
+  b.line([[[x0,0.03,z1+o],[x1,0.03,z1+o]],[[x0,0.03,z1+o-t],[x0,0.03,z1+o+t]],[[x1,0.03,z1+o-t],[x1,0.03,z1+o+t]]], c);
+  b.tag([0,0.03,z1+o],'W '+inr(dm.w)+' mm'+e,{dy:16,c:'#9FE3E6',lead:false});
+  b.line([[[x1+o,0.03,z0],[x1+o,0.03,z1]],[[x1+o-t,0.03,z0],[x1+o+t,0.03,z0]],[[x1+o-t,0.03,z1],[x1+o+t,0.03,z1]]], c);
+  b.tag([x1+o,0.03,0],'D '+inr(dm.d)+' mm'+e,{dy:16,c:'#9FE3E6',lead:false});
+  b.line([[[x1+o,0,z1+o],[x1+o,h,z1+o]],[[x1+o-t,h,z1+o],[x1+o+t,h,z1+o]]], c);
+  b.tag([x1+o,h,z1+o],'H '+inr(dm.h)+' mm'+e,{dy:-10,c:'#9FE3E6',lead:false});
+}
 /* Engineering overlay: the datum, each active axis with its travel, and the
    joint values — drawn only with the machine assembled, so nothing it marks
    has been moved away by the exploded view. */
@@ -10461,7 +11087,7 @@ function m3dInit(){
   });
 
   /* camera presets */
-  var pv=$('#v3dview'), presets=[['iso','Iso'],['front','Front'],['top','Top'],['work','Work']];
+  var pv=$('#v3dview'), presets=[['iso','Iso'],['front','Front'],['side','Side'],['top','Top'],['work','Work']];
   presets.forEach(function(p,i){
     var bt=el('button', i===0?'on':'', p[1]);
     bt.onclick=function(){
@@ -10497,9 +11123,11 @@ function m3dInit(){
   var misBtn=tool('flag','Guided missions', function(){ var pn=$('#v3dmis'); pn.classList.toggle('open'); misDraw(); });
   misBtn.id='misBtn';
   misInit();
+  try{ if(Store.get('teal.lite', false)) M3D.vp.setLite(true); }catch(e){}
   /* presets and tools share a row only while the viewer is wide enough for both */
   var vw=$('.view');
-  function vNarrow(){ if(vw) vw.classList.toggle('narrow', vw.getBoundingClientRect().width<492); }
+  function vNarrow(){                     /* five presets (228 px) + eight tools (267 px) + margins */
+    if(vw) vw.classList.toggle('narrow', vw.getBoundingClientRect().width<528); }
   if(window.ResizeObserver && vw) new ResizeObserver(vNarrow).observe(vw);
   vNarrow();
   tool('reset','Reset view', function(){ M3D.vp.reset(); isoSet(null); expClear(); });
@@ -10519,7 +11147,7 @@ function m3dInit(){
   /* click any assembly to read what it is; a drag still orbits */
   (function(){
     var cv=$('#mcanvas'), dx=0, dy=0, dn=false;
-    cv.addEventListener('pointerdown', function(e){ dn=true; dx=e.clientX; dy=e.clientY; });
+    cv.addEventListener('pointerdown', function(e){ dn=e.button===0 && !e.shiftKey; dx=e.clientX; dy=e.clientY; });
     cv.addEventListener('pointerup', function(e){
       if(!dn) return; dn=false;
       if(Math.abs(e.clientX-dx)>4 || Math.abs(e.clientY-dy)>4) return;
@@ -10548,7 +11176,7 @@ function m3dInit(){
   })();
   $('#simBtn').onclick=function(){ SIM.on? simStop() : simStart(); };
   /* keyboard: view modes on 1–4, layers on their initials */
-  var LKEY={e:'enc', g:'glz', c:'cov', i:'lit', m:'mod', u:'util', b:'beam', f:'flr', j:'kin'};
+  var LKEY={e:'enc', g:'glz', c:'cov', i:'lit', m:'mod', u:'util', b:'beam', f:'flr', j:'kin', d:'dim'};
   document.addEventListener('keydown', function(e){
     if(adminOpen) return;
     var tag=(e.target.tagName||'').toLowerCase();
@@ -10630,7 +11258,7 @@ function m3dInit(){
 
 var LAYERDEF=[['enc','Enclosure & guarding'],['glz','Glazing'],['cov','Sheet-metal covers'],
               ['lit','Interior lighting'],['mod','Automation modules'],['util','Utilities & routing'],
-              ['beam','Beam & process'],['flr','Floor & safety zone'],['kin','Axes & joints']];
+              ['beam','Beam & process'],['flr','Floor & safety zone'],['kin','Axes & joints'],['dim','Overall dimensions']];
 var VMODES=[['solid','Solid'],['cutaway','Cutaway'],['xray','X-ray'],['exploded','Exploded']];
 function buildLayerPanel(){
   var pn=$('#v3dlay'); if(!pn) return;
@@ -10660,6 +11288,15 @@ function buildLayerPanel(){
     lt.appendChild(b3);
   });
   pn.appendChild(lt);
+  pn.appendChild(el('h5','','Rendering'));
+  var rq=el('div','lmode');
+  [['full','Full'],['lite','Lite']].forEach(function(m){
+    var on=(M3D.vp&&M3D.vp.lite? 'lite' : 'full')===m[0], b4=el('button', on?'on':'', m[1]);
+    b4.title= m[0]==='lite'? 'Plainer drawing for modest hardware — same machine, same data' : 'Full detail, adapting to the hardware';
+    b4.onclick=function(){ if(M3D.vp) M3D.vp.setLite(m[0]==='lite'); Store.set('teal.lite', m[0]==='lite'); buildLayerPanel(); };
+    rq.appendChild(b4);
+  });
+  pn.appendChild(rq);
   pn.appendChild(el('h5','','Layers'));
   LAYERDEF.forEach(function(L){
     var on=M3D.layers[L[0]]!==false;
@@ -10819,6 +11456,7 @@ function showComp(id, hf){
   pn.classList.add('open');
   if(CAD.state==='idle') cadLoad();
   misEvent('inspect', id||null);
+  try{ wsBomMark(id); }catch(e){}
 }
 /* The engineering record under the description: identity, geometry, CAD
    search, where it is priced, the joint it moves on and its neighbours. */
@@ -11371,11 +12009,762 @@ function misInit(){
   misDraw();
 }
 
+/* ==========================================================================
+   INTERNAL WORKSPACE — product portfolio, engineering, BOM and costing,
+   components and suppliers, application trials, validation and release,
+   enquiries, a management overview, settings and the audit log.
+   Every figure comes from one of three places, and says which:
+     · the public catalogue (data.json) and the configurator's own models
+     · records typed into this browser (local storage — not shared, not secure)
+     · demonstration records, loaded on request and marked SYNTHETIC
+   Anything else is shown as "Not recorded" or "Awaiting input", never filled.
+   All reads and writes go through WSDB, so a real service can replace the
+   local adapter without touching the screens (docs/INTERNAL-DATA.md).
+   ========================================================================== */
+var DATA_REV='2026-08-02';                 /* data.json _updated; replaced by the fetched file's own */
+var WSDB={d:null, ok:true};
+function wsData(){
+  if(WSDB.d) return WSDB.d;
+  var d=Store.get('teal.ws', null);
+  d=(d && typeof d==='object')? d : {};
+  ['products','costs','suppliers','releases'].forEach(function(k){ if(!d[k]||typeof d[k]!=='object'||Array.isArray(d[k])) d[k]={}; });
+  ['trials','enquiries','audit'].forEach(function(k){ if(!Array.isArray(d[k])) d[k]=[]; });
+  /* an imported file may hold anything: keep only records that are objects */
+  var obj=function(x){ return !!x && typeof x==='object' && !Array.isArray(x); };
+  ['trials','enquiries','audit'].forEach(function(k){ d[k]=d[k].filter(obj); });
+  ['products','costs','releases'].forEach(function(k){ Object.keys(d[k]).forEach(function(i){ if(!obj(d[k][i])) delete d[k][i]; }); });
+  Object.keys(d.suppliers).forEach(function(i){ d.suppliers[i]=Array.isArray(d.suppliers[i])? d.suppliers[i].filter(obj) : []; });
+  Object.keys(d.releases).forEach(function(i){ if(!Array.isArray(d.releases[i].log)) d.releases[i].log=[]; else d.releases[i].log=d.releases[i].log.filter(obj); });
+  if(d.baseline!=null && !(obj(d.baseline) && isFinite(d.baseline.total) && +d.baseline.total>0)) d.baseline=null;
+  d.v=1; WSDB.d=d; return d;
+}
+function wsSave(){
+  try{ localStorage.setItem('teal.ws', JSON.stringify(WSDB.d)); WSDB.ok=true; }
+  catch(e){ WSDB.ok=false; toast('Not saved — browser storage is full or blocked. Records last only until this tab closes.','warn'); }
+}
+function wsAudit(action, rec, detail){
+  var d=wsData();
+  d.audit.unshift({ts:Date.now(), role:ROLE.cur, action:action, rec:rec||'', detail:detail||''});
+  if(d.audit.length>400) d.audit.length=400;
+  wsSave();
+}
+function wsId(pfx){ return pfx+'-'+cfgNewId().slice(3)+'-'+Date.now().toString(36).slice(-3).toUpperCase(); }
+function wsDate(t){ return t? new Date(t).toLocaleString([], {year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit'}) : '—'; }
+var DC={user:'User-selected', mfr:'Catalogue data', calc:'Calculated', sim:'Simulated', meas:'Measured',
+        appr:'Engineering-approved', miss:'Missing', local:'Entered in this browser', demo:'SYNTHETIC demo', est:'Estimate'};
+function dc(k, t){ return '<span class="dc dc-'+k+'">'+esc(t||DC[k])+'</span>'; }
+function wsNA(t){ return '<span class="wsna">'+esc(t||'Not recorded')+'</span>'; }
+function wsSec(title, sub, body, extra){
+  return '<section class="wsp"><header class="wsph"><div><h3>'+esc(title)+'</h3>'+(sub? '<p>'+sub+'</p>' : '')+'</div>'+(extra||'')+'</header>'+body+'</section>';
+}
+
+/* ---- docking the live 3D view into a workspace screen ------------------------ */
+/* The configurator's own viewer moves into the screen and back, so selection,
+   isolation and the run carry over — one machine, never two copies of it. */
+var WSDOCK={home:null, next:null};
+function wsDock(slot){
+  var v=document.querySelector('.view'); if(!v) return;
+  if(!WSDOCK.home){ WSDOCK.home=v.parentNode; WSDOCK.next=v.nextSibling; }
+  var target=slot? $(slot) : null;
+  if(target){ if(v.parentNode!==target) target.appendChild(v); }
+  else if(v.parentNode!==WSDOCK.home) WSDOCK.home.insertBefore(v, WSDOCK.next);
+  if(M3D.vp) setTimeout(function(){ M3D.vp.resize(); M3D.vp.dirty=true; }, 30);
+}
+
+/* ---- dispatcher --------------------------------------------------------------- */
+function wsRender(){
+  var ws=$('#ws'); if(!ws || ws.hidden) return;
+  var f={portfolio:wsPortfolio, eng:wsEng, bom:wsBom, comp:wsComp, trials:wsTrials, release:wsRelease,
+         enq:wsEnq, mgmt:wsMgmt, settings:wsSettings}[VIEW.sec];
+  wsDock(null);
+  ws.innerHTML='<div class="wsbody">'+(f? f() : '')+'</div>';
+  var after={bom:wsBomBind, comp:wsCompBind, trials:wsTrialsBind, release:wsReleaseBind, enq:wsEnqBind,
+             portfolio:wsPortfolioBind, settings:wsSettingsBind, eng:wsEngBind}[VIEW.sec];
+  if(after) after();
+}
+function wsNeedMachine(){
+  return '<div class="wsempty"><p>Configure a machine first — this screen works on the configuration in the Machine Configurator.</p>'+
+    '<button type="button" class="btn pri" data-go="cfg">Open the Machine Configurator</button></div>';
+}
+document.addEventListener('click', function(e){
+  var g=e.target.closest && e.target.closest('#ws [data-go]'); if(!g) return;
+  viewSet('internal', g.getAttribute('data-go'));
+});
+
+/* ---- 1 · Product portfolio --------------------------------------------------- */
+var LIFECYCLE=['Concept','Prototype','Application Validation','Pilot','Released','Deprecated'];
+/* What the catalogue itself leaves open for a platform, worked out from the data */
+function platGaps(k){
+  var p=PLAT[k], g=[];
+  var col=p.deliv!=='robot' && p.deliv!=='handpiece';
+  if(col && !specGet(p,/^z.?axis/i)) g.push('Z stroke not stated');
+  if(!specGet(p,/footprint/i)) g.push('Footprint not stated — enclosure size is estimated');
+  if(!specGet(p,/safety|laser class/i)) g.push('Laser class not stated');
+  if(!(p.lens||[]).length) g.push('No objectives offered');
+  g.push('Working distance of offered objectives not in the data');
+  return g;
+}
+function wsPortfolio(){
+  var d=wsData(), F=VIEW.pf||{fam:'', st:'', own:'', q:''};
+  var rows=Object.keys(PLAT).filter(function(k){
+    var p=PLAT[k], r=d.products[k]||{}, st=r.status||'';
+    if(F.fam && p.fam!==F.fam) return false;
+    if(F.st && (F.st==='—'? !!st : st!==F.st)) return false;
+    if(F.own && (r.owner||'').toLowerCase().indexOf(F.own.toLowerCase())<0) return false;
+    if(F.q && (p.n+' '+p.t+' '+p.code+' '+k).toLowerCase().indexOf(F.q.toLowerCase())<0) return false;
+    return true;
+  });
+  var t='<div class="wsfilt">'+
+    '<label>Family <select data-f="fam"><option value="">All</option>'+Object.keys(FAM).map(function(f){ return '<option value="'+f+'"'+(F.fam===f?' selected':'')+'>'+esc(FAM[f].n)+'</option>'; }).join('')+'</select></label>'+
+    '<label>Lifecycle <select data-f="st"><option value="">All</option><option value="—"'+(F.st==='—'?' selected':'')+'>Not recorded</option>'+LIFECYCLE.map(function(s){ return '<option'+(F.st===s?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></label>'+
+    '<label>Owner <input data-f="own" value="'+esc(F.own)+'" placeholder="Any"></label>'+
+    '<label class="grow">Search <input data-f="q" value="'+esc(F.q)+'" placeholder="Name, code or type"></label></div>';
+  t+='<div class="wstw"><table class="wst"><thead><tr><th>Family</th><th>Platform</th><th>Type</th><th>Lifecycle</th><th>Owner</th>'+
+     '<th>Revision</th><th class="n">Lead</th><th>Open items</th><th></th></tr></thead><tbody>';
+  rows.forEach(function(k){
+    var p=PLAT[k], r=d.products[k]||{}, gaps=platGaps(k), acts=(r.actions||'').split('\n').filter(Boolean);
+    t+='<tr data-k="'+k+'"><td>'+esc(FAM[p.fam].n)+'</td><td><b>'+esc(p.n)+'</b><span class="sub mono">'+esc(p.code)+'</span></td><td>'+esc(p.t)+'</td>'+
+      '<td>'+(r.status? dc(r.demo?'demo':'local', r.status) : wsNA())+'</td><td>'+(r.owner? esc(r.owner) : wsNA())+'</td>'+
+      '<td>'+(r.rev? esc(r.rev) : '<span class="sub">catalogue '+esc(DATA_REV)+'</span>')+'</td><td class="n">'+(p.lead? p.lead+' wk' : '—')+'</td>'+
+      '<td><details><summary>'+(gaps.length+acts.length)+' item'+(gaps.length+acts.length===1?'':'s')+'</summary><ul>'+
+        gaps.map(function(x){ return '<li>'+dc('miss','Data')+' '+esc(x)+'</li>'; }).join('')+
+        acts.map(function(x){ return '<li>'+dc('local','Action')+' '+esc(x)+'</li>'; }).join('')+'</ul></details></td>'+
+      '<td class="acts"><button type="button" data-a="edit">Edit</button><button type="button" data-a="open">Configure</button></td></tr>';
+  });
+  if(!rows.length) t+='<tr><td colspan="9" class="wsnone">No platform matches these filters.</td></tr>';
+  t+='</tbody></table></div>';
+  var n=Object.keys(PLAT).length, rec=Object.keys(d.products).filter(function(k){ return d.products[k].status; }).length;
+  return wsSec('Product portfolio', Object.keys(FAM).length+' families · '+n+' platforms from the catalogue (revision '+esc(DATA_REV)+'). '+
+    'Lifecycle, owner and revision are not in the catalogue; '+rec+' of '+n+' have been recorded in this browser.', t)+
+    '<div id="pfedit"></div>';
+}
+function wsPortfolioBind(){
+  var ws=$('#ws');
+  ws.querySelectorAll('[data-f]').forEach(function(i){
+    i.addEventListener(i.tagName==='SELECT'? 'change' : 'input', function(){
+      VIEW.pf=VIEW.pf||{fam:'', st:'', own:'', q:''}; VIEW.pf[i.getAttribute('data-f')]=i.value;
+      var pos=i.selectionStart; wsRender();
+      var n=$('#ws [data-f="'+i.getAttribute('data-f')+'"]'); if(n){ n.focus(); if(pos!=null && n.setSelectionRange) try{ n.setSelectionRange(pos,pos); }catch(e){} }
+    });
+  });
+  ws.querySelector('.wst').addEventListener('click', function(e){
+    var b=e.target.closest('button[data-a]'); if(!b) return;
+    var k=b.closest('tr').getAttribute('data-k');
+    if(b.getAttribute('data-a')==='open'){ pickPlatform(k); viewSet('internal','cfg'); go(2); return; }
+    var r=wsData().products[k]||{}, p=PLAT[k];
+    $('#pfedit').innerHTML=wsSec('Edit — '+p.n, 'Recorded in this browser only. A real record would be held by the product-data service.',
+      '<div class="wsform">'+
+      '<label>Lifecycle <select id="pf_st"><option value="">Not recorded</option>'+LIFECYCLE.map(function(s){ return '<option'+(r.status===s?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></label>'+
+      '<label>Product owner <input id="pf_own" value="'+esc(r.owner||'')+'"></label>'+
+      '<label>Product revision <input id="pf_rev" value="'+esc(r.rev||'')+'" placeholder="e.g. B.2"></label>'+
+      '<label class="wide">Outstanding actions <textarea id="pf_act" rows="3" placeholder="One per line">'+esc(r.actions||'')+'</textarea></label>'+
+      '<div class="wide wsbtns"><button type="button" class="btn pri" id="pf_ok">Save record</button><button type="button" class="btn" id="pf_x">Cancel</button></div></div>');
+    $('#pf_x').onclick=function(){ $('#pfedit').innerHTML=''; };
+    $('#pf_ok').onclick=function(){
+      var rec={status:$('#pf_st').value, owner:$('#pf_own').value.trim(), rev:$('#pf_rev').value.trim(), actions:$('#pf_act').value.trim(), updated:Date.now()};
+      wsData().products[k]=rec; wsAudit('product record', k, (rec.status||'no status')+(rec.owner? ' · '+rec.owner : ''));
+      toast('Saved in this browser.'); wsRender();
+    };
+    $('#pfedit').scrollIntoView({block:'nearest'});
+  });
+}
+
+/* ---- 2 · Product engineering ------------------------------------------------- */
+function wsSpecRows(){
+  var p=P(), a=A(), o=optics(), ph=null, pm=null, rows=[];
+  try{ ph=physics(); }catch(e){} try{ pm=procModel(); }catch(e){}
+  function r(k,v,c,b){ rows.push([k,v,c,b||'']); }
+  r('Platform', p.n+' ('+p.code+')', 'user'); if(a) r('Application', a.n, 'user');
+  if(S.src) r('Laser source', SRC[S.src].n, 'user'); if(S.pw!=null) r('Average power', S.pw+' W', 'user');
+  if(S.lens) r('Objective', LENS[S.lens].n, 'user');
+  var mk=[]; for(var k in S.mods) if(S.mods[k]) mk.push(modName(k)); r('Modules', mk.join(', ')||'None', 'user');
+  r('Software', SW[S.sw].n, 'user'); if(S.target>0) r('Target rate', S.target+' parts/h', 'user');
+  (p.specs||[]).forEach(function(x){ r(x[0], x[1], 'mfr', 'Platform specification'); });
+  if(S.src){ var s=SRC[S.src]; r('Wavelength', s.wl, 'mfr', 'Source class'); r('Beam quality M²', s.m2, 'mfr', 'Source class');
+    if(s.mode!=='cw') r('Pulse duration', s.tau+' '+(s.tauU||'ns'), 'mfr', 'Source class'); }
+  if(S.lens){ var L=LENS[S.lens]; r('Focal length', L.f+' mm', 'mfr', 'Objective'); r('Field', L.fld+' × '+L.fld+' mm', 'mfr', 'Objective'); }
+  if(o){ r('Spot diameter', o.spot.toFixed(0)+' µm', 'calc', 'd = 4·λ·f·M² / (π·D), diffraction-limited');
+         r('Depth of focus', '± '+(o.dof/1000).toFixed(2)+' mm', 'calc', 'Rayleigh range z = πd² / (4·M²·λ)'); }
+  if(ph){ if(ph.Ep_mJ!=null) r('Pulse energy', num(ph.Ep_mJ)+' mJ', 'calc', 'P / f at '+num(ph.frep_khz)+' kHz');
+          r('Heat to reject', num(ph.heat_kW)+' kW', 'calc', 'Wall-plug draw less optical output'); r('Process regime', ph.regime.n, 'calc', 'Irradiance and pulse class'); }
+  if(pm) r('Processing time per part', fmtS(pm.t), 'calc', 'Process model: path '+Math.round(pm.len)+' mm at '+Math.round(pm.v)+' mm/s');
+  var ran=SIM.cycle && SIM.forKey===simKey();
+  r('Cycle time', ran? fmtS(SIM.cycle)+' ('+Math.round(3600/SIM.cycle)+' parts/h)' : 'Not simulated for this revision', ran? 'sim' : 'miss', ran? 'Simulated cycle — animation timings, not measured' : 'Run the simulation');
+  var tr=wsData().trials.filter(function(t){ return t.plat===S.plat && t.app===S.app && t.status==='Approved'; });
+  r('Process result', tr.length? tr.map(function(t){ return t.id+': '+t.achieved; }).join('; ') : 'No measured results recorded', tr.length? 'meas' : 'miss',
+    tr.length? 'Approved application trial' : 'No approved trial for this platform and application');
+  var rel=wsRelRec(CFG.id);
+  r('Release state', rel? rel.state+(rel.released? ' (released r'+esc(rel.released.rev)+')' : '') : 'Draft — no release record', rel&&rel.released? 'appr' : 'miss', 'Validation & Release');
+  r('Working distance', 'Not in the product data', 'miss', 'Objective datasheet');
+  if(!specGet(p,/^z.?axis/i) && p.deliv!=='robot' && p.deliv!=='handpiece') r('Z stroke', 'Not in the product data', 'miss', 'Platform specification');
+  var dm=machineDims(); r('Machine envelope', inr(dm.w)+' × '+inr(dm.d)+' × '+inr(dm.h)+' mm', dm.stated? 'mfr' : 'est', dm.stated? 'Stated footprint' : 'Estimated from power, field and modules');
+  r('Bought-in part numbers', 'None specified in the product data', 'miss', 'Engineering BOM');
+  return rows;
+}
+function wsDiffFields(a, b){
+  var A2=JSON.parse(a), B2=JSON.parse(b), out=[];
+  function nm(k,v){ return k==='src'? (SRC[v]||{n:v}).n : k==='lens'? (LENS[v]||{n:v}).n : k==='plat'? (PLAT[v]||{n:v}).n : k==='sw'? (SW[v]||{n:v}).n : String(v); }
+  ['plat','app','src','pw','lens','sw','target','notes'].forEach(function(k){ if(String(A2[k])!==String(B2[k])) out.push(k+': '+nm(k,A2[k])+' → '+nm(k,B2[k])); });
+  ['mods','extra'].forEach(function(k){ var x=A2[k]||{}, y=B2[k]||{}, m;
+    for(m in y) if(y[m] && !x[m]) out.push('+ '+modName(m)); for(m in x) if(x[m] && !y[m]) out.push('− '+modName(m)); });
+  return out;
+}
+function wsEng(){
+  if(!P()) return wsSec('Product engineering', '', wsNeedMachine());
+  var p=P(), h='';
+  /* identity */
+  h+=wsSec('Configuration identity', '', '<dl class="wsdl">'+
+    '<dt>Configuration</dt><dd class="mono">'+esc(cfgRef())+(CFG.from? ' <span class="sub">copied from '+esc(CFG.from)+'</span>' : '')+'</dd>'+
+    '<dt>Content fingerprint</dt><dd class="mono">'+cfgHash()+'</dd>'+
+    '<dt>Designation</dt><dd class="mono">'+esc(desig())+'</dd>'+
+    '<dt>Catalogue revision</dt><dd>'+esc(DATA_REV)+' · '+esc(DATA_SOURCE)+'</dd>'+
+    '<dt>Architecture</dt><dd>'+esc(p.t)+' · '+esc({galvo:'galvo scan head',galvo2:'dual galvo heads',gantry:'gantry-moved head',robot:'robot-carried head',handpiece:'handheld head'}[p.deliv]||p.deliv)+'</dd>'+
+    '<dt>Assemblies</dt><dd>'+M3D.list.map(function(g){ return esc(g.n); }).join(' · ')+'</dd></dl>');
+  /* what changed */
+  var prev=CFG.ptr>0? CFG.hist[CFG.ptr-1] : null, cur=CFG.hist[CFG.ptr];
+  if(prev && cur){
+    var f=wsDiffFields(prev.snap, cur.snap), D=null;
+    try{ CFG.mute++; D=cmpDiff(cmpScan(JSON.parse(prev.snap)), cmpScan(JSON.parse(cur.snap)), JSON.parse(prev.snap), JSON.parse(cur.snap)); }catch(e){ D=null; } finally{ CFG.mute--; }
+    var nm=function(o){ return Object.keys(o||{}).map(function(k){ var c=compInfo(k); return c? c.n : k; }).filter(function(v,i,a){ return a.indexOf(v)===i; }); };
+    h+=wsSec('Affected by the last change', 'r'+esc(prev.rev)+' → r'+esc(cur.rev)+', '+wsDate(cur.ts),
+      '<div class="wsgrid3"><div><h4>Selection</h4><ul>'+(f.length? f.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('') : '<li>No field change</li>')+'</ul></div>'+
+      '<div><h4>Components</h4><ul>'+(D? ([].concat(nm(D.add).map(function(n){ return '<li class="add">Added · '+esc(n)+'</li>'; }),
+          nm(D.rem).map(function(n){ return '<li class="rem">Removed · '+esc(n)+'</li>'; }),
+          nm(D.chg).map(function(n){ return '<li class="chg">Changed · '+esc(n)+'</li>'; })).join('')||'<li>None</li>') : '<li>Could not compare</li>')+'</ul></div>'+
+      '<div><h4>Priced lines</h4><ul>'+(D && D.lines.length? D.lines.map(function(x){ return '<li>'+esc(x.k)+' · '+esc(x.l.n)+'</li>'; }).join('') : '<li>None</li>')+'</ul></div></div>');
+  }
+  /* specification by provenance */
+  var rows=wsSpecRows();
+  h+=wsSec('Specification by source', 'Each value says where it comes from. Calculated values are estimates from the stated relation, not measurements.',
+    '<div class="wsfilt dcleg">'+['user','mfr','calc','sim','meas','appr','est','miss'].map(function(k){ return dc(k); }).join('')+'</div>'+
+    '<div class="wstw"><table class="wst"><thead><tr><th>Parameter</th><th>Value</th><th>Source</th><th>Basis</th></tr></thead><tbody>'+
+    rows.map(function(x){ return '<tr><td>'+esc(x[0])+'</td><td class="mono">'+esc(String(x[1]))+'</td><td>'+dc(x[2])+'</td><td class="sub">'+esc(x[3])+'</td></tr>'; }).join('')+
+    '</tbody></table></div>');
+  /* compatibility */
+  var mods=Object.keys(MOD).map(function(k){
+    var on=!!S.mods[k], std=(p.std||[]).indexOf(k)>=0, fits=modFits(p,k), f=MODFIT[k]||null, why='';
+    if(f){ var w=[]; if(f.fam) w.push('families: '+f.fam.join(', ')); if(f.noFam) w.push('not for: '+f.noFam.join(', '));
+      if(f.deliv) w.push('delivery: '+f.deliv.join(', ')); if(f.noDeliv) w.push('not with: '+f.noDeliv.join(', '));
+      if(f.mat) w.push('materials: '+f.mat.join(', ')); if(f.noPlat) w.push('not on: '+f.noPlat.join(', ')); why=w.join(' · '); }
+    return '<tr class="'+(fits?'':'no')+'"><td>'+esc(MOD[k].n)+'</td><td>'+(std? 'Standard' : on? 'Fitted' : fits? 'Available' : 'Not compatible')+'</td>'+
+      '<td class="sub">'+esc(why||'No fitment rule — fits every platform')+'</td></tr>';
+  }).join('');
+  h+=wsSec('Compatibility', 'Module fitment comes from the catalogue’s fitment rules. Component-level compatibility (source to scanner, scanner to objective, controller to drive) is <b>not defined in the data</b> — it needs engineering-approved rules before substitutions can be checked.',
+    '<div class="wstw"><table class="wst"><thead><tr><th>Module</th><th>This configuration</th><th>Fitment rule</th></tr></thead><tbody>'+mods+'</tbody></table></div>');
+  /* warnings */
+  var cs=[]; try{ cs=considerations(); }catch(e){}
+  var ws=[];
+  if(S.src && (p.src||[]).indexOf(S.src)<0) ws.push(['bad','Source '+SRC[S.src].n+' is not offered on this platform.']);
+  if(S.src && S.pw!=null && powersFor(p,S.src).indexOf(S.pw)<0) ws.push(['bad',S.pw+' W is not a power class offered for this source.']);
+  if(S.lens && (p.lens||[]).indexOf(S.lens)<0) ws.push(['bad','Objective '+LENS[S.lens].n+' is not offered on this platform.']);
+  for(var mk2 in S.mods) if(S.mods[mk2] && !modFits(p,mk2)) ws.push(['bad', modName(mk2)+' does not fit this platform under the fitment rules.']);
+  cs.forEach(function(c){ ws.push([c.sev==='out'?'bad':'warn', c.n+' — '+c.why]); });
+  h+=wsSec('Warnings and validation', ws.length? ws.length+' finding'+(ws.length===1?'':'s') : 'No rule is broken by this configuration.',
+    ws.length? '<ul class="wswarn">'+ws.map(function(w){ return '<li class="'+w[0]+'">'+esc(w[1])+'</li>'; }).join('')+'</ul>' : '');
+  /* CAD and trials */
+  var sc=(M3D.scene||[]).filter(function(x){ return x.cid; }), cad={}, seen={};
+  sc.forEach(function(x){ if(seen[x.cid]) return; seen[x.cid]=1; var r=cadRec(x.cid), s=r&&r.cad? r.cad.status : (x.cid.indexOf('mod:')===0? 'module' : 'no record'); cad[s]=(cad[s]||0)+1; });
+  h+=wsSec('CAD assets', Object.keys(seen).length+' drawn components. None is drawn from CAD — all geometry is parametric. Candidate sources and blockers are in the component records.',
+    '<ul class="wsinline">'+Object.keys(cad).map(function(k){ return '<li><b>'+cad[k]+'</b> '+esc(CADSTAT[k]||k)+'</li>'; }).join('')+'</ul>');
+  var tr=wsData().trials.filter(function(t){ return t.plat===S.plat; });
+  h+=wsSec('Application trial evidence', tr.length? tr.length+' trial record'+(tr.length===1?'':'s')+' for this platform' : 'No trial recorded for this platform.',
+    tr.length? '<ul class="wsinline">'+tr.map(function(t){ return '<li>'+esc(t.id)+' · '+esc(t.material||'')+' · '+dc(t.demo?'demo':'local', t.status)+'</li>'; }).join('')+'</ul>' : '', '<button type="button" class="btn" data-go="trials">Open trials</button>');
+  /* revision history */
+  h+=wsSec('Revision history', 'Revisions of '+esc(CFG.id||'—')+' kept in this browser (latest 60).',
+    '<div class="wstw"><table class="wst"><thead><tr><th>Revision</th><th>Time</th><th>Change from the previous revision</th></tr></thead><tbody>'+
+    CFG.hist.slice().reverse().map(function(x, i, arr){ var pv=arr[i+1];
+      return '<tr'+(x.rev===CFG.rev?' class="cur"':'')+'><td class="mono">r'+esc(x.rev)+'</td><td>'+wsDate(x.ts)+'</td><td class="sub">'+
+        esc(pv? (wsDiffFields(pv.snap, x.snap).join(' · ')||'—') : 'First revision')+'</td></tr>'; }).join('')+'</tbody></table></div>');
+  return h;
+}
+function wsEngBind(){}
+
+/* ---- 3 · BOM & costing ------------------------------------------------------- */
+var COSTCAT=[['purchased','Purchased components'],['fab','Fabrication'],['elec','Electrical & controls'],['asm','Mechanical assembly'],
+  ['integ','Integration & programming'],['test','Testing & validation'],['pack','Packaging & logistics'],['other','Other approved costs']];
+var CATOF={Structure:'fab', Fixturing:'fab', Electrical:'elec', Compliance:'other'};
+var LABOURCAT=['asm','integ','test','pack'];
+/* Every part the machine has, whatever the view mode shows: the configuration
+   is built offscreen solid and cut away, and the two are merged. Outline-only
+   parts (louvres, LEDs, the inspection region) are included. */
+function bomScan(){
+  var key=cfgKey()+'|'+DATA_REV;
+  if(bomScan.k===key) return bomScan.v;
+  var out=[], seen={};
+  ['solid','cutaway'].forEach(function(vm){
+    var b=new B3(); b.q=1; b.lod=1;
+    try{ mmBuild(b, 0, scanVp(vm)); }catch(e){ return; }
+    b.f.forEach(function(f){ if(!f.cid || !f.gid || f.gid==='site') return; var k=f.gid+'|'+f.cid; if(seen[k]) return; seen[k]=1; out.push({gid:f.gid, cid:f.cid}); });
+  });
+  bomScan.k=key; bomScan.v=out; return out;
+}
+function bomItems(){
+  var sc=bomScan(), groups=[], gi={}, out=[];
+  sc.forEach(function(x){ if(!x.cid) return; if(!(x.gid in gi)){ gi[x.gid]=groups.length; groups.push({gid:x.gid, items:{}}); } groups[gi[x.gid]].items[x.cid]=1; });
+  groups.forEach(function(g,i){
+    out.push({lvl:1, no:String(i+1), gid:g.gid, n:isoName(g.gid)});
+    Object.keys(g.items).forEach(function(cid,j){
+      var c=compInfo(cid)||{n:cid, g:'Module'}, r=cadRec(cid), idn=(r&&r.identity)||{};
+      out.push({lvl:2, no:(i+1)+'.'+(j+1), gid:g.gid, cid:cid, n:c.n, grp:c.g, cat:CATOF[c.g]||'purchased',
+        mfr:idn.manufacturer, mpn:idn.partNumber, idst:cid.indexOf('mod:')===0? 'module' : idn.status});
+    });
+  });
+  return out;
+}
+function bomCosts(items){
+  var C=wsData().costs, cats={}, all=true, demo=false, total=0;
+  COSTCAT.forEach(function(c){ cats[c[0]]={n:c[1], have:0, of:0, sum:0}; });
+  items.forEach(function(it){ if(it.lvl!==2) return; var r=C[it.cid], cat=(r&&r.cat)||it.cat, k=cats[cat]||cats.other;
+    k.of++; if(r && r.unit!=null && r.unit!==''){ k.have++; k.sum+=+r.unit; if(r.demo) demo=true; } });
+  LABOURCAT.concat(['other']).forEach(function(c){ var r=C['cat:'+c]; if(r && r.unit!=null && r.unit!==''){ cats[c].lab=+r.unit; if(r.demo) demo=true; } });
+  COSTCAT.forEach(function(c){ var k=cats[c[0]], lab=LABOURCAT.indexOf(c[0])>=0 || c[0]==='other';
+    k.complete = k.have===k.of && (!lab || k.lab!=null || c[0]==='other' && k.of>0);
+    if(lab && k.lab==null && !(c[0]==='other' && k.of)) k.complete=false;
+    k.total = k.sum + (k.lab||0);
+    if(!k.complete) all=false; total+=k.total; });
+  return {cats:cats, complete:all, total:total, demo:demo};
+}
+function wsBom(){
+  if(!P()) return wsSec('BOM & costing', '', wsNeedMachine());
+  var items=bomItems(), C=wsData().costs, seeCost=can('cost'), B=bomCosts(items), pr=priceLines();
+  var h='<div class="wsbomlay"><div class="wsbomtab">';
+  var rows=items.map(function(it){
+    if(it.lvl===1) return '<tr class="l1"><td class="mono">'+it.no+'</td><td colspan="'+(seeCost?6:4)+'"><b>'+esc(it.n)+'</b></td></tr>';
+    var r=C[it.cid]||{}, cost=r.unit!=null && r.unit!==''? +r.unit : null;
+    var sup=[r.supplier, r.lead? r.lead+' wk' : '', r.origin].filter(Boolean).join(' · ');
+    return '<tr class="l2" data-cid="'+esc(it.cid)+'" data-gid="'+esc(it.gid)+'" tabindex="0"><td class="mono">'+it.no+'</td><td><b>'+esc(it.n)+'</b><span class="sub mono">'+esc(it.cid)+'</span></td>'+
+      '<td>'+(it.mfr? esc(it.mfr)+(it.mpn? '<span class="sub mono">'+esc(it.mpn)+'</span>' : '') : wsNA(it.idst==='fabricated-to-drawing'? 'TEAL drawing' : it.idst==='module'? 'Catalogue module' : 'Not specified'))+'</td>'+
+      '<td>'+(sup? esc(sup) : '<span class="wsdash">—</span>')+(r.sourcing? '<span class="sub">'+esc(r.sourcing)+'</span>' : '')+'</td>'+
+      (seeCost? '<td class="n">'+(cost!=null? (r.demo? dc('demo','SYNTH')+' ' : '')+sINR(Math.round(cost))+(r.src? '<span class="sub">'+esc(r.src)+'</span>' : '') : wsNA('Awaiting input'))+'</td>'+
+        '<td class="sub">'+esc((COSTCAT.filter(function(c){ return c[0]===(r.cat||it.cat); })[0]||['',''])[1])+'</td>' : '')+
+      '<td class="acts">'+(can('editCost')? '<button type="button" data-a="cost">Edit</button>' : '')+'</td></tr>';
+  }).join('');
+  h+='<div class="wstw"><table class="wst bom"><thead><tr><th>Item</th><th>Component</th><th>Manufacturer · MPN</th><th>Supplier · lead · origin</th>'+
+     (seeCost? '<th class="n">Cost / machine</th><th>Category</th>' : '')+'<th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  h+='</div><div class="wsbomside"><div class="wsdock" id="wsdock"></div><p class="sub">Click a row to find the part in the machine; click the machine to find the row.</p></div></div>';
+  var tot='';
+  if(seeCost){
+    tot='<div class="wstw"><table class="wst"><thead><tr><th>Category</th><th class="n">Items costed</th><th class="n">Total</th><th></th></tr></thead><tbody>'+
+      COSTCAT.map(function(c){ var k=B.cats[c[0]], lab=LABOURCAT.indexOf(c[0])>=0;
+        return '<tr><td>'+esc(c[1])+'</td><td class="n">'+(k.of? k.have+' / '+k.of : lab? (k.lab!=null?'entered':'—') : '—')+'</td>'+
+          '<td class="n">'+(k.complete? sINR(Math.round(k.total)) : wsNA('Incomplete'))+'</td>'+
+          '<td class="acts">'+(can('editCost') && (lab||c[0]==='other')? '<button type="button" data-cat="'+c[0]+'">'+(k.lab!=null?'Edit':'Enter')+'</button>' : '')+'</td></tr>'; }).join('')+'</tbody></table></div>';
+    var price=pr? pr.total : null, base=wsData().baseline;
+    var sum='<dl class="wsdl">'+
+      '<dt>Estimated machine cost</dt><dd>'+(B.complete? '<b>'+sINR(Math.round(B.total))+'</b>'+(B.demo? ' '+dc('demo') : ' '+dc('local')) : wsNA('Not available — costs incomplete'))+'</dd>'+
+      '<dt>Selling price</dt><dd>'+(price!=null? sINR(Math.round(price))+' '+dc('est','Catalogue estimate — not an approved price') : '—')+'</dd>'+
+      (can('margin')? '<dt>Gross margin</dt><dd>'+(B.complete && price? '<b>'+((price-B.total)/price*100).toFixed(1)+' %</b> · '+sINR(Math.round(price-B.total))+(B.demo? ' '+dc('demo') : '') : wsNA('Not available — needs complete costs and an approved price'))+'</dd>' : '')+
+      '<dt>Variance to baseline</dt><dd>'+(base && B.complete? sINR(Math.round(B.total-base.total))+' ('+((B.total-base.total)/base.total*100).toFixed(1)+' %) against '+esc(base.ref)+', '+wsDate(base.ts) : wsNA(base? 'Not available — costs incomplete' : 'No approved baseline'))+'</dd></dl>'+
+      (can('approve')? '<div class="wsbtns"><button type="button" class="btn" id="bom_base"'+(B.complete?'':' disabled')+'>Set as approved baseline</button></div>' : '');
+    tot=wsSec('Cost roll-up', 'Totals appear only for categories whose every item has a cost. The selling price is the catalogue’s indicative estimate, not an approved price.'+(B.demo? ' <b class="warnt">Includes SYNTHETIC demonstration costs — not real figures.</b>' : ''), tot+sum);
+  } else tot=wsSec('Cost roll-up', 'Costs and margins are hidden for the '+esc(ROLES[ROLE.cur].n)+' role.', '');
+  return wsSec('BOM & costing — '+esc(cfgRef()), 'Structured from the assemblies and components the 3D model draws for this configuration. Manufacturer and part numbers are not in the product data. Costs are entered here per machine set, because quantities per machine are not defined.', h)+tot+'<div id="bomedit"></div>';
+}
+function wsBomBind(){
+  wsDock('#wsdock');
+  var t=$('#ws .wst.bom');
+  if(t){
+    var pick=function(tr){ var cid=tr.getAttribute('data-cid'), gid=tr.getAttribute('data-gid');
+      $('#ws').querySelectorAll('tr.l2.on').forEach(function(x){ x.classList.remove('on'); }); tr.classList.add('on');
+      expSelect(cid, gid, false); };
+    t.addEventListener('click', function(e){
+      var b=e.target.closest('button[data-a="cost"]'), tr=e.target.closest('tr.l2'); if(!tr) return;
+      if(b) return wsCostEdit(tr.getAttribute('data-cid'));
+      pick(tr);
+    });
+    t.addEventListener('keydown', function(e){ var tr=e.target.closest('tr.l2'); if(tr && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); pick(tr); } });
+  }
+  $('#ws').querySelectorAll('[data-cat]').forEach(function(b){ b.onclick=function(){ wsCostEdit('cat:'+b.getAttribute('data-cat')); }; });
+  var bb=$('#bom_base'); if(bb) bb.onclick=function(){
+    var B=bomCosts(bomItems()); wsData().baseline={total:B.total, ts:Date.now(), ref:cfgRef(), demo:B.demo};
+    wsAudit('cost baseline', cfgRef(), sINR(Math.round(B.total))); toast('Baseline recorded in this browser.'); wsRender(); };
+}
+function wsBomMark(cid){
+  if(VIEW.v!=='internal' || VIEW.sec!=='bom') return;
+  var tr=document.querySelector('#ws tr.l2[data-cid="'+(window.CSS&&CSS.escape? CSS.escape(cid) : cid)+'"]'); if(!tr) return;
+  document.querySelectorAll('#ws tr.l2.on').forEach(function(x){ x.classList.remove('on'); });
+  tr.classList.add('on'); tr.scrollIntoView({block:'nearest'});
+}
+function wsCostEdit(key){
+  var C=wsData().costs, r=C[key]||{}, isCat=key.indexOf('cat:')===0;
+  var name=isCat? (COSTCAT.filter(function(c){ return 'cat:'+c[0]===key; })[0]||['',''])[1] : (compInfo(key)||{n:key}).n;
+  $('#bomedit').innerHTML=wsSec('Cost record — '+name, 'Kept in this browser’s storage, unencrypted. Do not enter confidential supplier prices on a shared or public computer.',
+    '<div class="wsform">'+
+    '<label>Cost per machine (INR) <input id="ce_u" type="number" min="0" step="1" value="'+(r.unit!=null?esc(r.unit):'')+'"></label>'+
+    (isCat? '' : '<label>Supplier <input id="ce_s" value="'+esc(r.supplier||'')+'"></label>'+
+    '<label>Lead time (weeks) <input id="ce_l" type="number" min="0" step="1" value="'+esc(r.lead||'')+'"></label>'+
+    '<label>Country of origin <input id="ce_o" value="'+esc(r.origin||'')+'"></label>'+
+    '<label>Sourcing status <select id="ce_ss">'+['','Not sourced','RFQ issued','Quoted','Approved','Single source','Obsolete risk'].map(function(x){ return '<option'+(r.sourcing===x?' selected':'')+'>'+x+'</option>'; }).join('')+'</select></label>'+
+    '<label>Category <select id="ce_c">'+COSTCAT.map(function(c){ return '<option value="'+c[0]+'"'+((r.cat||CATOF[(compInfo(key)||{}).g]||'purchased')===c[0]?' selected':'')+'>'+c[1]+'</option>'; }).join('')+'</select></label>')+
+    '<label class="wide">Cost source <input id="ce_src" value="'+esc(r.src||'')+'" placeholder="e.g. supplier quotation Q-1234, 2026-09"></label>'+
+    '<div class="ferr" id="ce_err" role="alert"></div>'+
+    '<div class="wide wsbtns"><button type="button" class="btn pri" id="ce_ok">Save</button><button type="button" class="btn" id="ce_clr">Clear</button><button type="button" class="btn" id="ce_x">Cancel</button></div></div>');
+  $('#ce_x').onclick=function(){ $('#bomedit').innerHTML=''; };
+  $('#ce_clr').onclick=function(){ delete C[key]; wsAudit('cost cleared', key, ''); wsSave(); wsRender(); };
+  $('#ce_ok').onclick=function(){
+    var u=$('#ce_u').value.trim(), src=$('#ce_src').value.trim(), err=[];
+    if(u!=='' && !(+u>=0)) err.push('Cost must be a number of rupees, zero or more.');
+    if(u!=='' && !src) err.push('Say where the cost comes from — a cost without a source cannot be reviewed.');
+    if(err.length){ var e2=$('#ce_err'); e2.textContent=err.join(' '); e2.style.display='block'; return; }
+    var rec={unit:u===''? null : +u, src:src, updated:Date.now(), cur:'INR'};
+    if(!isCat){ rec.supplier=$('#ce_s').value.trim(); rec.lead=$('#ce_l').value.trim(); rec.origin=$('#ce_o').value.trim(); rec.sourcing=$('#ce_ss').value; rec.cat=$('#ce_c').value; }
+    C[key]=rec; wsAudit('cost record', key, (rec.unit!=null? sINR(rec.unit) : 'no cost')+' · '+(rec.src||'')); wsSave(); toast('Saved in this browser.'); wsRender();
+  };
+  $('#bomedit').scrollIntoView({block:'nearest'});
+}
+
+/* ---- 4 · Components & suppliers ---------------------------------------------- */
+function wsComp(){
+  var F=VIEW.cf||{g:'', q:''}, S2=wsData().suppliers;
+  var groups={}; Object.keys(COMPINFO).forEach(function(k){ groups[COMPINFO[k].g]=1; });
+  var t='<div class="wsfilt"><label>Group <select data-cf="g"><option value="">All</option>'+Object.keys(groups).sort().map(function(g){ return '<option'+(F.g===g?' selected':'')+'>'+esc(g)+'</option>'; }).join('')+'</select></label>'+
+    '<label class="grow">Search <input data-cf="q" value="'+esc(F.q)+'" placeholder="Component, vendor or ID"></label></div>';
+  t+='<div class="wstw"><table class="wst"><thead><tr><th>Component</th><th>Group</th><th>Identity</th><th>Example vendors (catalogue)</th><th>CAD search</th><th>Suppliers recorded</th><th></th></tr></thead><tbody>';
+  Object.keys(COMPINFO).sort(function(a,b){ return COMPINFO[a].g.localeCompare(COMPINFO[b].g) || COMPINFO[a].n.localeCompare(COMPINFO[b].n); }).forEach(function(k){
+    var c=COMPINFO[k], r=cadRec(k), idn=(r&&r.identity)||{}, sup=S2[k]||[];
+    if(F.g && c.g!==F.g) return;
+    if(F.q && (c.n+' '+k+' '+c.v).toLowerCase().indexOf(F.q.toLowerCase())<0) return;
+    var ap=sup.filter(function(s){ return s.status==='Approved'; }).length;
+    t+='<tr data-k="'+k+'"><td><b>'+esc(c.n)+'</b><span class="sub mono">'+esc(k)+'</span></td><td>'+esc(c.g)+'</td>'+
+      '<td>'+(idn.status==='class-only'? wsNA('Class only — no part number') : idn.status==='fabricated-to-drawing'? 'TEAL drawing' : idn.status==='not-a-part'? 'Not a part' : wsNA('—'))+'</td>'+
+      '<td class="sub">'+esc(c.v)+'</td><td>'+(r&&r.cad? '<span class="cst c-'+esc(r.cad.status)+'">'+esc(CADSTAT[r.cad.status]||r.cad.status)+'</span>' : '—')+'</td>'+
+      '<td>'+(sup.length? sup.length+' ('+ap+' approved)'+(ap===1&&sup.length===1? ' '+dc('miss','Single source') : '') : wsNA('None'))+'</td>'+
+      '<td class="acts"><button type="button" data-a="sup">Suppliers</button></td></tr>';
+  });
+  t+='</tbody></table></div>';
+  var rules=Object.keys(MODFIT).map(function(k){ var f=MODFIT[k], w=[];
+    if(f.fam) w.push('families '+f.fam.join(', ')); if(f.noFam) w.push('not '+f.noFam.join(', ')); if(f.deliv) w.push('delivery '+f.deliv.join(', '));
+    if(f.noDeliv) w.push('not '+f.noDeliv.join(', ')); if(f.mat) w.push('materials '+f.mat.join(', ')); if(f.noPlat) w.push('not on '+f.noPlat.join(', '));
+    return '<tr><td>'+esc(modName(k))+'</td><td class="sub">'+esc(w.join(' · '))+'</td></tr>'; }).join('');
+  return wsSec('Component library', Object.keys(COMPINFO).length+' component classes from the configurator’s component library and the CAD manifest. The vendors listed are the catalogue’s examples of the class of part — <b>not approved suppliers</b>.', t)+
+    '<div id="supedit"></div>'+
+    wsSec('Compatibility rules', 'The only compatibility rules in the data are the module fitment rules below. A component is never treated as compatible because its category matches — a substitution needs an approved supplier record.',
+      '<div class="wstw"><table class="wst"><thead><tr><th>Module</th><th>Fits</th></tr></thead><tbody>'+rules+'</tbody></table></div>');
+}
+function wsCompBind(){
+  var ws=$('#ws');
+  ws.querySelectorAll('[data-cf]').forEach(function(i){
+    i.addEventListener(i.tagName==='SELECT'? 'change' : 'input', function(){ VIEW.cf=VIEW.cf||{g:'',q:''}; VIEW.cf[i.getAttribute('data-cf')]=i.value; var pos=i.selectionStart; wsRender();
+      var n=$('#ws [data-cf="'+i.getAttribute('data-cf')+'"]'); if(n){ n.focus(); try{ if(pos!=null) n.setSelectionRange(pos,pos); }catch(e){} } });
+  });
+  ws.querySelector('.wst').addEventListener('click', function(e){
+    var b=e.target.closest('button[data-a="sup"]'); if(b) wsSupEdit(b.closest('tr').getAttribute('data-k'));
+  });
+}
+function wsSupEdit(k){
+  var c=COMPINFO[k], list=wsData().suppliers[k]||[];
+  function draw(){
+    $('#supedit').innerHTML=wsSec('Suppliers — '+c.n, 'Approval of a supplier or an alternative is an engineering decision; only roles allowed to approve substitutions can mark one Approved. Records are kept in this browser.',
+      (list.length? '<div class="wstw"><table class="wst"><thead><tr><th>Supplier</th><th>Part number</th><th>Lead</th><th>Status</th><th>Alternative</th><th>Documentation</th><th></th></tr></thead><tbody>'+
+        list.map(function(s,i){ return '<tr><td>'+esc(s.name)+(s.demo? ' '+dc('demo') : '')+'</td><td class="mono">'+esc(s.pn||'—')+'</td><td>'+(s.lead? esc(s.lead)+' wk' : '—')+'</td><td>'+esc(s.status)+'</td><td>'+(s.alt?'Yes':'No')+'</td>'+
+          '<td>'+(s.doc && /^https:\/\//.test(s.doc)? '<a href="'+esc(s.doc)+'" target="_blank" rel="noopener noreferrer">Link</a>' : '—')+'</td><td class="acts"><button type="button" data-i="'+i+'">Remove</button></td></tr>'; }).join('')+'</tbody></table></div>' : '<p class="sub">No supplier recorded for this component.</p>')+
+      '<div class="wsform"><label>Supplier <input id="su_n"></label><label>Manufacturer part number <input id="su_p"></label>'+
+      '<label>Lead time (weeks) <input id="su_l" type="number" min="0"></label>'+
+      '<label>Status <select id="su_s"><option>Candidate</option><option>Qualified</option>'+(can('approveSub')||can('approve')? '<option>Approved</option>' : '')+'<option>Rejected</option></select></label>'+
+      '<label>Documentation URL <input id="su_d" placeholder="https://"></label><label class="chk"><input type="checkbox" id="su_a"> Approved alternative to the primary part</label>'+
+      '<div class="ferr" id="su_err" role="alert"></div>'+
+      '<div class="wide wsbtns"><button type="button" class="btn pri" id="su_ok">Add supplier</button><button type="button" class="btn" id="su_x">Close</button></div></div>');
+    $('#su_x').onclick=function(){ $('#supedit').innerHTML=''; wsRender(); };
+    $('#supedit').querySelectorAll('[data-i]').forEach(function(b){ b.onclick=function(){ var s=list.splice(+b.getAttribute('data-i'),1)[0]; wsData().suppliers[k]=list; wsAudit('supplier removed', k, s.name); draw(); }; });
+    $('#su_ok').onclick=function(){
+      var n=$('#su_n').value.trim(), d=$('#su_d').value.trim(), err=[];
+      if(!n) err.push('Supplier name is required.');
+      if(d && !/^https:\/\//.test(d)) err.push('Documentation must be an https:// link.');
+      if(err.length){ var e2=$('#su_err'); e2.textContent=err.join(' '); e2.style.display='block'; return; }
+      var s={name:n, pn:$('#su_p').value.trim(), lead:$('#su_l').value.trim(), status:$('#su_s').value, doc:d, alt:$('#su_a').checked, ts:Date.now(), by:ROLE.cur};
+      list.push(s); wsData().suppliers[k]=list; wsAudit('supplier added', k, n+' · '+s.status); draw();
+    };
+  }
+  draw(); $('#supedit').scrollIntoView({block:'nearest'});
+}
+
+/* ---- 5 · Application trials ---------------------------------------------------- */
+var TRIALST=['Requested','Planned','In progress','Tested','Approved','Rejected'];
+var TRIALF=[['ref','Customer or project reference'],['material','Material and grade'],['thick','Thickness (mm)'],['geom','Component geometry'],
+  ['req','Process requirement'],['params','Pulse, repetition rate and other parameters'],['recipe','Recipe revision'],['owner','Trial owner'],['date','Trial date'],
+  ['inspect','Inspection method and results'],['accept','Acceptance criteria'],['achieved','Achieved result'],['issues','Open issues']];
+function wsTrials(){
+  var d=wsData(), apps='';
+  Object.keys(PLAT).forEach(function(pk){ var p=PLAT[pk]; Object.keys(p.apps||{}).forEach(function(ak){
+    var tr=d.trials.filter(function(t){ return t.plat===pk && t.app===ak; }), ok=tr.filter(function(t){ return t.status==='Approved'; });
+    apps+='<tr><td>'+esc(p.n)+'</td><td>'+esc(p.apps[ak].n)+'</td><td>'+esc((MAT[p.apps[ak].mat]||{n:p.apps[ak].mat}).n)+'</td>'+
+      '<td>'+(ok.length? dc(ok.some(function(t){ return t.demo; })?'demo':'appr', 'Validated — '+ok.map(function(t){ return t.id; }).join(', ')) : tr.length? dc('local', tr.length+' trial(s), none approved') : dc('est','Catalogue recommendation — no trial evidence'))+'</td></tr>'; }); });
+  var list=d.trials.length? '<div class="wstw"><table class="wst"><thead><tr><th>Trial</th><th>Platform · application</th><th>Material</th><th>Source</th><th>Status</th><th>Updated</th><th></th></tr></thead><tbody>'+
+    d.trials.map(function(t,i){ return '<tr><td class="mono">'+esc(t.id)+(t.demo? ' '+dc('demo') : '')+'</td><td>'+esc((PLAT[t.plat]||{n:t.plat||'—'}).n)+' · '+esc(t.appName||'—')+'</td><td>'+esc(t.material||'—')+'</td>'+
+      '<td>'+esc(t.srcName||'—')+'</td><td>'+esc(t.status)+'</td><td>'+wsDate(t.updated)+'</td><td class="acts"><button type="button" data-t="'+i+'">Open</button></td></tr>'; }).join('')+'</tbody></table></div>'
+    : '<p class="sub">No trial recorded in this browser. Customer trial requests made here appear in this list.</p>';
+  return wsSec('Application trials', 'A laser–material combination counts as validated only by an approved trial with recorded results. The catalogue’s applications are recommendations until then.',
+    list, '<button type="button" class="btn pri" id="tr_new">New trial from the current configuration</button>')+'<div id="tredit"></div>'+
+    wsSec('Catalogue applications — evidence status', '', '<div class="wstw"><table class="wst"><thead><tr><th>Platform</th><th>Application</th><th>Material</th><th>Evidence</th></tr></thead><tbody>'+apps+'</tbody></table></div>');
+}
+function wsTrialsBind(){
+  var nb=$('#tr_new'); if(nb) nb.onclick=function(){
+    if(!P()){ toast('Configure a machine first — a trial is recorded against a configuration.','warn'); return; }
+    var a=A(); wsTrialEdit({id:wsId('TR'), plat:S.plat, app:S.app, appName:a? a.n : '', material:a? (MAT[a.mat]||{n:''}).n : '', srcName:S.src? SRC[S.src].n+' '+SRC[S.src].wl+' '+S.pw+' W' : '',
+      optics:S.lens? LENS[S.lens].n+' f '+LENS[S.lens].f+' mm' : '', cfg:cfgRef(), status:'Planned', created:Date.now()}, true);
+  };
+  $('#ws').querySelectorAll('[data-t]').forEach(function(b){ b.onclick=function(){ wsTrialEdit(wsData().trials[+b.getAttribute('data-t')], false); }; });
+}
+function wsImg(file, cb){
+  if(!file || !/^image\//.test(file.type)) return cb(null, 'Only image files can be attached.');
+  var rd=new FileReader();
+  rd.onload=function(){ var im=new Image(); im.onload=function(){
+      var k=Math.min(1, 480/Math.max(im.width, im.height)), c=document.createElement('canvas');
+      c.width=Math.round(im.width*k); c.height=Math.round(im.height*k); c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      cb(c.toDataURL('image/jpeg', 0.72)); };
+    im.onerror=function(){ cb(null,'That image could not be read.'); }; im.src=rd.result; };
+  rd.readAsDataURL(file);
+}
+/* a photograph is only ever the JPEG wsImg made; anything else in an imported file is dropped */
+function wsPhotoOk(u){ return typeof u==='string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/]+=*$/.test(u); }
+function wsTrialEdit(t, isNew){
+  var photos=(Array.isArray(t.photos)? t.photos : []).filter(wsPhotoOk).slice(0,3);
+  $('#tredit').innerHTML=wsSec((isNew? 'New trial ' : 'Trial ')+t.id, 'Configuration '+esc(t.cfg||'—')+' · '+esc(t.srcName||'')+' · '+esc(t.optics||'')+
+    '. Approval needs inspection results, acceptance criteria and the achieved result, and a role allowed to approve trials.',
+    '<div class="wsform">'+TRIALF.map(function(f){ var long=/inspect|accept|achieved|issues|params|req|geom/.test(f[0]);
+      return '<label'+(long?' class="wide"':'')+'>'+esc(f[1])+(long? ' <textarea data-tf="'+f[0]+'" rows="2">'+esc(t[f[0]]||'')+'</textarea>' : ' <input data-tf="'+f[0]+'" value="'+esc(t[f[0]]||'')+'"'+(f[0]==='date'?' type="date"':'')+'>')+'</label>'; }).join('')+
+    '<label>Status <select id="tf_st">'+TRIALST.map(function(s){ return '<option'+(t.status===s?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></label>'+
+    '<label class="wide">Sample photographs (up to 3, resized to 480 px and kept in this browser) <input type="file" id="tf_ph" accept="image/*" multiple></label>'+
+    '<div class="wide wsph" id="tf_pv"></div><div class="ferr" id="tf_err" role="alert"></div>'+
+    '<div class="wide wsbtns"><button type="button" class="btn pri" id="tf_ok">Save trial</button>'+(isNew? '' : '<button type="button" class="btn" id="tf_del">Delete</button>')+'<button type="button" class="btn" id="tf_x">Close</button></div></div>');
+  function pv(){ $('#tf_pv').innerHTML=photos.map(function(u,i){ return '<figure><img src="'+esc(u)+'" alt="Sample photograph '+(i+1)+'"><button type="button" data-p="'+i+'" aria-label="Remove photograph">×</button></figure>'; }).join(''); }
+  pv();
+  $('#tf_pv').onclick=function(e){ var b=e.target.closest('[data-p]'); if(b){ photos.splice(+b.getAttribute('data-p'),1); pv(); } };
+  $('#tf_ph').onchange=function(){ [].slice.call(this.files).slice(0, 3-photos.length).forEach(function(f){ wsImg(f, function(u, err){ if(u){ photos.push(u); pv(); } else toast(err,'warn'); }); }); this.value=''; };
+  $('#tf_x').onclick=function(){ $('#tredit').innerHTML=''; };
+  if(!isNew) $('#tf_del').onclick=function(){ if(!confirm('Delete trial '+t.id+'?')) return; var d=wsData(); d.trials=d.trials.filter(function(x){ return x!==t; }); wsAudit('trial deleted', t.id, ''); wsSave(); wsRender(); };
+  $('#tf_ok').onclick=function(){
+    var v={}, err=[]; $('#tredit').querySelectorAll('[data-tf]').forEach(function(i){ v[i.getAttribute('data-tf')]=i.value.trim(); });
+    var st=$('#tf_st').value;
+    if(st==='Approved'){
+      if(!(can('approveTrial')||can('approve'))) err.push('The '+ROLES[ROLE.cur].n+' role cannot approve trials.');
+      if(!v.inspect||!v.accept||!v.achieved) err.push('Approval needs inspection results, acceptance criteria and the achieved result.');
+    }
+    if(!v.material) err.push('Material is required.');
+    if(err.length){ var e2=$('#tf_err'); e2.textContent=err.join(' '); e2.style.display='block'; return; }
+    for(var k in v) t[k]=v[k]; t.status=st; t.photos=photos; t.updated=Date.now(); if(st==='Approved') t.approvedBy=ROLE.cur;
+    var d=wsData(); if(isNew) d.trials.unshift(t);
+    wsAudit('trial '+(isNew?'created':'updated'), t.id, st); wsSave(); toast('Trial saved in this browser.'); wsRender();
+  };
+  $('#tredit').scrollIntoView({block:'nearest'});
+}
+
+/* ---- 6 · Validation & release ------------------------------------------------- */
+var RELST=['Draft','In Review','Approved','Released','Deprecated'];
+function wsRelRec(id){ return id? wsData().releases[id]||null : null; }
+function wsRelease(){
+  var h='', R=wsData().releases;
+  if(P() && CFG.id){
+    var r=R[CFG.id]||{state:'Draft', log:[]}, rel=r.released, differs=rel && rel.snap!==cfgKey();
+    var next={Draft:['In Review'], 'In Review':['Approved','Draft'], Approved:['Released','Draft'], Released:['Deprecated'], Deprecated:[]}[r.state]||[];
+    var need=function(s){ return (s==='Approved'||s==='Released'||s==='Deprecated')? can('approve') : true; };
+    h+=wsSec('This configuration — '+esc(cfgRef()), 'State <b>'+esc(r.state)+'</b>'+(rel? ' · released revision r'+esc(rel.rev)+' on '+wsDate(rel.ts) : ' · never released')+'.'+
+      (differs? ' <b class="warnt">The working revision differs from the released one — the released record is unchanged and still what any issued document refers to.</b>' : ''),
+      '<div class="wsform"><label>Owner <input id="rl_o" value="'+esc(r.owner||'')+'"></label><label>Reviewer <input id="rl_r" value="'+esc(r.reviewer||'')+'"></label>'+
+      '<label class="wide">Change description <textarea id="rl_n" rows="2" placeholder="What changed and why"></textarea></label>'+
+      '<div class="wide wsbtns">'+next.map(function(s){ return '<button type="button" class="btn'+(s==='Released'||s==='Approved'?' pri':'')+'" data-to="'+s+'"'+(need(s)?'':' disabled title="Needs a role allowed to approve"')+'>'+(s==='Draft'? 'Return to Draft' : 'Move to '+s)+'</button>'; }).join('')+
+      (rel? '<button type="button" class="btn" id="rl_back">Restore released revision r'+esc(rel.rev)+'</button>' : '')+'</div>'+
+      '<div class="ferr" id="rl_err" role="alert"></div></div>'+
+      (r.log&&r.log.length? '<div class="wstw"><table class="wst"><thead><tr><th>Time</th><th>Revision</th><th>Change</th><th>Owner / reviewer</th><th>Role</th><th>Note</th></tr></thead><tbody>'+
+        r.log.map(function(x){ return '<tr><td>'+wsDate(x.ts)+'</td><td class="mono">r'+esc(x.rev)+'</td><td>'+esc(x.from)+' → '+esc(x.to)+'</td><td>'+esc((x.owner||'—')+' / '+(x.reviewer||'—'))+'</td><td>'+esc((ROLES[x.role]||{n:x.role}).n)+'</td><td class="sub">'+esc(x.note||'')+'</td></tr>'; }).join('')+'</tbody></table></div>' : ''));
+  } else h+=wsSec('This configuration', '', wsNeedMachine());
+  var others=Object.keys(R).filter(function(k){ return k!==CFG.id; });
+  if(others.length) h+=wsSec('Other configurations with release records', '', '<div class="wstw"><table class="wst"><thead><tr><th>Configuration</th><th>State</th><th>Released</th></tr></thead><tbody>'+
+    others.map(function(k){ var r=R[k]; return '<tr><td class="mono">'+esc(k)+(r.demo? ' '+dc('demo') : '')+'</td><td>'+esc(r.state)+'</td><td>'+(r.released? 'r'+esc(r.released.rev)+' · '+wsDate(r.released.ts) : '—')+'</td></tr>'; }).join('')+'</tbody></table></div>');
+  var drafts=(typeof CHLOG!=='undefined')? CHLOG.length : 0;
+  h+=wsSec('Catalogue data', 'Catalogue revision '+esc(DATA_REV)+', loaded from '+esc(DATA_SOURCE)+'. '+
+    (drafts? drafts+' unexported value-store change'+(drafts===1?'':'s')+' in this browser — they affect only this browser until data.json is exported, reviewed and committed.' : 'No unexported value-store changes in this browser.')+
+    ' Publishing the catalogue is a reviewed commit to the repository; nothing here changes the public site.', '', '<button type="button" class="btn" id="rl_vs">Open the value store</button>');
+  return h;
+}
+function wsReleaseBind(){
+  var vs=$('#rl_vs'); if(vs) vs.onclick=function(){ openAdmin(); };
+  if(!CFG.id) return;
+  var R=wsData().releases;
+  $('#ws').querySelectorAll('[data-to]').forEach(function(b){ b.onclick=function(){
+    var r=R[CFG.id]||{state:'Draft', log:[]}, to=b.getAttribute('data-to'), o=$('#rl_o').value.trim(), rv=$('#rl_r').value.trim(), n=$('#rl_n').value.trim(), err=[];
+    if(to==='In Review' && !o) err.push('Name the owner before review.');
+    if((to==='Approved'||to==='Released') && !rv) err.push('Name the reviewer who approves it.');
+    if(to==='Approved' && rv && o && rv.toLowerCase()===o.toLowerCase()) err.push('The reviewer must not be the owner.');
+    if(!n && to!=='Draft') err.push('Describe the change.');
+    if(err.length){ var e2=$('#rl_err'); e2.textContent=err.join(' '); e2.style.display='block'; return; }
+    r.log=r.log||[]; r.log.unshift({ts:Date.now(), rev:CFG.rev, from:r.state, to:to, owner:o, reviewer:rv, role:ROLE.cur, note:n});
+    r.state=to; r.owner=o; r.reviewer=rv;
+    if(to==='Released') r.released={rev:CFG.rev, snap:cfgKey(), ts:Date.now()};
+    R[CFG.id]=r; wsAudit('release '+to, cfgRef(), n); wsSave(); wsRender();
+  }; });
+  var bk=$('#rl_back'); if(bk) bk.onclick=function(){
+    var r=R[CFG.id]; if(!r||!r.released) return;
+    if(!confirm('Load released revision r'+r.released.rev+' into the configurator? The working revision stays in the undo history.')) return;
+    CFG.last=''; restore(JSON.parse(r.released.snap)); writeHash();
+    wsAudit('released revision restored', CFG.id, 'r'+r.released.rev); toast('Released revision loaded as a new working revision.'); wsRender();
+  };
+}
+
+/* ---- 7 · Customer enquiries ---------------------------------------------------- */
+var ENQST=['New','Technical Review','Application Trial','Quotation Preparation','Submitted','Won','Lost','On Hold'];
+function wsEnq(){
+  var d=wsData(), F=VIEW.ef||'';
+  var list=d.enquiries.filter(function(e){ return !F || e.status===F; });
+  var t='<div class="wsfilt"><label>Status <select id="eq_f"><option value="">All</option>'+ENQST.map(function(s){ return '<option'+(F===s?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></label>'+
+    '<span class="grow"></span><button type="button" class="btn" id="eq_csv"'+(d.enquiries.length?'':' disabled')+'>Export CSV</button></div>';
+  t+=list.length? '<div class="wstw"><table class="wst"><thead><tr><th>Enquiry</th><th>Type</th><th>Organisation · contact</th><th>Configuration</th><th>Application</th><th>Status</th><th>Owner</th><th>Next action</th><th>Quote ref.</th><th></th></tr></thead><tbody>'+
+    list.map(function(e){ var i=d.enquiries.indexOf(e);
+      return '<tr><td class="mono">'+esc(e.id)+(e.demo? ' '+dc('demo') : '')+'<span class="sub">'+wsDate(e.ts)+'</span></td><td>'+esc(e.type==='trial'?'Trial request':'Quotation')+'</td>'+
+        '<td>'+esc(e.org||'—')+'<span class="sub">'+esc(e.name||'')+' · '+esc(e.email||'')+'</span></td><td class="mono">'+esc(e.cfg||'—')+'</td><td>'+esc(e.app||'—')+'</td>'+
+        '<td><select data-e="'+i+'" data-k="status">'+ENQST.map(function(s){ return '<option'+(e.status===s?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></td>'+
+        '<td><input data-e="'+i+'" data-k="owner" value="'+esc(e.owner||'')+'" size="9"></td><td><input data-e="'+i+'" data-k="next" value="'+esc(e.next||'')+'" size="14"></td>'+
+        '<td><input data-e="'+i+'" data-k="quote" value="'+esc(e.quote||'')+'" size="9"></td><td class="acts"><button type="button" data-v="'+i+'">Details</button></td></tr>'; }).join('')+'</tbody></table></div>'
+    : '<p class="sub">No enquiry in this browser'+(F? ' with status '+esc(F) : '')+'.</p>';
+  return wsSec('Customer enquiries', 'This list holds only enquiries prepared <b>in this browser</b> (the Customer view’s quotation and trial requests, or loaded demonstration records). There is no server: an enquiry a customer prepares in their own browser never reaches this list, and none is marked submitted unless you set it.', t)+'<div id="eqview"></div>';
+}
+function wsEnqBind(){
+  var d=wsData();
+  var f=$('#eq_f'); if(f) f.onchange=function(){ VIEW.ef=this.value; wsRender(); };
+  var c=$('#eq_csv'); if(c) c.onclick=function(){
+    var head=['Enquiry','Type','Created','Organisation','Name','Email','Country','Configuration','Fingerprint','Designation','Application','Quantity','Timeline','Target rate','Budget','Status','Owner','Next action','Quotation','Synthetic'];
+    var rows=[head].concat(d.enquiries.map(function(e){ return [e.id, e.type, new Date(e.ts).toISOString(), e.org, e.name, e.email, e.country, e.cfg, e.hash, e.desig, e.app, e.qty, e.when, e.target, e.budget, e.status, e.owner, e.next, e.quote, e.demo?'yes':'']; }));
+    download('TEAL-enquiries.csv', '﻿'+toCSV(rows), 'text/csv');
+  };
+  $('#ws').querySelectorAll('[data-e]').forEach(function(i){ i.onchange=function(){
+    var e=d.enquiries[+i.getAttribute('data-e')], k=i.getAttribute('data-k'), old=e[k]; e[k]=i.value; e.updated=Date.now();
+    wsAudit('enquiry '+k, e.id, (old||'—')+' → '+i.value); wsSave(); if(k==='status') wsRender(); }; });
+  $('#ws').querySelectorAll('[data-v]').forEach(function(b){ b.onclick=function(){
+    var e=d.enquiries[+b.getAttribute('data-v')], skip={photos:1};
+    $('#eqview').innerHTML=wsSec('Enquiry '+e.id, '', '<dl class="wsdl">'+Object.keys(e).filter(function(k){ return !skip[k] && e[k]!=='' && e[k]!=null; }).map(function(k){
+      return '<dt>'+esc(k)+'</dt><dd>'+esc(k==='ts'||k==='updated'? wsDate(e[k]) : String(e[k]))+'</dd>'; }).join('')+'</dl>');
+    $('#eqview').scrollIntoView({block:'nearest'}); }; });
+}
+
+/* ---- 8 · Management overview ---------------------------------------------------- */
+function wsMgmt(){
+  var d=wsData(), n=Object.keys(PLAT).length, h='';
+  var demo=d.trials.some(function(t){ return t.demo; })||d.enquiries.some(function(e){ return e.demo; })||Object.keys(d.costs).some(function(k){ return d.costs[k].demo; });
+  function tile(t, v, src, note){ return '<div class="wstile"><h4>'+esc(t)+'</h4><div class="v">'+v+'</div><p class="src">'+src+'</p>'+(note? '<p class="sub">'+note+'</p>' : '')+'</div>'; }
+  var last=function(arr, k){ var m=0; arr.forEach(function(x){ m=Math.max(m, x[k]||0); }); return m? 'updated '+wsDate(m) : 'no records'; };
+  var lc={}; Object.keys(PLAT).forEach(function(k){ var s=(d.products[k]||{}).status||'Not recorded'; lc[s]=(lc[s]||0)+1; });
+  var lcv='<ul class="wsbars">'+LIFECYCLE.concat(['Not recorded']).filter(function(s){ return lc[s]; }).map(function(s){ return '<li><span>'+esc(s)+'</span><i style="--w:'+(lc[s]/n*100)+'%"></i><b>'+lc[s]+'</b></li>'; }).join('')+'</ul>';
+  var R=d.releases, rel=Object.keys(R).filter(function(k){ return R[k].state==='Released'; }).length, rev=Object.keys(R).filter(function(k){ return R[k].state==='In Review'; }).length;
+  var tOpen=d.trials.filter(function(t){ return t.status!=='Approved' && t.status!=='Rejected'; }).length;
+  var byS={}; d.enquiries.forEach(function(e){ byS[e.status]=(byS[e.status]||0)+1; });
+  var won=byS.Won||0, lost=byS.Lost||0;
+  var sup=d.suppliers, single=[], longLead=[], orig={imp:0, loc:0, any:0};
+  Object.keys(sup).forEach(function(k){ var l=sup[k]||[], ap=l.filter(function(s){ return s.status==='Approved'; });
+    if(l.length && ap.length<=1 && !l.some(function(s){ return s.alt; })) single.push(compInfo(k)? compInfo(k).n : k);
+    l.forEach(function(s){ if(+s.lead>=16) longLead.push((compInfo(k)||{n:k}).n+' · '+s.name+' '+s.lead+' wk'); }); });
+  Object.keys(d.costs).forEach(function(k){ var c=d.costs[k]; if(c.origin && c.unit!=null){ orig.any+=+c.unit; if(/^(india|in)$/i.test(c.origin.trim())) orig.loc+=+c.unit; else orig.imp+=+c.unit; } });
+  var B=P()? bomCosts(bomItems()) : null, hc=wsHealth();
+  var zMiss=Object.keys(PLAT).filter(function(k){ var p=PLAT[k]; return p.deliv!=='robot' && p.deliv!=='handpiece' && !specGet(p,/^z.?axis/i); }).length;
+  h+='<div class="wstiles">'+
+    tile('Products by lifecycle', lcv, 'Product records in this browser · '+last(Object.keys(d.products).map(function(k){ return d.products[k]; }),'updated'), lc['Not recorded']===n? 'No lifecycle recorded for any platform.' : '')+
+    tile('Release readiness', rel+' released · '+rev+' in review', 'Release records in this browser', Object.keys(R).length? '' : 'Awaiting input — no configuration has a release record.')+
+    tile('Catalogue health', hc? hc.err+' error'+(hc.err===1?'':'s')+' · '+hc.warn+' warning'+(hc.warn===1?'':'s') : 'Not available', 'Live health check of the catalogue in this browser (revision '+esc(DATA_REV)+')',
+      'Engineering data gaps: no bought-in part numbers; working distance for '+Object.keys(LENS).length+' of '+Object.keys(LENS).length+' objectives; Z stroke for '+zMiss+' platform'+(zMiss===1?'':'s')+'. See assets/cad/COVERAGE.md.')+
+    tile('Open validation items', String(tOpen), 'Application trials in this browser · '+last(d.trials,'updated'), d.trials.length? '' : 'Awaiting input — no trials recorded.')+
+    tile('BOM cost completeness', B? (B.complete? 'Complete' : Object.keys(B.cats).reduce(function(a,k){ return a+B.cats[k].have; },0)+' of '+Object.keys(B.cats).reduce(function(a,k){ return a+B.cats[k].of; },0)+' items costed') : '—', 'Current configuration '+esc(cfgRef()), B&&B.demo? 'Includes SYNTHETIC demonstration costs.' : '')+
+    tile('BOM cost variance', B&&B.complete&&d.baseline? sINR(Math.round(B.total-d.baseline.total)) : 'Not available', 'Against the approved baseline', d.baseline? '' : 'Awaiting input — no approved baseline.')+
+    tile('Quotation pipeline', d.enquiries.length? ENQST.filter(function(s){ return byS[s]; }).map(function(s){ return s+' '+byS[s]; }).join(' · ') : 'Not available', 'Enquiries in this browser · '+last(d.enquiries,'ts'), d.enquiries.length? '' : 'Awaiting input.')+
+    tile('Enquiry-to-order conversion', won+lost? Math.round(won/(won+lost)*100)+' % ('+won+' of '+(won+lost)+' decided)' : 'Not available', 'Won and lost enquiries', won+lost? '' : 'Not measurable until enquiries are decided.')+
+    tile('Supplier lead-time risks', longLead.length? longLead.length+' at 16 weeks or more' : 'Not available', 'Supplier records', longLead.length? longLead.slice(0,4).map(esc).join('<br>') : 'Awaiting supplier lead times.')+
+    tile('Single-source dependencies', single.length? String(single.length) : 'Not available', 'Components with at most one approved supplier and no alternative', single.length? single.slice(0,5).map(esc).join(', ') : 'Awaiting supplier records.')+
+    tile('Imported vs local value', orig.any? Math.round(orig.loc/orig.any*100)+' % local' : 'Not available', 'Cost records with a country of origin', orig.any? '' : 'Awaiting country of origin on cost records.')+
+    tile('Pending decisions', String(rev+d.trials.filter(function(t){ return t.status==='Tested'; }).length), 'Configurations in review and tested trials awaiting approval', '')+
+    '</div>';
+  return wsSec('Management overview', 'From the catalogue and the records in this browser only. Nothing is projected or filled in; each figure names its source and freshness.'+(demo? ' <b class="warnt">Some records are SYNTHETIC demonstration data.</b>' : ''), h);
+}
+
+/* The value store's own health check, run offscreen and counted. It sweeps
+   every rule against every platform, so it is cached until the data changes. */
+function wsHealth(){
+  var key=DATA_REV+'|'+((typeof CHLOG!=='undefined')? CHLOG.length : 0);
+  if(wsHealth.k===key) return wsHealth.v;
+  var box=document.createElement('div'), v=null;
+  try{ CFG.mute++; aHealth(box); v={err:box.querySelectorAll('.hlth.err').length, warn:box.querySelectorAll('.hlth.warn2').length}; }
+  catch(e){ v=null; } finally{ CFG.mute--; }
+  wsHealth.k=key; wsHealth.v=v; return v;
+}
+
+/* ---- 9 · Settings & audit -------------------------------------------------------- */
+function wsSettings(){
+  var d=wsData(), size=0; try{ size=(localStorage.getItem('teal.ws')||'').length; }catch(e){}
+  var h=wsSec('Access and security', '',
+    '<ul class="wsnotes"><li><b>This is a demonstration workspace, not a secure one.</b> The site is static and public: the Customer / Internal switch and the role preview only change what is shown. Anyone can open this view, and nothing here is access-controlled.</li>'+
+    '<li>It holds no confidential data. It shows the public catalogue, and records you type into this browser, which live unencrypted in its local storage.</li>'+
+    '<li>Real internal use needs a server with authentication, server-enforced roles, protected storage and an audit trail — set out in <code>SECURITY.md</code> and <code>docs/INTERNAL-DATA.md</code>.</li></ul>');
+  h+=wsSec('Role preview', 'Shows what each role would see once a server enforces it. Changing it here is not a permission.',
+    '<div class="wstw"><table class="wst"><thead><tr><th>Role</th><th>Screens</th><th>Costs</th><th>Margins</th><th>Approve</th></tr></thead><tbody>'+
+    Object.keys(ROLES).map(function(k){ var r=ROLES[k];
+      return '<tr'+(k===ROLE.cur?' class="cur"':'')+'><td>'+esc(r.n)+'</td><td class="sub">'+r.sec.map(function(s){ return (WSEC.filter(function(x){ return x[0]===s; })[0]||['',s])[1]; }).join(', ')+'</td>'+
+        '<td>'+(r.cost?'Yes':'—')+'</td><td>'+(r.margin?'Yes':'—')+'</td><td>'+[r.approve&&'Releases', r.approveTrial&&'Trials', r.approveSub&&'Substitutions'].filter(Boolean).join(', ')+'</td></tr>'; }).join('')+'</tbody></table></div>');
+  h+=wsSec('Data in this browser', size? Math.round(size/1024)+' KB of workspace records.' : 'No workspace records yet.',
+    '<div class="wsbtns"><button type="button" class="btn" id="st_exp">Export records (JSON)</button>'+
+    '<label class="btn">Import records (JSON)<input type="file" id="st_imp" accept="application/json" hidden></label>'+
+    '<button type="button" class="btn" id="st_demo">Load demonstration records</button><button type="button" class="btn" id="st_undemo">Remove demonstration records</button>'+
+    '<button type="button" class="btn" id="st_clr">Clear all workspace records</button><button type="button" class="btn" id="st_vs">Open the value store</button></div>'+
+    '<p class="sub">Demonstration records are synthetic, prefixed DEMO and marked wherever they appear. They are for showing the workflow — never real trials, enquiries or costs.</p>');
+  h+=wsSec('Audit history', 'Every change made in this workspace, newest first ('+d.audit.length+' entries, last 400 kept). Kept in this browser; a server would hold the authoritative trail.',
+    d.audit.length? '<div class="wstw"><table class="wst"><thead><tr><th>Time</th><th>Role</th><th>Action</th><th>Record</th><th>Detail</th></tr></thead><tbody>'+
+      d.audit.slice(0,150).map(function(a){ return '<tr><td>'+wsDate(a.ts)+'</td><td>'+esc((ROLES[a.role]||{n:a.role}).n)+'</td><td>'+esc(a.action)+'</td><td class="mono">'+esc(a.rec)+'</td><td class="sub">'+esc(a.detail)+'</td></tr>'; }).join('')+'</tbody></table></div>' : '<p class="sub">No changes recorded.</p>');
+  return h;
+}
+function wsSettingsBind(){
+  $('#st_vs').onclick=function(){ openAdmin(); };
+  $('#st_exp').onclick=function(){ download('teal-workspace-'+new Date().toISOString().slice(0,10)+'.json', JSON.stringify(wsData(), null, 2), 'application/json'); };
+  $('#st_imp').onchange=function(){
+    var f=this.files[0]; if(!f) return;
+    var rd=new FileReader(); rd.onload=function(){
+      try{ var x=JSON.parse(rd.result); if(!x||typeof x!=='object'||Array.isArray(x)) throw new Error('not a workspace file');
+        if(!confirm('Replace the workspace records in this browser with the imported file?')) return;
+        WSDB.d=null; localStorage.setItem('teal.ws', JSON.stringify(x)); wsData(); wsAudit('records imported', f.name, ''); toast('Imported.'); wsRender();
+      }catch(e){ toast('That file is not a workspace export.','warn'); } };
+    rd.readAsText(f);
+  };
+  $('#st_clr').onclick=function(){ if(!confirm('Delete every workspace record in this browser — products, costs, suppliers, trials, enquiries, releases and the audit log?')) return;
+    WSDB.d=null; try{ localStorage.removeItem('teal.ws'); }catch(e){} wsData(); wsAudit('records cleared', '', ''); wsRender(); };
+  $('#st_demo').onclick=function(){ wsDemoLoad(); wsRender(); };
+  $('#st_undemo').onclick=function(){ wsDemoRemove(); wsRender(); };
+}
+/* Synthetic records for showing the workflow. Every one is marked demo:true
+   and prefixed DEMO; costs are round figures derived from the catalogue
+   estimate so they cannot be mistaken for supplier prices. */
+function wsDemoLoad(){
+  var d=wsData(), now=Date.now();
+  wsDemoRemove(true);
+  var ks=Object.keys(PLAT);
+  [['markf','Released','A. Rao'],['markc2i','Pilot','S. Iyer'],['weldb','Application Validation','K. Menon'],['cutxt','Prototype','R. Das']].forEach(function(x){
+    if(PLAT[x[0]]) d.products[x[0]]={status:x[1], owner:x[2]+' (DEMO)', rev:'DEMO-A', actions:'', updated:now, demo:true}; });
+  var pk=PLAT[S.plat]? S.plat : ks[0], p=PLAT[pk], ak=Object.keys(p.apps||{})[0];
+  d.trials.unshift({id:'DEMO-TR-001', demo:true, plat:pk, app:ak, appName:ak? p.apps[ak].n : '', material:'DEMO material', srcName:SRC[p.dsrc].n+' '+p.dpw+' W',
+    status:'Tested', inspect:'DEMO — visual and grading', accept:'DEMO — grade B or better', achieved:'DEMO — grade A', cfg:'DEMO', created:now, updated:now});
+  d.trials.unshift({id:'DEMO-TR-002', demo:true, plat:pk, app:ak, appName:ak? p.apps[ak].n : '', material:'DEMO material', status:'Planned', cfg:'DEMO', created:now, updated:now});
+  [['Quotation Preparation','DEMO Components Ltd'],['Technical Review','DEMO Automotive'],['Won','DEMO Medical'],['Lost','DEMO Electronics']].forEach(function(x,i){
+    d.enquiries.unshift({id:'DEMO-EQ-00'+(i+1), demo:true, type:i===1?'trial':'quote', ts:now-i*864e5, updated:now, org:x[1], name:'Demo Contact', email:'demo@example.invalid',
+      cfg:'DEMO', app:'DEMO application', status:x[0], owner:'DEMO'}); });
+  var pr=priceLines(), base=pr? pr.total : 4e6, items=P()? bomItems() : [];
+  items.forEach(function(it){ if(it.lvl!==2) return; var hsh=0; for(var i=0;i<it.cid.length;i++) hsh=(hsh*31+it.cid.charCodeAt(i))>>>0;
+    d.costs[it.cid]={unit:Math.round(base*(0.004+(hsh%9)*0.002)/1000)*1000, src:'SYNTHETIC — demonstration only', updated:now, cur:'INR', demo:true,
+      origin:hsh%3? 'India' : 'Germany', lead:String(4+hsh%14), sourcing:'Quoted', supplier:'DEMO Supplier '+(hsh%5+1)}; });
+  LABOURCAT.forEach(function(c){ d.costs['cat:'+c]={unit:Math.round(base*0.02/1000)*1000, src:'SYNTHETIC — demonstration only', updated:now, demo:true}; });
+  d.suppliers.scanhead=[{name:'DEMO Optics GmbH', pn:'DEMO-SH-10', lead:'18', status:'Approved', alt:false, demo:true, ts:now}];
+  if(CFG.id) d.releases[CFG.id]=d.releases[CFG.id]||{state:'In Review', owner:'DEMO Owner', reviewer:'', log:[{ts:now, rev:CFG.rev, from:'Draft', to:'In Review', owner:'DEMO Owner', role:'pm', note:'DEMO record'}], demo:true};
+  wsAudit('demonstration records loaded', '', 'synthetic'); wsSave(); toast('Demonstration records loaded — every one is marked SYNTHETIC.');
+}
+function wsDemoRemove(quiet){
+  var d=wsData();
+  Object.keys(d.products).forEach(function(k){ if(d.products[k].demo) delete d.products[k]; });
+  d.trials=d.trials.filter(function(t){ return !t.demo; }); d.enquiries=d.enquiries.filter(function(e){ return !e.demo; });
+  Object.keys(d.costs).forEach(function(k){ if(d.costs[k].demo) delete d.costs[k]; });
+  Object.keys(d.suppliers).forEach(function(k){ d.suppliers[k]=(d.suppliers[k]||[]).filter(function(s){ return !s.demo; }); });
+  Object.keys(d.releases).forEach(function(k){ if(d.releases[k].demo) delete d.releases[k]; });
+  if(d.baseline && d.baseline.demo) d.baseline=null;
+  if(!quiet){ wsAudit('demonstration records removed', '', ''); wsSave(); toast('Demonstration records removed.'); }
+}
+
 /* ---- component register — what the view draws, with each record's status --- */
 function compCSV(){
   var p=P(); if(!p) return '';
   var list=M3D.scene||[], seen={}, rows=[['TEAL Laser Equipment Configurator — component register'],
-    ['Designation', desig()], ['Generated', new Date().toISOString().slice(0,10)],
+    ['Designation', desig()], ['Configuration', cfgRef()+' · fingerprint '+cfgHash()], ['Generated', new Date().toISOString().slice(0,10)],
     ['Status','Engineering visualisation register: identity, geometry, CAD and pricing status of each drawn component. Not a procurement BOM.'],
     ['Asset manifest', CAD.state==='ready'? 'assets/cad/manifest.json, checked '+(CAD.man._checked||'—') : 'unavailable ('+(CAD.err||CAD.state)+')'], [],
     ['Component ID','Component','Assembly','Category','Manufacturer','Model','Part number','Identity','Example vendors',
@@ -12355,7 +13744,7 @@ function dfmPDF(){
   if(img){ var iw=CW, ih=iw*img.h/img.w; doc.y-=ih; doc.img(doc.addJPEG(img.url,img.w,img.h),M,doc.y,iw,ih); doc.y-=22; }
   doc.text(M,doc.y,'Design for Manufacture',{size:22,bold:true,c:INKC}); doc.y-=22;
   doc.text(M,doc.y,p.n+' — '+p.t,{size:11,c:DIMC}); doc.y-=16;
-  doc.text(M,doc.y,desig(),{size:10,mono:true,c:TEALC}); doc.y-=22;
+  doc.text(M,doc.y,desig()+'   ·   '+cfgRef()+'   ·   '+new Date().toISOString().slice(0,10),{size:10,mono:true,c:TEALC}); doc.y-=22;
   doc.y-=doc.para(M,doc.y,CW,'This report states what the configured machine can hold, and what that means for '+
     'the part you are designing. Every figure is computed from the catalogue model for '+p.n+
     ' with a '+SRC[S.src].n+' source at '+S.pw+' W and the '+LENS[S.lens].n+' objective, on '+D.mat.n+'.',
@@ -12996,7 +14385,7 @@ function demoOff(){
 /* ---- wiring ------------------------------------------------------------- */
 (function(){
   var m={openSaved:['layers',''], hCmp:['grid',''], hVal:['sliders',''],
-         hInq:['mail','Submit enquiry']};
+         hInq:['mail','Request a quote']};
   Object.keys(m).forEach(function(id){
     var e=document.getElementById(id); if(!e) return;
     e.innerHTML=ico(m[id][0]) + (m[id][1]? '<span>'+m[id][1]+'</span>' : '');
@@ -13370,14 +14759,17 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v14.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v15.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
   BOOTED = true;
+  try{ shellInit(); }catch(e){ if(window.console) console.warn('header switches:', e.message); }
   render();
   try{ m3dInit(); }catch(e){}
   try{ storyInit(); }catch(e){}
+  try{ cfgInit(hadHash, READQ); }catch(e){ if(window.console) console.warn('configuration identity:', e.message); }
+  try{ wsShow(); }catch(e){}
   /* the component manifest is not needed to draw the machine — fetch it once
      the page has settled; an inspector opened sooner asks for it itself */
   setTimeout(function(){ try{ cadLoad(); }catch(e){} }, 1500);

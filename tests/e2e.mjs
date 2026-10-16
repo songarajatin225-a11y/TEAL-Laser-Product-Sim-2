@@ -46,7 +46,7 @@ async function open(hash = '', opts = {}) {
   page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) page.errors.push(m.text()); });
-  page.on('dialog', d => d.accept(d.type() === 'prompt' ? 'teal2026' : ''));   // the value store is PIN-gated
+  page.on('dialog', d => d.accept(d.type() === 'prompt' ? 'Test configuration' : ''));   // name prompts and confirmations
   await page.addInitScript(() => { try { localStorage.setItem('teal.seenAdvisor', 'true'); } catch (e) {} });
   await page.goto(BASE + hash, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => typeof BOOTED !== 'undefined' && BOOTED && window.M3D && M3D.vp);
@@ -64,13 +64,18 @@ try {
       .filter(t => JSON.stringify(DEFAULTS[t]) !== JSON.stringify(live[t]));
   });
   check('embedded defaults match data.json (file:// and hosted show the same catalogue)', drift.length === 0, drift.join(', '));
-  const nav = await pg.$$eval('#hnav button', b => b.map(x => x.textContent.trim()));
-  check('header carries Configurator / Portfolio / Applications / Engineering', nav.join('/') === 'Configurator/Portfolio/Applications/Engineering', nav.join('/'));
+  const hdr = await pg.evaluate(() => ({
+    views: [...document.querySelectorAll('#vsw [role=radio]')].map(b => b.textContent.trim() + (b.getAttribute('aria-checked') === 'true' ? '*' : '')).join('/'),
+    themes: [...document.querySelectorAll('#tsw [role=radio]')].map(b => b.getAttribute('data-theme')).join('/'),
+    val: getComputedStyle(document.querySelector('#hVal')).display, fab: getComputedStyle(document.querySelector('#adminBtn')).display }));
+  check('header carries the Customer / Internal and Light / Dark / System switches, Customer by default', hdr.views === 'Customer*/Internal' && hdr.themes === 'light/dark/system', JSON.stringify(hdr));
+  check('the value store is not offered in the Customer view', hdr.val === 'none' && hdr.fab === 'none', JSON.stringify(hdr));
   await pg.click('#hInq'); await pg.waitForTimeout(350);
   check('header enquiry with no configuration leads to the advisor, not a dead end', await pg.$eval('#advisor', e => e.classList.contains('open')));
   await pg.keyboard.press('Escape'); await pg.waitForTimeout(250);
   await pg.goto(BASE + C2I, { waitUntil: 'networkidle' }); await pg.waitForFunction(() => typeof BOOTED !== 'undefined' && BOOTED);
   for (const [btn, dlg] of [['#openAdvisor', '#advisor'], ['#openSaved', '#drawer'], ['#hInq', '#inquiry'], ['#hVal', '#admin']]) {
+    if (btn === '#hVal') { await pg.evaluate(() => viewSet('internal', 'cfg')); await pg.waitForTimeout(200); }
     await pg.click(btn); await pg.waitForTimeout(350);
     check(`${btn} opens ${dlg}`, await pg.$eval(dlg, e => e.classList.contains('open')));
     await pg.keyboard.press('Escape'); await pg.waitForTimeout(250);
@@ -418,6 +423,255 @@ try {
   check('no script errors in mechanisms, comparison, assistant or missions', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
   /* ------------------------------------------------------------------ */
+  sec('Views, themes and configuration identity');
+  pg = await open(C2I);
+  const th = await pg.evaluate(async () => {
+    const out = {}, st0 = JSON.stringify([S, cur, reach]);
+    const bg = () => getComputedStyle(document.body).backgroundColor, card = () => getComputedStyle(document.querySelector('.stage')).backgroundColor;
+    themeApply('light'); out.light = [document.documentElement.dataset.theme, bg(), card()];
+    themeApply('dark'); out.dark = [document.documentElement.dataset.theme, bg(), card()];
+    out.stored = Store.get('teal.theme', null);
+    themeApply('system'); out.sys = document.documentElement.dataset.theme;
+    out.same = st0 === JSON.stringify([S, cur, reach]);
+    return out;
+  });
+  const luma = c => { const m = c.match(/\d+/g).map(Number); return (m[0] * 299 + m[1] * 587 + m[2] * 114) / 1000; };
+  check('Light and Dark change the page and its panels, and the choice is kept', th.light[0] === 'light' && th.dark[0] === 'dark' && luma(th.dark[1]) < 40 && luma(th.light[1]) > 200 && luma(th.dark[2]) < 50 && th.stored === 'dark', JSON.stringify(th));
+  check('switching the theme never touches the configuration', th.same);
+  await pg.close();
+  for (const scheme of ['dark', 'light']) {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: scheme });
+    const p2 = await ctx.newPage(); await p2.addInitScript(() => { try { localStorage.setItem('teal.seenAdvisor', 'true'); } catch (e) {} });
+    await p2.goto(BASE + C2I, { waitUntil: 'networkidle' }); await p2.waitForFunction(() => typeof BOOTED !== 'undefined' && BOOTED);
+    const t = await p2.evaluate(() => [document.documentElement.dataset.theme, THEME.pref]);
+    await p2.emulateMedia({ colorScheme: scheme === 'dark' ? 'light' : 'dark' }); await p2.waitForTimeout(150);
+    const t2 = await p2.evaluate(() => document.documentElement.dataset.theme);
+    check(`System follows an operating system set to ${scheme}, and follows it when it changes`, t[0] === scheme && t[1] === 'system' && t2 === (scheme === 'dark' ? 'light' : 'dark'), t.join('/') + ' → ' + t2);
+    await ctx.close();
+  }
+  pg = await open(C2I);
+  const vw = await pg.evaluate(async () => {
+    const st0 = JSON.stringify(S), out = {};
+    document.querySelector('#vsw [data-view="internal"]').click(); await new Promise(r => setTimeout(r, 200));
+    out.bar = !document.querySelector('#wsbar').hidden; out.story = document.querySelector('#story').hidden;
+    out.secs = [...document.querySelectorAll('#wsnav button')].map(b => b.textContent);
+    out.val = getComputedStyle(document.querySelector('#hVal')).display !== 'none';
+    for (const sec of WSEC.map(x => x[0])) { viewSet('internal', sec); out[sec] = sec === 'cfg' ? !document.querySelector('#cfgwrap').hidden : document.querySelector('#ws .wsp') !== null; }
+    out.banner = /demonstration/i.test(document.querySelector('#wsbar').textContent) && /Not access-controlled/i.test(document.querySelector('#wsbar').textContent);
+    document.querySelector('#vsw [data-view="customer"]').click(); await new Promise(r => setTimeout(r, 200));
+    out.back = document.querySelector('#wsbar').hidden && !document.querySelector('#cfgwrap').hidden && getComputedStyle(document.querySelector('#hVal')).display === 'none';
+    out.same = st0 === JSON.stringify(S);
+    return out;
+  });
+  check('Internal shows its ten-section workspace under a demonstration banner; Customer hides it again', vw.bar && vw.story && vw.secs.length === 10 && vw.banner && vw.back && vw.val, JSON.stringify(vw));
+  check('every Internal section renders', ['portfolio','cfg','eng','bom','comp','trials','release','enq','mgmt','settings'].every(k => vw[k]), JSON.stringify(vw));
+  check('switching views never touches the configuration', vw.same);
+  const kb = await pg.evaluate(() => { const b = document.querySelector('#tsw [aria-checked="true"]'); b.focus();
+    b.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); const a = THEME.pref;
+    document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true })); return [a, THEME.pref, document.activeElement.getAttribute('data-theme')]; });
+  check('the switches are radio groups the arrow keys move through', kb[0] !== kb[1] && kb[1] === kb[2], kb.join(' → '));
+  const sec2 = await pg.evaluate(async () => {
+    const src = await (await fetch('index.html')).text(), data = await (await fetch('data.json')).text();
+    return { pin: /adminPin|teal2026/.test(src + data), prompt: /prompt\(\s*'Enter the admin PIN/.test(src) };
+  });
+  check('no password is shipped in the page or the data, and the value store asks for none', !sec2.pin && !sec2.prompt, JSON.stringify(sec2));
+  const id = await pg.evaluate(async () => {
+    const out = { id: CFG.id, rev: CFG.rev, hash: location.hash };
+    S.pw = powersFor(P(), S.src).filter(w => w !== S.pw)[0]; render();
+    out.rev2 = CFG.rev; out.hash2 = location.hash; out.sameId = CFG.id === out.id;
+    const saved = JSON.parse(localStorage.getItem('teal.cfg'));
+    out.auto = saved.id === CFG.id && saved.rev === CFG.rev;
+    cfgUndo(); out.undo = [CFG.rev, S.pw]; cfgRedo(); out.redo = CFG.rev;
+    S.lens = Object.keys(LENS).find(l => l !== S.lens && P().lens.indexOf(l) >= 0); render(); out.branch = CFG.rev;
+    out.bar = document.querySelector('#cfgbar').innerText;
+    saveCfg('Identity test'); out.saved = [SAVED[0].cfgId, SAVED[0].rev];
+    return out;
+  });
+  check('a configuration has an ID, every change makes a new revision, and the link carries both',
+    /^TC-[0-9A-F]{6}$/.test(id.id) && id.rev2 === id.rev + 1 && id.sameId && id.hash2.includes('id=' + id.id) && id.hash2.includes('r=' + id.rev2), JSON.stringify(id));
+  check('the working revision is autosaved; undo and redo step through revisions', id.auto && id.undo[0] === id.rev && id.redo === id.rev2 && id.branch === id.rev2 + 1, JSON.stringify(id));
+  check('saved copies keep the configuration ID and revision', id.saved[0] === id.id && id.saved[1] === id.branch, JSON.stringify(id));
+  /* the same browser comes back without a link */
+  await pg.goto('about:blank'); await pg.goto(BASE, { waitUntil: 'networkidle' });
+  await pg.waitForFunction(() => typeof BOOTED !== 'undefined' && BOOTED && window.M3D && M3D.vp);
+  const offer = await pg.evaluate(() => ({ text: document.querySelector('#cfgbar').innerText, shown: !document.querySelector('#cfgbar').hidden, plat: S.plat }));
+  check('a returning visitor is offered their unfinished configuration, not forced into it', offer.shown && /unfinished configuration/i.test(offer.text) && !offer.plat, JSON.stringify(offer));
+  const rest = await pg.evaluate(() => { document.querySelector('#cfgbar [data-c="restore"]').click(); return { plat: S.plat, ref: cfgRef() }; });
+  check('restoring brings back the same ID and revision', rest.plat === 'markc2i' && /^TC-[0-9A-F]{6} r\d+$/.test(rest.ref), JSON.stringify(rest));
+  const shared = await pg.evaluate(async () => { const h = location.hash; localStorage.removeItem('teal.cfg');
+    return h; });
+  await pg.close();
+  pg = await open(shared.replace(/^[^#]*/, ''));
+  const fork = await pg.evaluate(() => { const a = cfgRef(); S.mods.visfid = !S.mods.visfid; render(); return { a, b: cfgRef(), from: CFG.from }; });
+  check('a configuration opened from someone else’s link keeps its reference, and becomes a copy when changed',
+    fork.a !== '—' && fork.b.split(' ')[0] !== fork.a.split(' ')[0] && fork.from === fork.a, JSON.stringify(fork));
+  const rs = await pg.evaluate(async () => { reach = 5; go(5); await new Promise(r => setTimeout(r, 200));
+    let asked = ''; const c = window.confirm; window.confirm = m => { asked = m; return false; };
+    document.querySelector('#rs').click(); const kept = !!S.plat; window.confirm = c; return { asked: asked.slice(0, 40), kept }; });
+  check('Start over asks first, and declining keeps the configuration', /Start over/.test(rs.asked) && rs.kept, JSON.stringify(rs));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
+  sec('Internal workspace and customer requests');
+  pg = await open(C2I);
+  const ws = await pg.evaluate(async () => {
+    const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+    viewSet('internal', 'bom'); await wait(300);
+    const rows = [...document.querySelectorAll('#ws tr.l2')];
+    out.items = rows.length; out.docked = !!document.querySelector('#wsdock .view');
+    out.inner = rows.some(r => r.getAttribute('data-cid') === 'plc') && rows.some(r => r.getAttribute('data-cid') === 'vent');
+    out.noCost = /Not available — costs incomplete/.test(document.querySelector('#ws').innerText);
+    const r0 = rows.find(r => r.getAttribute('data-cid') === 'scanhead'); r0.click(); await wait(200);
+    out.sel = M3D.sel.join(); out.card = document.querySelector('#v3dinfo').classList.contains('open');
+    showComp('objective', { gid: 'optic' }); await wait(100);
+    out.mark = document.querySelector('#ws tr.l2.on') && document.querySelector('#ws tr.l2.on').getAttribute('data-cid');
+    ROLE.cur = 'design'; viewSet('internal', 'bom'); await wait(200);
+    out.designCost = /Cost \/ machine/.test(document.querySelector('#ws').innerText); out.designNav = [...document.querySelectorAll('#wsnav button')].length;
+    ROLE.cur = 'pm'; viewSet('internal', 'bom'); await wait(200);
+    /* cost every item and every labour category: totals and margin appear */
+    const d = wsData(); bomItems().forEach(it => { if (it.lvl === 2) d.costs[it.cid] = { unit: 1000, src: 'test', updated: Date.now() }; });
+    LABOURCAT.forEach(c => { d.costs['cat:' + c] = { unit: 5000, src: 'test', updated: Date.now() }; }); wsSave(); wsRender(); await wait(100);
+    const B = bomCosts(bomItems()); out.complete = B.complete; out.total = B.total;
+    const n = bomItems().filter(i => i.lvl === 2).length; out.expect = n * 1000 + LABOURCAT.length * 5000;
+    out.margin = /gross margin/i.test(document.querySelector('#ws').innerText) && /%/.test(document.querySelector('#ws').innerText);
+    ROLE.cur = 'procurement'; viewSet('internal', 'bom'); await wait(100); out.procMargin = /gross margin/i.test(document.querySelector('#ws').innerText);
+    ROLE.cur = 'pm'; Object.keys(d.costs).forEach(k => delete d.costs[k]); wsSave();
+    viewSet('internal', 'cfg'); await wait(100); out.undocked = !document.querySelector('#wsdock .view') && !!document.querySelector('.plate .view');
+    return out;
+  });
+  check('the BOM lists every part of the machine, cut-away internals and outline-only parts included', ws.items > 40 && ws.inner, JSON.stringify(ws));
+  check('a BOM row finds the part in the docked 3D view, and the 3D view finds the row', ws.docked && ws.sel === 'scanhead' && ws.card && ws.mark === 'objective' && ws.undocked, JSON.stringify(ws));
+  check('costs total only when every item is costed, and margins show only to roles allowed to see them',
+    ws.noCost && ws.complete && ws.total === ws.expect && ws.margin && !ws.procMargin && !ws.designCost && ws.designNav < 10, JSON.stringify(ws));
+  const wf = await pg.evaluate(async () => {
+    const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+    viewSet('internal', 'trials'); await wait(150);
+    document.querySelector('#tr_new').click(); await wait(100);
+    document.querySelector('#tf_st').value = 'Approved'; document.querySelector('[data-tf="material"]').value = 'SS316L';
+    document.querySelector('#tf_ok').click(); out.blocked = document.querySelector('#tf_err').textContent;
+    document.querySelector('[data-tf="inspect"]').value = 'Grader'; document.querySelector('[data-tf="accept"]').value = 'Grade B';
+    document.querySelector('[data-tf="achieved"]').value = 'Grade A'; document.querySelector('#tf_ok').click(); await wait(100);
+    out.trial = wsData().trials[0].status; out.evidence = /validated/i.test(document.querySelector('#ws').innerText);
+    viewSet('internal', 'release'); await wait(100);
+    const go2 = t => { const b = [...document.querySelectorAll('#ws [data-to]')].find(x => x.getAttribute('data-to') === t); b.click(); };
+    document.querySelector('#rl_n').value = 'Initial release'; go2('In Review'); out.needOwner = document.querySelector('#rl_err').textContent;
+    document.querySelector('#rl_o').value = 'Owner'; document.querySelector('#rl_n').value = 'Initial release'; go2('In Review'); await wait(50);
+    document.querySelector('#rl_o').value = 'Owner'; document.querySelector('#rl_r').value = 'Owner'; document.querySelector('#rl_n').value = 'ok'; go2('Approved'); out.selfApprove = document.querySelector('#rl_err').textContent;
+    document.querySelector('#rl_r').value = 'Reviewer'; go2('Approved'); await wait(50);
+    document.querySelector('#rl_o').value = 'Owner'; document.querySelector('#rl_r').value = 'Reviewer'; document.querySelector('#rl_n').value = 'ship'; go2('Released'); await wait(50);
+    const rel = wsRelRec(CFG.id); out.released = rel.state + ' r' + rel.released.rev; const relRev = rel.released.rev, relSnap = rel.released.snap;
+    S.mods.visver = !S.mods.visver; render(); await wait(50);
+    out.frozen = wsRelRec(CFG.id).released.snap === relSnap && /differs from the released/.test(document.querySelector('#ws').innerText);
+    viewSet('internal', 'mgmt'); await wait(100); out.mgmt = /1 released/.test(document.querySelector('#ws').innerText) && /catalogue health/i.test(document.querySelector('#ws').innerText);
+    viewSet('internal', 'settings'); await wait(100); out.audit = document.querySelectorAll('#ws .wst tbody tr').length > 4;
+    return out;
+  });
+  check('a trial cannot be approved without inspection results, acceptance criteria and the achieved result', /needs inspection/.test(wf.blocked) && wf.trial === 'Approved' && wf.evidence, JSON.stringify(wf));
+  check('release needs an owner, a separate reviewer and a description; a released revision is frozen', /owner/.test(wf.needOwner) && /must not be the owner/.test(wf.selfApprove) && /^Released r\d+$/.test(wf.released) && wf.frozen, JSON.stringify(wf));
+  check('the management overview and the audit log reflect the records', wf.mgmt && wf.audit, JSON.stringify(wf));
+  const dm = await pg.evaluate(async () => { viewSet('internal', 'settings'); document.querySelector('#st_demo').click(); await new Promise(r => setTimeout(r, 100));
+    const d = wsData(), n = d.enquiries.filter(e => e.demo).length, c = Object.keys(d.costs).filter(k => d.costs[k].demo).length;
+    viewSet('internal', 'bom'); const synth = /SYNTHETIC/.test(document.querySelector('#ws').innerText);
+    viewSet('internal', 'settings'); document.querySelector('#st_undemo').click();
+    return { n, c, synth, left: wsData().enquiries.filter(e => e.demo).length + Object.keys(wsData().costs).filter(k => wsData().costs[k].demo).length }; });
+  check('demonstration records are marked SYNTHETIC wherever they appear, and remove cleanly', dm.n > 0 && dm.c > 0 && dm.synth && dm.left === 0, JSON.stringify(dm));
+  await pg.evaluate(() => viewSet('customer'));
+  const rq = await pg.evaluate(async () => {
+    const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+    openTrial(); await wait(100);
+    out.title = document.querySelector('#inquiry h3').textContent; out.ref = document.querySelector('.reqref').textContent.includes(CFG.id);
+    document.querySelector('#iq_csv').click(); out.err = document.querySelector('#iq_err').textContent;
+    document.querySelector('#iq_name').value = 'A. Tester'; document.querySelector('#iq_co').value = 'Test Co'; document.querySelector('#iq_em').value = 'a@test.example';
+    document.querySelector('#iq_tgt').value = 'Grade A 2D code';
+    let dl = ''; const d0 = window.download; window.download = (n, t) => { dl = t; }; document.querySelector('#iq_csv').click(); window.download = d0;
+    out.csv = dl.includes(CFG.id) && dl.includes('trial'); out.done = document.querySelector('#iq_done').innerText;
+    const e = wsData().enquiries[0], t = wsData().trials[0];
+    out.rec = e.type === 'trial' && e.cfg === cfgRef() && e.status === 'New' && t.status === 'Requested' && t.id === e.id;
+    closeOverlay('#inquiry'); openInquiry(); await wait(50);
+    out.qtitle = document.querySelector('#inquiry h3').textContent; out.fields = ['iq_cty','iq_app','iq_proc','iq_qt','iq_tp','iq_wh','iq_bud','iq_att'].every(i => !!document.getElementById(i));
+    closeOverlay('#inquiry');
+    return out;
+  });
+  check('requests carry the configuration ID and revision, validate their fields, and say plainly that nothing was sent',
+    /Organisation is required/.test(rq.err) && rq.ref && rq.csv && /Nothing has been sent/.test(rq.done) && rq.rec, JSON.stringify(rq));
+  check('quotation and trial requests ask for the fields the application needs', /trial/i.test(rq.title) && /quotation/i.test(rq.qtitle) && rq.fields, JSON.stringify(rq));
+  const sheetOut = await pg.evaluate(() => { reach = 5; go(5); const h = document.querySelector('#sheet').innerText;
+    return { id: h.includes(CFG.id), assum: /Assumptions and limitations/i.test(h), next: /Recommended next steps/i.test(h), safety: /Class 1 per IEC 60825-1 \(platform specification\)|not stated in the specification/.test(h) }; });
+  check('the printed specification names the configuration revision, its assumptions and next steps, and takes the laser class from the data',
+    sheetOut.id && sheetOut.assum && sheetOut.next && sheetOut.safety, JSON.stringify(sheetOut));
+  const zone = await pg.evaluate(() => {
+    const st = snapshot(), out = {};
+    const look = k => { pickPlatform(k); S.app = Object.keys(PLAT[k].apps)[0]; const b = new B3(); mmBuild(b, 0, M3D.vp); const d = document.createElement('div'); uiSpec(d);
+      return { tag: b.tags.map(t => t.t).filter(t => /ZONE/.test(t)).join('|'), spec: (d.textContent.match(/Laser safety(.{0,70})/) || [])[1] || '' }; };
+    out.markf = look('markf'); out.cleanp = look('cleanp'); out.markc2i = look('markc2i');
+    restore(st);
+    return out;
+  });
+  check('the floor plan and the specification call a machine Class 1 only where its specification says so',
+    zone.markf.tag === 'CLASS 1 ENCLOSED ZONE' && /Class 1 per IEC 60825-1/.test(zone.markf.spec) &&
+    zone.cleanp.tag === 'KEEP-OUT ZONE' && !/Class 1/.test(zone.cleanp.spec) &&
+    zone.markc2i.tag === 'KEEP-OUT ZONE' && /Not stated in the specification/.test(zone.markc2i.spec), JSON.stringify(zone));
+  const v3 = await pg.evaluate(async () => {
+    const vp = M3D.vp, out = {}; document.querySelector('#v3d').scrollIntoView();
+    vp.preset('side'); out.side = Math.abs(vp.cam.yaw - 1.5708) < 1e-6;
+    const t0 = [vp.cam.tx, vp.cam.ty, vp.cam.tz]; vp.pan(80, 0); out.pan = Math.hypot(vp.cam.tx - t0[0], vp.cam.tz - t0[2]) > 0.5 && Math.abs(vp.cam.ty - t0[1]) < 1e-6;
+    vp.reset(); out.reset = vp.cam.tx === vp.home.tx && vp.cam.tz === vp.home.tz;
+    const tags = () => { const b = new B3(); mmBuild(b, 0, vp); return b.tags.map(t => t.t).join('|'); };
+    M3D.layers.dim = true; out.dims = /W [\d,]+ mm/.test(tags()) && /H [\d,]+ mm/.test(tags()); M3D.layers.dim = false;
+    vp.setLite(true); out.lite = vp.lite && vp.dprCap === 1 && lodOf(vp) === 0; const n1 = (() => { const b = new B3(); b.lod = 0; mmBuild(b, 0, vp); return b.f.length; })();
+    vp.setLite(false); out.full = !vp.lite && lodOf(vp) >= 1;
+    return out;
+  });
+  check('the view adds a side preset, panning, an overall-dimension layer and a lite rendering mode', v3.side && v3.pan && v3.reset && v3.dims && v3.lite && v3.full, JSON.stringify(v3));
+  /* records can arrive in an imported file from anyone, so every screen must show
+     every field as text, and malformed records must not break a screen */
+  const hostile = await pg.evaluate(() => {
+    let i = 0; const X = () => `"'><img src=x data-pwn="${i++}" onerror="window.__pwn=1"><svg onload="window.__pwn=1">`;
+    const all = ks => Object.fromEntries(ks.map(k => [k, X()]));
+    const cid = bomItems().find(x => x.lvl === 2).cid;
+    const f = { v: 1,
+      products: { [S.plat]: all(['status', 'owner', 'rev', 'actions', 'updated']), junk: null },
+      costs: { [cid]: all(['unit', 'src', 'cur', 'origin', 'lead', 'sourcing', 'supplier', 'cat', 'updated']), 'cat:asm': all(['unit', 'src']) },
+      suppliers: { [cid]: [all(['name', 'pn', 'lead', 'status', 'doc', 'ts', 'by']), null, 'x'], scanhead: 'not a list' },
+      trials: [{ ...all(['id', 'plat', 'app', 'appName', 'material', 'thick', 'geom', 'req', 'params', 'recipe', 'owner', 'date', 'inspect', 'accept',
+        'achieved', 'issues', 'status', 'cfg', 'ref', 'srcName', 'optics', 'created', 'updated']), photos: ['x" onerror="window.__pwn=1', 'data:image/jpeg;base64,AA" onerror="window.__pwn=1'] }, null, 7],
+      enquiries: [all(['id', 'type', 'ts', 'updated', 'org', 'name', 'email', 'country', 'cfg', 'hash', 'desig', 'app', 'qty', 'when', 'target', 'budget',
+        'status', 'owner', 'next', 'quote', 'material', 'note']), 'junk'],
+      releases: { [CFG.id]: { ...all(['state', 'owner', 'reviewer']), released: { rev: X(), snap: '{}', ts: X() },
+        log: [all(['ts', 'rev', 'from', 'to', 'owner', 'reviewer', 'role', 'note']), null] }, 'TC-000000': 5 },
+      baseline: all(['total', 'ts', 'ref']),
+      audit: [all(['ts', 'role', 'action', 'rec', 'detail']), null] };
+    ROLE.cur = 'admin'; viewSet('internal', 'settings');
+    return { n: i, json: JSON.stringify(f) };
+  });
+  await pg.setInputFiles('#st_imp', { name: 'hostile.json', mimeType: 'application/json', buffer: Buffer.from(hostile.json) });
+  await pg.waitForFunction(() => wsData().trials.length > 0 && wsData().trials[0].photos);
+  const errs0 = pg.errors.length, leaks = [];
+  /* injected markup shows up as a data-pwn attribute on some element: an <img>, or
+     an <input> whose value it broke out of. Each screen replaces the last, so look
+     after every one */
+  const leaked = async s => { const n = await pg.evaluate(() => document.querySelectorAll('[data-pwn], [onerror], svg[onload]').length); if (n) leaks.push(s + ' ' + n); };
+  for (const s of ['portfolio', 'eng', 'bom', 'comp', 'trials', 'release', 'enq', 'mgmt', 'settings']) {
+    await pg.evaluate(s => viewSet('internal', s), s);
+    /* open the detail and edit views of the rows that carry the imported text */
+    for (let k = 0; k < 4; k++) {
+      const b = [];
+      for (const x of await pg.$$('#ws tr:has-text("data-pwn") button, #ws [data-v]')) if (!/delete|remove/i.test(await x.textContent())) b.push(x);
+      if (!b[k]) break;
+      await b[k].click().catch(() => {}); await pg.waitForTimeout(40); await leaked(s);
+    }
+    await leaked(s);
+  }
+  await pg.waitForTimeout(200);
+  const xss = await pg.evaluate(() => ({ ran: !!window.__pwn,
+    junk: wsData().trials.length === 1 && wsData().enquiries.length === 1 && !wsData().products.junk && !wsData().baseline }));
+  check('an imported workspace file is shown as text on every screen, never run as markup, and malformed records are dropped',
+    hostile.n >= 80 && !xss.ran && !leaks.length && xss.junk && pg.errors.length === errs0,
+    `${hostile.n} payloads · ${JSON.stringify(xss)} · leaked: ${leaks.join(', ') || 'none'} · ${pg.errors.slice(errs0).join(' | ')}`);
+  await pg.evaluate(() => { ROLE.cur = 'pm'; WSDB.d = null; try { localStorage.removeItem('teal.ws'); } catch (e) {} viewSet('customer'); });
+  check('no script errors in views, themes, identity, workspace or requests', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+  /* ------------------------------------------------------------------ */
   sec('Simulation and presentation');
   pg = await open('#p=markf&a=metal&s=mopa&w=50&l=f420');
   await pg.evaluate(() => { reach = 5; go(5); SIM.rate = 8; simStart(); });
@@ -548,7 +802,10 @@ try {
         if (getComputedStyle(e).display === 'none') return; const q = e.getBoundingClientRect(); if (!q.width) return;
         l = Math.min(l, q.left); r = Math.max(r, e.children.length ? q.right : Math.max(q.right, q.left + e.scrollWidth)); }); return { l, r }; };
       const k = [...document.querySelector('header .wrap').children].filter(x => getComputedStyle(x).display !== 'none');
-      let gap = 1e9; for (let i = 0; i < k.length - 1; i++) gap = Math.min(gap, ink(k[i + 1]).l - ink(k[i]).r);
+      /* groups on the same row must keep apart; a phone puts the switches on a second row */
+      const row = (a, b) => { const p = a.getBoundingClientRect(), q = b.getBoundingClientRect(); return p.top < q.bottom - 2 && q.top < p.bottom - 2; };
+      let gap = 1e9; for (let i = 0; i < k.length; i++) for (let j = i + 1; j < k.length; j++) if (row(k[i], k[j])) {
+        const A = ink(k[i]), B = ink(k[j]); gap = Math.min(gap, A.r <= B.l ? B.l - A.r : A.l - B.r); }
       return { gap, doc: document.documentElement.scrollWidth - document.documentElement.clientWidth }; });
     if (m.gap < 8 || m.doc > 1) bad.push(`${w}px (gap ${Math.round(m.gap)})`);
   }
