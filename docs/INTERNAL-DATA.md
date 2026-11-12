@@ -43,9 +43,11 @@ Everything here is the shape the page reads and writes today, taken from
 | `from` | `"TC-xxxxxx rN"` or null | Set when the configuration was copied from someone else's link |
 | `hist` | `[{rev, ts, snap}]` | Latest 60 revisions |
 | `snap` | JSON string | `{plat, app, src, pw, lens, mods:{key:true}, sw, extra:{key:true}, notes, target}`. Keys refer to the catalogue |
+| `snap.pp` | object, optional | The process point, present only when it was changed from its starting point: `f` repetition rate (kHz), `u` pulse duration (ns), `v` speed (mm/s), `h` line pitch (share of the track), `n` passes, `d` working spot (µm). Absent keys are at their starting value |
 | fingerprint | 8 hex digits | 32-bit FNV-1a hash of `snap`. The same selection always gives the same fingerprint. It is computed, not stored |
 
-The share link carries the selection, plus `id` and `r`. A link whose `id` is not
+The share link carries the selection, the process point where one is set (`pp`), plus
+`id` and `r`. A link whose `id` is not
 `TC-` followed by six hex digits is ignored.
 
 ## Workspace records (`teal.ws`)
