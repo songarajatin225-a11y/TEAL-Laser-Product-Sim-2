@@ -13,6 +13,7 @@
  */
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
@@ -22,12 +23,21 @@ let pw;
 try { pw = require('playwright'); }
 catch { pw = require(join(execSync('npm root -g').toString().trim(), 'playwright')); }
 
+import { build as accessBuild, derive as accessDerive } from '../tools/access/set-passkeys.mjs';
+
 const ROOT = normalize(join(new URL('.', import.meta.url).pathname, '..'));
+/* The suite never knows the real passkeys. Its server answers access.json with
+   verifiers for two throw-away keys, and pages open already holding a session
+   for one of them unless a check is about the passkey form itself. */
+const KEYS = { customer: 'e2e-customer-key', internal: 'e2e-internal-key' };
+const ACCESS = accessBuild(KEYS.customer, KEYS.internal);
+const TOKEN = r => JSON.stringify({ r, k: accessDerive(KEYS[r], ACCESS[r].s, ACCESS.it) });
 const MIME = { '.html': 'text/html', '.json': 'application/json', '.js': 'text/javascript',
                '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.glb': 'model/gltf-binary' };
 const server = createServer(async (req, res) => {
   const p = normalize(join(ROOT, decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html'));
   if (!p.startsWith(ROOT)) { res.writeHead(403).end(); return; }
+  if (p === join(ROOT, 'access.json')) { res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify(ACCESS)); return; }
   try { const body = await readFile(p); res.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream' }).end(body); }
   catch { res.writeHead(404).end(); }
 });
@@ -42,14 +52,19 @@ const check = (name, ok, detail = '') => results.push({ section, name, ok: !!ok,
 
 const browser = await pw.chromium.launch();
 async function open(hash = '', opts = {}) {
-  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, ...opts });
+  const { access, ...pageOpts } = opts;
+  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, ...pageOpts });
   page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) page.errors.push(m.text()); });
   page.on('dialog', d => d.accept(d.type() === 'prompt' ? 'Test configuration' : ''));   // name prompts and confirmations
   await page.addInitScript(() => { try { localStorage.setItem('teal.seenAdvisor', 'true'); } catch (e) {} });
+  const role = access === undefined ? 'internal' : access;                 // 'internal' | 'customer' | null (meet the passkey form)
+  if (role) await page.addInitScript(t => { try { if (location.protocol !== 'about:') sessionStorage.setItem('teal.access', t); } catch (e) {} }, TOKEN(role));
   await page.goto(BASE + hash, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => typeof BOOTED !== 'undefined' && BOOTED && window.M3D && M3D.vp);
+  /* the session is checked asynchronously: wait until it is accepted, or the form is up */
+  await page.waitForFunction(() => ACC.role || (ACC.ready && document.documentElement.classList.contains('locked') && !document.documentElement.classList.contains('unlocking')));
   return page;
 }
 
@@ -457,7 +472,7 @@ try {
     out.secs = [...document.querySelectorAll('#wsnav button')].map(b => b.textContent);
     out.val = getComputedStyle(document.querySelector('#hVal')).display !== 'none';
     for (const sec of WSEC.map(x => x[0])) { viewSet('internal', sec); out[sec] = sec === 'cfg' ? !document.querySelector('#cfgwrap').hidden : document.querySelector('#ws .wsp') !== null; }
-    out.banner = /demonstration/i.test(document.querySelector('#wsbar').textContent) && /Not access-controlled/i.test(document.querySelector('#wsbar').textContent);
+    out.banner = /demonstration/i.test(document.querySelector('#wsbar').textContent) && /not a security control/i.test(document.querySelector('#wsbar').textContent);
     document.querySelector('#vsw [data-view="customer"]').click(); await new Promise(r => setTimeout(r, 200));
     out.back = document.querySelector('#wsbar').hidden && !document.querySelector('#cfgwrap').hidden && getComputedStyle(document.querySelector('#hVal')).display === 'none';
     out.same = st0 === JSON.stringify(S);
@@ -672,6 +687,210 @@ try {
   check('no script errors in views, themes, identity, workspace or requests', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
   /* ------------------------------------------------------------------ */
+  sec('Process point, physics and sources');
+  pg = await open(C2I);
+  const ppSweep = await pg.evaluate(() => {
+    const bad = [], seen = {}; let n = 0;
+    const fin = (o, path, done = new Set()) => { if (o == null) return; if (typeof o === 'number') { if (!isFinite(o)) bad.push(path + ' is not finite'); return; }
+      if (typeof o !== 'object' || done.has(o)) return; done.add(o); for (const k in o) { if (k === 'src' || k === 'lens' || k === 'm' || k === 'K') continue; fin(o[k], path + '.' + k, done); } };
+    for (const pk in PLAT) { const p = PLAT[pk];
+      for (const ak in p.apps) for (const sk of p.src) for (const w of powersFor(p, sk)) for (const lk of p.lens) {
+        n++; const tag = [pk, ak, sk, w, lk].join('/');
+        const st = { plat: pk, app: ak, src: sk, pw: w, lens: lk, mods: {}, sw: 'desktop', extra: {}, notes: '', target: null };
+        (p.std || []).forEach(m => { if (MOD[m]) st.mods[m] = true; });
+        try {
+          restore(st); const o = optics(), ph = physics(), pm = procModel(), q = ph.pp;
+          fin(o, tag + ' optics'); fin(ph, tag + ' physics'); fin(pm, tag + ' process');
+          seen[q.kind] = (seen[q.kind] || 0) + 1;
+          if (q.pulsed && q.K.ov != null && q.ov < q.K.ov - 1e-6) bad.push(tag + ' runs below its overlap rule: ' + q.ov.toFixed(2));
+          if (q.dStated && (q.d < Math.max(q.d0, q.dStated[0]) - 1e-6 || q.d > Math.max(q.d0, q.dStated[1]) + 1e-6)) bad.push(tag + ' working spot outside the stated range: ' + q.d);
+          if (q.v > q.vMax + 1e-6 || !(q.v > 0)) bad.push(tag + ' speed ' + q.v + ' against a limit of ' + q.vMax);
+          if (!(pm.on > 0 && pm.on <= pm.t + 1e-9)) bad.push(tag + ' beam-on time ' + pm.on + ' against process time ' + pm.t);
+          if (!(pm.t > 0 && pm.t < 900)) bad.push(tag + ' process time ' + pm.t);
+          if (PLAT[pk].fam !== 'weld' && !isWeldKind(q.kind) && /keyhole|weld/i.test(ph.regime.n)) bad.push(tag + ' is called ' + ph.regime.n);
+          if (q.pulsed && Math.abs(ph.Ep_mJ - w / q.f) > 1e-6 * ph.Ep_mJ) bad.push(tag + ' pulse energy is not P / f');
+        } catch (e) { bad.push(tag + ' threw ' + e.message); }
+      } }
+    return { n, bad: [...new Set(bad)], kinds: seen };
+  });
+  check(`every platform, application, source, power and objective gives a finite, self-consistent process point (${ppSweep.n} configurations)`,
+    ppSweep.n > 1000 && ppSweep.bad.length === 0 && Object.keys(ppSweep.kinds).length === 8, ppSweep.bad.slice(0, 6).join(' | ') + ' ' + JSON.stringify(ppSweep.kinds));
+  const fixes = await pg.evaluate(() => {
+    const at = (h) => { const q = {}; h.split('&').forEach(kv => { const i = kv.indexOf('='); q[kv.slice(0, i)] = kv.slice(i + 1); });
+      const p = PLAT[q.p], st = { plat: q.p, app: q.a, src: q.s, pw: +q.w, lens: q.l, mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }; (p.std || []).forEach(m => { if (MOD[m]) st.mods[m] = true; }); restore(st);
+      const ph = physics(), pm = procModel(), b = new B3(); cur = 5; mmBuild(b, 0, M3D.vp);
+      return { kind: ph.kind, verb: famVerb(), regime: ph.regime.n, d: ph.spot, d0: ph.focus, stated: ph.pp.dStated, f: ph.frep_khz, pk: ph.Ppk_kW, v: ph.v, ov: ph.ov, t: pm.t,
+               plate: b.tags.map(t => t.t).filter(t => /CLASS|NAMEPLATE|CE FILE/.test(t) && !/ZONE/.test(t)).join('|'), acc: (dfmData().limits.find(r => /accuracy|repeatab|position/i.test(r[0])) || [])[1] }; };
+    return { weldh: at('p=weldh&a=implant&s=qcw&w=300&l=f163'), voltm: at('p=voltm&a=cylcan&s=mopa&w=30&l=f254'), roto: at('p=roto&a=multi&s=fiber&w=50&l=f254'),
+             semidc: at('p=semidc&a=fa&s=fiber&w=20&l=f163'), cutuv: at('p=cutxg&a=flexpcb&s=uv&w=100&l=f163'), markf: at('p=markf&a=metal&s=fiber&w=30&l=f254'), cleana: at('p=cleana&a=prebond&s=fiber&w=500&l=f254') };
+  });
+  check('a welding platform works at a spot inside its stated range, not at the diffraction limit',
+    fixes.weldh.stated && fixes.weldh.d >= 50 && fixes.weldh.d <= 300 && fixes.weldh.d0 < 50, JSON.stringify(fixes.weldh));
+  check('a quasi-CW source delivers the catalogue’s ten-to-one peak, and a hermetic seam runs at its overlap rule',
+    Math.abs(fixes.weldh.pk - 3.0) < 1e-6 && Math.abs(fixes.weldh.f - 0.2) < 1e-9 && fixes.weldh.kind === 'pseam' && Math.abs(fixes.weldh.ov - 0.75) < 1e-6 && fixes.weldh.v < 20, JSON.stringify(fixes.weldh));
+  check('a Volt station marks, an automation cell with a pulsed source is not “keyhole”, and a decapsulation system ablates',
+    fixes.voltm.kind === 'mark' && fixes.voltm.verb === 'MARK' && fixes.roto.kind === 'mark' && !/keyhole/i.test(fixes.roto.regime) && fixes.semidc.kind === 'ablate' && fixes.semidc.verb === 'ABLATE' && !/cold/i.test(fixes.semidc.regime),
+    JSON.stringify([fixes.voltm, fixes.roto, fixes.semidc].map(x => [x.kind, x.verb, x.regime])));
+  check('a pulsed cut runs slowly enough for its pulses to overlap', fixes.cutuv.kind === 'cut' && fixes.cutuv.ov >= 0.8 - 1e-6 && /ablation cutting/i.test(fixes.cutuv.regime), JSON.stringify(fixes.cutuv));
+  check('the nameplate claims a laser class, and the report an accuracy, only where the specification states one',
+    /IEC 60825-1 CLASS 1/.test(fixes.markf.plate) && /LASER CLASS NOT STATED/.test(fixes.weldh.plate) && /CLASS 1/.test(fixes.cleana.plate) && !/^CE/.test(fixes.markf.plate) &&
+    /25 µm/.test(fixes.markf.acc) && /Not stated/.test(fixes.weldh.acc), JSON.stringify({ markf: [fixes.markf.plate, fixes.markf.acc], weldh: [fixes.weldh.plate, fixes.weldh.acc], cleana: fixes.cleana.plate }));
+  await pg.close();
+  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254');
+  await pg.evaluate(() => { reach = 5; go(3); });
+  const drag = async (key, frac, commit) => pg.evaluate(([key, frac, commit]) => { const i = document.querySelector('#pp_' + key); i.value = String(Math.round(+i.min + (+i.max - +i.min) * frac));
+    i.dispatchEvent(new Event('input', { bubbles: true })); if (commit) i.dispatchEvent(new Event('change', { bubbles: true })); }, [key, frac, commit]);
+  const pp0 = await pg.evaluate(() => ({ snap: Object.keys(snapshot()).join(), rev: CFG.rev, v: physics().v, hash: cfgHash(), link: location.hash, panel: !!document.querySelector('.ppanel'),
+    controls: [...document.querySelectorAll('.ppanel input[type=range]')].map(i => i.id + ':' + !!document.querySelector('label[for=' + i.id + ']') + ':' + !!i.getAttribute('aria-valuetext')).join(' '),
+    reset: document.querySelector('#pp_reset').disabled, viz: document.querySelectorAll('#pp_viz svg').length, chk: document.querySelectorAll('#pp_chk li').length }));
+  check('the source step shows the process point with labelled controls, two drawings and its consequences',
+    pp0.panel && /pp_d:true:true/.test(pp0.controls) && /pp_f:true:true/.test(pp0.controls) && /pp_v:true:true/.test(pp0.controls) && pp0.viz === 2 && pp0.chk >= 1 && pp0.reset, JSON.stringify(pp0));
+  check('an untouched process point adds nothing to the configuration record, so earlier fingerprints stand', !/\bpp\b/.test(pp0.snap) && !/pp=/.test(pp0.link), pp0.snap + ' ' + pp0.link);
+  await drag('f', 0.9, false);
+  const pp1 = await pg.evaluate(() => ({ rev: CFG.rev, f: physics().frep_khz, out: document.querySelector('#pp_f_o').textContent, same: !!document.querySelector('#pp_f'), ov: document.querySelector('#ph_live').textContent }));
+  check('dragging a control previews the result live without writing a revision', pp1.rev === pp0.rev && pp1.f > 60 && /kHz/.test(pp1.out) && pp1.same && /Pulse overlap/.test(pp1.ov), JSON.stringify(pp1));
+  await drag('f', 0.9, true); await drag('v', 1, true);
+  const pp2 = await pg.evaluate(() => { const ph = physics(), pm = procModel();
+    return { rev: CFG.rev, f: ph.frep_khz, v: ph.v, ov: ph.ov, warn: document.querySelector('#pp_chk .warn') ? document.querySelector('#pp_chk .warn').textContent : '', link: location.hash, hash: cfgHash(),
+      snap: JSON.stringify(snapshot().pp), reset: document.querySelector('#pp_reset').disabled, t: pm.t, lim: pm.lim, sheet: (go(5), document.querySelector('#sheet').innerText) }; });
+  check('a committed change becomes a revision, travels in the link and changes the fingerprint', pp2.rev === pp0.rev + 2 && /pp=f[\d.]+_v7000/.test(pp2.link) && pp2.hash !== pp0.hash && /"v":7000/.test(pp2.snap) && !pp2.reset, JSON.stringify({ ...pp2, sheet: '' }));
+  check('running faster than the pulses can follow is said plainly: the line is a row of dots', pp2.v === 7000 && pp2.ov < 0 && /do not touch/.test(pp2.warn) && pp2.lim === 'set', JSON.stringify({ v: pp2.v, ov: pp2.ov, warn: pp2.warn }));
+  check('the printed specification states the process point it was computed at', /process point adjusted/i.test(pp2.sheet) && /7,000 mm\/s/.test(pp2.sheet) && /Pulse overlap/.test(pp2.sheet), '');
+  const shared2 = await pg.evaluate(() => location.href);
+  const pgB = await open(shared2.replace(/^[^#]*/, ''));
+  const pp3 = await pgB.evaluate(() => ({ v: physics().v, f: physics().frep_khz, has: ppHas(), hash: cfgHash() }));
+  check('a shared link reproduces the process point', pp3.has && pp3.v === 7000 && Math.abs(pp3.f - pp2.f) < 0.01 * pp2.f, JSON.stringify(pp3) + ' vs ' + pp2.f);
+  await pgB.close();
+  const pp4 = await pg.evaluate(() => { cfgUndo(); const a = { v: physics().v, rev: CFG.rev, has: ppHas() }; cfgRedo(); go(3); S.lens = 'f420'; render();
+    const b = { has: ppHas(), v: physics().v, vDef: physics().pp.vDef, snap: Object.keys(snapshot()).join() }; S.lens = 'f254'; render(); document.querySelector('#pp_reset').click();
+    return { a, b, c: { has: ppHas(), reset: document.querySelector('#pp_reset').disabled, hash: cfgHash() } }; });
+  check('undo steps back through process-point changes, and Reset returns to the starting point and the original fingerprint',
+    pp4.a.v !== 7000 && pp4.a.has && !pp4.c.has && pp4.c.reset && pp4.c.hash === pp0.hash, JSON.stringify(pp4));
+  check('a process point lapses when the objective changes, since its limits no longer hold', !pp4.b.has && Math.abs(pp4.b.v - pp4.b.vDef) < 1e-9 && !/\bpp\b/.test(pp4.b.snap), JSON.stringify(pp4.b));
+  const src2 = await pg.evaluate(() => {
+    go(3); const m = document.querySelector('#msrc'); m.open = true; const t = m.innerText;
+    const refs = Object.keys(REF), used = new Set(); METHOD.forEach(x => x.r.forEach(k => used.add(k)));
+    const stdOf = h => { const st = { plat: h[0], app: h[1], src: h[2], pw: h[3], lens: h[4], mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }; restore(st); return standardsFor(); };
+    const out = { rows: m.querySelectorAll('.mst.m4 tbody tr').length, n: METHOD.length, refsOk: [...used].every(k => REF[k] && REF[k].a && REF[k].t),
+      matRef: Object.keys(MAT).every(k => MAT[k].ref && REF[MAT[k].ref] && MAT[k].tk && MAT[k].note), traceable: Object.keys(MAT).filter(k => MAT[k].ref !== 'typ').length,
+      steel: [MAT.steel.k, MAT.steel.rho, MAT.steel.cp].join('/'), ss: [MAT.ss.k, MAT.ss.rho, MAT.ss.cp].join('/'), cu: [MAT.cu.k, MAT.cu.rho, MAT.cu.cp].join('/'),
+      text: /Incropera/.test(t) && /Siegman/.test(t) && /ISO 11146-1:2021/.test(t) && /not stated in the catalogue/i.test(t) && /Rule of practice/i.test(t),
+      glass: matTrans(MAT.glass), pi: matTrans(MAT.pi), steelT: matTrans(MAT.steel),
+      prov: DATASRC.every(d => PROV[d.p] && typeof d.count() === 'string' && (d.refs || []).every(k => REF[k])),
+      qcw: SRC.qcw.pk };
+    out.stdMark = stdOf(['markf', 'metal', 'fiber', 30, 'f254']); out.stdHand = stdOf(['cleanp', 'rust', 'fiber', 200, 'f254']); out.stdWeldCu = stdOf(['weldb', 'busbar', 'smcw', 3000, 'f254']);
+    out.scopeTagged = Object.keys(STD).filter(k => STD[k].b === 'scope').length; out.catTagged = Object.keys(STD).filter(k => STD[k].b === 'cat').length; out.untagged = Object.keys(STD).filter(k => !STD[k].b).length;
+    out.label = stdLabel('iec60825_4');
+    return out; });
+  check('every computed figure has a listed relation, inputs and reference', src2.rows === src2.n && src2.n >= 10 && src2.refsOk && src2.text && src2.prov, JSON.stringify({ ...src2, stdMark: 0, stdHand: 0, stdWeldCu: 0 }));
+  check('material properties are the cited values, each material names its source, and a glass or polyimide is not said to melt',
+    src2.matRef && src2.traceable >= 11 && src2.steel === '60.5/7854/434' && src2.ss === '14.9/7900/477' && src2.cu === '401/8933/385' && /does not melt/.test(src2.glass) && /does not melt/.test(src2.pi) && /^Melts at/.test(src2.steelT),
+    JSON.stringify({ steel: src2.steel, ss: src2.ss, cu: src2.cu, glass: src2.glass, pi: src2.pi, traceable: src2.traceable }));
+  check('standards carry their edition and say whether the catalogue names them or they apply by scope',
+    src2.stdMark.includes('iso11553_1') && src2.stdMark.includes('iso16022') && src2.stdHand.includes('iso11553_2') && !src2.stdHand.includes('iso11553_1') && src2.stdWeldCu.includes('iso13919_2') &&
+    src2.scopeTagged >= 6 && src2.catTagged >= 15 && src2.untagged === 0 && src2.label === 'IEC 60825-4:2022', JSON.stringify({ m: src2.stdMark, h: src2.stdHand, w: src2.stdWeldCu, s: src2.scopeTagged, c: src2.catTagged, l: src2.label }));
+  const run2 = await pg.evaluate(async () => {
+    restore({ plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null });
+    document.querySelector('#v3d').scrollIntoView(); simStart(); simHud();
+    const cells = [...document.querySelectorAll('#simstats div')].map(d => d.textContent).join(' | '), q = pp();
+    const r = { on: SIM.onS, proc: SIM.procS, eJ: SIM.eJ, pulses: SIM.pulses, wh: SIM.elWh, f: q.f, cells, sum: typeof simSummaryText === 'function' ? simSummaryText() : '' };
+    const a = askAnswer('what is the pulse overlap'), b = askAnswer('energy per part'), c = askAnswer('where do the numbers come from');
+    r.ask = [a.h, b.h, c.h].map(x => x.replace(/<[^>]+>/g, '')); simStop(); return r; });
+  check('the run reports what the beam delivers to each part: emission time, energy and pulses',
+    run2.on > 0 && run2.on < run2.proc && Math.abs(run2.eJ - 30 * run2.on) < 1e-9 && Math.abs(run2.pulses - run2.f * 1000 * run2.on) < 1e-6 && Math.abs(run2.wh - run2.eJ / 0.30 / 3600) < 1e-9 &&
+    /Energy \/ part/i.test(run2.cells) && /Pulses \/ part/i.test(run2.cells), JSON.stringify({ ...run2, ask: 0, sum: 0 }));
+  check('the assistant answers on overlap, energy per part and where the numbers come from', /Pulse overlap 50 %/.test(run2.ask[0]) && /laser energy/.test(run2.ask[1]) && /Method and sources/.test(run2.ask[2]), run2.ask.join(' || '));
+  check('no script errors in the process point, the sources or the run telemetry', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
+  sec('Access passkeys');
+  const shipped = (() => {
+    const page = readFileSync(join(ROOT, 'index.html'), 'utf8'), file = JSON.parse(readFileSync(join(ROOT, 'access.json'), 'utf8'));
+    const m = page.match(/\/\*ACCESS:BEGIN\*\/([\s\S]*?)\/\*ACCESS:END\*\//), emb = m ? JSON.parse(m[1]) : null;
+    const hexOnly = c => !!c && ['customer', 'internal'].every(r => /^[0-9a-f]{32}$/.test(c[r].s) && /^[0-9a-f]{64}$/.test(c[r].v) && Object.keys(c[r]).join() === 's,v');
+    return { same: !!emb && ['it', 'customer', 'internal'].every(k => JSON.stringify(emb[k]) === JSON.stringify(file[k])), hex: hexOnly(emb) && hexOnly(file),
+             differ: !!emb && emb.customer.v !== emb.internal.v && emb.customer.s !== emb.internal.s, it: file.it };
+  })();
+  check('only salts and verifiers ship — no passkey — and access.json matches the copy in the page', shipped.same && shipped.hex && shipped.differ && shipped.it >= 100000, JSON.stringify(shipped));
+  pg = await open(C2I, { access: null });
+  const g0 = await pg.evaluate(() => {
+    const vis = sel => { const e = document.querySelector(sel); return !!e && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0; };
+    const g = document.querySelector('#gate');
+    return { gate: vis('#gate'), form: vis('#gateK'), header: vis('header.site'), main: vis('#cfgwrap'), story: vis('#story'), footer: vis('footer.site'), vsw: vis('#vsw'),
+      role: ACC.role, dialog: g.getAttribute('role') === 'dialog' && g.getAttribute('aria-modal') === 'true', label: !!document.querySelector('label[for=gateK]'),
+      focus: document.activeElement && document.activeElement.id, type: document.querySelector('#gateK').type,
+      says: g.innerText };
+  });
+  check('without a passkey the page shows only the passkey form', g0.gate && g0.form && !g0.header && !g0.main && !g0.story && !g0.footer && !g0.vsw && !g0.role, JSON.stringify(g0));
+  check('the passkey form is a labelled dialog, takes focus, masks the key and does not mention an internal mode',
+    g0.dialog && g0.label && g0.focus === 'gateK' && g0.type === 'password' && !/internal|staff/i.test(g0.says), JSON.stringify({ ...g0, says: g0.says.replace(/\s+/g, ' ') }));
+  const enter = async key => { await pg.fill('#gateK', key); await pg.click('#gateGo');
+    await pg.waitForFunction(() => !document.querySelector('#gateGo').disabled && (document.querySelector('#gateE').textContent || !document.documentElement.classList.contains('locked') && !document.documentElement.classList.contains('gate-staff'))); };
+  await enter('not-the-key');
+  const g1 = await pg.evaluate(() => ({ locked: document.documentElement.classList.contains('locked'), err: document.querySelector('#gateE').textContent, role: ACC.role,
+    stored: sessionStorage.getItem('teal.access') || localStorage.getItem('teal.access') }));
+  check('a wrong passkey is refused, says so, and stores nothing', g1.locked && /not recognised/.test(g1.err) && !g1.role && !g1.stored, JSON.stringify(g1));
+  /* a forged session: the right shape, but not a key the verifier accepts */
+  await pg.evaluate(() => { sessionStorage.setItem('teal.access', JSON.stringify({ r: 'internal', k: 'ab'.repeat(32) })); localStorage.setItem('teal.access', JSON.stringify({ r: 'internal', k: '1' })); localStorage.setItem('teal.view', JSON.stringify({ v: 'internal', sec: 'bom' })); });
+  await pg.reload({ waitUntil: 'networkidle' });
+  await pg.waitForFunction(() => typeof ACC !== 'undefined' && ACC.ready && !document.documentElement.classList.contains('unlocking'));
+  const g2 = await pg.evaluate(() => ({ locked: document.documentElement.classList.contains('locked'), role: ACC.role, view: VIEW.v, cleared: !sessionStorage.getItem('teal.access') && !localStorage.getItem('teal.access') }));
+  check('writing a session into browser storage opens nothing', g2.locked && !g2.role && g2.view === 'customer' && g2.cleared, JSON.stringify(g2));
+  await enter(KEYS.customer);
+  const g3 = await pg.evaluate(() => {
+    const shown = sel => { const e = document.querySelector(sel); return !!e && getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility !== 'hidden' && e.getBoundingClientRect().width > 0; };
+    const before = VIEW.v; viewSet('internal', 'bom');                 /* a customer session asking for the Internal view */
+    const asked = document.documentElement.classList.contains('gate-staff');
+    document.querySelector('#gateX').click();
+    return { role: ACC.role, locked: document.documentElement.classList.contains('locked'), vsw: shown('#vsw'), tsw: shown('#tsw'), main: shown('#cfgwrap'),
+      staff: shown('#accStaff'), inFooter: !!document.querySelector('footer.site #accStaff'), inHeader: !!document.querySelector('header.site #accStaff'),
+      before, after: VIEW.v, asked, closed: !document.documentElement.classList.contains('gate-staff'), ws: !document.querySelector('#ws').hidden, bar: !document.querySelector('#wsbar').hidden,
+      vals: shown('#hVal') || shown('#adminBtn'), remembered: !!localStorage.getItem('teal.access'), session: !!sessionStorage.getItem('teal.access') };
+  });
+  check('the customer passkey opens the Customer view, with no Internal switch in the header', g3.role === 'customer' && !g3.locked && g3.main && !g3.vsw && g3.tsw && !g3.vals, JSON.stringify(g3));
+  check('a customer session cannot be switched to the Internal view: it is asked for the internal passkey and stays put',
+    g3.before === 'customer' && g3.after === 'customer' && g3.asked && g3.closed && !g3.ws && !g3.bar, JSON.stringify(g3));
+  check('staff access is a footer link, not a header control, and a session is not remembered unless asked', g3.staff && g3.inFooter && !g3.inHeader && g3.session && !g3.remembered, JSON.stringify(g3));
+  await pg.evaluate(() => { location.hash = '#admin'; });
+  await pg.waitForTimeout(150);
+  const g4 = await pg.evaluate(() => ({ asked: document.documentElement.classList.contains('gate-staff'), admin: document.querySelector('#admin').classList.contains('open'), title: document.querySelector('#gateT').textContent }));
+  check('the value store link asks a customer session for the internal passkey instead of opening', g4.asked && !g4.admin && /Staff/.test(g4.title), JSON.stringify(g4));
+  await enter(KEYS.customer);
+  const g5 = await pg.evaluate(() => ({ asked: document.documentElement.classList.contains('gate-staff'), err: document.querySelector('#gateE').textContent, role: ACC.role, admin: document.querySelector('#admin').classList.contains('open') }));
+  check('the staff form refuses the customer passkey', g5.asked && /not the internal/.test(g5.err) && g5.role === 'customer' && !g5.admin, JSON.stringify(g5));
+  await pg.click('#gateX');
+  await pg.evaluate(() => { history.replaceState(null, '', location.pathname + '#p=markc2i&a=dual&s=co2&w=30&l=f254'); });
+  await pg.click('#accStaff');
+  await enter(KEYS.internal);
+  const g6 = await pg.evaluate(() => {
+    const shown = sel => { const e = document.querySelector(sel); return !!e && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0; };
+    return { role: ACC.role, view: VIEW.v, vsw: shown('#vsw'), staff: shown('#accStaff'), bar: !document.querySelector('#wsbar').hidden, banner: document.querySelector('.wsdemo').textContent };
+  });
+  check('the internal passkey opens the Internal view and shows the switch', g6.role === 'internal' && g6.view === 'internal' && g6.vsw && !g6.staff && g6.bar, JSON.stringify(g6));
+  check('the Internal banner says what the passkey is and is not', /demonstration/i.test(g6.banner) && /not a security control/i.test(g6.banner), g6.banner);
+  await pg.reload({ waitUntil: 'networkidle' });
+  await pg.waitForFunction(() => typeof ACC !== 'undefined' && (ACC.role || ACC.ready && !document.documentElement.classList.contains('unlocking')));
+  const g7 = await pg.evaluate(() => ({ role: ACC.role, view: VIEW.v, locked: document.documentElement.classList.contains('locked') }));
+  check('the session and its view survive a reload in the same tab', g7.role === 'internal' && g7.view === 'internal' && !g7.locked, JSON.stringify(g7));
+  await Promise.all([pg.waitForNavigation({ waitUntil: 'networkidle' }), pg.click('#accLock')]);
+  await pg.waitForFunction(() => typeof ACC !== 'undefined' && ACC.ready && !document.documentElement.classList.contains('unlocking'));
+  const g8 = await pg.evaluate(() => ({ locked: document.documentElement.classList.contains('locked'), role: ACC.role, stored: sessionStorage.getItem('teal.access') || localStorage.getItem('teal.access'), view: VIEW.v }));
+  check('Lock ends the session and returns to the passkey form', g8.locked && !g8.role && !g8.stored && g8.view === 'customer', JSON.stringify(g8));
+  for (let i = 0; i < 5; i++) await enter('wrong-' + i);
+  await enter(KEYS.internal);
+  const g9 = await pg.evaluate(() => ({ locked: document.documentElement.classList.contains('locked'), err: document.querySelector('#gateE').textContent, role: ACC.role }));
+  check('five wrong passkeys in a row make the form wait, even for the right one', g9.locked && /Too many attempts/.test(g9.err) && !g9.role, JSON.stringify(g9));
+  check('no script errors at the passkey form', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+  pg = await open(C2I, { access: 'customer' });
+  const g10 = await pg.evaluate(() => { reach = 5; go(5); const b = document.querySelector('#tq'), q = document.querySelector('#iq');
+    return { role: ACC.role, step: cur, trial: !!b, quote: !!q, sim: typeof simReady === 'function' && simReady(), print: !!document.querySelector('#pr') }; });
+  check('a customer session keeps the whole customer workflow: specification, run, print and requests', g10.role === 'customer' && g10.step === 5 && g10.trial && g10.quote && g10.sim && g10.print, JSON.stringify(g10));
+  check('no script errors in a customer session', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
   sec('Simulation and presentation');
   pg = await open('#p=markf&a=metal&s=mopa&w=50&l=f420');
   await pg.evaluate(() => { reach = 5; go(5); SIM.rate = 8; simStart(); });
@@ -792,24 +1011,52 @@ try {
   /* ------------------------------------------------------------------ */
   sec('Layout and accessibility');
   pg = await open(C2I);
+  /* Measure ink, not boxes: a group may shrink below its non-wrapping text, so
+     the extent is taken over every visible descendant, text overflow included. */
+  const headerGap = page => page.evaluate(() => {
+    const ink = el => { let l = 1e9, r = -1e9; [el, ...el.querySelectorAll('*')].forEach(e => {
+      if (getComputedStyle(e).display === 'none') return; const q = e.getBoundingClientRect(); if (!q.width) return;
+      l = Math.min(l, q.left); r = Math.max(r, e.children.length ? q.right : Math.max(q.right, q.left + e.scrollWidth)); }); return { l, r }; };
+    const k = [...document.querySelector('header .wrap').children].filter(x => getComputedStyle(x).display !== 'none');
+    /* groups on the same row must keep apart; a phone puts the switches on a second row */
+    const row = (a, b) => { const p = a.getBoundingClientRect(), q = b.getBoundingClientRect(); return p.top < q.bottom - 2 && q.top < p.bottom - 2; };
+    let gap = 1e9; for (let i = 0; i < k.length; i++) for (let j = i + 1; j < k.length; j++) if (row(k[i], k[j])) {
+      const A = ink(k[i]), B = ink(k[j]); gap = Math.min(gap, A.r <= B.l ? B.l - A.r : A.l - B.r); }
+    return { gap, doc: document.documentElement.scrollWidth - document.documentElement.clientWidth }; });
   const bad = [];
   for (let w = 360; w <= 1900; w += 40) {
     await pg.setViewportSize({ width: w, height: 900 }); await pg.waitForTimeout(40);
-    /* Measure ink, not boxes: a group may shrink below its non-wrapping text, so
-       the extent is taken over every visible descendant, text overflow included. */
-    const m = await pg.evaluate(() => {
-      const ink = el => { let l = 1e9, r = -1e9; [el, ...el.querySelectorAll('*')].forEach(e => {
-        if (getComputedStyle(e).display === 'none') return; const q = e.getBoundingClientRect(); if (!q.width) return;
-        l = Math.min(l, q.left); r = Math.max(r, e.children.length ? q.right : Math.max(q.right, q.left + e.scrollWidth)); }); return { l, r }; };
-      const k = [...document.querySelector('header .wrap').children].filter(x => getComputedStyle(x).display !== 'none');
-      /* groups on the same row must keep apart; a phone puts the switches on a second row */
-      const row = (a, b) => { const p = a.getBoundingClientRect(), q = b.getBoundingClientRect(); return p.top < q.bottom - 2 && q.top < p.bottom - 2; };
-      let gap = 1e9; for (let i = 0; i < k.length; i++) for (let j = i + 1; j < k.length; j++) if (row(k[i], k[j])) {
-        const A = ink(k[i]), B = ink(k[j]); gap = Math.min(gap, A.r <= B.l ? B.l - A.r : A.l - B.r); }
-      return { gap, doc: document.documentElement.scrollWidth - document.documentElement.clientWidth }; });
+    const m = await headerGap(pg);
     if (m.gap < 8 || m.doc > 1) bad.push(`${w}px (gap ${Math.round(m.gap)})`);
   }
   check('header groups keep at least 8 px of clear space and the page never scrolls sideways, 360–1900 px', bad.length === 0, bad.join(' '));
+  {
+    /* a customer session has no view switch; the source step carries the process point */
+    const pc = await open(C2I, { access: 'customer' }), badC = [], badP = [];
+    await pc.evaluate(() => { reach = 5; applyEng(true); go(3); });
+    for (const w of [320, 360, 390, 430, 560, 760, 900, 1080, 1240, 1440, 1900]) {
+      await pc.setViewportSize({ width: w, height: 900 }); await pc.waitForTimeout(60);
+      const m = await headerGap(pc);
+      if (w >= 360 && (m.gap < 8 || m.doc > 1)) badC.push(`${w}px (gap ${Math.round(m.gap)})`);
+      const q = await pc.evaluate(() => { const out = []; const vw = document.documentElement.clientWidth;
+        document.querySelectorAll('.ppanel, .ppanel .ppx, .ppanel svg, .ppanel input[type=range], .phys .pcell, #msrc').forEach(e => { const r = e.getBoundingClientRect(); if (r.width && (r.right > vw + 1 || r.left < -1)) out.push(e.className || e.id || e.tagName); });
+        return { out, doc: document.documentElement.scrollWidth - vw }; });
+      if (q.out.length || q.doc > 1) badP.push(`${w}px ${q.out.slice(0, 2).join(',')} doc+${q.doc}`);
+    }
+    check('in a customer session the header keeps its spacing without the view switch, 360–1900 px', badC.length === 0, badC.join(' '));
+    check('the process-point panel and its drawings stay inside the page, 320–1900 px', badP.length === 0, badP.join(' | '));
+    await pc.close();
+    const pf = await open('', { access: null }), badG = [];
+    for (const w of [320, 390, 760, 1440]) {
+      await pf.setViewportSize({ width: w, height: 640 }); await pf.waitForTimeout(60);
+      const g = await pf.evaluate(() => { const c = document.querySelector('.gatec').getBoundingClientRect(), vw = document.documentElement.clientWidth;
+        const b = document.querySelector('#gateGo').getBoundingClientRect(), k = document.querySelector('#gateK').getBoundingClientRect();
+        return { fits: c.left >= 0 && c.right <= vw + 1, btn: b.height >= 40, input: k.height >= 40 && parseFloat(getComputedStyle(document.querySelector('#gateK')).fontSize) >= 16, cancel: getComputedStyle(document.querySelector('#gateX')).display }; });
+      if (!g.fits || !g.btn || !g.input || g.cancel !== 'none') badG.push(`${w}px ${JSON.stringify(g)}`);
+    }
+    check('the passkey form fits a phone, with full-size controls and no Cancel on the entry form', badG.length === 0, badG.join(' | '));
+    await pf.close();
+  }
   const bar = [];
   for (let w = 320; w <= 1900; w += 20) {
     await pg.setViewportSize({ width: w, height: 900 }); await pg.waitForTimeout(30);

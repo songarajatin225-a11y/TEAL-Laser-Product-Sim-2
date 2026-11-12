@@ -1,0 +1,13 @@
+{
+  "_comment": "Access verifiers for the TEAL configurator. No passkey is stored here — see tools/access/set-passkeys.mjs and SECURITY.md.",
+  "v": 1,
+  "it": 210000,
+  "customer": {
+    "s": "ff61f189fdfc694e9764aa22ffb091c9",
+    "v": "7650490f5a33f3b22cd270582c95e9fa5dd2a3b65a10d25b89ba809013e245d1"
+  },
+  "internal": {
+    "s": "13f520a03f2b5d06a1d9420f05b983aa",
+    "v": "b04006350105dd48449984424e4aa26917c3563296c6854a422733dd674337a5"
+  }
+}

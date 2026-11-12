@@ -2,33 +2,82 @@
 
 ## What this site is
 
-The configurator is a static site: `index.html`, `data.json` and the files under
-`assets/`, served by GitHub Pages. Everything in the repository and everything the
-page loads is **public**: anyone who can open the page can read all of it, including
-the JavaScript and the data. The site has:
+The configurator is a static site: `index.html`, `data.json`, `access.json` and the
+files under `assets/`, served by GitHub Pages. Everything in the repository and
+everything the page loads is **public**: anyone who knows the address of a file can
+download it, including the JavaScript and the data. The site has:
 - no server
-- no login
+- no user accounts
 - no API
-- no secret
+- no secret: the passkey check ships salted verifiers, never a passkey
 
 Its only outbound request is Google Fonts.
 
-## The Customer / Internal switch is not a security boundary
+## Access passkeys: what they do, and what they cannot
 
-The header switch changes what is shown, not who may see it. Anyone can switch to the
-Internal view. Nothing is gained by doing it some other way, such as:
-- editing local storage
-- adding a URL parameter (`#admin` switches to the Internal view on purpose)
-- editing the JavaScript
+Since v16.0 the page opens with a passkey form. There are two passkeys.
+
+| Passkey | Opens | Internal switch in the header |
+|---|---|---|
+| Customer | The Customer view | Not shown |
+| Internal | The Customer and Internal views, and the value store | Shown |
+
+- Without a passkey the page shows only the form. Nothing else is visible.
+- A customer session never sees the Internal option. Staff reach it from
+  **Staff access** in the footer's fine print, which asks for the internal passkey.
+- **Lock**, beside it, ends the session.
+- A session lasts for the browser tab. *Remember on this device* keeps it until Lock.
+- Five wrong passkeys in a row make the form wait 30 seconds.
+
+**How it is built.** No passkey is stored anywhere. For each one the site holds a
+random salt and a verifier: SHA-256 of the key that PBKDF2-HMAC-SHA256 (210,000
+iterations) derives from the passkey. The page derives the same key from what is
+typed and compares. A session keeps that derived key, not the passkey, so writing a
+"signed in" flag into browser storage opens nothing. The verifiers are in
+`access.json` and, identically, in the block of `index.html` marked `ACCESS`.
+
+**What it cannot do.** This keeps casual visitors out. It is **not a security
+boundary**, and nothing confidential may be put behind it:
+
+- The files are public. `data.json` can be downloaded by its address without any
+  passkey. The form covers the page; it does not protect the data.
+- The check runs in the visitor's browser. Someone who edits the page there, with the
+  browser's developer tools, can skip it.
+- The verifiers are public, so a short or guessable passkey can be found by trying
+  candidates offline. Use long random passkeys. The tool refuses anything under ten
+  characters.
+- A shared passkey does not identify anyone. Everyone with the customer passkey is the
+  same visitor. One person's access cannot be withdrawn without changing the passkey
+  for all.
+- The 30-second wait applies to one browser tab. It slows a person, not a program.
+
+Real access control needs a server that checks the user before it sends anything. See
+[What a real internal workspace needs](#what-a-real-internal-workspace-needs).
+
+**Changing the passkeys.** Run one of these, then commit `access.json` and
+`index.html`:
+
+```
+node tools/access/set-passkeys.mjs --customer "<new key>" --internal "<new key>"
+node tools/access/set-passkeys.mjs --generate        # two random keys, printed once
+node tools/access/set-passkeys.mjs --check "<key>"   # which view a key opens
+```
+
+Changing a passkey ends every session opened with the old one. Give passkeys to
+people directly. Never put one in the repository, an issue or a pull request.
+
+## The Internal view is a demonstration
 
 The Internal view holds nothing that needs protecting. It is a **demonstration
 workspace**:
 - It works on the public catalogue, and on records typed into the visitor's own browser.
 - Its role selector previews what each role would see. It does not grant anything.
-- A banner on every Internal screen says so.
+- A banner on every Internal screen says so, and says the passkey is not a security
+  control.
 
-v15.0 removed the admin PIN. It was `teal2026`, shipped in `data.json`. Anyone could
-read it, so it protected nothing while implying that it did.
+v15.0 removed the old admin PIN. It was `teal2026`, shipped in plain text in
+`data.json`, so anyone could read it. The passkeys of v16.0 differ in one respect: the
+passkey itself is not in the files. The limits above still apply.
 
 ## What the public build contains, and must never contain
 
@@ -50,14 +99,18 @@ read it, so it protected nothing while implying that it did.
 `assets/cad/restricted/` is git-ignored for CAD that cannot be redistributed.
 
 The end-to-end suite checks that the old PIN and its prompt are gone from the page
-and the data. It cannot check for confidential numbers, because it cannot tell them
-from estimates. That is a review
-step before every `data.json` commit.
+and the data, and that the access block holds only salts and verifiers. It cannot
+check for confidential numbers, because it cannot tell them from estimates. That is a
+review step before every `data.json` commit.
+
+The suite never uses the real passkeys. Its own server answers `access.json` with
+verifiers for two throw-away keys.
 
 ## What is kept in the browser
 
-All of it stays in the visitor's browser, in `localStorage`, unencrypted. None of it
-is sent anywhere.
+All of it stays in the visitor's browser, unencrypted. None of it is sent anywhere.
+Everything is in `localStorage` except the access session, which is in
+`sessionStorage` unless *Remember on this device* was ticked.
 
 | Key | Holds |
 |---|---|
@@ -67,6 +120,8 @@ is sent anywhere.
 | `teal.draft` | A recoverable draft of value-store edits |
 | `teal.theme`, `teal.view`, `teal.lite`, `teal.eng` | Theme, view and role preview, lite rendering, engineering mode |
 | `teal.missions`, `teal.seenAdvisor` | Mission scores; whether the advisor has been offered |
+| `teal.access` | The access session: which view it opens, and the key derived from the passkey. Not the passkey |
+| `teal.gatewait` | When the passkey form may be tried again after five wrong attempts |
 
 What this means in practice:
 - Anyone with access to that browser profile can read these records.
@@ -113,8 +168,8 @@ contract.
 1. **A separate, authenticated deployment.** Serve the internal application from a
    host that requires sign-in before any page or script is served. Use the company's
    identity provider (OIDC or SAML single sign-on, with multi-factor authentication).
-   Do not add internal data to this public site behind a client-side check: anything
-   shipped to the browser is readable.
+   Do not add internal data to this public site behind the passkey form or any other
+   client-side check: anything shipped to the browser is readable.
 2. **Authorisation on the server.** Check every API call against the user's role,
    using least privilege. The role preview's permission matrix (Settings & Audit) is a
    starting point:

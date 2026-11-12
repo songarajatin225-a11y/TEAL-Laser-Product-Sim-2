@@ -16,6 +16,13 @@
   document.documentElement.setAttribute('data-theme', dark? 'dark' : 'light');
   document.documentElement.setAttribute('data-theme-pref', t);
 })();
+/* Access before first paint: the page stays covered until a passkey is accepted.
+   A session that already holds a token shows a plain cover while it is checked,
+   rather than flashing the passkey form. */
+(function(){
+  var r=document.documentElement; r.classList.add('locked');
+  try{ if(sessionStorage.getItem('teal.access')||localStorage.getItem('teal.access')) r.classList.add('unlocking'); }catch(e){}
+})();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;680;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -260,6 +267,94 @@ main{padding:32px 0 40px;min-height:60vh}
 .pcell .pv{font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink);display:block;
   margin-top:5px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .pcell .pn{font-size:11.5px;color:var(--ink-2);display:block;margin-top:5px;line-height:1.45}
+
+/* ---------- process point ---------- */
+.ppanel{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);box-shadow:var(--sh1);margin-top:16px;overflow:hidden}
+.pph{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--rule-2);flex-wrap:wrap}
+.pph .pt{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--ink)}
+.pph .ppk{font-family:var(--mono);font-size:11px;border:1px solid var(--teal-line);color:var(--teal-deep);
+  border-radius:var(--r-pill);padding:3px 12px;font-weight:600;background:var(--card-tint)}
+.pph .ppr{margin-left:auto;background:none;border:1px solid var(--rule);border-radius:var(--r-pill);padding:6px 13px;
+  font:inherit;font-size:12px;color:var(--ink-2);cursor:pointer}
+.pph .ppr:hover:not(:disabled){border-color:var(--teal);color:var(--teal-deep)}
+.pph .ppr:disabled{opacity:.45;cursor:default}
+.ppi{margin:0;padding:12px 18px 0;font-size:12.5px;color:var(--ink-2);line-height:1.55;max-width:74ch}
+.ppc{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px 22px;padding:16px 18px 6px}
+.ppx{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:baseline;min-width:0}
+.ppx label{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.ppx label i{font-style:normal;color:var(--amber);letter-spacing:.06em;margin-left:4px}
+.ppx output{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ppx.set output{color:var(--teal-deep)}
+.ppx input[type=range]{grid-column:1/-1;width:100%;margin:6px 0 2px;accent-color:var(--teal);height:22px;cursor:pointer}
+.ppx small{grid-column:1/-1;font-size:11px;color:var(--ink-3);line-height:1.4}
+.ppv{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;padding:10px 18px 4px}
+.ppv figure{margin:0;min-width:0}
+.ppv svg{width:100%;height:auto;display:block;border:1px solid var(--rule-2);border-radius:var(--r-sm);background:var(--card-2,var(--card))}
+.ppv figcaption{font-size:11.5px;line-height:1.45;color:var(--ink-3);margin-top:5px}
+.ppv figcaption b{color:var(--ink-2);font-weight:600}
+.ppk2{list-style:none;margin:0;padding:8px 18px 16px;display:grid;gap:6px}
+.ppk2 li{font-size:12.5px;line-height:1.5;color:var(--ink-2);padding-left:20px;position:relative}
+.ppk2 li:before{content:'';position:absolute;left:3px;top:.52em;width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+.ppk2 li.ok:before{background:var(--ok,#0F7B5A)}
+.ppk2 li.warn:before{background:var(--amber)}
+.ppk2 li.warn{color:var(--ink)}
+/* ---------- method and sources ---------- */
+.msrc{border:1px solid var(--rule);border-radius:var(--r);background:var(--card);margin-top:16px}
+.msrc summary{cursor:pointer;padding:13px 18px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;list-style-position:inside}
+.msrc summary span{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--ink)}
+.msrc summary i{font-style:normal;font-size:12px;color:var(--ink-3)}
+.msrc summary:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:var(--r)}
+.msb{padding:0 18px 16px;overflow-x:auto}
+.msb h5{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 6px;font-weight:600}
+.mst{width:100%;min-width:640px;border-collapse:collapse;font-size:12px;line-height:1.5;table-layout:fixed}
+.mst.m4 th:nth-child(1){width:17%}.mst.m4 th:nth-child(2){width:25%}.mst.m4 th:nth-child(3){width:40%}.mst.m4 th:nth-child(4){width:18%}
+.mst.m3 th:nth-child(1){width:26%}.mst.m3 th:nth-child(2){width:26%}.mst.m3 th:nth-child(3){width:48%}
+.mst th{text-align:left;font-weight:600;color:var(--ink-2);padding:6px 10px 6px 0;border-bottom:1px solid var(--rule);white-space:nowrap}
+.mst td{padding:7px 10px 7px 0;border-bottom:1px solid var(--rule-2);vertical-align:top;color:var(--ink-2)}
+.mst td:first-child{color:var(--ink);font-weight:600}
+.mst td.mono{font-family:var(--mono);font-size:11.5px;color:var(--ink);overflow-wrap:anywhere}
+.msr{margin:0;padding-left:20px;font-size:12px;line-height:1.55;color:var(--ink)}
+.msr li{margin-bottom:5px}
+.msr li span{color:var(--ink-3)}
+.stdb{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--ink-3);border:1px solid var(--rule);
+  border-radius:var(--r-pill);padding:1px 7px;margin-left:4px;white-space:nowrap}
+.pvref{display:block;margin-top:5px;font-size:11px;color:var(--ink-3);line-height:1.45}
+@media(max-width:560px){.ppc{grid-template-columns:1fr}}
+
+/* ---------- access gate ---------- */
+.gate{display:none;position:fixed;inset:0;z-index:5000;place-items:center;padding:20px;overflow:auto;
+  background:var(--page)}
+html.locked .gate,html.gate-staff .gate{display:grid}
+html.gate-staff .gate{background:var(--overlay)}
+html.locked body>*:not(#gate):not(#toasts){visibility:hidden}
+html.locked,html.gate-staff{overflow:hidden}
+.gatec{width:min(420px,100%);background:var(--card);border:1px solid var(--rule);border-radius:var(--r-lg);
+  box-shadow:var(--sh3);padding:30px 28px 24px;display:grid;gap:12px}
+html.unlocking .gatec>*:not(.gatew){display:none}
+.gatew{display:none;font-size:13px;color:var(--ink-2);text-align:center;padding:14px 0}
+html.unlocking .gatew{display:block}
+.gatelogo{height:38px;width:auto;justify-self:start;margin-bottom:4px}
+:root[data-theme="dark"] .gatelogo{filter:brightness(0) invert(1)}
+.gatec h2{font-size:21px;font-weight:680;letter-spacing:-.02em;margin:0}
+.gatec p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+.gatec label.gk{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-top:6px}
+.gatec input[type=password],.gatec input[type=text]{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--rule);
+  border-radius:var(--r-sm);background:var(--field);color:var(--ink)}
+.gatec input:focus-visible{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+.gaterem{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink-2);cursor:pointer}
+.gateb{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.gateb .btn{justify-content:center}
+.gateb .btn.pri{flex:1}
+.gatec .ferr{margin:0}
+.gate [hidden]{display:none!important}
+.gatec .gaten{font-size:11.5px;color:var(--ink-3);border-top:1px solid var(--rule-2);padding-top:12px;margin-top:4px}
+/* the Internal switch is shown only to a session opened with the internal passkey */
+body.access-customer #vsw{display:none!important}
+/* staff entry and the lock sit in the footer's fine print, out of the way */
+.facc{display:inline-flex;gap:14px;align-items:center}
+.flink{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.flink:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:2px}
+body.access-internal #accStaff{display:none}
 
 /* ---------- fields ---------- */
 .field{margin-bottom:26px}
@@ -1754,6 +1849,20 @@ body.demo #demobar{display:flex}
 
 <a href="#rail" class="skip">Skip to configurator</a>
 <div id="toasts" aria-live="polite" aria-atomic="false"></div>
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateT">
+  <form class="gatec" id="gateF" novalidate>
+    <p class="gatew" role="status">Checking access…</p>
+    <img class="gatelogo" id="gateLogo" alt="TEAL — A TATA Enterprise">
+    <h2 id="gateT">Laser Equipment Configurator</h2>
+    <p id="gateP">Enter your access key to continue.</p>
+    <label class="gk" for="gateK">Access key</label>
+    <input id="gateK" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="gateE">
+    <label class="gaterem"><input type="checkbox" id="gateR"> Remember on this device</label>
+    <div class="ferr" id="gateE" role="alert"></div>
+    <div class="gateb"><button type="submit" class="btn pri" id="gateGo">Continue</button><button type="button" class="btn" id="gateX" hidden>Cancel</button></div>
+    <p class="gaten">Access keys are issued by TEAL. Ask your TEAL contact if you do not have one.</p>
+  </form>
+</div>
 <div id="status" role="status" aria-live="polite"><i aria-hidden="true"></i><span></span></div>
 
 <header class="site">
@@ -1791,7 +1900,7 @@ body.demo #demobar{display:flex}
 
 <div class="wsbar" id="wsbar" hidden>
   <div class="wrap">
-    <p class="wsdemo"><b>Internal workspace — demonstration.</b> Not access-controlled: it shows the public catalogue and records typed into this browser.</p>
+    <p class="wsdemo"><b>Internal workspace — demonstration.</b> Opened with the internal passkey, which keeps casual visitors out and is not a security control. It shows the public catalogue and records typed into this browser.</p>
     <div class="wsbarrow">
       <nav class="wsnav" id="wsnav" aria-label="Internal workspace"></nav>
       <label class="wsrolel">Role preview <select id="wsrole" aria-label="Role preview — not a permission"></select></label>
@@ -1950,7 +2059,7 @@ body.demo #demobar{display:flex}
   </div>
   <div class="fbot">
     <span>© <span id="yr"></span> Titan Engineering &amp; Automation Ltd — A TATA Enterprise</span>
-    <span id="stamp">Configurator v15.0</span>
+    <span class="facc"><button type="button" class="flink" id="accStaff">Staff access</button><button type="button" class="flink" id="accLock">Lock</button><span id="stamp">Configurator v16.0</span></span>
   </div>
 </div></footer>
 
@@ -2052,7 +2161,7 @@ var LOGO = document.querySelector('.lock img').src;
 var SRC = {
   fiber:{n:'Fiber (Q-switched)', wl:'1064 nm', um:1.064, col:'#E0552B', m2:1.3, dia:14, mode:'pulsed', tau:100, tauU:'ns', frep:[20,100], wpe:0.30, prem:1.00},
   mopa :{n:'Fiber MOPA',         wl:'1064 nm', um:1.064, col:'#EE6B33', m2:1.3, dia:14, mode:'pulsed', tau:2,   tauU:'ns', frep:[1,4000], tauRange:[2,500], wpe:0.27, prem:1.12},
-  qcw  :{n:'QCW fiber',          wl:'1064 nm', um:1.064, col:'#E8703A', m2:1.1, dia:12, mode:'pulsed', tau:500000, tauU:'ns', frep:[0.1,1], wpe:0.25, prem:1.22},
+  qcw  :{n:'QCW fiber',          wl:'1064 nm', um:1.064, col:'#E8703A', m2:1.1, dia:12, mode:'pulsed', tau:500000, tauU:'ns', frep:[0.1,1], pk:10, wpe:0.25, prem:1.22},
   smcw :{n:'CW single-mode fiber',wl:'1070 nm',um:1.070, col:'#D94F26', m2:1.05,dia:12, mode:'cw', wpe:0.35, prem:1.28},
   uv   :{n:'UV DPSS (THG)',      wl:'355 nm',  um:0.355, col:'#8A5CF0', m2:1.2, dia:10, mode:'pulsed', tau:25,  tauU:'ns', frep:[20,150], wpe:0.03, prem:1.55},
   green:{n:'Green DPSS (SHG)',   wl:'532 nm',  um:0.532, col:'#28C36A', m2:1.2, dia:10, mode:'pulsed', tau:15,  tauU:'ns', frep:[10,100], wpe:0.07, prem:1.40},
@@ -2074,28 +2183,53 @@ var LENS = {
 };
 
 
-/* Material coupling data. Absorptivity is for a clean, room-temperature,
-   optically flat surface — oxides, roughness and melting all raise it
-   substantially, so treat these as the cold-start floor, not the process value.
-   Thermal properties are handbook values at room temperature.
-   Sources: Steen & Mazumder, Laser Material Processing; standard metals handbooks. */
+/* Material data, each property with the source it was taken from (REF).
+   Thermal properties are 300 K values. `tm` is the temperature at which the
+   solid gives way and `tk` says how: it melts, decomposes, or — a glass or a
+   polyimide — passes a transition without ever melting.
+   Absorptivity is for a clean, room-temperature, optically flat surface —
+   oxides, roughness and melting all raise it substantially, so treat these as
+   the cold-start floor, not the process value. Only copper and silicon are
+   traceable to a measurement (`aref`); the rest are indicative class values. */
 var MAT = {
-  steel:{n:'Carbon steel',    k:50,  tm:1538, rho:7850, cp:490, a:{uv:.60,blue:.60,green:.55,ir:.35,co2:.10}},
-  ss   :{n:'Stainless 304',   k:16,  tm:1450, rho:8000, cp:500, a:{uv:.60,blue:.58,green:.55,ir:.35,co2:.10}},
-  al   :{n:'Aluminium',       k:237, tm:660,  rho:2700, cp:900, a:{uv:.25,blue:.16,green:.15,ir:.08,co2:.02}},
-  cu   :{n:'Copper',          k:401, tm:1085, rho:8960, cp:385, a:{uv:.55,blue:.55,green:.40,ir:.04,co2:.015}},
-  ti   :{n:'Titanium',        k:22,  tm:1668, rho:4510, cp:520, a:{uv:.55,blue:.52,green:.50,ir:.42,co2:.12}},
-  ni   :{n:'Nickel',          k:91,  tm:1455, rho:8900, cp:440, a:{uv:.50,blue:.45,green:.42,ir:.28,co2:.05}},
-  si   :{n:'Silicon',         k:150, tm:1414, rho:2330, cp:700, a:{uv:.65,blue:.62,green:.60,ir:.30,co2:.05}},
-  sic  :{n:'Silicon carbide', k:370, tm:2730, rho:3210, cp:690, a:{uv:.70,blue:.55,green:.35,ir:.15,co2:.08}},
-  al2o3:{n:'Alumina',         k:30,  tm:2072, rho:3950, cp:880, a:{uv:.45,blue:.20,green:.15,ir:.12,co2:.90}},
-  aln  :{n:'Aluminium nitride',k:170,tm:2200, rho:3260, cp:740, a:{uv:.50,blue:.25,green:.18,ir:.14,co2:.88}},
-  glass:{n:'Soda-lime glass', k:1.0, tm:1000, rho:2500, cp:840, a:{uv:.35,blue:.02,green:.01,ir:.02,co2:.92}},
-  fr4  :{n:'FR4 / solder mask',k:0.3,tm:300,  rho:1850, cp:1100,a:{uv:.75,blue:.35,green:.30,ir:.15,co2:.92}, org:1},
-  pi   :{n:'Polyimide',       k:0.15,tm:400,  rho:1420, cp:1090,a:{uv:.85,blue:.45,green:.35,ir:.12,co2:.94}, org:1},
-  poly :{n:'Engineering polymer',k:0.2,tm:250,rho:1200, cp:1500,a:{uv:.70,blue:.30,green:.25,ir:.10,co2:.93}, org:1},
-  emc  :{n:'Epoxy mould compound',k:0.7,tm:350,rho:1900,cp:1000,a:{uv:.72,blue:.40,green:.35,ir:.30,co2:.90}, org:1}
+  steel:{n:'Carbon steel',    k:60.5, tm:1537, rho:7854, cp:434, a:{uv:.60,blue:.60,green:.55,ir:.35,co2:.10}, tk:'melt', ref:'incropera',
+         note:'Plain carbon steel (Mn ≤ 1 %, Si ≤ 0.1 %). The melting point is that of pure iron; carbon steels begin to melt lower.'},
+  ss   :{n:'Stainless 304',   k:14.9, tm:1397, rho:7900, cp:477, a:{uv:.60,blue:.58,green:.55,ir:.35,co2:.10}, tk:'melt', ref:'incropera',
+         note:'AISI 304.'},
+  al   :{n:'Aluminium',       k:237, tm:660,  rho:2702, cp:903, a:{uv:.25,blue:.16,green:.15,ir:.08,co2:.02}, tk:'melt', ref:'incropera',
+         note:'Pure aluminium. Alloys conduct less: 2024-T6 is about 177 W/m·K.'},
+  cu   :{n:'Copper',          k:401, tm:1085, rho:8933, cp:385, a:{uv:.55,blue:.55,green:.40,ir:.04,co2:.015}, tk:'melt', ref:'incropera', aref:'hummel',
+         note:'Pure copper. Published room-temperature absorptivity: under 5 % near 1 µm, 40–60 % at 515 nm, 50 % and above at 450 nm.'},
+  ti   :{n:'Titanium',        k:21.9, tm:1680, rho:4500, cp:522, a:{uv:.55,blue:.52,green:.50,ir:.42,co2:.12}, tk:'melt', ref:'incropera',
+         note:'Pure titanium.'},
+  ni   :{n:'Nickel',          k:90.7, tm:1455, rho:8900, cp:444, a:{uv:.50,blue:.45,green:.42,ir:.28,co2:.05}, tk:'melt', ref:'incropera',
+         note:'Pure nickel.'},
+  si   :{n:'Silicon',         k:148, tm:1412, rho:2330, cp:712, a:{uv:.43,blue:.58,green:.63,ir:.30,co2:.05}, tk:'melt', ref:'incropera', aref:'green',
+         note:'Absorptivity at 355, 450 and 532 nm is 1 − R from the tabulated n and k. At 1064 nm silicon is weakly absorbing — light travels about a millimetre — so a wafer absorbs only part of what enters it.'},
+  sic  :{n:'Silicon carbide', k:490, tm:2827, rho:3160, cp:675, a:{uv:.70,blue:.55,green:.35,ir:.15,co2:.08}, tk:'decomp', ref:'incropera',
+         note:'Dense, high-purity silicon carbide; sintered grades conduct considerably less.'},
+  al2o3:{n:'Alumina',         k:36,  tm:2050, rho:3970, cp:765, a:{uv:.45,blue:.20,green:.15,ir:.12,co2:.90}, tk:'melt', ref:'incropera',
+         note:'Polycrystalline aluminium oxide.'},
+  aln  :{n:'Aluminium nitride',k:170,tm:2200, rho:3260, cp:740, a:{uv:.50,blue:.25,green:.18,ir:.14,co2:.88}, tk:'decomp', ref:'alnds',
+         note:'Substrate grade: 170 W/m·K is the usual minimum, some grades reach 230. Suppliers quote 720–800 J/kg·K.'},
+  glass:{n:'Soda-lime glass', k:1.0, tm:570,  rho:2500, cp:840, a:{uv:.35,blue:.02,green:.01,ir:.02,co2:.92}, tk:'tg', ref:'typ',
+         note:'A glass has no melting point: it passes its transition near 570 °C and softens progressively above it.'},
+  fr4  :{n:'FR4 / solder mask',k:0.3,tm:300,  rho:1850, cp:1100,a:{uv:.75,blue:.35,green:.30,ir:.15,co2:.92}, org:1, tk:'decomp', ref:'typ',
+         note:'Glass-epoxy laminate. The decomposition temperature depends on the grade, roughly 300–350 °C.'},
+  pi   :{n:'Polyimide',       k:0.12,tm:360,  rho:1420, cp:1090,a:{uv:.85,blue:.45,green:.35,ir:.12,co2:.94}, org:1, tk:'tg', ref:'kapton',
+         note:'Kapton HN film. It does not melt; the second-order transition lies between 360 and 410 °C.'},
+  poly :{n:'Engineering polymer',k:0.2,tm:250,rho:1200, cp:1500,a:{uv:.70,blue:.30,green:.25,ir:.10,co2:.93}, org:1, tk:'melt', ref:'typ',
+         note:'A placeholder for the ABS, PC and PEEK class. Properties differ by resin and filler.'},
+  emc  :{n:'Epoxy mould compound',k:0.7,tm:350,rho:1900,cp:1000,a:{uv:.72,blue:.40,green:.35,ir:.30,co2:.90}, org:1, tk:'decomp', ref:'typ',
+         note:'Silica-filled epoxy. Properties depend on filler loading.'}
 };
+/* how a material gives way at `tm`, in words */
+function matTrans(M){
+  var t=M.tm+' °C';
+  return M.tk==='tg'? 'Transition near '+t+' — softens, does not melt'
+       : (M.tk==='decomp' || (M.org && M.tk!=='melt'))? 'Decomposes near '+t
+       : M.org? 'Softens or melts near '+t : 'Melts at '+t;
+}
 function matBand(srcKey){
   var um=SRC[srcKey]?SRC[srcKey].um:1.064;
   if(um<0.40) return 'uv';
@@ -2120,32 +2254,46 @@ var IND = {
 
 
 /* ===================== STANDARDS REGISTER =========================
-   Real, citable standards already referenced across the catalogue.
+   Real, citable standards with their official titles. `b` says why each
+   is here: 'cat' is named in the TEAL catalogue; 'scope' applies through
+   the standard's own published scope and is NOT named in the catalogue,
+   so listing it is not a claim that TEAL certifies to it. `ed` is the
+   current edition where it was checked against the publisher's catalogue.
    Applicability is derived from the configuration rather than tagged
    by hand, so it stays correct as the catalogue changes.
    ================================================================= */
 var STD = {
-  iec60825_1:{n:'IEC 60825-1', d:'Safety of laser products — equipment classification and requirements', s:'Every enclosed system; defines the Class 1 condition'},
-  iec60825_4:{n:'IEC 60825-4', d:'Safety of laser products — laser guards', s:'Cabins and guarding around robot and gantry cells'},
-  iso12100  :{n:'ISO 12100',   d:'Safety of machinery — risk assessment and risk reduction', s:'Cell-level risk assessment and residual-risk file'},
-  iso13849  :{n:'ISO 13849-1', d:'Safety-related parts of control systems', s:'Performance level of interlock and E-stop circuits'},
-  iso29158  :{n:'ISO/IEC 29158', d:'Direct part mark quality guideline', s:'Grading of marked 2D codes (AIM DPM)'},
-  iso15415  :{n:'ISO/IEC 15415', d:'2D symbol print quality test specification', s:'Grading of printed and label 2D codes'},
-  semi_t7   :{n:'SEMI T7',     d:'Back-surface marking of double-side polished wafers', s:'Wafer back-side identity'},
-  semi_m12  :{n:'SEMI M12',    d:'Serial alphanumeric marking of the front surface of wafers', s:'Wafer front-side identity'},
-  semi_m13  :{n:'SEMI M13',    d:'Alphanumeric marking of silicon wafers', s:'Wafer character set and placement'},
-  semi_e30  :{n:'SEMI E30 / E37 / E40', d:'GEM, HSMS and processing management', s:'Fab and OSAT host communication'},
-  smema     :{n:'IPC-SMEMA-9851', d:'Mechanical equipment interface standard', s:'Board handshake between inline machines'},
-  hermes    :{n:'IPC-HERMES-9852', d:'Machine-to-machine communication in SMT', s:'Digital successor to SMEMA on SMT lines'},
-  iec61340  :{n:'IEC 61340-5-1', d:'Protection of electronic devices from electrostatic phenomena', s:'ESD-safe build and dry-room handling'},
-  iso14644  :{n:'ISO 14644-1', d:'Cleanrooms — classification of air cleanliness by particle concentration', s:'Cleanroom-compatible construction'},
-  cfr11     :{n:'21 CFR Part 11', d:'Electronic records and electronic signatures', s:'Validated sites using audit-trailed software'}
+  iec60825_1:{n:'IEC 60825-1', d:'Safety of laser products — equipment classification and requirements', s:'Every enclosed system; defines the Class 1 condition', b:'cat', ed:'2014'},
+  iec60825_4:{n:'IEC 60825-4', d:'Safety of laser products — laser guards', s:'Cabins and guarding around robot and gantry cells', b:'cat', ed:'2022'},
+  iso11553_1:{n:'ISO 11553-1', d:'Safety of machinery — Laser processing machines — Part 1: Laser safety requirements', s:'Laser hazards of a machine that processes material with a laser', b:'scope', ed:'2020'},
+  iso11553_2:{n:'ISO 11553-2', d:'Safety of machinery — Laser processing machines — Part 2: Safety requirements for hand-held laser processing devices', s:'Hand-held laser processing — the open-beam hand-piece', b:'scope'},
+  iso12100  :{n:'ISO 12100',   d:'Safety of machinery — risk assessment and risk reduction', s:'Cell-level risk assessment and residual-risk file', b:'cat', ed:'2010'},
+  iso13849  :{n:'ISO 13849-1', d:'Safety-related parts of control systems', s:'Performance level of interlock and E-stop circuits', b:'cat', ed:'2023'},
+  iso29158  :{n:'ISO/IEC 29158', d:'Direct part mark quality guideline', s:'Grading of marked 2D codes (AIM DPM)', b:'cat', ed:'2025'},
+  iso15415  :{n:'ISO/IEC 15415', d:'2D symbol print quality test specification', s:'Grading of printed and label 2D codes', b:'cat'},
+  iso16022  :{n:'ISO/IEC 16022', d:'Data Matrix bar code symbology specification', s:'The Data Matrix (ECC 200) symbol that is marked and graded', b:'scope', ed:'2024'},
+  iso13919_1:{n:'ISO 13919-1', d:'Electron and laser-beam welded joints — quality levels for imperfections — Part 1: Steel, nickel, titanium and their alloys', s:'Acceptance levels B, C and D for laser-welded seams', b:'scope', ed:'2019'},
+  iso13919_2:{n:'ISO 13919-2', d:'Electron and laser-beam welded joints — quality levels for imperfections — Part 2: Aluminium, magnesium and their alloys and pure copper', s:'Acceptance levels for laser welds in aluminium and copper', b:'scope'},
+  iso9013   :{n:'ISO 9013',    d:'Thermal cutting — classification of thermal cuts — geometrical product specification and quality tolerances', s:'Cut-edge quality and tolerances of laser-cut profiles', b:'scope'},
+  semi_t7   :{n:'SEMI T7',     d:'Back-surface marking of double-side polished wafers', s:'Wafer back-side identity', b:'cat'},
+  semi_m12  :{n:'SEMI M12',    d:'Serial alphanumeric marking of the front surface of wafers', s:'Wafer front-side identity', b:'cat'},
+  semi_m13  :{n:'SEMI M13',    d:'Alphanumeric marking of silicon wafers', s:'Wafer character set and placement', b:'cat'},
+  semi_e30  :{n:'SEMI E30 / E37 / E40', d:'GEM, HSMS and processing management', s:'Fab and OSAT host communication', b:'cat'},
+  smema     :{n:'IPC-SMEMA-9851', d:'Mechanical equipment interface standard', s:'Board handshake between inline machines', b:'cat'},
+  hermes    :{n:'IPC-HERMES-9852', d:'Machine-to-machine communication in SMT', s:'Digital successor to SMEMA on SMT lines', b:'cat'},
+  iec61340  :{n:'IEC 61340-5-1', d:'Protection of electronic devices from electrostatic phenomena', s:'ESD-safe build and dry-room handling', b:'cat'},
+  iso14644  :{n:'ISO 14644-1', d:'Cleanrooms — classification of air cleanliness by particle concentration', s:'Cleanroom-compatible construction', b:'cat'},
+  cfr11     :{n:'21 CFR Part 11', d:'Electronic records and electronic signatures', s:'Validated sites using audit-trailed software', b:'cat'}
 };
+function stdLabel(k){ var x=STD[k]; return x? x.n+(x.ed? ':'+x.ed : '') : k; }
 function standardsFor(){
   var p=P(); if(!p) return [];
-  var out=['iec60825_1'];
+  var out=['iec60825_1'], kind=S.src? procKind() : null, a=A();
+  out.push(p.deliv==='handpiece'? 'iso11553_2' : 'iso11553_1');
   if(p.deliv==='robot'||p.deliv==='gantry') out.push('iec60825_4','iso12100','iso13849');
-  if(p.fam==='mark'||p.fam==='volt'||p.fam==='semi') out.push('iso29158','iso15415');
+  if(p.fam==='mark'||p.fam==='volt'||p.fam==='semi') out.push('iso29158','iso15415','iso16022');
+  if(p.fam==='weld') out.push(a && (a.mat==='al'||a.mat==='cu')? 'iso13919_2' : 'iso13919_1');
+  if(p.fam==='cut' && kind==='cut' && !effPulsed()) out.push('iso9013');
   if(p.fam==='semi') out.push('semi_t7','semi_m12','semi_m13','semi_e30');
   if((p.ind||[]).indexOf('ems')>=0) out.push('smema','hermes');
   if(S.mods&&S.mods.cleanrm) out.push('iso14644');
@@ -2233,28 +2381,97 @@ var PROV = {
   computed :{n:'Computed',         d:'Derived at runtime from other values', c:'#54677A', act:'No action — check the formula, not the number'},
   estimate :{n:'Estimate',         d:'Built for scoping. NOT from TEAL data.',        c:'#C44A0E', act:'REPLACE with real figures before commercial use'}
 };
+/* ===================== REFERENCES ================================
+   Where a number or a formula comes from. Each entry is a publication
+   that can be looked up; `chk` says how far it was checked while this
+   register was written: 'cat' against the publisher's catalogue, 'val'
+   the values themselves against a copy of the table, 'cite' cited from
+   the literature without the page in hand.
+   ================================================================= */
+var REF = {
+  siegman  :{a:'A. E. Siegman', t:'Lasers', p:'University Science Books, 1986', u:'Gaussian beam propagation: focused spot, Rayleigh range, beam growth through focus', chk:'cite'},
+  iso11146 :{a:'ISO 11146-1:2021', t:'Lasers and laser-related equipment — Test methods for laser beam widths, divergence angles and beam propagation ratios — Part 1: Stigmatic and simple astigmatic beams', p:'International Organization for Standardization', u:'Definition of beam diameter (second moment, 1/e² for a Gaussian) and of the beam propagation ratio M²', chk:'cat'},
+  liu      :{a:'J. M. Liu', t:'Simple technique for measurements of pulsed Gaussian-beam spot sizes', p:'Optics Letters 7(5), 196–198, 1982', u:'Peak fluence of a Gaussian pulse, F₀ = 2E/πw₀²', chk:'cite'},
+  carslaw  :{a:'H. S. Carslaw, J. C. Jaeger', t:'Conduction of Heat in Solids', p:'2nd ed., Oxford University Press, 1959', u:'Thermal diffusion length √(4αt)', chk:'cite'},
+  steen    :{a:'W. M. Steen, J. Mazumder', t:'Laser Material Processing', p:'4th ed., Springer, 2010', u:'Keyhole threshold near 10⁶ W/cm², absorptivity trends with wavelength, process regimes', chk:'cite'},
+  incropera:{a:'F. P. Incropera, D. P. DeWitt', t:'Fundamentals of Heat and Mass Transfer', p:'Wiley — Appendix A, thermophysical properties of solids at 300 K', u:'Density, specific heat, thermal conductivity and melting point of metals and ceramics', chk:'val'},
+  green    :{a:'M. A. Green, M. J. Keevers', t:'Optical properties of intrinsic silicon at 300 K', p:'Progress in Photovoltaics 3(3), 189–192, 1995', u:'Refractive index and extinction coefficient of silicon; absorptivity computed as 1 − R at normal incidence', chk:'val'},
+  hummel   :{a:'M. Hummel, C. Schöler, A. Häusler, A. Gillner, R. Poprawe', t:'New approaches on laser micro welding of copper by using a laser beam source with a wavelength of 450 nm', p:'Journal of Advanced Joining Processes 1, 2020', u:'Room-temperature absorptivity of copper at 450 nm, 515 nm and near 1 µm', chk:'cite'},
+  kapton   :{a:'DuPont', t:'Kapton HN polyimide film — technical data sheet', p:'DuPont Electronics & Industrial', u:'Density, specific heat, thermal conductivity (0.12 W/m·K) and second-order transition (360–410 °C)', chk:'val'},
+  alnds    :{a:'CeramTec; MARUWA', t:'Aluminium nitride substrate data sheets (Alunit; AlN substrates)', p:'Supplier data sheets', u:'Thermal conductivity ≥ 170 W/m·K, density 3.26 g/cm³', chk:'val'},
+  typ      :{a:'Typical values', t:'Not traceable to one published table', p:'Laminate, glass and compound supplier literature', u:'Order-of-magnitude thermal properties for materials whose grade is not fixed', chk:'none'},
+  ahmed    :{a:'N. Ahmed (ed.)', t:'New Developments in Advanced Welding', p:'Woodhead Publishing, 2005 — pulsed Nd:YAG laser welding', u:'Overlap of pulsed seam welds, %OL = 100·(d − v/f)/d; 70–80 % for hermetic seams, 50–60 % otherwise', chk:'val'},
+  ewi      :{a:'J. Eastman', t:'Achieving Hermeticity in Laser Welded Metal Components', p:'EWI', u:'75–80 % overlap recommended for hermetic pulsed seams', chk:'val'},
+  ipgqcw   :{a:'IPG Photonics', t:'YLM-QCW and YLR-QCW quasi-CW fiber lasers — data sheet', p:'IPG Photonics', u:'A 150 W average quasi-CW source delivers 1,500 W peak: a ten-to-one peak-to-average ratio', chk:'val'},
+  catalogue:{a:'Titan Engineering & Automation Ltd', t:'TEAL Laser Automation Solutions — Product Catalogue', p:'2026 Edition, Ch. 02–13', u:'Platform specifications, source bands, spot ranges, speeds, cycle times', chk:'none'}
+};
+function refCite(k){ var r=REF[k]; return r? r.a+', '+r.t+', '+r.p+'.' : k; }
+/* ===================== METHOD ====================================
+   Every computed figure: its formula, what goes into it, and the
+   reference for the relation. `in` names the inputs so a reader can see
+   which of them are catalogue values and which are assumptions.
+   ================================================================= */
+var METHOD = [
+  {k:'spot',  n:'Focused spot diameter', f:'d = 4 λ f M² / (π D)', i:'wavelength λ, focal length f, beam quality M², beam diameter D at the objective', r:['siegman','iso11146'],
+   c:'1/e² diameter of an ideal Gaussian beam of quality M². Lens aberration and beam clipping make a real spot larger. M² and D are class values, not measured on a TEAL source.'},
+  {k:'dof',   n:'Depth of focus', f:'z_R = π d² / (4 M² λ)', i:'spot diameter d, M², λ', r:['siegman'],
+   c:'The Rayleigh range: over ± z_R the spot grows by √2. The window that holds it within 5 % is 0.32 z_R.'},
+  {k:'work',  n:'Working spot away from focus', f:'d(z) = d·√(1 + (z/z_R)²)', i:'focus spot d, Rayleigh range z_R, defocus z', r:['siegman'],
+   c:'Used to state the defocus equivalent to a working spot larger than the focus limit.'},
+  {k:'ep',    n:'Pulse energy and peak power', f:'E = P / f,  P_pk = E / τ', i:'average power P, repetition rate f, pulse duration τ', r:['steen'],
+   c:'Rectangular-pulse approximation. A quasi-CW source is taken at its catalogue peak-to-average ratio.'},
+  {k:'flu',   n:'Fluence', f:'F = E / (π d²/4),  F₀ = 2F', i:'pulse energy E, working spot d', r:['liu'],
+   c:'F is averaged over the 1/e² spot; F₀ is the value on the axis of a Gaussian spot.'},
+  {k:'irr',   n:'Irradiance', f:'I = P / (π d²/4)', i:'power (peak power when pulsed), working spot d', r:['steen'],
+   c:'Compared with the ~10⁶ W/cm² keyhole threshold for welding only. That threshold is a rule of thumb for steel and is higher for copper and aluminium.'},
+  {k:'ov',    n:'Pulse overlap', f:'O = 1 − v / (f·d),  N = f·d / v', i:'speed v, repetition rate f, track width d', r:['ahmed','ewi'],
+   c:'N is the number of pulses landing on one spot diameter. The overlap each process starts at is a rule of practice, not TEAL process data.'},
+  {k:'dose',  n:'Line energy and areal dose', f:'E_l = P / v,  D = P·n / (v·h)', i:'power P, speed v, line pitch h, passes n', r:['steen'],
+   c:'Energy delivered per unit length of track and per unit area covered.'},
+  {k:'diff',  n:'Thermal diffusion length', f:'l = √(4 α t),  α = k / (ρ c_p)', i:'conductivity k, density ρ, specific heat c_p; t is the pulse duration, or the dwell time d/v for a continuous beam', r:['carslaw','incropera'],
+   c:'The scale over which heat spreads while the beam is on a point.'},
+  {k:'wall',  n:'Electrical input and heat to reject', f:'P_el = P / η,  Q = P_el − P', i:'optical power P, wall-plug efficiency η of the source class', r:[],
+   c:'Laser source only. Chiller, extraction, motion and controls are not included. η is a class value; for ultraviolet, green and ultrafast sources it is an estimate.'},
+  {k:'time',  n:'Process time', f:'t = n·(L / v + L_jump / v_jump + N_vec·t_delay)', i:'track length L, speed v, passes n, jump length, number of vectors, scanner delay (250 µs each)', r:[],
+   c:'Timed on the reference content named beside it, not on your part. The scanner delay is a typical galvanometer setting.'}
+];
 var DATASRC = [
- {a:'Platform specifications', p:'catalogue', w:'PLAT.*.specs',
+ {a:'Platform specifications', p:'catalogue', w:'PLAT.*.specs', refs:['catalogue'],
   note:'Fields, speeds, accuracies, footprints, utilities, throughput — transcribed from the catalogue.',
   count:function(){ var n=0; for(var k in PLAT) n+=(PLAT[k].specs||[]).length; return n+' rows'; }},
- {a:'Platform and family names', p:'catalogue', w:'PLAT.*.n / FAM.*',
+ {a:'Platform and family names', p:'catalogue', w:'PLAT.*.n / FAM.*', refs:['catalogue'],
   note:'Model designations, types and chapter references.',
   count:function(){ return Object.keys(PLAT).length+' platforms, '+Object.keys(FAM).length+' families'; }},
- {a:'Applications and rationale', p:'catalogue', w:'PLAT.*.apps',
+ {a:'Applications and rationale', p:'catalogue', w:'PLAT.*.apps', refs:['catalogue'],
   note:'Application list per platform; the engineering rationale is written from catalogue reasoning.',
   count:function(){ var n=0; for(var k in PLAT) n+=Object.keys(PLAT[k].apps||{}).length; return n+' applications'; }},
- {a:'Material absorptivity and thermal data', p:'handbook', w:'MAT.*',
-  note:'Steen &amp; Mazumder, Laser Material Processing, and standard metals handbooks. Room-temperature, clean-surface values.',
-  count:function(){ return Object.keys(MAT).length+' materials'; }},
- {a:'Optical formulas and pulse arithmetic', p:'computed', w:'physics()',
-  note:'d = 4λfM²/πD, Rayleigh range, pulse energy, peak power, fluence, irradiance, √(4ατ).',
-  count:function(){ return 'runtime'; }},
- {a:'Wall-plug efficiencies', p:'handbook', w:'SRC.*.wpe',
-  note:'Published class figures — fiber ~30 %, CO₂ ~10 %, UV DPSS ~3 %. Point values chosen inside published ranges.',
+ {a:'Source bands stated in the catalogue', p:'catalogue', w:'SRC.*.frep / tauRange / pk', refs:['catalogue','ipgqcw'],
+  note:'UV: under 25 ns at 20–150 kHz. MOPA: pulse 2–500 ns. Quasi-CW: 150 W average at 1.5 kW peak, a ten-to-one ratio that published quasi-CW fiber data sheets also show.',
+  count:function(){ return '3 sources'; }},
+ {a:'Material thermal properties', p:'handbook', w:'MAT.*.k / rho / cp / tm', refs:['incropera','kapton','alnds','typ'],
+  note:'300 K values. Nine materials from Incropera &amp; DeWitt, Appendix A; polyimide and aluminium nitride from supplier data sheets; glass, FR4, polymer and mould compound are typical values.',
+  count:function(){ var n=0; for(var k in MAT) if(MAT[k].ref && MAT[k].ref!=='typ') n++; return n+' of '+Object.keys(MAT).length+' traceable'; }},
+ {a:'Optical formulas and pulse arithmetic', p:'computed', w:'physics() / pp()', refs:['siegman','iso11146','liu','carslaw','steen','ahmed'],
+  note:'Every formula is listed with its inputs and reference under Method and sources in the source step.',
+  count:function(){ return METHOD.length+' relations'; }},
+ {a:'Wall-plug efficiencies — fiber, CO₂, diode', p:'handbook', w:'SRC.*.wpe', refs:[],
+  note:'Point values inside published class ranges: fiber roughly 25–50 %, CO₂ 6–20 %, direct diode around 45 %.',
+  count:function(){ var n=0; for(var k in SRC) if(/fiber|mopa|qcw|smcw|co2|diode/.test(k)) n++; return n+' sources'; }},
+ {a:'Standards register', p:'catalogue', w:'STD.*', refs:['catalogue'],
+  note:'Official titles. Standards named in the catalogue are marked so; the rest apply through their own scope and are not a statement of certification.',
+  count:function(){ var c=0, n=0; for(var k in STD){ n++; if(STD[k].b!=='scope') c++; } return c+' named in the catalogue, '+(n-c)+' by scope'; }},
+ {a:'Source beam parameters', p:'estimate', w:'SRC.*.m2 / dia / tau',
+  note:'Beam quality M², beam diameter at the objective and fixed pulse durations are typical values for each source class. The catalogue does not state them, and they set the computed spot.',
   count:function(){ return Object.keys(SRC).length+' sources'; }},
- {a:'Standards register', p:'catalogue', w:'STD.*',
-  note:'Standards named in the catalogue, with their official titles.',
-  count:function(){ return Object.keys(STD).length+' standards'; }},
+ {a:'Wall-plug efficiencies — UV, green, ultrafast', p:'estimate', w:'SRC.*.wpe',
+  note:'No published class figure was found for frequency-converted and ultrafast sources. These are order-of-magnitude estimates.',
+  count:function(){ var n=0; for(var k in SRC) if(/uv|green|blue|pico|femto/.test(k)) n++; return n+' sources'; }},
+ {a:'Material absorptivity', p:'estimate', w:'MAT.*.a', refs:['hummel','green','steen'],
+  note:'Indicative values for a clean, cold, flat surface. Copper and silicon are traceable; the rest follow published trends and are not measured values.',
+  count:function(){ var n=0; for(var k in MAT) if(MAT[k].aref) n++; return n+' of '+Object.keys(MAT).length+' traceable'; }},
+ {a:'Process starting points', p:'estimate', w:'PKIND / headSpeed()', refs:['ahmed','ewi'],
+  note:'Starting overlap per process (marking 50 %, cutting and scribing 80 %, cleaning 30 %, pulsed seams 75 %), the 20 µm minimum mark line, the 250 µs scanner delay, and the speed assumed where the specification states none. Rules of practice, to be replaced by trial results.',
+  count:function(){ return Object.keys(PKIND).length+' process kinds'; }},
  {a:'Platform base prices', p:'estimate', w:'PLAT.*.base',
   note:'A parametric model anchored on one figure you supplied — the CO₂ PCB dual-head at approximately ₹65.6 L ex-works. Every other price is extrapolated from it and is NOT a TEAL number.',
   count:function(){ return Object.keys(PLAT).length+' prices'; }},
@@ -2988,43 +3205,197 @@ function optics(){
 }
 
 
+/* ======================= PROCESS POINT ===============================
+   One operating point for the laser process — working spot, repetition
+   rate, pulse length, speed, line pitch and passes — read by the physics
+   panel, the cycle model, the run and every document, so that a figure
+   cannot be computed two ways. Each default states its basis: the platform
+   specification, the source band, or a rule of practice that is a starting
+   point and not TEAL process data. Changes are part of the configuration
+   (S.pp) and lapse when the platform, source or objective changes.
+   ==================================================================== */
+/* What the source does in this process, not what it can do: a green DPSS
+   marks in pulses but welds continuously, and a nanosecond 1 µm source above
+   a few hundred watts on a welding or cutting platform is running CW. */
+function effPulsed(){
+  var p=P(), s=S.src? SRC[S.src] : null; if(!s || s.mode!=='pulsed') return false;
+  var fam=p? p.fam : null;
+  if(s.tau>1000) return true;                                   /* QCW stays pulsed */
+  if((fam==='weld'||fam==='cut') && S.pw>=400) return false;
+  return true;
+}
+/* The kind of process decides which overlap rule applies, what the run draws
+   and what the cycle is timed on. It is read from the platform and the
+   application, so a platform added in the value store gets one too. */
+var PKIND={
+  mark  :{n:'Vector marking',          ov:0.50, hf:0.50},
+  dot   :{n:'Dot-matrix marking'},
+  scribe:{n:'Scribing',                ov:0.80},
+  cut   :{n:'Cutting',                 ov:0.80},
+  ablate:{n:'Area ablation',           ov:0.30, hf:0.70},
+  pseam :{n:'Pulsed seam welding',     ov:0.75},
+  spot  :{n:'Spot welding'},
+  seam  :{n:'Continuous seam welding'}
+};
+function procKind(){
+  var p=P(), a=A(), fam=p? p.fam : 'mark', an=(a&&a.n)||'', pt=(p&&p.t)||'', s=S.src? SRC[S.src] : null;
+  if(fam==='weld') return !effPulsed()? 'seam' : /spot|wire|pad|terminal|repair|tack/i.test(an)? 'spot' : 'pseam';
+  if(fam==='clean') return 'ablate';
+  if(fam==='cut') return /scrib/i.test(an)? 'scribe' : 'cut';
+  if(fam==='semi') return /wafer/i.test(pt)? 'dot' : /scrib|groov/i.test(pt)? 'scribe' : /decap/i.test(pt)? 'ablate' : 'mark';
+  if(fam==='auto' && s && s.mode==='cw' && s.um<3 && S.pw>=400) return 'seam';
+  return 'mark';
+}
+function isWeldKind(k){ return k==='seam'||k==='pseam'||k==='spot'; }
+/* The positioning or placement accuracy a platform states, if it states one */
+function accSpec(p){ return p? specGet(p,/positioning|placement accuracy/i) : null; }
+/* The laser-safety statement a platform makes: its Safety or Enclosure row.
+   Null where the specification is silent. */
+function safetySpec(p){
+  if(!p) return null;
+  return specGet(p,/safety|enclosure|laser class/i);
+}
+function statesClass1(p){ var r=safetySpec(p); return !!r && /class\s*1\b/i.test(r.row[1]); }
+/* "30–600 µm" → [30, 600]; "15 µm" → [15] */
+function specUm(p, re){
+  var r=p? specGet(p,re) : null; if(!r) return null;
+  var t=String(r.row[1]).replace(/,/g,''), m=t.match(/(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*µm/);
+  if(m) return [+m[1], +m[2]];
+  m=t.match(/(\d+(?:\.\d+)?)\s*µm/);
+  return m? [+m[1]] : null;
+}
+/* The fastest the beam is moved in this process. A speed stated in the
+   specification is used; otherwise a class default, which is an estimate. */
+function headSpeed(){
+  var p=P(), i, m;
+  if(p&&p.specs) for(i=0;i<p.specs.length;i++){
+    if(!/speed/i.test(p.specs[i][0])) continue;
+    m=String(p.specs[i][1]).replace(/,/g,'').match(/(\d{2,6})\s*mm\/s/);
+    if(m) return {v:+m[1], basis:'spec', row:p.specs[i]};
+  }
+  var f=p? p.fam : 'mark', k=procKind();
+  return {v: isWeldKind(k)?120 : f==='clean'?900 : f==='cut'?400 : f==='semi'?3000 : 2500, basis:'est'};
+}
+function scanSpeed(){ return headSpeed().v; }
+function ppKey(){ return [S.plat,S.src,S.lens].join('|'); }
+function ppOver(){ return (S.pp && S.pp.k===ppKey() && S.pp.o)? S.pp.o : {}; }
+function ppHas(){ var o=ppOver(), k; for(k in o) if(o[k]!=null) return true; return false; }
+function pp(){
+  if(!S.src||!S.lens||S.pw==null) return null;
+  var p=P(), s=SRC[S.src], o=optics(), kind=procKind(), K=PKIND[kind], ov=ppOver(), pulsed=effPulsed();
+  var r={kind:kind, K:K, pulsed:pulsed, over:ov, d0:o.spot};
+
+  /* Working spot. The focus is the diffraction limit of this source and
+     objective. Where the platform states the spot it works at, the working
+     spot stays inside that range; it is reached through the delivery optics
+     or by defocus, and z is the defocus that would give it. */
+  var sr=specUm(p,/^spot$/i), lo=o.spot, hi=o.spot*10;
+  if(sr && sr.length===2){ r.dStated=sr; lo=Math.max(o.spot, sr[0]); hi=Math.max(lo, sr[1]); }
+  r.dR=[lo,hi];
+  r.dDef = (r.dStated && isWeldKind(kind))? clamp(Math.sqrt(sr[0]*sr[1]), lo, hi) : lo;
+  r.d = ov.d!=null? clamp(ov.d, lo, hi) : r.dDef;
+  r.z_mm = r.d>o.spot*1.001? (o.dof/1000)*Math.sqrt(Math.pow(r.d/o.spot,2)-1) : 0;
+
+  /* Pulse train. A tunable pulse length and the repetition rate both start
+     at the geometric mid-point of their stated range. A quasi-CW source has
+     a fixed peak-to-average ratio, so its rate follows from the pulse. */
+  if(pulsed){
+    var band=s.frep||[1,1], tR=s.tauRange||null;
+    r.tauR=tR; r.tauDef= tR? Math.sqrt(tR[0]*tR[1]) : s.tau;
+    r.tau = (tR && ov.u!=null)? clamp(ov.u, tR[0], tR[1]) : r.tauDef;
+    var fMin=band[0], fMax=band[1], fDef=Math.sqrt(band[0]*band[1]);
+    if(s.pk){ fDef=clamp(1/(s.pk*r.tau*1e-9)/1000, band[0], band[1]); fMin=fDef; }
+    r.fR=[fMin,fMax]; r.fDef=fDef;
+    r.f = ov.f!=null? clamp(ov.f, fMin, fMax) : fDef;
+  }
+
+  /* The track the beam leaves. A mark is not drawn narrower than the smallest
+     feature the platform states, or 20 µm where it states none — below that
+     the ablated line is wider than the optics. */
+  var mf=specUm(p,/minimum feature/i);
+  r.lineMin = mf? mf[0] : 20; r.lineMinStated=!!mf;
+  r.lw = kind==='mark'? Math.max(r.d, r.lineMin) : r.d;
+
+  /* Speed. A pulsed line can only run as fast as its overlap rule allows;
+     past that the line breaks into dots. */
+  var hs=headSpeed(), vDef=hs.v, lim='head';
+  r.vMax=hs.v; r.vBasis=hs.basis; r.vRow=hs.row||null;
+  if(pulsed && K.ov!=null){
+    var vo=r.f*1000*(r.lw/1000)*(1-K.ov);
+    if(vo<vDef){ vDef=vo; lim='overlap'; }
+  }
+  r.vDef=vDef; r.vR=[Math.min(vDef, Math.max(0.5, hs.v/1000)), hs.v];
+  r.v = ov.v!=null? clamp(ov.v, r.vR[0], r.vR[1]) : vDef;
+  r.lim = ov.v!=null? 'set' : lim;
+  if(pulsed){ r.pitch=r.v/(r.f*1000)*1000; r.ov=1-r.pitch/r.lw; r.N=r.lw/r.pitch; }
+
+  /* Line pitch and passes */
+  r.hfDef = K.hf!=null? K.hf : 1;
+  r.hf = (K.hf!=null && ov.h!=null)? clamp(ov.h, 0.1, 1.5) : r.hfDef;
+  r.hatch = r.lw*r.hf;
+  r.n = ov.n!=null? clamp(Math.round(ov.n), 1, 50) : 1;
+  return r;
+}
+/* Set or clear one process parameter. commit=false is a live preview while a
+   control is dragged; the configuration takes it on release. */
+function ppSet(k, v, commit){
+  if(!S.pp || S.pp.k!==ppKey()) S.pp={k:ppKey(), o:{}};
+  if(v==null) delete S.pp.o[k]; else S.pp.o[k]=v;
+  if(!ppHas()) S.pp=null;
+  if(commit!==false) render(); else ppLive();
+}
+function ppReset(){ S.pp=null; render(); }
+/* What the operating point means for the result — each one a consequence of
+   the numbers, with the rule it is judged by. */
+function ppChecks(q, ph){
+  var c=[], K=q.K;
+  function add(lvl,t){ c.push({lvl:lvl, t:t}); }
+  if(q.pulsed && K.ov!=null){
+    var pc=Math.round(q.ov*100);
+    if(q.ov<0) add('warn','Pulses do not touch: '+num(q.pitch)+' µm apart on a '+num(q.lw)+' µm track. The line is a row of separate dots.');
+    else if(q.kind==='pseam' && q.ov<0.70) add('warn','Overlap '+pc+' % is below the 70–80 % a hermetic seam is normally welded at (50–60 % for a structural seam).');
+    else if((q.kind==='cut'||q.kind==='scribe') && q.ov<0.5) add('warn','Overlap '+pc+' % leaves a scalloped kerf; cutting and scribing normally run well above half a spot.');
+    else add('ok','Pulse overlap '+pc+' % — '+num(q.N)+' pulses land on each spot diameter.');
+  }
+  if(q.kind==='dot' && q.pulsed) add('ok','Dot marking: one pulse per dot, '+num(q.pitch)+' µm between dots at this speed.');
+  if(q.d>q.d0*1.001) add('ok','Working spot '+num(q.d)+' µm is '+(q.d/q.d0).toFixed(1)+'× the focus limit — the delivery optics, or about ± '+num(q.z_mm)+' mm of defocus.');
+  if(q.dStated && q.d0>q.dStated[1]) add('warn','The focus limit ('+num(q.d0)+' µm) is larger than the platform’s stated spot range.');
+  if(q.vBasis==='est') add('info','No speed is stated for this platform. '+inr(q.vMax)+' mm/s is a class estimate, so the process time is indicative.');
+  if(q.lim==='overlap') add('info','Speed is held to '+inr(Math.round(q.vDef))+' mm/s by the '+Math.round(K.ov*100)+' % overlap rule, below the '+inr(q.vMax)+' mm/s the beam can be moved at.');
+  if(ph && ph.mode==='cw' && isWeldKind(q.kind) && ph.irr<1e6) add('info','Below about 10⁶ W/cm²: a conduction weld. A smaller spot or more power moves it to keyhole.');
+  return c;
+}
+
 /* ======================= PROCESS PHYSICS =============================
    Deterministic optics and energy-balance quantities only. Anything that
    varies too much between suppliers, surface conditions or lots to be
    trustworthy is deliberately absent — see the notes shown alongside.
+   Every formula is listed with its source in METHOD, below.
    ==================================================================== */
 function physics(){
   if(!S.src||!S.lens||S.pw==null) return null;
-  var s=SRC[S.src], L=LENS[S.lens], o=optics();
-  var d_um=o.spot, d_cm=d_um/10000, area_cm2=Math.PI*Math.pow(d_cm/2,2);
-  var r={ spot:d_um, area:area_cm2, lens:L, src:s,
-          w0_um:d_um/2, mode:s.mode||'cw' };
+  var s=SRC[S.src], L=LENS[S.lens], o=optics(), q=pp();
+  var d_um=q.d, d_cm=d_um/10000, area_cm2=Math.PI*Math.pow(d_cm/2,2);
+  var r={ spot:d_um, focus:o.spot, area:area_cm2, lens:L, src:s,
+          w0_um:o.spot/2, pp:q, kind:q.kind, kindName:q.K.n };
 
   /* Rayleigh range z_R = pi w0^2 / (M^2 lambda) */
-  var w0_um=d_um/2;
-  r.rayleigh_mm = (Math.PI*w0_um*w0_um)/(s.m2*s.um)/1000;
+  r.rayleigh_mm = o.dof/1000;
 
-  /* Effective mode. A source's nominal capability is not the process: a green
-     DPSS marks in pulses but welds continuously, and any 1 µm source above a
-     few hundred watts on a welding platform is running CW. */
-  var p=P(), fam=p?p.fam:null;
-  var pulsed = (s.mode==='pulsed');
-  if(pulsed && (fam==='weld') && s.tau>1000) pulsed=true;          // QCW stays pulsed
-  else if(pulsed && (fam==='weld'||fam==='cut') && S.pw>=400 && s.tau<1000) pulsed=false;
+  var p=P(), fam=p?p.fam:null, pulsed=q.pulsed, weld=isWeldKind(q.kind);
   r.mode = pulsed? 'pulsed':'cw';
-  /* Fluence over the focused spot is only meaningful where the process spot is
-     the focused spot — micro-processing, not welding, which defocuses. */
-  r.showFluence = pulsed && fam!=='weld';
+  /* Fluence is a micro-processing quantity. A weld is judged by irradiance. */
+  r.showFluence = pulsed && !weld;
 
-  if(pulsed && s.frep){
-    var f_khz = Math.sqrt(s.frep[0]*s.frep[1]);
-    r.frep_khz=f_khz; r.frep_band=s.frep;
-    r.Ep_mJ = (S.pw/(f_khz*1000))*1000;
-    r.tau_ns = s.tau;
-    r.Ppk_kW = (r.Ep_mJ/1000)/(s.tau*1e-9)/1000;
-    r.fluence = (r.Ep_mJ/1000)/area_cm2;
+  if(pulsed){
+    r.frep_khz=q.f; r.frep_band=s.frep; r.tau_ns=q.tau;
+    r.Ep_mJ = (S.pw/(q.f*1000))*1000;
+    r.Ppk_kW = (r.Ep_mJ/1000)/(q.tau*1e-9)/1000;
+    r.fluence = (r.Ep_mJ/1000)/area_cm2;            /* averaged over the 1/e² spot */
+    r.fluence0 = 2*r.fluence;                        /* on the axis of a Gaussian spot */
     r.irr = (r.Ppk_kW*1000)/area_cm2;
     r.irrLabel='Peak irradiance';
+    r.pitch_um=q.pitch; r.ov=q.ov; r.N=q.N;
   } else {
     r.irr = S.pw/area_cm2;
     r.irrLabel='Irradiance';
@@ -3033,25 +3404,32 @@ function physics(){
   /* Regime follows the process, not the arithmetic. The ~10⁶ W/cm² keyhole
      threshold is a welding result and is applied only to welding. */
   (function(){
-    var I=r.irr;
-    if(fam==='weld'){
+    var I=r.irr, k=q.kind, cold=pulsed && q.tau<1;
+    var COLD={n:'Cold ablation', d:'Pulse shorter than electron–phonon coupling — material leaves before heat spreads.'};
+    if(weld){
       r.regime = I>=1e6
         ? {n:'Keyhole welding', d:'Above ~10⁶ W/cm² a vapour capillary forms — deep, narrow fusion zones at high aspect ratio.'}
         : {n:'Conduction welding', d:'Below the keyhole threshold — melting spreads by conduction, giving shallow, wide, cosmetically smooth seams.'};
-    } else if(fam==='mark'||fam==='volt'){
-      r.regime = (r.fluence!=null && r.fluence<10)
+    } else if(k==='ablate'){
+      r.regime={n:'Selective ablation', d:'A layer removed below the damage threshold of what lies beneath — the window between the two is what makes the process work.'};
+    } else if(k==='cut'){
+      r.regime = cold? COLD
+        : pulsed? {n:'Ablation cutting', d:'Material removed pulse by pulse along the kerf; thicker stock takes several passes.'}
+        : {n:'Fusion cutting', d:'Material melted and ejected, typically with a coaxial assist-gas jet.'};
+    } else if(k==='scribe'){
+      r.regime = cold? COLD : {n:'Scribing', d:'A groove a fraction of the thickness, cut to guide a controlled break.'};
+    } else if(!pulsed){
+      r.regime = fam==='auto'
+        ? {n:'Thermal processing', d:'Continuous beam — heating, with melting where the irradiance allows.'}
+        : {n:'Ablative marking', d:'Surface layer removed or converted along the track; contrast comes from the exposed or changed material.'};
+    } else if(cold){
+      r.regime=COLD;
+    } else if(s.um<0.4){
+      r.regime={n:'UV ablation', d:'Short wavelength, absorbed in a thin surface layer — removal with a small heat-affected zone.'};
+    } else {
+      r.regime = r.fluence<10
         ? {n:'Annealing / surface mark', d:'Low fluence — oxide colour change or foaming, with no material removed.'}
         : {n:'Ablative marking', d:'Material removed pulse by pulse; contrast comes from depth and surface texture.'};
-    } else if(fam==='clean'){
-      r.regime={n:'Selective ablation', d:'Contaminant removed below the substrate damage threshold — the window between the two is what makes the process work.'};
-    } else if(fam==='cut'){
-      r.regime = (s.tau!=null && s.tau<1)
-        ? {n:'Cold ablation', d:'Pulse shorter than electron–phonon coupling — material leaves before heat spreads.'}
-        : {n:'Fusion cutting', d:'Material melted and ejected, typically with a coaxial assist-gas jet.'};
-    } else if(fam==='semi'){
-      r.regime={n:'Cold ablation', d:'Short wavelength or ultrashort pulse — removal with minimal heat-affected zone on device layers.'};
-    } else {
-      r.regime = I>=1e6? {n:'Keyhole', d:'Vapour capillary regime.'} : {n:'Thermal processing', d:'Conduction-limited melting or heating.'};
     }
   })();
 
@@ -3060,21 +3438,23 @@ function physics(){
   if(a && a.mat && MAT[a.mat]){
     var M=MAT[a.mat], band=matBand(S.src), abs=M.a[band];
     r.mat={key:a.mat, m:M, band:band, abs:abs, coupled:S.pw*abs};
-    /* Thermal diffusion length during one pulse: sqrt(4 * alpha * tau) */
-    var alpha = M.k/(M.rho*M.cp);                    // m^2/s
-    if(r.mode==='pulsed'){
-      var tau_s=s.tau*1e-9;
-      r.mat.diff_um = Math.sqrt(4*alpha*tau_s)*1e6;
-    }
+    r.mat.alpha = M.k/(M.rho*M.cp);                  /* thermal diffusivity, m²/s */
+    /* Thermal diffusion length √(4αt): during one pulse, or — for a
+       continuous beam — during the time the spot dwells on a point. */
+    if(pulsed) r.mat.diff_um = Math.sqrt(4*r.mat.alpha*q.tau*1e-9)*1e6;
   }
 
-  /* Marking areal rate: scan speed x hatch pitch. 7,000 mm/s is the
-     catalogue head speed; hatch is taken as half the spot. */
-  r.hatch_mm = (d_um/2)/1000;
-  r.areal_mm2s = 7000 * r.hatch_mm;
-
-  /* Welding heat input per unit length at an indicative 50 mm/s */
-  if(r.mode==='cw'){ r.heat_Jmm = S.pw/50; }
+  /* What the moving beam delivers */
+  r.v=q.v; r.vMax=q.vMax; r.passes=q.n;
+  r.hatch_mm = q.hatch/1000;
+  r.areal_mm2s = q.v*r.hatch_mm/q.n;                 /* area covered per second */
+  r.lineE_Jmm = S.pw/q.v;                            /* energy per unit length of track */
+  r.dose_Jcm2 = S.pw*q.n/(q.v*r.hatch_mm)*100;       /* energy per unit area covered */
+  r.ti_ms = (d_um/1000)/q.v*1000;                    /* time the spot dwells on a point */
+  if(!pulsed){
+    r.heat_Jmm = r.lineE_Jmm;
+    if(r.mat) r.mat.diffI_um = Math.sqrt(4*r.mat.alpha*r.ti_ms/1000)*1e6;
+  }
 
   /* Wall plug and services */
   var wpe=s.wpe||0.25;
@@ -3575,7 +3955,7 @@ function schematicSVG(){
     G+=lbl(478,214,'LOAD','middle',7.5,TXT);
     G+=lbl(378,214,'PROCESS','middle',7.5,TEALC);
     G+='<rect x="150" y="86" width="330" height="1" fill="none"/>';
-    G+=lbl(22,32,pw+'  ·  '+wl+'  ·  CLASS 1 CABIN','start',8.5,TEALC);
+    G+=lbl(22,32,pw+'  ·  '+wl+'  ·  '+(statesClass1(p)? 'CLASS 1 CABIN' : 'GUARDED CELL'),'start',8.5,TEALC);
 
   } else if(mode==='handpiece'){
     G+='<rect x="34" y="96" width="96" height="130" fill="#0E1920" stroke="'+DIM+'" rx="3"/>';
@@ -3690,6 +4070,138 @@ function themeInit(){
 }
 
 /* ==========================================================================
+   ACCESS — one passkey opens the Customer view, another the Internal view.
+   A session opened with the customer passkey never sees the Internal switch;
+   staff reach it from "Staff access" in the footer with the internal passkey.
+   No passkey is stored anywhere. What ships — in access.json and, identically,
+   below — is a random salt per key and a verifier: SHA-256 of the key that
+   PBKDF2-HMAC-SHA256 derives from the passkey. A session keeps the derived
+   key, so writing a flag into browser storage opens nothing.
+   This keeps casual visitors out; it is not a security boundary. The site and
+   its data are public files, and a page edited in the browser can skip the
+   check — so nothing confidential belongs behind it (SECURITY.md).
+   Change the passkeys with tools/access/set-passkeys.mjs.
+   ========================================================================== */
+var ACCESS = /*ACCESS:BEGIN*/{"v":1,"it":210000,"customer":{"s":"ff61f189fdfc694e9764aa22ffb091c9","v":"7650490f5a33f3b22cd270582c95e9fa5dd2a3b65a10d25b89ba809013e245d1"},"internal":{"s":"13f520a03f2b5d06a1d9420f05b983aa","v":"b04006350105dd48449984424e4aa26917c3563296c6854a422733dd674337a5"}}/*ACCESS:END*/;
+var ACC={role:null, cfg:ACCESS, mode:'entry', then:null, after:null, wantView:null, ready:false, fails:0};
+function accHex(buf){ var a=new Uint8Array(buf), h='', i; for(i=0;i<a.length;i++) h+=(a[i]<16?'0':'')+a[i].toString(16); return h; }
+function accBytes(h){ var a=new Uint8Array(h.length/2), i; for(i=0;i<a.length;i++) a[i]=parseInt(h.substr(i*2,2),16); return a; }
+function accOk(c){ return !!c && c.it>0 && ['customer','internal'].every(function(r){ return c[r] && /^[0-9a-f]{32}$/.test(c[r].s) && /^[0-9a-f]{64}$/.test(c[r].v); }); }
+function accCrypto(){ return !!(window.crypto && crypto.subtle && window.TextEncoder); }
+function accDerive(key, salt){
+  return crypto.subtle.importKey('raw', new TextEncoder().encode(key), 'PBKDF2', false, ['deriveBits'])
+    .then(function(k){ return crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:accBytes(salt), iterations:ACC.cfg.it}, k, 256); })
+    .then(accHex);
+}
+function accVerifier(kHex){ return crypto.subtle.digest('SHA-256', accBytes(kHex)).then(accHex); }
+/* does a derived key open this role? */
+function accHolds(role, kHex){
+  var c=ACC.cfg[role];
+  if(!c || !/^[0-9a-f]{64}$/.test(kHex||'')) return Promise.resolve(false);
+  return accVerifier(kHex).then(function(v){ return v===c.v; });
+}
+/* which view a typed passkey opens — both are always tried */
+function accTry(key){
+  key=String(key||''); if(key.normalize) key=key.normalize('NFKC'); key=key.trim();
+  if(!key) return Promise.resolve(null);
+  return Promise.all(['internal','customer'].map(function(r){
+    return accDerive(key, ACC.cfg[r].s).then(function(k){ return accHolds(r,k).then(function(ok){ return ok? {role:r, k:k} : null; }); });
+  })).then(function(a){ return a[0]||a[1]; });
+}
+function accToken(){
+  var t=null;
+  try{ t=JSON.parse(sessionStorage.getItem('teal.access')||localStorage.getItem('teal.access')||'null'); }catch(e){}
+  return (t && (t.r==='customer'||t.r==='internal') && typeof t.k==='string')? t : null;
+}
+function accKeep(tok, remember){
+  var s=JSON.stringify({r:tok.role, k:tok.k});
+  try{ sessionStorage.setItem('teal.access', s); if(remember) localStorage.setItem('teal.access', s); else localStorage.removeItem('teal.access'); }catch(e){}
+}
+function accForget(){ try{ sessionStorage.removeItem('teal.access'); localStorage.removeItem('teal.access'); }catch(e){} }
+function accApply(role){
+  ACC.role=role;
+  var r=document.documentElement; r.classList.remove('locked','unlocking','gate-staff');
+  document.body.classList.toggle('access-internal', role==='internal');
+  document.body.classList.toggle('access-customer', role!=='internal');
+  if(role!=='internal' && VIEW.v==='internal') viewSet('customer');
+  if(M3D.vp){ M3D.vp.resize(); M3D.vp.dirty=true; }
+}
+/* show the passkey form: 'entry' covers the page, 'staff' asks over it */
+function accGate(mode, then){
+  ACC.mode=mode; ACC.then=then||null;
+  var r=document.documentElement, staff=mode==='staff';
+  r.classList.remove('unlocking');
+  r.classList.toggle('gate-staff', staff);
+  if(!staff) r.classList.add('locked');
+  $('#gateT').textContent= staff? 'Staff access' : 'Laser Equipment Configurator';
+  $('#gateP').textContent= staff? 'Enter the internal access key to open the Internal workspace.' : 'Enter your access key to continue.';
+  $('#gateX').hidden=!staff;
+  $('#gateK').value=''; accMsg('');
+  if(!accCrypto()) accMsg('This page needs a secure (https) connection to check access keys.');
+  setTimeout(function(){ var k=$('#gateK'); if(k) k.focus(); }, 30);
+}
+function accMsg(t){ var e=$('#gateE'); e.textContent=t||''; e.style.display=t?'block':'none'; }
+function accClose(){ document.documentElement.classList.remove('gate-staff'); ACC.then=null; }
+/* a few wrong keys in a row make the form wait — a speed bump, kept per tab */
+function accWait(){ var w=0; try{ w=+(sessionStorage.getItem('teal.gatewait')||0); }catch(e){} return Math.max(0, Math.ceil((w-Date.now())/1000)); }
+function accSubmit(){
+  var go=$('#gateGo'), w=accWait();
+  if(w>0){ accMsg('Too many attempts. Try again in '+w+' s.'); return; }
+  if(!accCrypto()){ accMsg('This page needs a secure (https) connection to check access keys.'); return; }
+  var key=$('#gateK').value; if(!key.trim()){ accMsg('Enter an access key.'); return; }
+  go.disabled=true; accMsg('');
+  accTry(key).then(function(tok){
+    go.disabled=false;
+    if(tok && ACC.mode==='staff' && tok.role!=='internal') tok=null;      /* the staff form takes the internal key only */
+    if(!tok){
+      ACC.fails=(ACC.fails||0)+1;
+      if(ACC.fails>=5){ ACC.fails=0; try{ sessionStorage.setItem('teal.gatewait', String(Date.now()+30000)); }catch(e){} }
+      accMsg(ACC.mode==='staff'? 'That is not the internal access key.' : 'That access key was not recognised.');
+      $('#gateK').select(); return;
+    }
+    ACC.fails=0;
+    var then=ACC.then||ACC.after; ACC.then=null; ACC.after=null;
+    accKeep(tok, $('#gateR').checked);
+    $('#gateK').value='';
+    accApply(tok.role);
+    /* a key typed for the internal view opens that view */
+    if(tok.role==='internal'){ if(then) then(); else viewSet('internal'); }
+    else toast('Customer view.');
+  }).catch(function(){ go.disabled=false; accMsg('The access key could not be checked in this browser.'); });
+}
+function accLock(){ accForget(); location.reload(); }
+function accInit(){
+  var lg=$('#gateLogo'); if(lg) lg.src=LOGO;
+  $('#gateF').addEventListener('submit', function(e){ e.preventDefault(); accSubmit(); });
+  $('#gateX').onclick=function(){ accClose(); };
+  /* keys typed in the form stay in the form: the page's shortcuts are not for it */
+  $('#gate').addEventListener('keydown', function(e){
+    e.stopPropagation();
+    if(e.key==='Escape' && ACC.mode==='staff' && document.documentElement.classList.contains('gate-staff')) accClose();
+  });
+  $('#accStaff').onclick=function(){ accGate('staff'); };
+  $('#accLock').onclick=function(){ accLock(); };
+  function settle(){
+    ACC.ready=true;
+    var t=accToken();
+    if(!t || !accCrypto() || !accOk(ACC.cfg)){ accGate('entry'); return; }
+    accHolds(t.r, t.k).then(function(ok){
+      if(!ok){ accForget(); accGate('entry'); return; }
+      accApply(t.r);
+      if(t.r==='internal'){
+        if(ACC.wantView==='internal') viewSet('internal');
+        if(ACC.after){ var f=ACC.after; ACC.after=null; f(); }
+      }
+    }).catch(function(){ accGate('entry'); });
+  }
+  /* access.json is the published copy of the verifiers; the block above is the
+     same data for a page opened from disk, where fetch is not available */
+  if(location.protocol==='file:'){ settle(); return; }
+  fetch('access.json', {cache:'no-store'}).then(function(r){ return r.ok? r.json() : null; })
+    .then(function(d){ if(accOk(d)) ACC.cfg=d; settle(); }).catch(settle);
+}
+
+/* ==========================================================================
    VIEW — Customer or Internal. This is presentation, not access control: the
    site is static and public, so anyone can switch, and nothing confidential
    is in it to protect. The Internal workspace works on the public catalogue
@@ -3736,6 +4248,13 @@ function segKeys(box, attr, pick){
 }
 function viewSet(v, sec){
   if(v!=='internal') v='customer';
+  /* the Internal view opens only for a session holding the internal passkey;
+     anyone else is asked for it, and stays where they are until they give it */
+  if(v==='internal' && ACC.role!=='internal'){
+    if(ACC.ready && ACC.role) accGate('staff', function(){ viewSet('internal', sec); });
+    else ACC.wantView='internal';
+    return;
+  }
   var was=VIEW.v; VIEW.v=v; if(sec) VIEW.sec=sec;
   Store.set('teal.view', {v:v, sec:VIEW.sec, role:ROLE.cur});
   document.body.classList.toggle('view-internal', v==='internal');
@@ -3743,7 +4262,7 @@ function viewSet(v, sec){
   hdrSync();
   wsShow();
   if(was!==v && BOOTED){
-    toast(v==='internal'? 'Internal workspace — a demonstration on public data, not access-controlled.' : 'Customer view.');
+    toast(v==='internal'? 'Internal workspace — a demonstration on public data.' : 'Customer view.');
     if(v==='internal') scrollTo(0,0); else setTimeout(function(){ toWork(true); }, 0);
   }
 }
@@ -3785,7 +4304,10 @@ function shellInit(){
   if(st && ROLES[st.role]) ROLE.cur=st.role;
   if(st && st.sec) VIEW.sec=st.sec;
   themeInit();
-  viewSet(st && st.v==='internal'? 'internal' : 'customer');
+  /* the Customer state is applied first; the Internal view follows only once the
+     session is known to hold the internal passkey */
+  viewSet('customer');
+  if(st && st.v==='internal') viewSet('internal');
 }
 /* ==========================================================================
    CONFIGURATION IDENTITY — every configuration has an ID and a revision.
@@ -4095,52 +4617,252 @@ function uiSrc(b){
 
   var o=optics(), ph=physics();
   if(o&&ph){
-    var g=el('div','phys');
+    var q=ph.pp, g=el('div','phys');
     /* adv marks a cell as engineering detail: the pulse train, the energy
        densities and the thermal scale. Standard view keeps what a non-specialist
        reads — spot, focus, field, coupling — and the toggle reveals the rest. */
-    function pc(lab,val,note,adv){
+    function pc(lab,val,note,adv,id){
       return '<div class="pcell'+(adv?' adv-only':'')+'"><span class="pl">'+lab+'</span>'+
-             '<span class="pv">'+val+'</span>'+
+             '<span class="pv"'+(id?' id="'+id+'"':'')+'>'+val+'</span>'+
              (note?'<span class="pn">'+note+'</span>':'')+'</div>';
     }
     var html='<div class="phh"><span class="pt">Computed process data</span>'+
-             '<span class="preg">'+ph.regime.n+'</span></div><div class="pgrid">';
-    html+=pc('Spot diameter', o.spot.toFixed(0)+' µm', 'd = 4λfM²/πD, M² = '+SRC[S.src].m2);
+             '<span class="preg" id="ph_reg">'+ph.regime.n+'</span></div><div class="pgrid">';
+    html+=pc('Focus spot', o.spot.toFixed(0)+' µm', 'd = 4λfM²/πD, M² = '+SRC[S.src].m2+' — the diffraction limit');
     html+=pc('Depth of focus', '± '+(o.dof/1000).toFixed(2)+' mm',
       'Rayleigh range, spot grows to √2× · ± '+(o.dof5/1000).toFixed(2)+' mm holds it within 5 %');
     html+=pc('Scan field', o.fld+' × '+o.fld+' mm', LENS[S.lens].n+', f = '+LENS[S.lens].f+' mm');
-    if(ph.mode==='pulsed'){
-      html+=pc('Pulse energy', num(ph.Ep_mJ)+' mJ', 'at '+num(ph.frep_khz)+' kHz ('+ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz usable)', 1);
-      html+=pc('Peak power', num(ph.Ppk_kW)+' kW', 'τ = '+tauTxt(ph.tau_ns), 1);
-      if(ph.showFluence) html+=pc('Fluence', num(ph.fluence)+' J/cm²', 'energy per pulse over the focused spot', 1);
-      html+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d, 1);
-      if(ph.heat_Jmm) html+=pc('Heat input', num(ph.heat_Jmm)+' J/mm', 'at an indicative 50 mm/s travel', 1);
-    } else {
-      html+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d, 1);
-      if(ph.heat_Jmm) html+=pc('Heat input', num(ph.heat_Jmm)+' J/mm', 'at an indicative 50 mm/s travel', 1);
-    }
+    html+='<span id="ph_live" style="display:contents">'+physLive(ph, pc)+'</span>';
     if(ph.mat){
       html+=pc('Absorptivity', (ph.mat.abs*100).toFixed(0)+' %',
         ph.mat.m.n+' at '+SRC[S.src].wl+', cold and clean');
       html+=pc('Coupled power', num(ph.mat.coupled)+' W', 'of '+S.pw+' W incident');
-      html+=pc('Thermal conductivity', ph.mat.m.k+' W/m·K',
-        ph.mat.m.org? 'Organic — decomposes near '+ph.mat.m.tm+' °C' : 'Melts at '+ph.mat.m.tm+' °C', 1);
-      if(ph.mat.diff_um!=null)
-        html+=pc('Heat diffusion / pulse', num(ph.mat.diff_um)+' µm', '√(4ατ) — the heat-affected scale', 1);
+      html+=pc('Thermal conductivity', ph.mat.m.k+' W/m·K', matTrans(ph.mat.m), 1);
     }
     html+='</div>';
     g.innerHTML=html;
     b.appendChild(g);
+    b.appendChild(ppPanel(ph));
     b.appendChild(el('div','disc',
-      '<b>How to read these.</b> Optics and pulse-train figures are deterministic and follow from the selections above. '+
+      '<b>How to read these.</b> Optics and pulse-train figures are deterministic and follow from the selections and the process point above. '+
       'Absorptivity is for a clean, room-temperature, optically flat surface — oxide, roughness and the melt itself raise it '+
-      'substantially, so treat it as the cold-start floor rather than the process value. Repetition rate is the geometric '+
-      'mid-point of the usable band; the real operating point is set during parameter development. '+
+      'substantially, so treat it as the cold-start floor rather than the process value. The process point starts at the '+
+      'geometric mid-point of each stated range and at a rule-of-practice overlap; the real operating point is set during parameter development. '+
       'Ablation thresholds and removal rates are deliberately not shown: published values scatter by several times across '+
       'lots and surface conditions, and the only number worth quoting is the one measured on your part at the '+
       'Application Laboratory.'));
+    b.appendChild(methodPanel(ph));
   }
+}
+/* The cells of the physics grid that move with the process point. Built in one
+   place so the live preview and the full render cannot drift apart. */
+function physLive(ph, pc){
+  var q=ph.pp, h='';
+  if(q.d>q.d0*1.001 || q.dStated)
+    h+=pc('Working spot', num(q.d)+' µm', q.dStated? 'Platform range '+q.dStated[0]+'–'+q.dStated[1]+' µm (catalogue)' : (q.d/q.d0).toFixed(1)+'× the focus limit, by defocus');
+  if(ph.mode==='pulsed'){
+    h+=pc('Pulse energy', num(ph.Ep_mJ)+' mJ', 'at '+num(ph.frep_khz)+' kHz ('+ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz usable)', 1);
+    h+=pc('Peak power', num(ph.Ppk_kW)+' kW', 'τ = '+tauTxt(ph.tau_ns)+(ph.src.pk? ' · '+ph.src.pk+'× the average, from the catalogue' : ''), 1);
+    if(ph.showFluence) h+=pc('Fluence', num(ph.fluence)+' J/cm²', 'over the 1/e² spot · '+num(ph.fluence0)+' J/cm² on the beam axis', 1);
+    h+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d, 1);
+    if(q.K.ov!=null) h+=pc('Pulse overlap', Math.round(ph.ov*100)+' %', num(ph.N)+' pulses per spot · '+num(ph.pitch_um)+' µm apart', 1);
+    else if(q.kind==='dot') h+=pc('Dot pitch', num(ph.pitch_um)+' µm', 'one pulse per dot at '+inr(Math.round(q.v))+' mm/s', 1);
+  } else {
+    h+=pc(ph.irrLabel, sci(ph.irr)+' W/cm²', ph.regime.d, 1);
+    h+=pc('Dwell time', num(ph.ti_ms)+' ms', 'the spot passes a point in d / v', 1);
+  }
+  h+=pc(ph.mode==='cw' && isWeldKind(q.kind)? 'Heat input' : 'Line energy', num(ph.lineE_Jmm)+' J/mm', 'P / v at '+inr(+q.v.toPrecision(3))+' mm/s', 1);
+  if(q.K.hf!=null) h+=pc('Areal dose', num(ph.dose_Jcm2)+' J/cm²', 'P·n / (v·h) at a '+Math.round(q.hatch)+' µm line pitch'+(q.n>1? ', '+q.n+' passes' : ''), 1);
+  if(ph.mat){
+    if(ph.mat.diff_um!=null) h+=pc('Heat diffusion / pulse', num(ph.mat.diff_um)+' µm', '√(4ατ) — the heat-affected scale', 1);
+    if(ph.mat.diffI_um!=null) h+=pc('Heat diffusion / dwell', num(ph.mat.diffI_um)+' µm', '√(4α·d/v) — how far heat spreads while the spot passes', 1);
+  }
+  return h;
+}
+
+/* The process point and what follows from it, as label / value rows — one list
+   for the specification card, the printed sheet, the RFQ text and the reports,
+   so no document can quote a figure the screen does not show. */
+function procRows(ph, plain){
+  var q=ph.pp, r=[], e=function(x){ return plain? x.toExponential(1)+' W/cm2' : sci(x)+' W/cm²'; }, c2=plain? 'cm2' : 'cm²';
+  r.push(['Process', q.K.n+(ppHas()? ' — process point adjusted' : ' — at its starting point')]);
+  r.push(['Regime', ph.regime.n]);
+  if(q.d>q.d0*1.001 || q.dStated) r.push(['Working spot', num(q.d)+' µm'+(q.dStated? ' (platform range '+q.dStated[0]+'–'+q.dStated[1]+' µm)' : '')]);
+  if(ph.mode==='pulsed'){
+    r.push(['Repetition rate', ppFmt('f',q.f)+' (band '+ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz)']);
+    r.push(['Pulse duration', tauTxt(q.tau)]);
+    r.push(['Pulse energy', num(ph.Ep_mJ)+' mJ']);
+    r.push(['Peak power', num(ph.Ppk_kW)+' kW']);
+    if(ph.showFluence) r.push(['Fluence', num(ph.fluence)+' J/'+c2+' over the spot, '+num(ph.fluence0)+' on axis']);
+    r.push([ph.irrLabel, e(ph.irr)]);
+  } else r.push(['Irradiance', e(ph.irr)]);
+  r.push(['Speed', inr(+q.v.toPrecision(3))+' mm/s'+(q.over.v!=null? '' : q.lim==='overlap'? ' (held by the overlap rule)' : q.vBasis==='est'? ' (class estimate)' : ' (platform specification)')]);
+  if(ph.mode==='pulsed' && q.K.ov!=null) r.push(['Pulse overlap', Math.round(q.ov*100)+' %']);
+  if(q.kind==='dot' && ph.mode==='pulsed') r.push(['Dot pitch', num(q.pitch)+' µm']);
+  if(q.K.hf!=null) r.push(['Line pitch', Math.round(q.hatch)+' µm']);
+  if(q.n>1) r.push(['Passes', String(q.n)]);
+  r.push([ph.mode==='cw' && isWeldKind(q.kind)? 'Heat input' : 'Line energy', num(ph.lineE_Jmm)+' J/mm']);
+  if(q.K.hf!=null) r.push(['Areal dose', num(ph.dose_Jcm2)+' J/'+c2]);
+  return r;
+}
+
+/* ---- process point: the operating point, adjustable ------------------------- */
+/* A slider position ↔ a value, on a log scale where the range spans decades */
+function ppScale(lo, hi){
+  var lg = hi/lo>20;
+  return { to:function(v){ return Math.round(1000*(lg? Math.log(v/lo)/Math.log(hi/lo) : (v-lo)/(hi-lo))); },
+           from:function(t){ t=t/1000; return lg? lo*Math.pow(hi/lo,t) : lo+(hi-lo)*t; } };
+}
+function ppFmt(k, v){
+  return k==='f'? (v<1? +(v*1000).toPrecision(3)+' Hz' : +v.toPrecision(3)+' kHz')
+       : k==='u'? tauTxt(v) : k==='v'? inr(+v.toPrecision(3))+' mm/s'
+       : k==='h'? Math.round(v*100)+' % of the track' : k==='n'? String(Math.round(v)) : num(v)+' µm';
+}
+function ppControls(q){
+  var c=[];
+  if(q.dR[1]>q.dR[0]*1.001) c.push({k:'d', n:'Working spot', v:q.d, def:q.dDef, lo:q.dR[0], hi:q.dR[1],
+    b:q.dStated? 'Platform range '+q.dStated[0]+'–'+q.dStated[1]+' µm · focus limit '+num(q.d0)+' µm' : 'From the focus limit ('+num(q.d0)+' µm) up to 10×, by defocus'});
+  if(q.pulsed && q.fR[1]>q.fR[0]*1.001) c.push({k:'f', n:'Repetition rate', v:q.f, def:q.fDef, lo:q.fR[0], hi:q.fR[1],
+    b: SRC[S.src].pk? 'From the rate that gives full peak power up to the band limit' : 'Source band '+q.fR[0]+'–'+q.fR[1]+' kHz · starts at its geometric mid-point'});
+  if(q.pulsed && q.tauR) c.push({k:'u', n:'Pulse duration', v:q.tau, def:q.tauDef, lo:q.tauR[0], hi:q.tauR[1],
+    b:'Tunable '+q.tauR[0]+'–'+q.tauR[1]+' ns (catalogue) · starts at its geometric mid-point'});
+  c.push({k:'v', n:'Speed', v:q.v, def:q.vDef, lo:q.vR[0], hi:q.vR[1],
+    b:(q.vBasis==='spec'? 'Up to '+inr(q.vMax)+' mm/s (platform specification)' : 'Up to '+inr(q.vMax)+' mm/s — a class estimate, the specification states none')+
+      (q.pulsed && q.K.ov!=null? ' · starts at '+Math.round(q.K.ov*100)+' % pulse overlap' : '')});
+  if(q.K.hf!=null) c.push({k:'h', n:'Line pitch', v:q.hf, def:q.hfDef, lo:0.1, hi:1.5,
+    b:'Distance between neighbouring lines, as a share of the '+num(q.lw)+' µm track'});
+  if(q.kind!=='spot' && q.kind!=='dot') c.push({k:'n', n:'Passes', v:q.n, def:1, lo:1, hi:20, step:1, b:'Repeats of the same path'});
+  return c;
+}
+function ppPanel(ph){
+  var q=ph.pp, w=el('div','ppanel'), cs=ppControls(q), h;
+  h='<div class="pph"><span class="pt">Process point</span><span class="ppk">'+esc(q.K.n)+'</span>'+
+    '<button type="button" class="ppr" id="pp_reset"'+(ppHas()?'':' disabled')+'>Reset to starting point</button></div>'+
+    '<p class="ppi">The operating point every figure on this page, the run and the documents are computed at. '+
+    'It starts from the catalogue and from rules of practice; move it to see what changes. It is saved with the configuration.</p><div class="ppc">';
+  cs.forEach(function(c){
+    var sc=ppScale(c.lo,c.hi), id='pp_'+c.k, set=q.over[c.k]!=null;
+    h+='<div class="ppx'+(set?' set':'')+'"><label for="'+id+'">'+c.n+(set? ' <i>changed</i>' : '')+'</label>'+
+       '<output id="'+id+'_o" for="'+id+'">'+ppFmt(c.k,c.v)+'</output>'+
+       '<input type="range" id="'+id+'" data-pp="'+c.k+'" min="'+(c.step? c.lo : 0)+'" max="'+(c.step? c.hi : 1000)+'" step="1" value="'+(c.step? c.v : sc.to(c.v))+'" '+
+         'aria-valuetext="'+esc(ppFmt(c.k,c.v))+'">'+
+       '<small>'+c.b+'</small></div>';
+  });
+  h+='</div><div class="ppv" id="pp_viz">'+ppViz(ph)+'</div><ul class="ppk2" id="pp_chk">'+ppChkHtml(ph)+'</ul>';
+  w.innerHTML=h;
+  w.querySelectorAll('input[data-pp]').forEach(function(inp){
+    var k=inp.getAttribute('data-pp'), c=cs.filter(function(x){ return x.k===k; })[0], sc=ppScale(c.lo,c.hi);
+    function val(){ return c.step? +inp.value : +sc.from(+inp.value).toPrecision(4); }
+    inp.addEventListener('input', function(){ ppSet(k, val(), false);
+      var o=$('#pp_'+k+'_o'), t=ppFmt(k, val()); if(o) o.textContent=t; inp.setAttribute('aria-valuetext', t); });
+    inp.addEventListener('change', function(){ ppSet(k, val(), true); var n=$('#pp_'+k); if(n) n.focus(); });
+  });
+  w.querySelector('#pp_reset').onclick=function(){ ppReset(); };
+  return w;
+}
+function ppChkHtml(ph){
+  return ppChecks(ph.pp, ph).map(function(c){ return '<li class="'+c.lvl+'">'+esc(c.t)+'</li>'; }).join('');
+}
+/* While a control is dragged: recompute and repaint the figures that depend on
+   the process point, without rebuilding the controls under the pointer. */
+function ppLive(){
+  var ph=null; try{ ph=physics(); }catch(e){} if(!ph) return;
+  function pc(lab,val,note,adv){
+    return '<div class="pcell'+(adv?' adv-only':'')+'"><span class="pl">'+lab+'</span><span class="pv">'+val+'</span>'+
+           (note?'<span class="pn">'+note+'</span>':'')+'</div>';
+  }
+  var a=$('#ph_live'), v=$('#pp_viz'), c=$('#pp_chk'), r=$('#ph_reg');
+  if(a) a.innerHTML=physLive(ph, pc);
+  if(v) v.innerHTML=ppViz(ph);
+  if(c) c.innerHTML=ppChkHtml(ph);
+  if(r) r.textContent=ph.regime.n;
+}
+/* Two drawings to scale. Left: where the pulses land along three neighbouring
+   lines — spot diameter, pulse pitch and line pitch in their true proportion.
+   Right: the beam through focus, with the depth of focus and the working spot. */
+function ppViz(ph){
+  var q=ph.pp, o=optics(), W=300, H=120, s='', i, j;
+  var ink='var(--ink-3)', teal='var(--teal)', line='var(--rule)';
+  /* --- placement --- */
+  var d=q.lw, pitch=q.pulsed? q.pitch : null, hp=q.K.hf!=null? q.hatch : null;
+  var span=Math.max(d*4.2, pitch? Math.min(pitch*6, d*14) : 0), k=(W-20)/span, r=d*k/2;
+  var rows=hp? 3 : 1, gap=hp? hp*k : 0, tot=(rows-1)*gap, y0=H/2-10-tot/2;
+  if(tot+2*r>H-34){ var f=(H-34)/(tot+2*r); k*=f; r*=f; gap*=f; tot*=f; y0=H/2-10-tot/2; }
+  s+='<figure><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Where the beam lands, to scale"><title>Where the beam lands, to scale</title>';
+  for(j=0;j<rows;j++){
+    var y=y0+j*gap;
+    if(pitch){
+      var px=pitch*k, n=Math.min(60, Math.floor((W-20-2*r)/px)+1);
+      for(i=0;i<n;i++) s+='<circle cx="'+(10+r+i*px).toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+Math.max(0.8,r).toFixed(1)+'" fill="'+teal+'" fill-opacity=".22" stroke="'+teal+'" stroke-width=".8"/>';
+    } else {
+      s+='<rect x="10" y="'+(y-r).toFixed(1)+'" width="'+(W-20)+'" height="'+(2*r).toFixed(1)+'" rx="'+r.toFixed(1)+'" fill="'+teal+'" fill-opacity=".25" stroke="'+teal+'" stroke-width=".8"/>';
+    }
+  }
+  var bar=d*k;   /* a scale bar the length of one track width */
+  s+='<line x1="10" y1="'+(H-12)+'" x2="'+(10+bar).toFixed(1)+'" y2="'+(H-12)+'" stroke="'+ink+'" stroke-width="1.6"/>'+
+     '<line x1="10" y1="'+(H-16)+'" x2="10" y2="'+(H-8)+'" stroke="'+ink+'" stroke-width="1.2"/>'+
+     '<line x1="'+(10+bar).toFixed(1)+'" y1="'+(H-16)+'" x2="'+(10+bar).toFixed(1)+'" y2="'+(H-8)+'" stroke="'+ink+'" stroke-width="1.2"/></svg>'+
+     '<figcaption><b>Where the beam lands, to scale.</b> The bar is one '+num(d)+' µm track'+
+     (pitch? '; pulses land '+num(pitch)+' µm apart' : '; the beam is continuous')+(hp? '; lines are '+Math.round(hp)+' µm apart' : '')+'.</figcaption></figure>';
+  /* --- caustic --- */
+  var zR=o.dof/1000, zmax=Math.max(3*zR, q.z_mm*1.25), w0=o.spot/2, cx=W/2, cy=H/2;
+  var wmax=w0*Math.sqrt(1+Math.pow(zmax/zR,2)), ky=(H/2-12)/wmax, kx=(W/2-14)/zmax, up=[], dn=[];
+  for(i=0;i<=40;i++){
+    var z=-zmax+2*zmax*i/40, wz=w0*Math.sqrt(1+Math.pow(z/zR,2));
+    up.push((cx+z*kx).toFixed(1)+' '+(cy-wz*ky).toFixed(1));
+    dn.unshift((cx+z*kx).toFixed(1)+' '+(cy+wz*ky).toFixed(1));
+  }
+  s+='<figure><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="The beam through focus"><title>The beam through focus</title>'+
+     '<rect x="'+(cx-zR*kx).toFixed(1)+'" y="6" width="'+(2*zR*kx).toFixed(1)+'" height="'+(H-12)+'" fill="'+teal+'" fill-opacity=".08"/>'+
+     '<path d="M'+up.concat(dn).join('L')+'Z" fill="'+teal+'" fill-opacity=".20" stroke="'+teal+'" stroke-width="1"/>'+
+     '<line x1="14" y1="'+cy+'" x2="'+(W-14)+'" y2="'+cy+'" stroke="'+line+'" stroke-dasharray="3 3"/>';
+  if(q.z_mm>0){
+    var zx=cx+q.z_mm*kx, wy=(q.d/2)*ky;
+    s+='<line x1="'+zx.toFixed(1)+'" y1="'+(cy-wy).toFixed(1)+'" x2="'+zx.toFixed(1)+'" y2="'+(cy+wy).toFixed(1)+'" stroke="var(--amber)" stroke-width="2"/>';
+  }
+  s+='</svg><figcaption><b>The beam through focus.</b> Focus '+num(o.spot)+' µm; the band is the depth of focus, ± '+zR.toFixed(2)+' mm'+
+     (q.z_mm>0? '; the bar marks the '+num(q.d)+' µm working spot, ± '+num(q.z_mm)+' mm from focus' : '')+'.</figcaption></figure>';
+  return s;
+}
+/* ---- method and sources: how each figure is computed, and from what -------- */
+function methodPanel(ph){
+  var d=document.createElement('details'); d.className='msrc'; d.id='msrc';
+  var h='<summary><span>Method and sources</span><i>how each figure is computed, and where its inputs come from</i></summary>'+
+    '<div class="msb"><h5>Relations</h5><table class="mst m4"><thead><tr><th>Figure</th><th>Relation</th><th>Inputs and limits</th><th>Reference</th></tr></thead><tbody>';
+  METHOD.forEach(function(m){
+    h+='<tr><td>'+esc(m.n)+'</td><td class="mono">'+esc(m.f)+'</td><td>'+esc(m.i)+'. '+esc(m.c)+'</td><td>'+
+       (m.r.length? m.r.map(function(k){ return esc(REF[k].a); }).join('; ') : '—')+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  var s=SRC[S.src], q=ph.pp;
+  h+='<h5>Inputs for this configuration</h5><table class="mst m3"><thead><tr><th>Input</th><th>Value</th><th>Where it comes from</th></tr></thead><tbody>';
+  function r(a,b,c){ h+='<tr><td>'+a+'</td><td class="mono">'+b+'</td><td>'+c+'</td></tr>'; }
+  r('Wavelength', esc(s.wl), 'Source class');
+  r('Beam quality M²', s.m2, 'Typical for the source class — not stated in the catalogue');
+  r('Beam diameter at the objective', s.dia+' mm', 'Typical for the source class — not stated in the catalogue');
+  r('Focal length and field', LENS[S.lens].f+' mm · '+LENS[S.lens].fld+' mm', 'Objective, TEAL catalogue');
+  if(q.pulsed){
+    r('Repetition band', s.frep[0]+'–'+s.frep[1]+' kHz', 'Source class'+(S.src==='uv'? ' — stated in the catalogue' : ''));
+    r('Pulse duration', tauTxt(q.tau)+(q.tauR? ' (tunable '+q.tauR[0]+'–'+q.tauR[1]+' ns)' : ''), q.tauR? 'TEAL catalogue (tunable range)' : 'Typical for the source class');
+    if(s.pk) r('Peak-to-average ratio', s.pk+' : 1', esc(REF.catalogue.t)+'; '+esc(REF.ipgqcw.a)+' data sheet');
+  }
+  r('Speed limit', inr(q.vMax)+' mm/s', q.vBasis==='spec'? 'Platform specification: “'+esc(q.vRow[0]+' — '+q.vRow[1])+'”' : 'Class estimate — the specification states no speed');
+  if(q.dStated) r('Working spot range', q.dStated[0]+'–'+q.dStated[1]+' µm', 'Platform specification');
+  if(q.K.ov!=null) r('Starting pulse overlap', Math.round(q.K.ov*100)+' %', 'Rule of practice for '+esc(q.K.n.toLowerCase())+(q.kind==='pseam'? ' — '+esc(REF.ahmed.a)+'; '+esc(REF.ewi.a) : ' — not TEAL process data'));
+  r('Wall-plug efficiency', Math.round((s.wpe||0.25)*100)+' %', /uv|green|blue|pico|femto/.test(S.src)? 'Estimate — no published class figure found' : 'Inside the published range for the source class');
+  if(ph.mat){
+    var M=ph.mat.m;
+    r('Thermal properties of '+esc(M.n.toLowerCase()), M.k+' W/m·K · '+M.rho+' kg/m³ · '+M.cp+' J/kg·K', esc(REF[M.ref||'typ'].a)+', '+esc(REF[M.ref||'typ'].t)+(M.note? '. '+esc(M.note) : ''));
+    r('Absorptivity at '+esc(s.wl), Math.round(ph.mat.abs*100)+' %', M.aref? esc(REF[M.aref].a)+', '+esc(REF[M.aref].p) : 'Indicative class value for a clean, cold, flat surface — not a measured figure');
+  }
+  h+='</tbody></table><h5>References</h5><ol class="msr">';
+  var used={}; METHOD.forEach(function(m){ m.r.forEach(function(k){ used[k]=1; }); });
+  if(ph.mat){ used[ph.mat.m.ref||'typ']=1; if(ph.mat.m.aref) used[ph.mat.m.aref]=1; }
+  if(s.pk) used.ipgqcw=1; used.catalogue=1;
+  Object.keys(REF).forEach(function(k){ if(used[k] && k!=='typ') h+='<li>'+esc(refCite(k))+' <span>'+esc(REF[k].u)+'.</span></li>'; });
+  h+='</ol></div>';
+  d.innerHTML=h;
+  return d;
 }
 
 function uiMod(b){
@@ -4240,7 +4962,7 @@ function uiSpec(b){
     '<div class="li"><span class="k">Average power</span><span class="v">'+S.pw+' W</span></div>'+
     '<div class="li"><span class="k">Objective</span><span class="v">'+o.lens+' · f = '+o.f+' mm</span></div>'+
     '<div class="li"><span class="k">Field</span><span class="v">'+o.fld+' × '+o.fld+' mm</span></div>'+
-    '<div class="li"><span class="k">Spot ⌀</span><span class="v">'+o.spot.toFixed(0)+' µm</span></div>'+
+    '<div class="li"><span class="k">Focus spot</span><span class="v">'+o.spot.toFixed(0)+' µm</span></div>'+
     '<div class="li"><span class="k">Depth of focus</span><span class="v">± '+(o.dof/1000).toFixed(2)+' mm</span></div>'));
 
   var specHtml='<h4>Platform specification</h4>';
@@ -4251,19 +4973,7 @@ function uiSpec(b){
   if(ph){
     var eh='<h4>Process &amp; energy</h4>';
     function li(k,v){ return '<div class="li"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>'; }
-    eh+=li('Regime', ph.regime.n);
-    if(ph.mode==='pulsed'){
-      eh+=li('Pulse energy', num(ph.Ep_mJ)+' mJ');
-      eh+=li('Peak power', num(ph.Ppk_kW)+' kW');
-      eh+=li('Pulse duration', tauTxt(ph.tau_ns));
-      eh+=li('Repetition rate', ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz');
-      if(ph.showFluence) eh+=li('Fluence', num(ph.fluence)+' J/cm²');
-      eh+=li(ph.irrLabel, sci(ph.irr)+' W/cm²');
-      if(ph.heat_Jmm) eh+=li('Heat input @ 50 mm/s', num(ph.heat_Jmm)+' J/mm');
-    } else {
-      eh+=li(ph.irrLabel, sci(ph.irr)+' W/cm²');
-      if(ph.heat_Jmm) eh+=li('Heat input @ 50 mm/s', num(ph.heat_Jmm)+' J/mm');
-    }
+    procRows(ph).forEach(function(x){ eh+=li(x[0], x[1]); });
     eh+=li('Focus window, spot ±5 %', '± '+(o.dof5/1000).toFixed(2)+' mm');
     if(ph.mat){
       eh+=li('Material', ph.mat.m.n);
@@ -4271,13 +4981,15 @@ function uiSpec(b){
       eh+=li('Coupled power', num(ph.mat.coupled)+' W');
       eh+=li('Conductivity', ph.mat.m.k+' W/m·K');
       if(ph.mat.diff_um!=null) eh+=li('Heat diffusion / pulse', num(ph.mat.diff_um)+' µm');
+      if(ph.mat.diffI_um!=null) eh+=li('Heat diffusion / dwell', num(ph.mat.diffI_um)+' µm');
     }
     g.appendChild(el('div','sc',eh));
     var stds=standardsFor();
     if(stds.length){
       var sh2='<h4>Applicable standards</h4>';
-      stds.forEach(function(k){ sh2+='<div class="li"><span class="k">'+STD[k].n+
-        '</span><span class="v" style="font-family:var(--sans);font-size:11.5px;color:var(--ink-2)">'+STD[k].s+'</span></div>'; });
+      stds.forEach(function(k){ sh2+='<div class="li"><span class="k">'+esc(stdLabel(k))+
+        '</span><span class="v" style="font-family:var(--sans);font-size:11.5px;color:var(--ink-2)">'+STD[k].s+
+        (STD[k].b==='scope'? ' <i class="stdb" title="Applies through the standard’s own scope. It is not named in the TEAL catalogue, so this is not a statement of certification.">by scope</i>' : '')+'</span></div>'; });
       g.appendChild(el('div','sc',sh2));
     }
     g.appendChild(el('div','sc','<h4>Commercial terms</h4>'+
@@ -4292,7 +5004,7 @@ function uiSpec(b){
       li('Heat to reject', num(ph.heat_kW)+' kW')+
       li('Cooling', ph.cool)+
       li('Beam delivery', MOTIONLBL(p.deliv))+
-      li('Laser safety', (function(){ var sf=specGet(p,/safety|laser class/i); return sf? esc(sf.row[1]) : 'Not stated in the specification — set by the machine’s risk assessment'; })())+
+      li('Laser safety', (function(){ var sf=safetySpec(p); return sf? esc(sf.row[1]) : 'Not stated in the specification — set by the machine’s risk assessment'; })())+
       li('Eyewear', 'OD set by the Laser Safety Officer per IEC 60825-1')));
   }
   g.appendChild(el('div','sc','<h4>Integration</h4>'+
@@ -4406,21 +5118,13 @@ function rfq(p,a,o,lo,hi,mk,ex,sd){
   L.push('  Source          : '+SRC[S.src].n+', '+SRC[S.src].wl);
   L.push('  Average power   : '+S.pw+' W');
   L.push('  Objective       : '+o.lens+', f = '+o.f+' mm, field '+o.fld+' × '+o.fld+' mm');
-  L.push('  Spot diameter   : '+o.spot.toFixed(0)+' µm (computed)');
+  L.push('  Focus spot      : '+o.spot.toFixed(0)+' µm (computed, diffraction limit)');
   L.push('  Depth of focus  : ± '+(o.dof/1000).toFixed(2)+' mm (computed)');
   L.push('');
   var _ph=physics();
   if(_ph){
     L.push('PROCESS & ENERGY (computed)');
-    L.push('  Regime          : '+_ph.regime.n);
-    if(_ph.mode==='pulsed'){
-      L.push('  Pulse energy    : '+num(_ph.Ep_mJ)+' mJ at '+num(_ph.frep_khz)+' kHz');
-      L.push('  Peak power      : '+num(_ph.Ppk_kW)+' kW');
-      if(_ph.showFluence) L.push('  Fluence         : '+num(_ph.fluence)+' J/cm2');
-      L.push('  '+_ph.irrLabel.padEnd(16,' ')+': '+_ph.irr.toExponential(1)+' W/cm2');
-    } else {
-      L.push('  Irradiance      : '+_ph.irr.toExponential(1)+' W/cm2');
-    }
+    procRows(_ph, true).forEach(function(x){ L.push('  '+x[0].padEnd(16,' ')+': '+x[1]); });
     if(_ph.mat){
       L.push('  Material        : '+_ph.mat.m.n);
       L.push('  Absorptivity    : '+(_ph.mat.abs*100).toFixed(0)+' % at '+SRC[S.src].wl+' (clean, cold)');
@@ -4442,7 +5146,7 @@ function rfq(p,a,o,lo,hi,mk,ex,sd){
   var _st=standardsFor();
   if(_st.length){
     L.push('APPLICABLE STANDARDS');
-    _st.forEach(function(k){ L.push('  '+STD[k].n+' — '+STD[k].s); });
+    _st.forEach(function(k){ L.push('  '+stdLabel(k)+' — '+STD[k].s+(STD[k].b==='scope'? ' [applies by scope; not named in the catalogue]' : '')); });
     L.push('');
   }
   L.push('COMMERCIAL');
@@ -4465,7 +5169,7 @@ function sheet(p,a,o,lo,hi,mk,ex,sd){
   r('Source', SRC[S.src].n+', '+SRC[S.src].wl);
   r('Average power', S.pw+' W');
   r('Objective', o.lens+' · f = '+o.f+' mm · field '+o.fld+' × '+o.fld+' mm');
-  r('Spot diameter (computed)', o.spot.toFixed(0)+' µm');
+  r('Focus spot (computed, diffraction limit)', o.spot.toFixed(0)+' µm');
   r('Depth of focus (computed)', '± '+(o.dof/1000).toFixed(2)+' mm');
   r('Selection rationale', a.w);
   var pr='';
@@ -4473,33 +5177,26 @@ function sheet(p,a,o,lo,hi,mk,ex,sd){
   var ph=physics(), pe='';
   if(ph){
     function pr2(k,v){ pe+='<tr><td class="k">'+k+'</td><td>'+v+'</td></tr>'; }
-    pr2('Process regime', ph.regime.n+' — '+ph.regime.d);
-    if(ph.mode==='pulsed'){
-      pr2('Pulse energy', num(ph.Ep_mJ)+' mJ at '+num(ph.frep_khz)+' kHz');
-      pr2('Peak power', num(ph.Ppk_kW)+' kW (τ = '+tauTxt(ph.tau_ns)+')');
-      if(ph.showFluence) pr2('Fluence', num(ph.fluence)+' J/cm²');
-      pr2(ph.irrLabel, sci(ph.irr)+' W/cm²');
-      if(ph.heat_Jmm) pr2('Heat input', num(ph.heat_Jmm)+' J/mm at an indicative 50 mm/s');
-      pr2('Repetition rate', ph.frep_band[0]+'–'+ph.frep_band[1]+' kHz usable');
-    } else {
-      pr2('Irradiance', sci(ph.irr)+' W/cm²');
-      if(ph.heat_Jmm) pr2('Heat input', num(ph.heat_Jmm)+' J/mm at an indicative 50 mm/s');
-    }
+    procRows(ph).forEach(function(x){ pr2(x[0]==='Regime'? 'Process regime' : x[0], x[0]==='Regime'? ph.regime.n+' — '+ph.regime.d : x[1]); });
     pr2('Focus window, spot ±5 %', '± '+(o.dof5/1000).toFixed(2)+' mm');
     if(ph.mat){
       pr2('Material', ph.mat.m.n);
       pr2('Absorptivity at '+SRC[S.src].wl, (ph.mat.abs*100).toFixed(0)+' % — clean, room temperature, optically flat');
       pr2('Coupled power', num(ph.mat.coupled)+' W of '+S.pw+' W incident');
-      pr2('Thermal conductivity', ph.mat.m.k+' W/m·K'+(ph.mat.m.org?'':' · melting point '+ph.mat.m.tm+' °C'));
+      pr2('Thermal conductivity', ph.mat.m.k+' W/m·K · '+matTrans(ph.mat.m).toLowerCase());
       if(ph.mat.diff_um!=null) pr2('Heat diffusion per pulse', num(ph.mat.diff_um)+' µm (√4ατ)');
+      if(ph.mat.diffI_um!=null) pr2('Heat diffusion while the spot passes', num(ph.mat.diffI_um)+' µm (√(4α·d/v))');
+      pr2('Material data from', esc(REF[ph.mat.m.ref||'typ'].a)+(ph.mat.m.ref && ph.mat.m.ref!=='typ'? ', '+esc(REF[ph.mat.m.ref].t) : ' — not traceable to one published table')+
+        '; absorptivity '+(ph.mat.m.aref? 'from '+esc(REF[ph.mat.m.aref].a) : 'is an indicative class value'));
     }
     pr2('Source wall-plug', num(ph.wall_kW)+' kW at '+((ph.src.wpe||0.25)*100).toFixed(0)+' % efficiency');
     pr2('Heat to reject', num(ph.heat_kW)+' kW — '+ph.cool);
-    var sfg=specGet(p,/safety|laser class/i);
+    var sfg=safetySpec(p);
     pr2('Laser safety', sfg? sfg.row[1]+' (platform specification)' : 'Laser class not stated in the specification — set by the machine’s risk assessment');
   }
   var sd2=standardsFor(), st='';
-  sd2.forEach(function(k){ st+='<tr><td class="k">'+STD[k].n+'</td><td>'+STD[k].d+' — '+STD[k].s+'</td></tr>'; });
+  sd2.forEach(function(k){ st+='<tr><td class="k">'+esc(stdLabel(k))+'</td><td>'+STD[k].d+' — '+STD[k].s+
+    (STD[k].b==='scope'? ' <i>(applies by scope; not named in the catalogue)</i>' : '')+'</td></tr>'; });
   var cm='';
   cm+='<tr><td class="k">Indicative lead time</td><td>'+(p.lead||'—')+' weeks from order</td></tr>';
   cm+='<tr><td class="k">Warranty</td><td>'+(p.warranty||12)+' months</td></tr>';
@@ -4570,7 +5267,7 @@ function sync(){
       '<div><span>Objective</span><b>'+o.lens+'</b></div>'+
       '<div><span>Focal</span><b>'+o.f+' mm</b></div>'+
       '<div><span>Field</span><b>'+o.fld+' mm</b></div>'+
-      '<div><span>Spot ⌀</span><b>'+o.spot.toFixed(0)+' µm</b></div>'+
+      '<div><span>'+(function(){ var q=pp(); return q && q.d>q.d0*1.001? 'Working spot</span><b>'+num(q.d) : 'Spot ⌀</span><b>'+o.spot.toFixed(0); })()+' µm</b></div>'+
       '<div><span>DOF</span><b>± '+(o.dof/1000).toFixed(2)+' mm</b></div>'+
       '<div><span>M²</span><b>'+SRC[S.src].m2+'</b></div>';
     var ph=physics();
@@ -4612,6 +5309,8 @@ function encodeState(){
   if(mk.length)q.push('m='+mk.join('.')); if(S.sw)q.push('f='+S.sw);
   if(ex.length)q.push('x='+ex.join('.'));
   if(S.target>0)q.push('t='+Math.round(S.target));
+  var po=ppOver(), pk=Object.keys(po).filter(function(k){ return po[k]!=null; });
+  if(pk.length) q.push('pp='+pk.map(function(k){ return k+(+po[k].toPrecision(4)); }).join('_'));
   if(typeof CFG!=='undefined' && CFG.id && CFG.rev) q.push('id='+CFG.id, 'r='+CFG.rev);
   return q.join('&');
 }
@@ -4639,6 +5338,10 @@ function readHash(){
   var tg=q.t? parseInt(q.t,10) : NaN;
   S.target = tg>0? tg : null;
   S.sw = (q.f&&SW[q.f])? q.f : 'desktop';
+  /* process point: f (kHz), u (pulse ns), v (mm/s), h (line pitch), n (passes), d (spot µm) */
+  S.pp=null;
+  if(q.pp){ var po={}; q.pp.split('_').forEach(function(t){ var m=/^([fuvhnd])(\d+(?:\.\d+)?(?:e-?\d+)?)$/.exec(t); if(m && isFinite(+m[2])) po[m[1]]=+m[2]; });
+    if(Object.keys(po).length) S.pp={k:ppKey(), o:po}; }
   reach=STEPS.length-1; cur=STEPS.length-1;
   return true;
 }
@@ -4758,9 +5461,13 @@ function applyAllReco(){
 var SAVED = Store.get('teal.saved', []);
 var HIST  = Store.get('teal.hist', []);
 function snapshot(){
-  return {plat:S.plat, app:S.app, src:S.src, pw:S.pw, lens:S.lens,
+  var o={plat:S.plat, app:S.app, src:S.src, pw:S.pw, lens:S.lens,
           mods:JSON.parse(JSON.stringify(S.mods)), sw:S.sw,
           extra:JSON.parse(JSON.stringify(S.extra)), notes:S.notes||'', target:S.target||null};
+  /* the process point is recorded only when it was changed, so the fingerprint
+     of every configuration made before it existed stays what it was */
+  if(S.plat && ppHas()) o.pp=JSON.parse(JSON.stringify(ppOver()));
+  return o;
 }
 function restore(st){
   if(!st||!PLAT[st.plat]) return false;
@@ -4768,6 +5475,9 @@ function restore(st){
   S.app=st.app; S.src=st.src; S.pw=st.pw; S.lens=st.lens;
   S.mods=st.mods||{}; S.sw=st.sw||'desktop'; S.extra=st.extra||{}; S.notes=st.notes||'';
   S.target=st.target||null;
+  S.pp=null;
+  if(st.pp && typeof st.pp==='object'){ var po={}, k; for(k in st.pp) if(/^[fuvhnd]$/.test(k) && isFinite(+st.pp[k])) po[k]=+st.pp[k];
+    if(Object.keys(po).length) S.pp={k:ppKey(), o:po}; }
   reach=STEPS.length-1; cur=STEPS.length-1; render();
   return true;
 }
@@ -4861,7 +5571,9 @@ function scanVp(vm){
 function cfgState(st){
   return {plat:st.plat, app:st.app, src:st.src, pw:st.pw, lens:st.lens,
           mods:JSON.parse(JSON.stringify(st.mods||{})), sw:st.sw||'desktop',
-          extra:JSON.parse(JSON.stringify(st.extra||{})), notes:st.notes||'', target:st.target||null};
+          extra:JSON.parse(JSON.stringify(st.extra||{})), notes:st.notes||'', target:st.target||null,
+          /* a saved configuration is compared at its own process point */
+          pp:(st.pp && typeof st.pp==='object')? {k:[st.plat,st.src,st.lens].join('|'), o:JSON.parse(JSON.stringify(st.pp))} : null};
 }
 function withCfg(st, fn){
   var kS=S, kC=cur, kSn=M3D.seen, kL=M3D.list, kF=famSel, kOn=SIM.on, r;
@@ -6551,7 +7263,8 @@ function aProvenance(b){
     var t=tbl(['Data area','Where it lives','Size','What it is']);
     items.forEach(function(d){
       row(t,['<span class="nm">'+d.a+'</span>','<span class="ky">'+d.w+'</span>',
-        '<span class="calc">'+d.count()+'</span>', d.note]);
+        '<span class="calc">'+d.count()+'</span>', d.note+
+        ((d.refs||[]).length? '<span class="pvref">'+d.refs.map(function(k){ return REF[k]? esc(REF[k].a+' — '+REF[k].t) : ''; }).filter(Boolean).join('<br>')+'</span>' : '')]);
     });
     b.appendChild(t);
   });
@@ -6805,6 +7518,10 @@ function aHealth(b){
    Internal view, and edits stay in this browser until data.json is exported
    and committed. */
 function openAdmin(){
+  if(ACC.role!=='internal'){                       /* the value store is staff-only */
+    if(ACC.ready && ACC.role) accGate('staff', openAdmin); else ACC.after=openAdmin;
+    return;
+  }
   if(VIEW.v!=='internal') viewSet('internal');
   adminOpen=true; $('#admin').classList.add('open'); renderAdmin();
   document.body.style.overflow='hidden';
@@ -8199,7 +8916,7 @@ function mmGroups(){
     for(k in EXTRA) if(S.extra[k] && !isStd(p,k)) g.push({id:'m_'+k, n:EXTRA[k].n, mod:k});
     g.push({id:'sw', n:SW[S.sw].n});
   }
-  if(cur>=5) g.push({id:'cert', n:'CE conformity & documentation'});
+  if(cur>=5) g.push({id:'cert', n:'Nameplate & documentation'});
   return g;
 }
 
@@ -8381,8 +9098,7 @@ function gFloor(b,R){
   var w=MW/2+3.4, d=MD/2+3.0;
   var zf=b.line([[[-w,0.02,-d],[w,0.02,-d],[w,0.02,d],[-w,0.02,d],[-w,0.02,-d]]],
          {c:C3.warn,a:.42,lw:1.4,dash:[6,5]}); if(zf) zf.floor=true;
-  var sf=R.p? specGet(R.p,/safety|laser class/i) : null;
-  b.tag([-w,0.02,d], sf && /class 1/i.test(sf.row[1])? 'CLASS 1 ENCLOSED ZONE' : 'KEEP-OUT ZONE',{dy:14,c:'rgba(232,178,58,.75)',lead:false});
+  b.tag([-w,0.02,d], statesClass1(R.p)? 'CLASS 1 ENCLOSED ZONE' : 'KEEP-OUT ZONE',{dy:14,c:'rgba(232,178,58,.75)',lead:false});
 }
 
 function gFrame(b,R,a){
@@ -9258,18 +9974,16 @@ function procStyle(){
   var p=P(), fam=p? p.fam : 'mark', ph=null;
   try{ ph=physics(); }catch(e){}
   var st={w:1.6, c:null, halo:5.5, haloA:0.30, pool:0, key:0, label:''};
-  var irr=ph? ph.irr : 0;
-  if(fam==='weld'){
-    var keyhole = irr>1e6;
+  var irr=ph? ph.irr : 0, kind=procKind();
+  if(isWeldKind(kind)){
+    var keyhole = irr>=1e6;
     st.w=keyhole? 2.2 : 3.6; st.halo=keyhole? 7 : 10;
     st.pool=keyhole? 0.34 : 0.52; st.key=keyhole?1:0;
     st.label=keyhole? 'keyhole' : 'conduction';
-  } else if(fam==='cut'){
-    st.w=1.2; st.halo=6; st.c='#2A3038'; st.pool=0.18; st.label='kerf';
-  } else if(fam==='clean'){
+  } else if(kind==='cut'||kind==='scribe'){
+    st.w=1.2; st.halo=6; st.c='#2A3038'; st.pool=0.18; st.label=kind==='cut'? 'kerf' : 'scribe';
+  } else if(kind==='ablate'){
     st.w=5.0; st.halo=9; st.haloA=0.18; st.label='ablation';
-  } else if(fam==='volt'){
-    st.w=2.4; st.pool=0.30; st.label='tab weld';
   }
   return st;
 }
@@ -9705,8 +10419,13 @@ MODG.iqoqpq =function(b,R){ utilCab(b,R,'IQ/OQ/PQ PACKAGE','#2C2438'); };
 /* ======================================================================== */
 function hash01(i){ var x=Math.sin(i*127.1+311.7)*43758.5453; return x-Math.floor(x); }
 function markPath(){
-  var p=P(), fam=p? p.fam : 'mark', segs=[], i, j, r, c;
+  var p=P(), fam=p? p.fam : 'mark', segs=[], i, j, r, c, kind=procKind();
   var app=S.app||'';
+  /* what is drawn follows the process: a robot cell fitted with a CW source
+     welds, a Volt station marks, a decapsulation system rasters an area */
+  if(isWeldKind(kind)) fam='weld';
+  else if(kind==='ablate') fam='clean';
+  else if(kind==='mark' && fam!=='mark') fam='mark';
   if(fam==='clean' || app.indexOf('clean')>=0){
     for(i=0;i<11;i++){ var z=-0.42+i*0.084;
       segs.push(i%2? [[0.46,z],[-0.46,z]] : [[-0.46,z],[0.46,z]]); }
@@ -9778,10 +10497,14 @@ var SIM = {on:false, t:0, ph:0, cyc:0, ng:0, grade:'', msg:'', msgT:0, sparks:[]
            procS:1, realS:1, animS:1, speed:2500, markMM:0, jumpMM:0, fx:'spark', beamOn:false,
            pm:null, basis:'', cycNote:''};
 
+/* The verb follows the process, not the catalogue chapter: a Volt station marks
+   cells, and a decapsulation system ablates. An automation cell's process is
+   set at integration, so it stays neutral. */
 function famVerb(){
-  var f=P()? P().fam : 'mark';
-  return f==='weld'? 'WELD' : f==='clean'? 'CLEAN' : f==='cut'? 'CUT' :
-         f==='volt'? 'JOIN' : f==='semi'? 'MARK' : f==='auto'? 'PROCESS' : 'MARK';
+  var f=P()? P().fam : 'mark', k=procKind();
+  if(f==='auto') return 'PROCESS';
+  return isWeldKind(k)? 'WELD' : k==='ablate'? (f==='clean'? 'CLEAN' : 'ABLATE') : k==='cut'? 'CUT' :
+         k==='scribe'? 'SCRIBE' : 'MARK';
 }
 /* How the part actually arrives, per handling module. Returns a pose in world
    units: the conveyor slides it in, a tray tower lowers it, a robot swings it
@@ -9879,48 +10602,33 @@ function statedCycle(){
 /* Marking a code is modelled at the size the code is actually made, not at the
    size of the field: a 12 × 12 ECC200 at the module the DFM report recommends
    for this spot, plus a line of human-readable text, filled with hatch lines.
-   The mark line is the spot, but not narrower than 20 µm — below that the
-   ablated line is wider than the optics. The hatch is half the line, as in the
-   physics panel. A pulsed source can only go as fast as 50 % pulse overlap
-   allows; past that the line breaks into dots. Every vector also pays the
-   scanner's jump and mark delays, taken at a typical 250 µs.
-   Other processes keep the drawn path at the scale of the field. */
+   Speed, line width, line pitch and passes come from the process point, so the
+   time here is the time of the operating point shown in the physics panel.
+   Every vector also pays the scanner's jump and mark delays, taken at a typical
+   250 µs. Other processes keep the drawn path at the scale of the field.
+   `on` is the time the beam is actually emitting — the basis of the pulse
+   count and the energy per part. */
+var SCAN_DELAY_S=250e-6;
 function procModel(){
-  var p=P(), fam=p? p.fam : 'mark', o=optics(), head=scanSpeed(), ph=null;
-  try{ ph=physics(); }catch(e){ ph=null; }
-  if(fam==='mark' && o){
-    var s=o.spot/1000, lw=Math.max(s,0.020), hatch=lw*0.5;
-    var cell=Math.max(0.30, Math.max(0.25, s*4)*1.3), n=12, side=cell*n;
+  var o=optics(), q=pp(), head=scanSpeed(), kind=q? q.kind : procKind();
+  var v=q? q.v : head, n=q? q.n : 1, lim=q? q.lim : 'head';
+  if(kind==='mark' && o && q){
+    var s=q.d/1000, lw=q.lw/1000, hatch=q.hatch/1000;
+    var cell=Math.max(0.30, Math.max(0.25, s*4)*1.3), N=12, side=cell*N;
     var dark=0.55*side*side, fill=dark/hatch;
     var chH=Math.max(s*25,0.5), text=9*chH*2.6;
-    var lines=n*cell/hatch, vecs=Math.round(lines*n*0.55/1.8)+9*4;
-    var v=head, lim='head';
-    if(ph && ph.mode==='pulsed' && ph.frep_khz){
-      var vo=ph.frep_khz*1000*lw*0.5;
-      if(vo<v){ v=vo; lim='overlap'; }
-    }
+    var lines=N*cell/hatch, vecs=Math.round(lines*N*0.55/1.8)+9*4;
     var len=fill+text, jump=vecs*cell*0.9;
-    var t=len/v + jump/head + vecs*250e-6;
-    return {t:t, len:len, jump:jump, v:v, head:head, lim:lim, kind:'code', vecs:vecs,
+    var on=len/v*n, t=on + (jump/head + vecs*SCAN_DELAY_S)*n;
+    return {t:t, on:on, len:len*n, jump:jump*n, v:v, head:head, lim:lim, kind:'code', pk:kind, vecs:vecs, n:n,
       cell:cell, side:side, hatch:hatch,
       basis:'12 × 12 Data Matrix at '+cell.toFixed(2)+' mm module ('+side.toFixed(1)+' mm square) and a '+
-            '9-character line, hatched at '+Math.round(hatch*1000)+' µm'};
+            '9-character line, hatched at '+Math.round(hatch*1000)+' µm'+(n>1? ', '+n+' passes' : '')};
   }
   var mv=buildMoves(markPath(), (S.lens? LENS[S.lens].fld/100 : 1.75)*0.92);
-  var mm=mv.markLen*100, jm=mv.jumpLen*100;
-  return {t:mm/head + jm/(head*3.2), len:mm, jump:jm, v:head, head:head, lim:'head', kind:'path',
-    basis:'Reference '+famVerb().toLowerCase()+' path across the '+(S.lens? LENS[S.lens].fld : 175)+' mm field'};
-}
-/* Marking speed from the specification, otherwise a family default. */
-function scanSpeed(){
-  var p=P(), i, m;
-  if(p&&p.specs) for(i=0;i<p.specs.length;i++){
-    if(!/speed/i.test(p.specs[i][0])) continue;
-    m=String(p.specs[i][1]).replace(/,/g,'').match(/(\d{2,6})\s*mm\/s/);
-    if(m) return +m[1];
-  }
-  var f=p? p.fam : 'mark';
-  return f==='weld'?120 : f==='clean'?900 : f==='cut'?400 : f==='volt'?300 : f==='semi'?3000 : 2500;
+  var mm=mv.markLen*100, jm=mv.jumpLen*100, on2=mm/v*n;
+  return {t:on2 + jm/(head*3.2)*n, on:on2, len:mm*n, jump:jm*n, v:v, head:head, lim:lim, kind:'path', pk:kind, n:n,
+    basis:'Reference '+famVerb().toLowerCase()+' path across the '+(S.lens? LENS[S.lens].fld : 175)+' mm field'+(n>1? ', '+n+' passes' : '')};
 }
 
 /* ---- the cycle ---------------------------------------------------------------- */
@@ -10004,6 +10712,12 @@ function simStart(){
   SIM.pm=procModel();
   SIM.speed=SIM.pm.v; SIM.procS=SIM.pm.t;
   SIM.markMM=SIM.pm.len; SIM.jumpMM=SIM.pm.jump;
+  /* what the beam delivers to one part: emission time, optical energy, pulses,
+     and the electrical energy the source draws while emitting */
+  SIM.q=pp(); SIM.onS=SIM.pm.on;
+  SIM.eJ=S.pw*SIM.onS;
+  SIM.pulses=SIM.q && SIM.q.pulsed? SIM.q.f*1000*SIM.onS : 0;
+  SIM.elWh=SIM.eJ/(SRC[S.src].wpe||0.25)/3600;
   SIM.phases=simPhases(); SIM.cycle=SIM.realS;
   SIM.total=0; SIM.phases.forEach(function(p){ SIM.total+=p.d; });
   simPlanCycle();
@@ -10378,7 +11092,10 @@ function mmBuild(b, T, vp){
     b.push(); b.t(-MW/2+1.4, CAB-2.4, MD/2+0.03);
     b.box(1.5,1.0,0.06,{c:C3.panelL,cy:true,e:'rgba(9,22,34,.5)'});
     b.pop();
-    b.tag([-MW/2+1.4, CAB-2.4, MD/2+0.1], 'CE · IEC 60825-1 CLASS 1', {dy:-12, c:'#8FD9DC'});
+    /* the plate says what the configuration supports: a class only where the
+       specification states it, a CE file only where that package is fitted */
+    b.tag([-MW/2+1.4, CAB-2.4, MD/2+0.1], (hasMod('cepath')? 'CE FILE · ' : 'NAMEPLATE · ')+
+      (statesClass1(p)? 'IEC 60825-1 CLASS 1' : 'LASER CLASS NOT STATED'), {dy:-12, c:'#8FD9DC'});
   });
   if(R.L('kin') && !R.story && R.exp<0.02) gKin(b,R);
   if(R.L('dim') && !R.story && R.exp<0.02 && p && cur>=1) gDims(b,R);
@@ -10716,7 +11433,7 @@ var COMPINFO = {
     m:'Armoured fibre or enclosed tube', s:'Bend radius per the source manufacturer', v:'Per the source manufacturer',
     mt:'Never kink or tread on the fibre; inspect the armour at each service.'},
   ceplate     :{n:'Conformity and laser-class plate', g:'Compliance',
-    d:'Plate carrying the CE marking and the laser product classification.',
+    d:'Plate carrying the machine’s conformity marking and its laser product classification.',
     f:'States the conformity of the machine and its laser class to the operator.',
     m:'Marked plate', s:'Laser class per IEC 60825-1', v:'—', mt:'Must remain legible.'},
   gascon      :{n:'Process-gas console', g:'Process',
@@ -11668,10 +12385,51 @@ function askAnswer(q0){
   if(comp && /what (does|do|is|are)\b|where is|what.*for\b|explain|describe/.test(q) &&
      !/spot|depth|angle|heat load|stroke|size|price|cost|time|power|wavelength|field|material|distance|pulse|class/.test(q)) return askPart(comp);
 
+  /* the process point: overlap, speed, energy and where the numbers come from */
+  if(/overlap|pulse pitch|pulses per (spot|point)|dot pitch/.test(q)){
+    if(!ph) return need('source and objective');
+    var qp=ph.pp;
+    if(!qp.pulsed) return A2('The beam is continuous in this process, so there is no pulse overlap. The spot dwells about <b>'+num(ph.ti_ms)+' ms</b> on each point at '+inr(+qp.v.toPrecision(3))+' mm/s.', 'source', 'computed — process point');
+    if(qp.K.ov==null) return A2(esc(qp.K.n)+' places separate pulses: they land <b>'+num(qp.pitch)+' µm</b> apart on a '+num(qp.lw)+' µm spot at '+inr(+qp.v.toPrecision(3))+' mm/s.', 'workpiece', 'computed — process point');
+    return A2('Pulse overlap <b>'+Math.round(qp.ov*100)+' %</b>: pulses land '+num(qp.pitch)+' µm apart on a '+num(qp.lw)+' µm track, so about '+num(qp.N)+' pulses hit each spot diameter. '+
+      'From O = 1 − v / (f·d) at '+inr(+qp.v.toPrecision(3))+' mm/s and '+ppFmt('f',qp.f)+'. '+esc(qp.K.n)+' starts at '+Math.round(qp.K.ov*100)+' % — a rule of practice, not TEAL process data.', 'workpiece', 'computed — process point');
+  }
+  if(/(scan|mark|weld|cut|travel|process)(ing)? speed|how fast does the (beam|laser|head)|mm\/s/.test(q)){
+    if(!ph) return need('source and objective');
+    var qv=ph.pp;
+    return A2('The process runs at <b>'+inr(+qv.v.toPrecision(3))+' mm/s</b>'+(qv.lim==='overlap'? ', held there by the '+Math.round(qv.K.ov*100)+' % pulse-overlap rule' : qv.lim==='set'? ', as set at the process point' : '')+
+      '. The beam can be moved at up to '+inr(qv.vMax)+' mm/s — '+(qv.vBasis==='spec'? 'from the platform specification' : 'a class estimate, because the specification states no speed')+'.', 'galvo', 'computed — process point');
+  }
+  if(/energy per part|pulses per part|energy (use|consumption)|kwh|electric(al|ity)/.test(q)){
+    if(!ph||!pm) return need('source and objective');
+    var eJ=S.pw*pm.on, wh=eJ/(s.wpe||0.25)/3600;
+    return A2('One part takes <b>'+(eJ>=1000? (eJ/1000).toFixed(2)+' kJ' : num(eJ)+' J')+'</b> of laser energy: '+S.pw+' W for '+pm.on.toFixed(3)+' s of beam-on time'+
+      (ph.pp.pulsed? ', about '+inr(Math.round(ph.pp.f*1000*pm.on))+' pulses' : '')+'. The source draws about '+num(wh)+' Wh for it at '+Math.round((s.wpe||0.25)*100)+
+      ' % wall-plug efficiency. That is the laser source alone — chiller, extraction and motion are not included.', 'source', 'computed — process model');
+  }
+  if(/fluence|irradiance|power density|energy density|dose|line energy|heat input/.test(q)){
+    if(!ph) return need('source and objective');
+    var bits=[];
+    if(ph.mode==='pulsed' && ph.showFluence) bits.push('fluence <b>'+num(ph.fluence)+' J/cm²</b> averaged over the spot ('+num(ph.fluence0)+' J/cm² on the beam axis)');
+    bits.push(ph.irrLabel.toLowerCase()+' <b>'+sci(ph.irr)+' W/cm²</b>');
+    bits.push((ph.mode==='cw'&&isWeldKind(ph.kind)? 'heat input ' : 'line energy ')+num(ph.lineE_Jmm)+' J/mm');
+    if(ph.pp.K.hf!=null) bits.push('areal dose '+num(ph.dose_Jcm2)+' J/cm²');
+    return A2('At the process point: '+bits.join('; ')+'. All on the '+num(ph.spot)+' µm working spot.', 'workpiece', 'computed — process point');
+  }
+  if(/source of|where (do|does|is).*(come|from)|reference|citation|how (is|are).*(calculated|computed)/.test(q)){
+    return A2('Every formula and its reference is listed under <b>Method and sources</b> at the foot of the Source step: the optics from Siegman and ISO 11146-1, thermal properties from Incropera &amp; DeWitt, '+
+      'the overlap rule for pulsed seams from published welding practice. Values the catalogue does not state — beam quality, beam diameter, starting overlaps — are marked there as class values or rules of practice.', null, 'method and sources');
+  }
+  if(/working spot/.test(q) && ph){
+    var qd=ph.pp;
+    return A2('Working spot <b>'+num(qd.d)+' µm</b>'+(qd.dStated? ', inside the platform’s stated '+qd.dStated[0]+'–'+qd.dStated[1]+' µm range' : '')+'. The focus limit of this source and objective is '+
+      num(qd.d0)+' µm'+(qd.z_mm>0? '; the working spot corresponds to about ± '+num(qd.z_mm)+' mm of defocus, or is set by the delivery optics.' : '.'), 'objective', 'computed — process point');
+  }
   if(/spot|focus(ed)? (size|diameter)|beam (size|diameter|waist)/.test(q)){
     if(!o) return need('source and objective');
     return A2('Focused spot ≈ <b>'+o.spot.toFixed(0)+' µm</b>, from d = 4·λ·f·M² / (π·D) with λ '+esc(s.wl)+', f '+L.f+' mm ('+esc(L.n)+'), M² '+s.m2+
-      ' and a '+s.dia+' mm beam at the objective. It is a diffraction-limited estimate; the real spot also depends on alignment and lens quality.', 'objective', 'computed — optics model');
+      ' and a '+s.dia+' mm beam at the objective. It is a diffraction-limited estimate; the real spot also depends on alignment and lens quality.'+
+      (ph && ph.pp.d>ph.pp.d0*1.001? ' The process works at a larger spot: '+num(ph.pp.d)+' µm.' : ''), 'objective', 'computed — optics model');
   }
   if(/depth of (focus|field)|\bdof\b|rayleigh/.test(q)){
     if(!o) return need('source and objective');
@@ -11699,8 +12457,8 @@ function askAnswer(q0){
   if(/pulse|repetition|frequency|khz|\bns\b|duration/.test(q)){
     if(!s) return need('source');
     return A2(s.n+' ('+esc(s.wl)+'): '+(s.mode==='cw'? 'continuous wave — no pulses.' :
-      'pulse duration '+s.tau+' '+(s.tauU||'ns')+(s.tauRange? ' (adjustable '+s.tauRange[0]+'–'+s.tauRange[1]+')' : '')+(s.frep? ', repetition '+s.frep[0]+'–'+s.frep[1]+' kHz' : '')+'.')+
-      (ph&&ph.Ep_mJ!=null? ' At '+S.pw+' W that is about '+num(ph.Ep_mJ)+' mJ per pulse at '+num(ph.frep_khz)+' kHz.' : ''), 'source', 'product data, computed pulse energy');
+      'pulse duration '+tauTxt(ph&&ph.tau_ns!=null? ph.tau_ns : s.tau)+(s.tauRange? ' (tunable '+s.tauRange[0]+'–'+s.tauRange[1]+' ns)' : '')+(s.frep? ', repetition '+s.frep[0]+'–'+s.frep[1]+' kHz' : '')+'.')+
+      (ph&&ph.Ep_mJ!=null? ' At '+S.pw+' W and the process point’s '+ppFmt('f',ph.frep_khz)+' that is about '+num(ph.Ep_mJ)+' mJ per pulse and '+num(ph.Ppk_kW)+' kW peak.' : ''), 'source', 'product data, computed pulse energy');
   }
   if(/wavelength|which laser|what laser|laser type|source/.test(q) && !/power supply/.test(q)){
     if(!s) return need('source');
@@ -11744,7 +12502,7 @@ function askAnswer(q0){
     return A2('The application works <b>'+esc(m.n)+'</b>'+(band&&m.a&&m.a[band]!=null? ', which absorbs about '+Math.round(m.a[band]*100)+' % at '+s.wl : '')+'. '+esc(a.w||''), 'workpiece', 'product data');
   }
   if(/safe|class|iec|60825/.test(q)){
-    var sg=specGet(p,/safety|laser class/i);
+    var sg=safetySpec(p);
     if(!sg) return A2('The specification of the '+esc(p.n)+' states <b>no laser class</b>. Take it from the machine’s risk assessment and conformity documentation.', null, 'product data — gap stated');
     return A2('The specification states: <b>'+esc(sg.row[1])+'</b>. On an enclosed machine the coded door interlock removes beam-enable whenever the guard opens.', askDrawn('interlock')? 'interlock' : null, 'product data');
   }
@@ -12021,7 +12779,7 @@ function misInit(){
    All reads and writes go through WSDB, so a real service can replace the
    local adapter without touching the screens (docs/INTERNAL-DATA.md).
    ========================================================================== */
-var DATA_REV='2026-08-02';                 /* data.json _updated; replaced by the fetched file's own */
+var DATA_REV='2026-11-11';                 /* data.json _updated; replaced by the fetched file's own */
 var WSDB={d:null, ok:true};
 function wsData(){
   if(WSDB.d) return WSDB.d;
@@ -12099,7 +12857,7 @@ function platGaps(k){
   var col=p.deliv!=='robot' && p.deliv!=='handpiece';
   if(col && !specGet(p,/^z.?axis/i)) g.push('Z stroke not stated');
   if(!specGet(p,/footprint/i)) g.push('Footprint not stated — enclosure size is estimated');
-  if(!specGet(p,/safety|laser class/i)) g.push('Laser class not stated');
+  if(!safetySpec(p)) g.push('Laser class not stated');
   if(!(p.lens||[]).length) g.push('No objectives offered');
   g.push('Working distance of offered objectives not in the data');
   return g;
@@ -12180,12 +12938,20 @@ function wsSpecRows(){
   var mk=[]; for(var k in S.mods) if(S.mods[k]) mk.push(modName(k)); r('Modules', mk.join(', ')||'None', 'user');
   r('Software', SW[S.sw].n, 'user'); if(S.target>0) r('Target rate', S.target+' parts/h', 'user');
   (p.specs||[]).forEach(function(x){ r(x[0], x[1], 'mfr', 'Platform specification'); });
-  if(S.src){ var s=SRC[S.src]; r('Wavelength', s.wl, 'mfr', 'Source class'); r('Beam quality M²', s.m2, 'mfr', 'Source class');
-    if(s.mode!=='cw') r('Pulse duration', s.tau+' '+(s.tauU||'ns'), 'mfr', 'Source class'); }
+  if(S.src){ var s=SRC[S.src]; r('Wavelength', s.wl, 'mfr', 'Source class'); r('Beam quality M²', s.m2, 'est', 'Typical for the source class — the catalogue does not state it');
+    if(s.mode!=='cw') r('Pulse duration', tauTxt(ph&&ph.tau_ns!=null? ph.tau_ns : s.tau), s.tauRange? 'user' : 'mfr', s.tauRange? 'Process point, within the tunable '+s.tauRange[0]+'–'+s.tauRange[1]+' ns' : 'Source class'); }
   if(S.lens){ var L=LENS[S.lens]; r('Focal length', L.f+' mm', 'mfr', 'Objective'); r('Field', L.fld+' × '+L.fld+' mm', 'mfr', 'Objective'); }
   if(o){ r('Spot diameter', o.spot.toFixed(0)+' µm', 'calc', 'd = 4·λ·f·M² / (π·D), diffraction-limited');
          r('Depth of focus', '± '+(o.dof/1000).toFixed(2)+' mm', 'calc', 'Rayleigh range z = πd² / (4·M²·λ)'); }
-  if(ph){ if(ph.Ep_mJ!=null) r('Pulse energy', num(ph.Ep_mJ)+' mJ', 'calc', 'P / f at '+num(ph.frep_khz)+' kHz');
+  if(ph){ var qq=ph.pp, ov=qq.over;
+          r('Process', qq.K.n, 'calc', 'From the platform, the application and the source');
+          if(qq.d>qq.d0*1.001 || qq.dStated) r('Working spot', num(qq.d)+' µm', ov.d!=null? 'user' : qq.dStated? 'mfr' : 'calc', qq.dStated? 'Inside the platform’s stated '+qq.dStated[0]+'–'+qq.dStated[1]+' µm' : 'Process point');
+          if(qq.pulsed) r('Repetition rate', ppFmt('f',qq.f), ov.f!=null? 'user' : 'est', ov.f!=null? 'Process point' : 'Starting point: geometric mid-point of the source band');
+          r('Process speed', inr(+qq.v.toPrecision(3))+' mm/s', ov.v!=null? 'user' : qq.lim==='overlap'? 'calc' : qq.vBasis==='spec'? 'mfr' : 'est',
+            ov.v!=null? 'Process point' : qq.lim==='overlap'? 'Held by the '+Math.round(qq.K.ov*100)+' % overlap rule' : qq.vBasis==='spec'? 'Platform specification' : 'Class estimate — the specification states no speed');
+          if(qq.pulsed && qq.K.ov!=null) r('Pulse overlap', Math.round(qq.ov*100)+' %', 'calc', 'O = 1 − v / (f·d)');
+          if(ph.Ep_mJ!=null) r('Pulse energy', num(ph.Ep_mJ)+' mJ', 'calc', 'P / f at '+ppFmt('f',ph.frep_khz));
+          r(ph.mode==='cw'&&isWeldKind(qq.kind)? 'Heat input' : 'Line energy', num(ph.lineE_Jmm)+' J/mm', 'calc', 'P / v');
           r('Heat to reject', num(ph.heat_kW)+' kW', 'calc', 'Wall-plug draw less optical output'); r('Process regime', ph.regime.n, 'calc', 'Irradiance and pulse class'); }
   if(pm) r('Processing time per part', fmtS(pm.t), 'calc', 'Process model: path '+Math.round(pm.len)+' mm at '+Math.round(pm.v)+' mm/s');
   var ran=SIM.cycle && SIM.forKey===simKey();
@@ -12205,6 +12971,8 @@ function wsDiffFields(a, b){
   var A2=JSON.parse(a), B2=JSON.parse(b), out=[];
   function nm(k,v){ return k==='src'? (SRC[v]||{n:v}).n : k==='lens'? (LENS[v]||{n:v}).n : k==='plat'? (PLAT[v]||{n:v}).n : k==='sw'? (SW[v]||{n:v}).n : String(v); }
   ['plat','app','src','pw','lens','sw','target','notes'].forEach(function(k){ if(String(A2[k])!==String(B2[k])) out.push(k+': '+nm(k,A2[k])+' → '+nm(k,B2[k])); });
+  var PPN={f:'repetition rate (kHz)', u:'pulse duration (ns)', v:'speed (mm/s)', h:'line pitch (share of track)', n:'passes', d:'working spot (µm)'}, pa=A2.pp||{}, pb=B2.pp||{};
+  Object.keys(PPN).forEach(function(k){ if(String(pa[k])!==String(pb[k])) out.push('process point — '+PPN[k]+': '+(pa[k]!=null? +(+pa[k]).toPrecision(4) : 'starting point')+' → '+(pb[k]!=null? +(+pb[k]).toPrecision(4) : 'starting point')); });
   ['mods','extra'].forEach(function(k){ var x=A2[k]||{}, y=B2[k]||{}, m;
     for(m in y) if(y[m] && !x[m]) out.push('+ '+modName(m)); for(m in x) if(x[m] && !y[m]) out.push('− '+modName(m)); });
   return out;
@@ -12844,7 +13612,10 @@ function simHud(){
     cell('Result', pr.l, 'p r', pr.c)+
     cell('Process', fmtS(SIM.procS), 's')+
     cell('Handling', fmtS(handS), 's')+
-    cell('Beam on', pcProc+' %', 's')+
+    cell('Beam on', (function(){ var d=cyc>0? (SIM.onS||0)/cyc*100 : 0; return (d<10? d.toFixed(1) : Math.round(d))+' %'; })(), 's')+
+    cell('Energy / part', SIM.eJ>=1000? (SIM.eJ/1000).toFixed(2)+' kJ' : num(SIM.eJ||0)+' J', 's')+
+    (SIM.pulses? cell('Pulses / part', SIM.pulses>=1e6? (SIM.pulses/1e6).toFixed(2)+' M' : SIM.pulses>=1e3? (SIM.pulses/1e3).toFixed(1)+' k' : Math.round(SIM.pulses), 's')
+               : cell('Line energy', num(S.pw/SIM.speed)+' J/mm', 's'))+
     cell('Good / 8 h', inr(Math.round(good*8)), 's')+
     (tgt? cell('vs target', Math.round(good/tgt*100)+' %', 's', good>=tgt?'ok':'warn')
         : cell('Speed', inr(Math.round(SIM.speed))+' mm/s', 's'))+
@@ -12863,10 +13634,11 @@ function simHud(){
   }
   var pm=SIM.pm||{};
   simMsg(k==='PROCESS'
-      ? S.pw+' W · '+SRC[S.src].wl+' · '+inr(Math.round(SIM.speed))+' mm/s'+
-        (pm.lim==='overlap'? ' (50 % pulse overlap)' : '')+' · '+inr(Math.round(SIM.markMM))+' mm'
+      ? S.pw+' W · '+SRC[S.src].wl+' · '+inr(+SIM.speed.toPrecision(3))+' mm/s'+
+        (SIM.q && SIM.q.pulsed? (SIM.q.K.ov!=null? ' · '+Math.round(SIM.q.ov*100)+' % pulse overlap' : SIM.q.kind==='dot'? ' · dots '+num(SIM.q.pitch)+' µm apart' : '') : '')+
+        ' · '+inr(Math.round(SIM.markMM))+' mm'
     : k==='LOAD' && SIM.wait>0.05 ? 'Index waits for station 2 — '+fmtS(SIM.wait)+' of loading'
-    : k==='LOCATE' && hasMod('visfid') ? 'Fiducial correction · ± 0.05 mm'
+    : k==='LOCATE' && hasMod('visfid') ? 'Fiducial correction'+(function(){ var a=accSpec(P()); return a? ' · '+a.row[1] : ''; })()
     : k==='FOCUS' ? (hasMod('autofoc')? 'Triangulation — Z set to the part · ' : 'Standoff '+(S.lens?LENS[S.lens].f:0)+' mm · ')+
         'DOF ± '+(o? (o.dof/1000).toFixed(2) : '—')+' mm'
     : k==='VERIFY' && hasMod('visver') ? 'Decode and grade to ISO/IEC 29158' : '',
@@ -13382,16 +14154,19 @@ function dfmData(){
   var p=P(), a=A(), o=optics(); if(!p||!a||!o) return null;
   var ph=null; try{ ph=physics(); }catch(e){}
   var mat=MAT[a.mat]||{n:'substrate'}, fam=p.fam;
-  var spot=o.spot, spotMM=spot/1000, dofMM=o.dof/1000, fld=o.fld;
+  var spot=ph? ph.spot : o.spot, spotMM=spot/1000, dofMM=o.dof/1000, fld=o.fld;
   var vis=hasMod('visfid'), af=hasMod('autofoc'), ver=hasMod('visver'), s3=hasMod('scan3d');
+  var acc=accSpec(p);
   var R={p:p,a:a,o:o,ph:ph,mat:mat,fam:fam,sec:[]};
 
   R.limits=[
-    ['Focused spot diameter', spot.toFixed(0)+' µm', 'd = 4·lambda·f·M2 / (pi·D), diffraction-limited'],
+    ['Focused spot diameter', o.spot.toFixed(0)+' µm', 'd = 4·lambda·f·M2 / (pi·D), diffraction-limited'],
+    ['Working spot', spot.toFixed(0)+' µm', ph && ph.pp.dStated? 'Inside the platform’s stated '+ph.pp.dStated[0]+'–'+ph.pp.dStated[1]+' µm range' : spot>o.spot*1.001? 'Set at the process point, above the focus limit' : 'The process works at focus'],
     ['Smallest reliable feature', (spotMM*1.2).toFixed(3)+' mm', 'About 1.2 x the spot; below this, edge definition is not repeatable'],
     ['Depth of focus', '± '+dofMM.toFixed(2)+' mm', 'Part height must stay inside this band'+(af?' (auto Z-focus fitted, so it tracks)':' unless auto Z-focus is fitted')],
     ['Addressable field', fld+' × '+fld+' mm', 'Larger features need field stitching or an axis move'],
-    ['Placement accuracy', vis? '± 0.05 mm':'± 0.25 mm', vis? 'With fiducial correction':'Fixture-limited without fiducial vision'],
+    [acc? acc.row[0] : 'Placement accuracy', acc? acc.row[1] : 'Not stated in the specification',
+      acc? 'Platform specification'+(vis? '' : ' — fiducial vision is not fitted, so the fixture sets where the mark lands') : (vis? 'Fiducial vision is fitted; confirm the figure with TEAL' : 'Fixture-limited without fiducial vision — confirm with TEAL')],
     ['Effective focal length', o.f+' mm', 'Not the working distance: the clearance under the objective is lens-specific and is not in the product data — take it from the objective datasheet']
   ];
   if(ph) R.limits.push(['Process regime', ph.regime.n, ph.regime.d]);
@@ -13586,8 +14361,10 @@ function dfmWindow(){
     ['Beam quality M²', String(s.m2), 'Lower is tighter focus and deeper focus range'],
     ['Focused spot', o.spot.toFixed(0)+' µm', 'Computed, diffraction-limited'],
     ['Depth of focus', '± '+(o.dof/1000).toFixed(2)+' mm', 'Computed'],
-    ['Scan speed', inr(scanSpeed())+' mm/s', 'From the platform specification']
+    (function(){ var hs=headSpeed(); return ['Fastest beam speed', inr(hs.v)+' mm/s', hs.basis==='spec'? 'From the platform specification' : 'A class estimate — the specification states no speed']; })()
   ];
+  if(ph) procRows(ph, true).forEach(function(x){ if(x[0]==='Process'||x[0]==='Speed'||x[0]==='Pulse overlap'||x[0]==='Line pitch'||x[0]==='Passes'||x[0]==='Working spot'||x[0]==='Dot pitch')
+    rows.push([x[0], x[1], x[0]==='Process'? 'The operating point every figure here is computed at' : 'Process point']); });
   if(ph){
     rows.push(['Process regime', ph.regime.n, ph.regime.d]);
     if(ph.mode==='pulsed'){
@@ -14161,8 +14938,12 @@ function simSummaryText(){
     kv('Process time', SIM.procS.toFixed(2)+' s');
     if(pm.basis) kv('Process basis', pm.basis);
     kv('Process speed', inr(Math.round(SIM.speed))+' mm/s'+
-      (pm.lim==='overlap'? ' — held to 50 % pulse overlap (head '+inr(pm.head)+' mm/s)' : ' — scan head'));
+      (pm.lim==='overlap'? ' — held by the pulse-overlap rule (head '+inr(pm.head)+' mm/s)' : pm.lim==='set'? ' — set at the process point' : ' — scan head'));
     kv('Path', inr(Math.round(SIM.markMM))+' mm processed, '+inr(Math.round(SIM.jumpMM))+' mm jumps');
+    kv('Beam-on time', (SIM.onS||0).toFixed(3)+' s a part — '+((SIM.onS||0)/SIM.cycle*100).toFixed(1)+' % of the cycle');
+    kv('Optical energy', (SIM.eJ>=1000? (SIM.eJ/1000).toFixed(2)+' kJ' : num(SIM.eJ||0)+' J')+' a part ('+S.pw+' W × beam-on time)');
+    if(SIM.pulses) kv('Pulses', inr(Math.round(SIM.pulses))+' a part');
+    kv('Source electrical', num(SIM.elWh||0)+' Wh a part while emitting — laser source only, at '+Math.round((SRC[S.src].wpe||0.25)*100)+' % wall-plug efficiency');
     kv('Handling time', Math.max(0,SIM.cycle-SIM.procS).toFixed(2)+' s');
     L.push('  Phases (real seconds):');
     SIM.phases.forEach(function(x){
@@ -14206,8 +14987,8 @@ function simSummaryText(){
   L.push('  · Cycle and rate figures come from the motion and phase model in this tool.');
   L.push('    They are indicative, and exclude line-level starvation and blocking.');
   L.push('  · Marking time is modelled on a 12 × 12 Data Matrix at the DFM-recommended');
-  L.push('    module and a line of text, hatched at half the line width. Pulsed sources');
-  L.push('    are held to 50 % pulse overlap; each vector pays a 250 µs scanner delay.');
+  L.push('    module and a line of text, at the line pitch, overlap and passes of the');
+  L.push('    process point; each vector pays a 250 µs scanner delay.');
   L.push('    Your own content, hatch and passes set the real figure.');
   L.push('  · Ablation thresholds, removal rates and eyewear optical density are');
   L.push('    deliberately absent — see Data provenance.');
@@ -14535,7 +15316,7 @@ function storyText(){
           ['Rayleigh range', ph&&ph.rayleigh_mm!=null? '± '+num(ph.rayleigh_mm)+' mm' : '—'],
           ['Regime', ph? esc(ph.regime.n) : '—']])+
       '<p class="sty-note">Illustrative: the drawing is a schematic of the train, not a ray trace.</p>');
-    var lim= pm && pm.lim==='overlap'? 'held to 50 % pulse overlap' : 'the head’s scan speed';
+    var lim= pm && pm.lim==='overlap'? 'held by the pulse-overlap rule' : pm && pm.lim==='set'? 'set at the process point' : 'the head’s scan speed';
     out.push(k(5)+'<h2>The process</h2><p>'+(pm? esc(pm.basis)+'.' : 'The path this machine runs.')+'</p>'+
       dl([['Process time', pm? pm.t.toFixed(2)+' s' : '—'],
           ['Speed', pm? inr(pm.v)+' mm/s — '+lim : '—'],
@@ -14759,12 +15540,13 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v15.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v16.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
   BOOTED = true;
   try{ shellInit(); }catch(e){ if(window.console) console.warn('header switches:', e.message); }
+  try{ accInit(); }catch(e){ if(window.console) console.warn('access:', e.message); }
   render();
   try{ m3dInit(); }catch(e){}
   try{ storyInit(); }catch(e){}

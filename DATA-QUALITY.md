@@ -94,7 +94,54 @@ is in [`assets/cad/COVERAGE.md`](assets/cad/COVERAGE.md), which `npm test` keeps
 |---|---|
 | `RULES.adminPin` (`teal2026`) was shipped in the public `data.json` and gated the value store. Anyone could read it, so it protected nothing while implying it did | **Removed** from `data.json` and the page. The value store opens from the Internal view, which is labelled a demonstration. See [`SECURITY.md`](SECURITY.md) |
 | The printed sheet, the specification step and the 3D floor plan called every platform "Class 1 per IEC 60825-1" | **Fixed.** All three read the platform's own `Safety` specification. Where there is none, they say the class is not stated |
-| Only 6 of 22 platforms have a `Safety` specification: `markf` and `markm` (Class 1 per IEC 60825-1), `weldr` (Class 1 cabin per IEC 60825-4), `robo` (Class 1 guarding), `cleanp` (eyewear, beacons, key control) and `roto` (risk assessment to ISO 12100) | **Needs TEAL** — the laser class and safety concept of the other 16 platforms |
+| At that date, only 6 of 22 platforms had a `Safety` specification (v16.0 also counts an `Enclosure` row; see below): `markf` and `markm` (Class 1 per IEC 60825-1), `weldr` (Class 1 cabin per IEC 60825-4), `robo` (Class 1 guarding), `cleanp` (eyewear, beacons, key control) and `roto` (risk assessment to ISO 12100) | **Needs TEAL** — the laser class and safety concept of the other 16 platforms |
 | Every export now carries the configuration ID, revision and fingerprint: the share link, printed sheet, BOM CSV, RFQ, component register, DFM report and requests | Done. Documents can be traced back to the selection they describe |
 
 No catalogue value was changed, apart from the removal of the PIN.
+
+## Process model and reference data (2026-11-11)
+
+An end-to-end inspection ran all 1,143 combinations of platform, application, source,
+power and objective through the optics, physics and cycle models. `npm test` now
+repeats that sweep on every run.
+
+### Fixed
+
+| Finding | Status |
+|---|---|
+| The focus limit was shown as the process spot on platforms that state a working spot: 12–20 µm on `weldh` (stated 50–300 µm), 19–32 µm on `weldp` (stated 30–600 µm) | **Fixed.** The working spot stays inside the stated range |
+| Quasi-CW peak power was derived from a guessed repetition rate, giving 0.95 kW at 150 W against the catalogue's 1.5 kW | **Fixed.** `SRC.qcw.pk = 10`, the catalogue's own ratio |
+| The physics panel, the heat-input figure and the run each used a different speed | **Fixed.** One process point |
+| Cutting, scribing and automation platforms ran pulsed lines with the pulses apart | **Fixed.** Each line process starts at an overlap rule |
+| `voltm` and `voltt` (cell marking) were simulated as a joining process | **Fixed** |
+| The MOPA source was computed at its shortest pulse, 2 ns, giving a 237 kW peak at 30 W | **Fixed.** The pulse starts at the geometric mid-point of the tunable range and is adjustable |
+| Thermal properties did not match any one source: carbon steel 50 W/m·K, 304 at 16 W/m·K and 8,000 kg/m³ | **Fixed.** Nine materials now carry the Incropera & DeWitt Appendix A values at 300 K |
+| Silicon absorptivity at 355 nm was 65 %; the tabulated n and k give 43 % | **Fixed** |
+| Glass "melts at 1,000 °C" and polyimide "decomposes near 400 °C" | **Fixed.** Each material states how it gives way: melts, decomposes, or passes a transition |
+| Wall-plug efficiency was labelled a published figure for every source | **Fixed.** Published ranges were found for fiber, CO₂ and diode only; the rest are now labelled estimates |
+| The 3D nameplate, robot schematic, run message and DFM report asserted Class 1, CE, ± 0.05 mm and ± 0.25 mm for every platform | **Fixed.** Each reads the platform's own specification |
+
+With the `Enclosure` row counted alongside `Safety`, 7 of 22 platforms make a safety
+statement and 5 name Class 1: `markf`, `markm`, `weldr`, `cleana` and `robo`.
+
+### Still estimates
+
+| Data | Why it matters | Needs |
+|---|---|---|
+| Beam quality M² and beam diameter at the objective, for all 12 sources | They set the computed focus spot. Neither is in the catalogue | **TEAL** — the source and beam-expander data sheets |
+| Starting pulse overlap: marking 50 %, cutting and scribing 80 %, cleaning 30 % | They set the default speed and so the cycle time | **TEAL** — application trial results. Only the 75 % for pulsed seams has a published basis |
+| Speed where the specification states none (19 of 22 platforms): welding 120, cleaning 900, cutting 400, semiconductor 3,000, otherwise 2,500 mm/s | Process time on those platforms is indicative | **TEAL** — a speed row in each platform's specification |
+| Absorptivity, except copper and silicon | Coupled power is indicative | Measured values, or n and k from a cited table |
+| Thermal properties of glass, FR4, engineering polymer and mould compound | Grade-dependent | The grades TEAL validates against |
+| Wall-plug efficiency of UV, green, blue, picosecond and femtosecond sources | Heat load and electrical energy for those sources | **TEAL** — source data sheets |
+| The 20 µm minimum mark line and the 250 µs scanner delay | Marking time | Scan-head settings |
+| The 10 J/cm² line between an annealing and an ablative mark | The regime label on marking platforms | Trial results per material |
+
+### Needs a TEAL decision
+
+| Record | Finding |
+|---|---|
+| `PLAT.weldh` | The specification calls 150–450 W the "peak class". The configurator treats platform power as average power, as on `weldp` (150 W average, 1.5 kW peak). If 150–450 W is peak, the average is a tenth of it and every energy figure for this platform is ten times too high |
+| `PLAT.weldp` | The seam application recommends CW 500 W, but the platform's power list stops at 450 W, so the recommendation snaps to 450 W |
+| `SRC.smcw` at 3–6 kW | Modelled as single-mode (M² 1.05). The catalogue also offers a ring-mode option. No beam parameter product is given, so the focus spot on `weldb` and `weldr` is the single-mode figure |
+| Source limits | Maximum pulse energy and peak power are not in the data. The process point can be set to a pulse energy a real source may not reach |

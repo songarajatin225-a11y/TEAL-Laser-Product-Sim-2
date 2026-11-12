@@ -1,6 +1,6 @@
 {
   "_comment": "TEAL Laser Equipment Configurator — value store. Edit here or via the admin panel, then commit alongside index.html.",
-  "_updated": "2026-08-02",
+  "_updated": "2026-11-11",
   "SRC": {
     "fiber": {
       "n": "Fiber (Q-switched)",
@@ -54,6 +54,7 @@
         0.1,
         1
       ],
+      "pk": 10,
       "wpe": 0.25,
       "prem": 1.22
     },
@@ -211,51 +212,60 @@
   "MAT": {
     "steel": {
       "n": "Carbon steel",
-      "k": 50,
-      "tm": 1538,
-      "rho": 7850,
-      "cp": 490,
+      "k": 60.5,
+      "tm": 1537,
+      "rho": 7854,
+      "cp": 434,
       "a": {
         "uv": 0.6,
         "blue": 0.6,
         "green": 0.55,
         "ir": 0.35,
         "co2": 0.1
-      }
+      },
+      "tk": "melt",
+      "ref": "incropera",
+      "note": "Plain carbon steel (Mn ≤ 1 %, Si ≤ 0.1 %). The melting point is that of pure iron; carbon steels begin to melt lower."
     },
     "ss": {
       "n": "Stainless 304",
-      "k": 16,
-      "tm": 1450,
-      "rho": 8000,
-      "cp": 500,
+      "k": 14.9,
+      "tm": 1397,
+      "rho": 7900,
+      "cp": 477,
       "a": {
         "uv": 0.6,
         "blue": 0.58,
         "green": 0.55,
         "ir": 0.35,
         "co2": 0.1
-      }
+      },
+      "tk": "melt",
+      "ref": "incropera",
+      "note": "AISI 304."
     },
     "al": {
       "n": "Aluminium",
       "k": 237,
       "tm": 660,
-      "rho": 2700,
-      "cp": 900,
+      "rho": 2702,
+      "cp": 903,
       "a": {
         "uv": 0.25,
         "blue": 0.16,
         "green": 0.15,
         "ir": 0.08,
         "co2": 0.02
-      }
+      },
+      "tk": "melt",
+      "ref": "incropera",
+      "note": "Pure aluminium. Alloys conduct less: 2024-T6 is about 177 W/m·K."
     },
     "cu": {
       "n": "Copper",
       "k": 401,
       "tm": 1085,
-      "rho": 8960,
+      "rho": 8933,
       "cp": 385,
       "a": {
         "uv": 0.55,
@@ -263,77 +273,97 @@
         "green": 0.4,
         "ir": 0.04,
         "co2": 0.015
-      }
+      },
+      "tk": "melt",
+      "ref": "incropera",
+      "aref": "hummel",
+      "note": "Pure copper. Published room-temperature absorptivity: under 5 % near 1 µm, 40–60 % at 515 nm, 50 % and above at 450 nm."
     },
     "ti": {
       "n": "Titanium",
-      "k": 22,
-      "tm": 1668,
-      "rho": 4510,
-      "cp": 520,
+      "k": 21.9,
+      "tm": 1680,
+      "rho": 4500,
+      "cp": 522,
       "a": {
         "uv": 0.55,
         "blue": 0.52,
         "green": 0.5,
         "ir": 0.42,
         "co2": 0.12
-      }
+      },
+      "tk": "melt",
+      "ref": "incropera",
+      "note": "Pure titanium."
     },
     "ni": {
       "n": "Nickel",
-      "k": 91,
+      "k": 90.7,
       "tm": 1455,
       "rho": 8900,
-      "cp": 440,
+      "cp": 444,
       "a": {
         "uv": 0.5,
         "blue": 0.45,
         "green": 0.42,
         "ir": 0.28,
         "co2": 0.05
-      }
+      },
+      "tk": "melt",
+      "ref": "incropera",
+      "note": "Pure nickel."
     },
     "si": {
       "n": "Silicon",
-      "k": 150,
-      "tm": 1414,
+      "k": 148,
+      "tm": 1412,
       "rho": 2330,
-      "cp": 700,
+      "cp": 712,
       "a": {
-        "uv": 0.65,
-        "blue": 0.62,
-        "green": 0.6,
+        "uv": 0.43,
+        "blue": 0.58,
+        "green": 0.63,
         "ir": 0.3,
         "co2": 0.05
-      }
+      },
+      "tk": "melt",
+      "ref": "incropera",
+      "aref": "green",
+      "note": "Absorptivity at 355, 450 and 532 nm is 1 − R from the tabulated n and k. At 1064 nm silicon is weakly absorbing — light travels about a millimetre — so a wafer absorbs only part of what enters it."
     },
     "sic": {
       "n": "Silicon carbide",
-      "k": 370,
-      "tm": 2730,
-      "rho": 3210,
-      "cp": 690,
+      "k": 490,
+      "tm": 2827,
+      "rho": 3160,
+      "cp": 675,
       "a": {
         "uv": 0.7,
         "blue": 0.55,
         "green": 0.35,
         "ir": 0.15,
         "co2": 0.08
-      }
+      },
+      "tk": "decomp",
+      "ref": "incropera",
+      "note": "Dense, high-purity silicon carbide; sintered grades conduct considerably less."
     },
     "al2o3": {
       "n": "Alumina",
-      "k": 30,
-      "tm": 2072,
-      "rho": 3950,
-      "cp": 880,
+      "k": 36,
+      "tm": 2050,
+      "rho": 3970,
+      "cp": 765,
       "a": {
         "uv": 0.45,
         "blue": 0.2,
         "green": 0.15,
         "ir": 0.12,
         "co2": 0.9
-      }
+      },
+      "tk": "melt",
+      "ref": "incropera",
+      "note": "Polycrystalline aluminium oxide."
     },
     "aln": {
       "n": "Aluminium nitride",
@@ -347,12 +377,15 @@
         "green": 0.18,
         "ir": 0.14,
         "co2": 0.88
-      }
+      },
+      "tk": "decomp",
+      "ref": "alnds",
+      "note": "Substrate grade: 170 W/m·K is the usual minimum, some grades reach 230. Suppliers quote 720–800 J/kg·K."
     },
     "glass": {
       "n": "Soda-lime glass",
       "k": 1,
-      "tm": 1000,
+      "tm": 570,
       "rho": 2500,
       "cp": 840,
       "a": {
@@ -361,7 +394,10 @@
         "green": 0.01,
         "ir": 0.02,
         "co2": 0.92
-      }
+      },
+      "tk": "tg",
+      "ref": "typ",
+      "note": "A glass has no melting point: it passes its transition near 570 °C and softens progressively above it."
     },
     "fr4": {
       "n": "FR4 / solder mask",
@@ -376,12 +412,15 @@
         "ir": 0.15,
         "co2": 0.92
       },
-      "org": 1
+      "org": 1,
+      "tk": "decomp",
+      "ref": "typ",
+      "note": "Glass-epoxy laminate. The decomposition temperature depends on the grade, roughly 300–350 °C."
     },
     "pi": {
       "n": "Polyimide",
-      "k": 0.15,
-      "tm": 400,
+      "k": 0.12,
+      "tm": 360,
       "rho": 1420,
       "cp": 1090,
       "a": {
@@ -391,7 +430,10 @@
         "ir": 0.12,
         "co2": 0.94
       },
-      "org": 1
+      "org": 1,
+      "tk": "tg",
+      "ref": "kapton",
+      "note": "Kapton HN film. It does not melt; the second-order transition lies between 360 and 410 °C."
     },
     "poly": {
       "n": "Engineering polymer",
@@ -406,7 +448,10 @@
         "ir": 0.1,
         "co2": 0.93
       },
-      "org": 1
+      "org": 1,
+      "tk": "melt",
+      "ref": "typ",
+      "note": "A placeholder for the ABS, PC and PEEK class. Properties differ by resin and filler."
     },
     "emc": {
       "n": "Epoxy mould compound",
@@ -421,7 +466,10 @@
         "ir": 0.3,
         "co2": 0.9
       },
-      "org": 1
+      "org": 1,
+      "tk": "decomp",
+      "ref": "typ",
+      "note": "Silica-filled epoxy. Properties depend on filler loading."
     }
   },
   "IND": {
@@ -462,77 +510,136 @@
     "iec60825_1": {
       "n": "IEC 60825-1",
       "d": "Safety of laser products — equipment classification and requirements",
-      "s": "Every enclosed system; defines the Class 1 condition"
+      "s": "Every enclosed system; defines the Class 1 condition",
+      "b": "cat",
+      "ed": "2014"
     },
     "iec60825_4": {
       "n": "IEC 60825-4",
       "d": "Safety of laser products — laser guards",
-      "s": "Cabins and guarding around robot and gantry cells"
+      "s": "Cabins and guarding around robot and gantry cells",
+      "b": "cat",
+      "ed": "2022"
+    },
+    "iso11553_1": {
+      "n": "ISO 11553-1",
+      "d": "Safety of machinery — Laser processing machines — Part 1: Laser safety requirements",
+      "s": "Laser hazards of a machine that processes material with a laser",
+      "b": "scope",
+      "ed": "2020"
+    },
+    "iso11553_2": {
+      "n": "ISO 11553-2",
+      "d": "Safety of machinery — Laser processing machines — Part 2: Safety requirements for hand-held laser processing devices",
+      "s": "Hand-held laser processing — the open-beam hand-piece",
+      "b": "scope"
     },
     "iso12100": {
       "n": "ISO 12100",
       "d": "Safety of machinery — risk assessment and risk reduction",
-      "s": "Cell-level risk assessment and residual-risk file"
+      "s": "Cell-level risk assessment and residual-risk file",
+      "b": "cat",
+      "ed": "2010"
     },
     "iso13849": {
       "n": "ISO 13849-1",
       "d": "Safety-related parts of control systems",
-      "s": "Performance level of interlock and E-stop circuits"
+      "s": "Performance level of interlock and E-stop circuits",
+      "b": "cat",
+      "ed": "2023"
     },
     "iso29158": {
       "n": "ISO/IEC 29158",
       "d": "Direct part mark quality guideline",
-      "s": "Grading of marked 2D codes (AIM DPM)"
+      "s": "Grading of marked 2D codes (AIM DPM)",
+      "b": "cat",
+      "ed": "2025"
     },
     "iso15415": {
       "n": "ISO/IEC 15415",
       "d": "2D symbol print quality test specification",
-      "s": "Grading of printed and label 2D codes"
+      "s": "Grading of printed and label 2D codes",
+      "b": "cat"
+    },
+    "iso16022": {
+      "n": "ISO/IEC 16022",
+      "d": "Data Matrix bar code symbology specification",
+      "s": "The Data Matrix (ECC 200) symbol that is marked and graded",
+      "b": "scope",
+      "ed": "2024"
+    },
+    "iso13919_1": {
+      "n": "ISO 13919-1",
+      "d": "Electron and laser-beam welded joints — quality levels for imperfections — Part 1: Steel, nickel, titanium and their alloys",
+      "s": "Acceptance levels B, C and D for laser-welded seams",
+      "b": "scope",
+      "ed": "2019"
+    },
+    "iso13919_2": {
+      "n": "ISO 13919-2",
+      "d": "Electron and laser-beam welded joints — quality levels for imperfections — Part 2: Aluminium, magnesium and their alloys and pure copper",
+      "s": "Acceptance levels for laser welds in aluminium and copper",
+      "b": "scope"
+    },
+    "iso9013": {
+      "n": "ISO 9013",
+      "d": "Thermal cutting — classification of thermal cuts — geometrical product specification and quality tolerances",
+      "s": "Cut-edge quality and tolerances of laser-cut profiles",
+      "b": "scope"
     },
     "semi_t7": {
       "n": "SEMI T7",
       "d": "Back-surface marking of double-side polished wafers",
-      "s": "Wafer back-side identity"
+      "s": "Wafer back-side identity",
+      "b": "cat"
     },
     "semi_m12": {
       "n": "SEMI M12",
       "d": "Serial alphanumeric marking of the front surface of wafers",
-      "s": "Wafer front-side identity"
+      "s": "Wafer front-side identity",
+      "b": "cat"
     },
     "semi_m13": {
       "n": "SEMI M13",
       "d": "Alphanumeric marking of silicon wafers",
-      "s": "Wafer character set and placement"
+      "s": "Wafer character set and placement",
+      "b": "cat"
     },
     "semi_e30": {
       "n": "SEMI E30 / E37 / E40",
       "d": "GEM, HSMS and processing management",
-      "s": "Fab and OSAT host communication"
+      "s": "Fab and OSAT host communication",
+      "b": "cat"
     },
     "smema": {
       "n": "IPC-SMEMA-9851",
       "d": "Mechanical equipment interface standard",
-      "s": "Board handshake between inline machines"
+      "s": "Board handshake between inline machines",
+      "b": "cat"
     },
     "hermes": {
       "n": "IPC-HERMES-9852",
       "d": "Machine-to-machine communication in SMT",
-      "s": "Digital successor to SMEMA on SMT lines"
+      "s": "Digital successor to SMEMA on SMT lines",
+      "b": "cat"
     },
     "iec61340": {
       "n": "IEC 61340-5-1",
       "d": "Protection of electronic devices from electrostatic phenomena",
-      "s": "ESD-safe build and dry-room handling"
+      "s": "ESD-safe build and dry-room handling",
+      "b": "cat"
     },
     "iso14644": {
       "n": "ISO 14644-1",
       "d": "Cleanrooms — classification of air cleanliness by particle concentration",
-      "s": "Cleanroom-compatible construction"
+      "s": "Cleanroom-compatible construction",
+      "b": "cat"
     },
     "cfr11": {
       "n": "21 CFR Part 11",
       "d": "Electronic records and electronic signatures",
-      "s": "Validated sites using audit-trailed software"
+      "s": "Validated sites using audit-trailed software",
+      "b": "cat"
     }
   },
   "LEX": {

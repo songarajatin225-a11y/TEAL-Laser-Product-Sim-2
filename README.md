@@ -9,13 +9,17 @@ sources, 4 f-theta objectives, 25 automation modules, 4 LaserSuite editions.
 
 ## Deploy to GitHub Pages
 
-1. Create a repository and add `index.html`, `.nojekyll` and this `README.md` to the
-   default branch.
+1. Create a repository and add `index.html`, `data.json`, `access.json`, the `assets`
+   folder, `.nojekyll` and this `README.md` to the default branch.
 2. **Settings → Pages → Source:** deploy from branch, `main`, `/ (root)`.
 3. Live at `https://<user>.github.io/<repo>/` within about a minute.
 
 For a custom domain, add a `CNAME` file containing the hostname and point a DNS
 record at GitHub Pages.
+
+The page opens with a passkey form. Set your own passkeys before publishing:
+`node tools/access/set-passkeys.mjs --generate`. See
+[Access passkeys](#access-passkeys) and [`SECURITY.md`](SECURITY.md).
 
 ## Notes
 
@@ -319,8 +323,8 @@ to the values built into `index.html`, so it never breaks.
 
 ### Option A — the admin panel (no code)
 
-1. Switch the header to **Internal** and click **⚙ Values**, bottom right (or open
-   `<site-url>/#admin`, which switches to the Internal view itself).
+1. Open the site with the internal passkey, switch the header to **Internal** and
+   click **⚙ Values**, bottom right (or open `<site-url>/#admin`).
 2. Edit across the tabs:
 
 | Tab | What you can change |
@@ -415,10 +419,10 @@ colleague's version before committing it.
 ### A caution about privacy
 
 This is a static site: the configurator runs entirely in the browser, so every
-value in `data.json` is readable by anyone who can load the page. There is no
-PIN: v15.0 removed it, because a PIN shipped in `data.json` was readable by anyone
-and so protected nothing. Edits in the panel change only the browser they are
-made in until the exported file is committed. If your cost basis must stay
+value in `data.json` is readable by anyone who knows its address, with or without
+a passkey. The passkey form added in v16.0 covers the page; it does not protect the
+data. Edits in the panel change only the browser they are made in until the exported
+file is committed. If your cost basis must stay
 confidential, keep the repository **private** (GitHub Pages on a private repo
 requires a paid plan), or move the values behind an authenticated API and have
 the page fetch from there instead.
@@ -1230,14 +1234,19 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 135 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 177 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
 the Customer and Internal views, the three themes, configuration identity and
-revisions, the ten workspace screens, quotation and trial requests, layout from 320
-to 1,900 px and accessible names. Each check names the behaviour it
+revisions, the ten workspace screens, quotation and trial requests, the process
+point, a sweep of every platform, application, source, power and objective through
+the physics, the sources and standards registers, the access passkeys, layout from
+320 to 1,900 px and accessible names. Each check names the behaviour it
 protects.
+
+The suite never uses the real passkeys: its own server answers `access.json` with
+verifiers for two throw-away keys, so the tests run the same on any copy of the site.
 
 ## v11.0 — commercial breakdown, assemblies, presentation
 
@@ -1689,6 +1698,9 @@ History. With no machine configured, it uses the README's worked example.
 
 ### The honest part first
 
+*v16.0 added access passkeys and hides the Internal switch from customer sessions; see
+[Access passkeys](#access-passkeys). The limits described here still hold.*
+
 The header has a **Customer / Internal** switch. It changes what is shown, not who
 may see it: the site is static and public, so anyone can switch, and nothing in it
 needs protecting. The Internal view is a **demonstration workspace**:
@@ -1841,6 +1853,138 @@ changing the screens.
 - **Supplier prices, part numbers, drawing numbers and margins** are TEAL data that
   this public site must not carry. The screens take them as local input instead.
 - **Real CAD** is still pending approved files, as in v13.0.
+
+## v16.0 — one process point, cited data, access passkeys
+
+An end-to-end inspection found that the tests passed while the physics disagreed with
+itself and, in places, with the catalogue. This version fixes that, makes the process
+adjustable, states where every number comes from, and puts the site behind passkeys.
+
+### What the inspection found
+
+All 1,143 combinations of platform, application, source, power and objective were run
+through the optics, physics and cycle models.
+
+| Finding | Now |
+|---|---|
+| Welding platforms showed the diffraction-limited focus as the process spot: 12–20 µm on the Weld H-Series, whose catalogue entry states 50–300 µm | The working spot stays inside the range the platform states. The focus limit is shown beside it |
+| A quasi-CW source's peak power came from a guessed repetition rate: 0.95 kW at 150 W | It is the catalogue's own 150 W average at 1.5 kW peak, a ten-to-one ratio |
+| Three different speeds: the physics panel assumed 7,000 mm/s on every platform, heat input assumed 50 mm/s, the run used a third | One speed, from the process point, everywhere |
+| Only marking limited speed by pulse overlap. A UV cut ran at 17 % overlap and scribing with the pulses apart: a dotted line shown as a cut | Every line process starts at an overlap rule and says when it is broken |
+| Volt cell-marking stations simulated a "JOIN" with weld-like lines | They mark |
+| Automation cells called a pulsed marking job "Keyhole", and drew a 161 mm code at head speed | The regime follows the process; the mark is timed at the size it is made |
+| A decapsulation system and a nanosecond scriber were called "Cold ablation" | Cold ablation is said only of ultrashort pulses |
+| The 3D nameplate said "CE · IEC 60825-1 CLASS 1" on every machine, and the robot schematic "CLASS 1 CABIN" | A class is named only where the specification states one, and a CE file only where that package is fitted |
+| The run and the DFM report quoted ± 0.05 mm and ± 0.25 mm placement on every platform | They quote the platform's own accuracy, or say it is not stated |
+| "Beam on" was the whole process time, jumps included | It is emission time |
+| The DFM report called a class-default speed "from the platform specification" | It says which it is |
+
+### The process point
+
+The Source step has a new panel: the operating point everything else is computed at.
+
+| Control | Starts at | Limits |
+|---|---|---|
+| Working spot | The focus limit, or the middle of the platform's stated range for welding | The stated range, or up to 10× the focus by defocus |
+| Repetition rate | The geometric mid-point of the source band | The band |
+| Pulse duration (MOPA) | The geometric mid-point of the tunable range | 2–500 ns, from the catalogue |
+| Speed | The overlap rule, or the fastest the beam is moved | The platform's stated speed, or a class estimate where it states none |
+| Line pitch | Half the track for marking, 70 % for cleaning | 10–150 % of the track |
+| Passes | 1 | 1–20 |
+
+- Dragging a control previews the result live. Releasing it makes a new revision.
+- The process point is part of the configuration: it travels in the share link, is
+  undone and redone like any other change, and is printed on every document.
+- It lapses when the platform, source or objective changes, because its limits no
+  longer hold.
+- An untouched process point adds nothing to the configuration record, so the
+  fingerprint of every earlier configuration is unchanged.
+
+Two drawings, to scale, sit under the controls:
+- **Where the beam lands:** spots at their true diameter, pulse pitch and line pitch.
+- **The beam through focus:** the caustic, the depth of focus and the working spot.
+
+Below them the panel states the consequences: the overlap and pulses per spot, a
+dotted line, a seam below hermetic overlap, a speed that is only an estimate.
+
+**Starting overlaps are rules of practice, not TEAL process data:** marking 50 %,
+cutting and scribing 80 %, cleaning 30 %, pulsed seams 75 %. Only the last has a
+published basis (70–80 % for hermetic seams). All are there to be replaced by trials.
+
+### New figures
+
+- Fluence both averaged over the spot and on the beam axis (twice the average for a
+  Gaussian spot).
+- Pulse overlap, pulses per spot diameter, pulse pitch; dot pitch for wafer marking.
+- Line energy and areal dose at the actual speed and line pitch.
+- Dwell time, and the thermal diffusion length during it, for a continuous beam.
+- Per part, from the run: beam-on time, optical energy, pulse count, and the
+  electrical energy the source draws while emitting. Source only; chiller, extraction
+  and motion are not included.
+
+The engineering assistant answers on overlap, speed, fluence and dose, energy per
+part, the working spot, and where the numbers come from.
+
+### Where the numbers come from
+
+**Method and sources**, at the foot of the Source step, lists every computed figure
+with its relation, its inputs and its reference, then the inputs of the current
+configuration with the origin of each, then the references in full.
+
+| Data | Source | Checked |
+|---|---|---|
+| Thermal properties of steel, 304, Al, Cu, Ti, Ni, Si, SiC, alumina | Incropera & DeWitt, *Fundamentals of Heat and Mass Transfer*, Appendix A, 300 K | Values against copies of the table |
+| Polyimide | DuPont Kapton HN data sheet | Conductivity and transition |
+| Aluminium nitride | CeramTec and MARUWA substrate data sheets | Conductivity and density |
+| Glass, FR4, polymer, mould compound | Typical values | Not traceable to one table, and marked so |
+| Copper absorptivity | Hummel et al., *J. Adv. Joining Processes*, 2020 | Ranges as published |
+| Silicon absorptivity | Green & Keevers, 1995, as 1 − R from n and k | Computed |
+| Other absorptivities | Indicative class values | Not measured figures, and marked so |
+| Optics | Siegman, *Lasers*; ISO 11146-1:2021 | Standard against ISO's catalogue |
+| Seam overlap | Ahmed (ed.), *New Developments in Advanced Welding*; Eastman, EWI | Formula and ranges |
+| Quasi-CW peak ratio | TEAL catalogue; IPG YLM-QCW data sheet | 150 W average, 1,500 W peak |
+
+Changed values: carbon steel is now plain carbon steel at 60.5 W/m·K (was 50); 304 is
+14.9 W/m·K and 7,900 kg/m³; silicon absorbs 43 % at 355 nm (was 65 %); polyimide
+conducts 0.12 W/m·K (was 0.15). A glass and a polyimide are no longer said to melt.
+
+Beam quality M², beam diameter at the objective and fixed pulse durations are class
+values the catalogue does not state. They set the computed spot, and the provenance
+register now lists them as estimates. See [`DATA-QUALITY.md`](DATA-QUALITY.md).
+
+**Standards** now carry the edition checked against the publisher's catalogue, and a
+*by scope* tag where the standard applies through its own scope but is not named in
+the TEAL catalogue. That tag is not a statement of certification. Added by scope:
+ISO 11553-1 and -2 (laser processing machines), ISO/IEC 16022 (Data Matrix),
+ISO 13919-1 and -2 (laser-welded joints), ISO 9013 (thermal cuts).
+
+### Access passkeys
+
+The page opens with a passkey form.
+
+- The **customer passkey** opens the Customer view. The Internal switch is not shown.
+- The **internal passkey** opens both views and the value store.
+- Staff reach the Internal view from **Staff access** in the footer; **Lock** beside
+  it ends the session.
+
+No passkey is in the repository: only a salt and a verifier for each. Change them with
+`node tools/access/set-passkeys.mjs`, then commit `access.json` and `index.html`.
+
+This keeps casual visitors out. **It is not a security boundary.** The files are
+public, `data.json` can be downloaded without a passkey, and a page edited in the
+browser can skip the check. Nothing confidential belongs behind it.
+[`SECURITY.md`](SECURITY.md) sets out the limits.
+
+### Not done
+
+- **Ablation thresholds, removal rates and weld depth** are still not computed.
+  Published values scatter too widely to quote; they come from trials.
+- **Beam quality, beam diameter and working distance** are not in the catalogue.
+- **Source limits** such as maximum pulse energy are not in the data, so the process
+  point can be set to a pulse energy a real source may not reach.
+- **kW-class sources** are modelled as single-mode. Multi-mode and ring-mode beams
+  focus larger; the catalogue gives no beam parameter product.
+- **Absorptivity** for most materials remains indicative.
 
 ---
 
