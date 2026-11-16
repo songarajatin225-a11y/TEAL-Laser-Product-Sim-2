@@ -33,7 +33,7 @@ const KEYS = { customer: 'e2e-customer-key', internal: 'e2e-internal-key' };
 const ACCESS = accessBuild(KEYS.customer, KEYS.internal);
 const TOKEN = r => JSON.stringify({ r, k: accessDerive(KEYS[r], ACCESS[r].s, ACCESS.it) });
 const MIME = { '.html': 'text/html', '.json': 'application/json', '.js': 'text/javascript',
-               '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.glb': 'model/gltf-binary' };
+               '.css': 'text/css', '.webp': 'image/webp', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.glb': 'model/gltf-binary' };
 const server = createServer(async (req, res) => {
   const p = normalize(join(ROOT, decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html'));
   if (!p.startsWith(ROOT)) { res.writeHead(403).end(); return; }
@@ -50,7 +50,8 @@ let section = '';
 const sec = s => { section = s; };
 const check = (name, ok, detail = '') => results.push({ section, name, ok: !!ok, detail: String(detail) });
 
-const browser = await pw.chromium.launch();
+/* PW_CHROMIUM names a browser to use where the pinned one is not installed */
+const browser = await pw.chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {});
 async function open(hash = '', opts = {}) {
   const { access, ...pageOpts } = opts;
   const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, ...pageOpts });
@@ -486,7 +487,7 @@ try {
     document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true })); return [a, THEME.pref, document.activeElement.getAttribute('data-theme')]; });
   check('the switches are radio groups the arrow keys move through', kb[0] !== kb[1] && kb[1] === kb[2], kb.join(' → '));
   const sec2 = await pg.evaluate(async () => {
-    const src = await (await fetch('index.html')).text(), data = await (await fetch('data.json')).text();
+    const src = await (await fetch('index.html')).text() + await (await fetch('app.js')).text(), data = await (await fetch('data.json')).text();
     return { pin: /adminPin|teal2026/.test(src + data), prompt: /prompt\(\s*'Enter the admin PIN/.test(src) };
   });
   check('no password is shipped in the page or the data, and the value store asks for none', !sec2.pin && !sec2.prompt, JSON.stringify(sec2));
@@ -804,9 +805,74 @@ try {
   await pg.close();
 
   /* ------------------------------------------------------------------ */
+  sec('Your part, the line, limits and documents');
+  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254');
+  const shell = await pg.evaluate(async () => { reach = 5; go(5);
+    const html = await (await fetch('index.html')).text();
+    return { inline: (html.match(/<script(?![^>]*\bsrc=)[^>]*>/g) || []).length, csp: (document.querySelector('meta[http-equiv="Content-Security-Policy"]') || {}).content || '',
+      h1: document.querySelectorAll('h1').length, manifest: !!document.querySelector('link[rel=manifest]'), og: !!document.querySelector('meta[property="og:image"]'),
+      logo: [...document.querySelectorAll('img')].every(i => !/^data:/.test(i.getAttribute('src') || '')), kb: Math.round(html.length / 1024) }; });
+  check('the page ships no inline script, under a content security policy that allows only its own', shell.inline === 0 && /script-src 'self'/.test(shell.csp) && !/unsafe-eval/.test(shell.csp) && shell.logo && shell.kb < 200, JSON.stringify(shell));
+  check('one h1, a web app manifest and a share preview', shell.h1 === 1 && shell.manifest && shell.og, JSON.stringify(shell));
+  const files = ['manifest.webmanifest', 'sw.js', 'assets/icon-192.png', 'assets/icon-512.png', 'assets/og.png', 'assets/logo.webp', 'boot.js', 'app.js'];
+  const got = await pg.evaluate(async fs => { const o = []; for (const f of fs) { const r = await fetch(f); if (!r.ok) o.push(f); } const m = await (await fetch('manifest.webmanifest')).json();
+    return { missing: o, icons: m.icons.length, start: m.start_url }; }, files);
+  check('the manifest, service worker, icons and split files are all served', got.missing.length === 0 && got.icons === 2, JSON.stringify(got));
+  const part = await pg.evaluate(() => {
+    const at = (st, o) => { restore(st); S.pp = o ? { k: ppKey(), o } : null; const pm = procModel(), ph = physics(); return { t: pm.t, len: pm.len, basis: pm.basis, ph }; };
+    const M = { plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null };
+    const W = { plat: 'weldp', app: 'seam', src: 'smcw', pw: 450, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null };
+    const C = { plat: 'cleana', app: 'prebond', src: 'fiber', pw: 500, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null };
+    const m0 = at(M), m1 = at(M, { c: 24, t: 20 }), w0 = at(W), w1 = at(W, { l: 40 }), c1 = at(C, { a: 400 });
+    const out = { m0: m0.t, m1: m1.t, mb: m1.basis, wl: w1.len, wb: w1.basis, wt: w1.t, w0: w0.basis, ca: c1.len, hatch: c1.ph.pp.hatch, cb: c1.basis,
+      melt: w0.ph.meltA_mm2, depth: w0.ph.meltD_mm, meltMark: m0.ph.meltA_mm2 };
+    restore(M); S.pp = { k: ppKey(), o: { e: 80, g: 30 } }; out.shift = shiftGood(100); S.pp = null; out.shift0 = shiftGood(100);
+    restore(M); go(3); out.groups = [...document.querySelectorAll('.ppanel .ppg')].map(e => e.textContent).join(' | ');
+    out.ids = ['pp_c', 'pp_t', 'pp_e', 'pp_g'].every(i => document.querySelector('#' + i) && document.querySelector('label[for=' + i + ']'));
+    return out; });
+  check('your own code, text, seam length or area replaces the reference content in the process time',
+    part.m1 > part.m0 * 2 && /24 × 24/.test(part.mb) && /20-character/.test(part.mb) && Math.abs(part.wl - 40) < 1e-6 && /Your content: 40 mm/.test(part.wb) && /Reference/.test(part.w0) &&
+    Math.abs(part.ca - 400 / (part.hatch / 1000)) < 1e-6 && /400 mm²/.test(part.cb) && part.ids && /Your part/.test(part.groups) && /line/.test(part.groups), JSON.stringify(part));
+  check('availability and changeover reduce the shift output, and leave it alone when unset', Math.abs(part.shift - 600) < 1e-9 && part.shift0 === 800, part.shift + ' / ' + part.shift0);
+  check('a weld shows the most it can melt as an upper bound, and a mark shows none', part.melt > 0 && isFinite(part.melt) && part.depth > 0 && part.meltMark === undefined, JSON.stringify([part.melt, part.depth]));
+  const lim = await pg.evaluate(() => {
+    const M = { plat: 'markf', app: 'metal', src: 'fiber', pw: 100, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }, out = {};
+    restore(M); const warn = () => ppChecks(pp(), physics()).map(c => c.lvl + ':' + c.t).join(' | ');
+    out.unknown = /maximum pulse energy is not in the data/.test(warn());
+    SRC.fiber.epMax = 1; out.over = /warn:Pulse energy [\d.]+ mJ is above the 1\.00 mJ/.test(warn()); S.pp = { k: ppKey(), o: { f: 100 } }; out.ok = !/above the/.test(warn()); delete SRC.fiber.epMax; S.pp = null;
+    const W = { plat: 'weldb', app: 'busbar', src: 'smcw', pw: 3000, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }; restore(W);
+    const d0 = optics().spot; SRC.smcw.bpp = 2; const o = optics(); out.bpp = Math.abs(o.spot - 4 * 2 * 254 / SRC.smcw.dia) < 1e-6 && o.spot > d0 * 3; delete SRC.smcw.bpp;
+    const H = { plat: 'weldh', app: 'implant', src: 'qcw', pw: 300, lens: 'f163', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }; restore(H);
+    const a = physics(); PLAT.weldh.pwBasis = 'peak'; const b = physics(); out.peak = a.P === 300 && b.P === 30 && Math.abs(b.Ppk_kW - 0.3) < 1e-9 && /peak class/.test(warn()); delete PLAT.weldh.pwBasis;
+    restore(M); LENS.f254.wd = 296; out.wd = /296 mm/.test(askAnswer('what is the working distance').h); delete LENS.f254.wd; out.wd0 = /not in the product data/.test(askAnswer('what is the working distance').h);
+    return out; });
+  check('a source limit, a beam parameter product, a peak-class power list and a working distance take effect as soon as the data states them',
+    lim.unknown && lim.over && lim.ok && lim.bpp && lim.peak && lim.wd && lim.wd0, JSON.stringify(lim));
+  const docs2 = await pg.evaluate(async () => {
+    restore({ plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); const out = {}, h0 = cfgHash(), r0 = CFG.rev;
+    const blob = proposalPDF({ org: 'Acme <Ltd>', name: 'A. Buyer' }); const buf = new Uint8Array(await blob.arrayBuffer()); const txt = new TextDecoder('latin1').decode(buf);
+    out.pdf = txt.slice(0, 5) === '%PDF-' && buf.length > 8000 && /Budgetary proposal/.test(txt) && /Acme/.test(txt) && txt.includes(CFG.id) && /%%EOF\s*$/.test(txt); out.kb = Math.round(buf.length / 1024);
+    go(5); out.btn = !!document.querySelector('#prop') && !!document.querySelector('#cmpp');
+    comparePlatforms(); const c = document.querySelector('#compare'); out.open = c.classList.contains('open'); out.cols = c.querySelectorAll('table.cmp tr:first-child th').length - 1;
+    out.names = [...c.querySelectorAll('table.cmp .cn')].map(e => e.textContent).join(' | '); out.same = cfgHash() === h0 && CFG.rev === r0 && CMPX.length === 0;
+    document.querySelectorAll('#compare .mx, #compare [data-x], #compare .mclose').forEach(b => b.click()); c.classList.remove('open'); document.body.style.overflow = '';
+    FMT.money = 'intl'; out.intl = shortINR(1.4e6) + ' ' + inr(1234567); FMT.money = 'in'; out.ind = shortINR(1.4e6) + ' ' + inr(1234567);
+    FMT.unit = 'in'; out.inch = mmIn(254); FMT.unit = 'mm'; out.mm = mmIn(254); out.toggles = !!document.querySelector('#fmtMoney').textContent && !!document.querySelector('#fmtUnit').textContent;
+    const d = wsData(); d.trials.unshift({ id: 'TR-E2E', plat: 'markf', app: 'metal', status: 'Approved', pv: 900, pf: 60 }); go(3);
+    out.offer = (document.querySelector('.pptr') || {}).textContent || ''; document.querySelector('#pp_trial').click(); const ph = physics(); out.applied = ph.v === 900 && ph.frep_khz === 60;
+    d.trials.shift(); S.pp = null; render(); out.gone = !document.querySelector('.pptr');
+    return out; });
+  check('the proposal is a valid PDF carrying the customer, the configuration ID and its figures', docs2.pdf && docs2.btn, JSON.stringify({ pdf: docs2.pdf, kb: docs2.kb }));
+  check('similar platforms are compared in one click without touching the configuration', docs2.open && docs2.cols >= 2 && /Mark F-Series/.test(docs2.names) && /Mark [A-Za-z]/.test(docs2.names.replace('Mark F-Series', '')) && docs2.same, JSON.stringify(docs2));
+  check('money can be shown in lakh and crore or in millions, and lengths with inches', docs2.intl === '₹1.40 M 1,234,567' && docs2.ind === '₹14.0 L 12,34,567' && docs2.inch === ' (10.0 in)' && docs2.mm === '' && docs2.toggles, JSON.stringify([docs2.intl, docs2.ind, docs2.inch]));
+  check('an approved trial’s proven parameters are offered as measured evidence and set the process point', /approved trial TR-E2E/.test(docs2.offer) && docs2.applied && docs2.gone, docs2.offer);
+  check('no script errors in the part content, limits, proposal or comparison', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
   sec('Access passkeys');
   const shipped = (() => {
-    const page = readFileSync(join(ROOT, 'index.html'), 'utf8'), file = JSON.parse(readFileSync(join(ROOT, 'access.json'), 'utf8'));
+    const page = readFileSync(join(ROOT, 'app.js'), 'utf8'), file = JSON.parse(readFileSync(join(ROOT, 'access.json'), 'utf8'));
     const m = page.match(/\/\*ACCESS:BEGIN\*\/([\s\S]*?)\/\*ACCESS:END\*\//), emb = m ? JSON.parse(m[1]) : null;
     const hexOnly = c => !!c && ['customer', 'internal'].every(r => /^[0-9a-f]{32}$/.test(c[r].s) && /^[0-9a-f]{64}$/.test(c[r].v) && Object.keys(c[r]).join() === 's,v');
     return { same: !!emb && ['it', 'customer', 'internal'].every(k => JSON.stringify(emb[k]) === JSON.stringify(file[k])), hex: hexOnly(emb) && hexOnly(file),
@@ -953,7 +1019,9 @@ try {
                                                          sim: [SIM.on, SIM.cyc], h: localStorage.getItem('teal.hist') }));
   check('scrolling the story changes no configuration, simulation, viewer or History state', stBefore === stAfter);
   check('the scene index is navigable: jumping to A returns to the top', await scene(0) === 0 && await pg.evaluate(() => scrollY < 5));
-  await pg.click('#stySkip'); await pg.waitForTimeout(900);
+  /* the page scrolls smoothly: wait for it to arrive rather than for a fixed time */
+  const landed = page => page.waitForFunction(() => { const t = document.getElementById('rail').getBoundingClientRect().top; return t > 40 && t < 200; }, null, { timeout: 5000 }).catch(() => {});
+  await pg.click('#stySkip'); await landed(pg);
   check('“Skip to configurator” lands on the workspace', await pg.evaluate(() => {
     const t = document.getElementById('rail').getBoundingClientRect().top; return t > 40 && t < 200; }));
   await pg.evaluate(() => { famSel = 'mark'; render(); });
@@ -981,7 +1049,7 @@ try {
   check('no script errors in the story', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
 
-  pg = await open('#p=markf&a=metal&s=mopa&w=50&l=f420');
+  pg = await open('#p=markf&a=metal&s=mopa&w=50&l=f420'); await landed(pg);
   check('a shared link lands on the workspace, with the story above it', await pg.evaluate(() => {
     const t = document.getElementById('rail').getBoundingClientRect().top; return t > 40 && t < 200 && scrollY > 200; }));
   check('the story follows the configuration: it tells the user’s own machine', await pg.evaluate(() =>

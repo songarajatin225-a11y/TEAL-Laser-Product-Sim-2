@@ -1,0 +1,14 @@
+{
+  "name": "TEAL Laser Equipment Configurator",
+  "short_name": "TEAL Laser",
+  "description": "Configure a TEAL laser system, see it built in 3D and run its production cycle.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0B1A2A",
+  "theme_color": "#00B7BA",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

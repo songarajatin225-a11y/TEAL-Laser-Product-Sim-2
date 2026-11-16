@@ -2,8 +2,8 @@
 
 ## What this site is
 
-The configurator is a static site: `index.html`, `data.json`, `access.json` and the
-files under `assets/`, served by GitHub Pages. Everything in the repository and
+The configurator is a static site: `index.html`, `app.js`, `boot.js`, `sw.js`,
+`data.json`, `access.json` and the files under `assets/`, served by GitHub Pages. Everything in the repository and
 everything the page loads is **public**: anyone who knows the address of a file can
 download it, including the JavaScript and the data. The site has:
 - no server
@@ -11,7 +11,8 @@ download it, including the JavaScript and the data. The site has:
 - no API
 - no secret: the passkey check ships salted verifiers, never a passkey
 
-Its only outbound request is Google Fonts.
+Its only outbound request is Google Fonts. A content security policy allows scripts
+from the site itself only.
 
 ## Access passkeys: what they do, and what they cannot
 
@@ -34,7 +35,7 @@ random salt and a verifier: SHA-256 of the key that PBKDF2-HMAC-SHA256 (210,000
 iterations) derives from the passkey. The page derives the same key from what is
 typed and compares. A session keeps that derived key, not the passkey, so writing a
 "signed in" flag into browser storage opens nothing. The verifiers are in
-`access.json` and, identically, in the block of `index.html` marked `ACCESS`.
+`access.json` and, identically, in the block of `app.js` marked `ACCESS`.
 
 **What it cannot do.** This keeps casual visitors out. It is **not a security
 boundary**, and nothing confidential may be put behind it:
@@ -51,11 +52,12 @@ boundary**, and nothing confidential may be put behind it:
   for all.
 - The 30-second wait applies to one browser tab. It slows a person, not a program.
 
-Real access control needs a server that checks the user before it sends anything. See
+Real access control needs a server that checks the user before it sends anything.
+[`docs/ACCESS-CONTROL.md`](docs/ACCESS-CONTROL.md) gives the setup. See also
 [What a real internal workspace needs](#what-a-real-internal-workspace-needs).
 
 **Changing the passkeys.** Run one of these, then commit `access.json` and
-`index.html`:
+`app.js`:
 
 ```
 node tools/access/set-passkeys.mjs --customer "<new key>" --internal "<new key>"
