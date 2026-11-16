@@ -5,7 +5,8 @@ on:
     branches: [main]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # the pinned Playwright installs its browser on 24.04; "latest" has moved past it
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
