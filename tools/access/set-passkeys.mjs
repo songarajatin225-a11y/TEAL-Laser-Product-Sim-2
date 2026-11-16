@@ -7,7 +7,7 @@
  *   node tools/access/set-passkeys.mjs --check "<key>"     # say which view a key opens, change nothing
  *
  * The passkeys themselves are never written anywhere. What is stored — in
- * access.json and, identically, in the block of index.html marked ACCESS — is a
+ * access.json and, identically, in the block of app.js marked ACCESS — is a
  * random salt per key and a verifier: SHA-256 of the PBKDF2-HMAC-SHA256 key
  * derived from the passkey. The page derives the same key from what is typed
  * and compares. Commit both files after running this.
@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, normalize } from 'node:path';
 
 const ROOT = normalize(join(new URL('.', import.meta.url).pathname, '..', '..'));
-const FILE = join(ROOT, 'access.json'), PAGE = join(ROOT, 'index.html');
+const FILE = join(ROOT, 'access.json'), PAGE = join(ROOT, 'app.js');
 const IT = 210000;
 
 export const norm = k => String(k).normalize('NFKC').trim();
@@ -69,11 +69,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
   writeFileSync(FILE, JSON.stringify(out, null, 2) + '\n');
   const page = readFileSync(PAGE, 'utf8'), re = /\/\*ACCESS:BEGIN\*\/[\s\S]*?\/\*ACCESS:END\*\//;
-  if (!re.test(page)) { console.error('index.html has no ACCESS block to update.'); process.exit(1); }
+  if (!re.test(page)) { console.error('app.js has no ACCESS block to update.'); process.exit(1); }
   const lit = JSON.stringify({ v: out.v, it: out.it, customer: out.customer, internal: out.internal });
   writeFileSync(PAGE, page.replace(re, '/*ACCESS:BEGIN*/' + lit + '/*ACCESS:END*/'));
 
-  console.log('Updated access.json and the ACCESS block of index.html. Commit both.');
+  console.log('Updated access.json and the ACCESS block of app.js. Commit both.');
   if (gen || customer) console.log('  Customer passkey: ' + (gen && !arg('customer') ? customer : '(as given)'));
   if (gen || internal) console.log('  Internal passkey: ' + (gen && !arg('internal') ? internal : '(as given)'));
   if (gen) console.log('These are shown once and stored nowhere. Keep them somewhere safe.');

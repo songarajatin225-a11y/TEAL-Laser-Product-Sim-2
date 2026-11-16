@@ -15,7 +15,7 @@ const ROOT = normalize(join(new URL('.', import.meta.url).pathname, '..', '..'))
 const OUT = join(ROOT, 'assets/cad/COVERAGE.md');
 const man = JSON.parse(readFileSync(join(ROOT, 'assets/cad/manifest.json'), 'utf8'));
 const data = JSON.parse(readFileSync(join(ROOT, 'data.json'), 'utf8'));
-const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+const html = readFileSync(join(ROOT, 'index.html'), 'utf8') + readFileSync(join(ROOT, 'app.js'), 'utf8');
 
 /* COMPINFO keys, read from the source without executing it */
 const ci = html.slice(html.indexOf('var COMPINFO = {'), html.indexOf('\n};', html.indexOf('var COMPINFO = {')));

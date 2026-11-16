@@ -145,3 +145,16 @@ statement and 5 name Class 1: `markf`, `markm`, `weldr`, `cleana` and `robo`.
 | `PLAT.weldp` | The seam application recommends CW 500 W, but the platform's power list stops at 450 W, so the recommendation snaps to 450 W |
 | `SRC.smcw` at 3–6 kW | Modelled as single-mode (M² 1.05). The catalogue also offers a ring-mode option. No beam parameter product is given, so the focus spot on `weldb` and `weldr` is the single-mode figure |
 | Source limits | Maximum pulse energy and peak power are not in the data. The process point can be set to a pulse energy a real source may not reach |
+
+## Fields waiting for TEAL values (2026-11-16)
+
+v17.0 added the fields below. Each is empty and takes effect when a value is entered.
+None was filled with an estimate.
+
+| Field | Records | Unblocks |
+|---|---|---|
+| `SRC.*.epMax`, `SRC.*.ppkMax` | 12 sources | Checking the process point against what the source can deliver |
+| `SRC.*.bpp` | The 3–6 kW sources first | A correct focus spot for multi-mode and ring-mode beams |
+| `LENS.*.wd` | 5 objectives | The working distance, which the DFM report and the assistant say is missing |
+| A `Speed` specification row | 19 of 22 platforms | Process time from the platform's own speed, not a class estimate |
+| `PLAT.weldh.pwBasis` | 1 platform | Whether 150–450 W is peak or average power: a factor of ten in every energy figure |

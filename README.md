@@ -9,8 +9,9 @@ sources, 4 f-theta objectives, 25 automation modules, 4 LaserSuite editions.
 
 ## Deploy to GitHub Pages
 
-1. Create a repository and add `index.html`, `data.json`, `access.json`, the `assets`
-   folder, `.nojekyll` and this `README.md` to the default branch.
+1. Create a repository and add `index.html`, `app.js`, `boot.js`, `sw.js`,
+   `manifest.webmanifest`, `data.json`, `access.json`, the `assets` folder, `.nojekyll`
+   and this `README.md` to the default branch.
 2. **Settings → Pages → Source:** deploy from branch, `main`, `/ (root)`.
 3. Live at `https://<user>.github.io/<repo>/` within about a minute.
 
@@ -23,8 +24,8 @@ The page opens with a passkey form. Set your own passkeys before publishing:
 
 ## Notes
 
-- Single self-contained file. The TEAL logo is embedded as a base64 data URI, so
-  there are no asset paths to break when served from a repository subpath. It is
+- Since v17.0 the page is `index.html` plus `app.js`, `boot.js` and the logo file, all
+  referenced by relative paths, so it still works from a repository subpath. The logo is
   the TEAL lockup — symbol, wordmark and *A TATA Enterprise* — as lossless WebP at
   711 × 160 with a true alpha channel: exact brand colours, enough resolution for
   the header at 3× density and the printed sheet, and clean edges where the footer
@@ -1234,7 +1235,7 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 177 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 189 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
@@ -1968,7 +1969,7 @@ The page opens with a passkey form.
   it ends the session.
 
 No passkey is in the repository: only a salt and a verifier for each. Change them with
-`node tools/access/set-passkeys.mjs`, then commit `access.json` and `index.html`.
+`node tools/access/set-passkeys.mjs`, then commit `access.json` and `app.js`.
 
 This keeps casual visitors out. **It is not a security boundary.** The files are
 public, `data.json` can be downloaded without a passkey, and a page edited in the
@@ -1985,6 +1986,93 @@ browser can skip the check. Nothing confidential belongs behind it.
 - **kW-class sources** are modelled as single-mode. Multi-mode and ring-mode beams
   focus larger; the catalogue gives no beam parameter product.
 - **Absorptivity** for most materials remains indicative.
+
+## v17.0 — your part, the line, source limits, proposal, offline
+
+Nineteen improvements came out of an inspection of v16.0. This version implements
+those that can be built in a static site. The ones that depend on values only TEAL
+has are built as data fields that take effect the moment the value is entered. No
+value was invented.
+
+### Structure
+
+- The page is split: `index.html` (about 140 KB), `app.js`, `boot.js` and
+  `assets/logo.webp`. It was one 987 KB file. Browsers now cache the code.
+- A **content security policy** allows scripts from the site itself only. The page has
+  no inline script.
+- **Offline:** a web app manifest and a service worker. After one visit the site opens
+  without a connection and can be installed. The worker is network-first, so a visitor
+  who is online always gets the current release.
+- A share preview (title, description, image) for links pasted into chat and email.
+- One `h1`.
+- `.github/workflows/test.yml` runs `npm test` on every pull request and on `main`.
+
+### Your part
+
+The process point has a second group of controls, **Your part**, in place of the
+reference content the process time was computed on:
+
+| Process | You enter |
+|---|---|
+| Marking | Code size (8 × 8 to 48 × 48 modules) and the number of text characters |
+| Welding, cutting, scribing | Seam or path length, 1–5,000 mm |
+| Cleaning, decapsulation | Area, 1–100,000 mm², rastered at the line pitch |
+
+The process time, the cycle, the energy per part and the documents follow.
+
+### The line
+
+**Availability** and **changeover** minutes per shift turn the hourly rate into good
+parts per eight-hour shift. Left at 100 % and 0, the figure is unchanged.
+
+### Data fields that wait for TEAL values
+
+| Field | Effect once entered | Where |
+|---|---|---|
+| `SRC.*.epMax` — maximum pulse energy, mJ | The process point warns when the pulse energy exceeds it | Value store → Sources |
+| `SRC.*.bpp` — beam parameter product, mm·mrad | The focus spot is computed from it (M² = BPP·π/λ), for multi-mode and ring-mode sources | Value store → Sources |
+| `SRC.*.ppkMax` — maximum peak power, kW | The process point warns above it | `data.json` |
+| `LENS.*.wd` — working distance, mm | Shown with the objective; the assistant quotes it | `data.json` |
+| `PLAT.*.pwBasis: "peak"` | The platform's power list is read as peak power; the average is peak ÷ the source's peak-to-average ratio | `data.json` |
+| A `Speed` row in a platform's specification | Replaces the class estimate of speed | Value store → Platforms |
+
+`pwBasis` settles the open question on the Weld H-Series: if 150–450 W is its peak
+class, add `"pwBasis": "peak"` to `PLAT.weldh` and every energy figure follows.
+
+Until `epMax` is entered, the process point says the pulse energy is not checked.
+
+### Measured values from trials
+
+An application trial can record its proven working spot, repetition rate and speed.
+When an **approved** trial exists for the platform and application, the process point
+shows it as measured evidence and offers to use its parameters. Trial records are kept
+in the browser they were entered in.
+
+### Welding: an upper bound on the melt
+
+For a weld the panel shows the largest cross-section the beam could melt:
+A ≤ P / (v·ρ·c_p·(T_m − T_0)). Every watt is taken as absorbed and none as conducted
+away, so a real seam is smaller. It is a bound, not a prediction of penetration.
+
+### Documents and display
+
+- **Proposal (PDF):** one document addressed to a named customer — configuration,
+  budget band, process point, platform specification, standards, assumptions and next
+  steps. It carries the configuration ID and fingerprint.
+- **Compare similar platforms:** the configuration beside up to two other platforms of
+  the same family, each at its recommendation for the same material. Nothing is saved
+  and the configuration is not changed.
+- Money in lakh and crore or in millions; inch equivalents beside the scan field.
+
+### Not done, and why
+
+- **Per-customer access with expiry, and real access control** need a server. No code
+  can provide them in a static site. [`docs/ACCESS-CONTROL.md`](docs/ACCESS-CONTROL.md)
+  gives the setup; the configurator needs no change for it.
+- **Beam data, source limits, speeds and working distances** are TEAL's to supply. The
+  fields are ready and empty.
+- **Inches** are shown for the scan field only, not for every length.
+- **Weld penetration** is not predicted. Only the bound above is shown.
 
 ---
 
