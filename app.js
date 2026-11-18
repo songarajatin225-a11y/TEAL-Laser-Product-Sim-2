@@ -1956,6 +1956,7 @@ function themeApply(pref){
   r.setAttribute('data-theme', dark? 'dark' : 'light');
   r.setAttribute('data-theme-pref', pref);
   var m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute('content', dark? '#0D141B' : '#00B7BA');
+  document.querySelectorAll('.tealfig').forEach(function(f){ f.setAttribute('data-theme', dark? 'dark' : 'light'); });
   Store.set('teal.theme', pref);
   hdrSync();
 }
@@ -2545,6 +2546,13 @@ function uiSrc(b){
     g.innerHTML=html;
     b.appendChild(g);
     b.appendChild(ppPanel(ph));
+    /* Fig 1 — the scan head that places the spot, driven by this configuration's
+       focal length, field and spot (anatomy.js, built by tools/anatomy). A gantry
+       table moves a fixed cutting head, so it has no scan head to show. */
+    if(P().deliv!=='gantry' && window.TEALAnatomy){
+      var fig=el('div','figslot'); b.appendChild(fig);
+      try{ TEALAnatomy.mount(fig, {f:LENS[S.lens].f, fld:LENS[S.lens].fld, spot:ph.spot, lens:LENS[S.lens].n}); }catch(e){ fig.remove(); }
+    } else if(window.TEALAnatomy && TEALAnatomy.mount.stop) TEALAnatomy.mount.stop();
     b.appendChild(el('div','disc',
       '<b>How to read these.</b> Optics and pulse-train figures are deterministic and follow from the selections and the process point above. '+
       'Absorptivity is for a clean, room-temperature, optically flat surface — oxide, roughness and the melt itself raise it '+
@@ -13616,7 +13624,7 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v17.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v18.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();

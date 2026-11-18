@@ -9,7 +9,8 @@ sources, 4 f-theta objectives, 25 automation modules, 4 LaserSuite editions.
 
 ## Deploy to GitHub Pages
 
-1. Create a repository and add `index.html`, `app.js`, `boot.js`, `sw.js`,
+1. Create a repository and add `index.html`, `app.js`, `boot.js`, `anatomy.js`,
+   `anatomy.css`, `sw.js`,
    `manifest.webmanifest`, `data.json`, `access.json`, the `assets` folder, `.nojekyll`
    and this `README.md` to the default branch.
 2. **Settings → Pages → Source:** deploy from branch, `main`, `/ (root)`.
@@ -1235,7 +1236,7 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 189 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 195 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
@@ -2073,6 +2074,43 @@ away, so a real seam is smaller. It is a bound, not a prediction of penetration.
   fields are ready and empty.
 - **Inches** are shown for the scan field only, not for every length.
 - **Weld penetration** is not predicted. Only the bound above is shown.
+
+## v18.0 — Fig 1: how the scan head places the spot
+
+The Source step now carries an interactive isometric figure, built with the
+open-source Anatomy kit (MIT, vendored in `tools/anatomy/kit` at a pinned commit).
+
+**What it shows.** A galvo scan head on an optical breadboard: a laser source and its
+controller, a beam expander on two posts, a two-mirror galvo block on a Z column and
+an f-theta objective over a calibration plate. The beam is the one lit line. The
+X mirror turns about the vertical axis and the Y mirror about a horizontal one; a
+mirror turned by θ swings the beam by 2θ, and the objective puts the spot at f·2θ.
+While nobody touches it, the spot marks the field's border and a 3 × 3 grid of
+crosses, the plate an operator marks to check a field.
+
+**It is the configuration's.** The page passes the objective's focal length and
+field and the working spot. The readout shows each mirror's angle and the spot's
+position in mm at every moment, from x = 2f·θ, the f-theta relation. At the corner of
+an F254 field each mirror reads ±9.87°; on an F420, ±10.23°. The caption states the
+largest angle and the spot size, and says the drawing is not to scale.
+
+**Interaction.** Hover the plate to aim the spot; arrow keys move it, Shift for
+bigger steps, Home centres it, End goes to the corner. The tour resumes 3.6 s after
+the last input. It stops when off screen, holds still under reduced motion, follows
+the Light and Dark themes, and is left out of print. It is not shown on the gantry
+cutting table, which moves a fixed head and has no scan head.
+
+**Files.** `tools/anatomy/scanhead.mjs` builds the figure once and writes
+`anatomy.js` (the static drawing, the geometry the page needs to turn the mirrors,
+and the kit's runtime) and `anatomy.css`. They load as files because the content
+security policy forbids inline script. Run `npm run anatomy` after changing the
+build; `npm test` fails if the committed files are not what it builds.
+
+**Checked.** The kit's line check finds no floating line end in either theme (436
+ends on 78 lines), and the figure was reviewed at 1×, at 4× on the galvo block,
+mid-tour, while aiming, at phone width and in both themes. The kit's depth-order
+audit (`kit/audit.mjs`) was not run: the figure records no shapes for it, so the
+painter's order is hand-set and was checked by eye on those captures.
 
 ---
 

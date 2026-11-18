@@ -870,6 +870,40 @@ try {
   await pg.close();
 
   /* ------------------------------------------------------------------ */
+  sec('Fig 1 — the galvo scan head');
+  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254');
+  const fig = await pg.evaluate(async () => {
+    reach = 5; go(3); const slot = document.querySelector('.figslot'); if (!slot) return { slot: false };
+    slot.scrollIntoView(); await new Promise(r => setTimeout(r, 400));
+    const ro = () => slot.querySelector('[data-readout]').textContent;
+    const out = { slot: true, svg: !!slot.querySelector('svg.iso-svg[role=img][aria-label]'), stage: slot.querySelector('.iso-stage').getAttribute('role'),
+      cap: slot.querySelector('.iso-caption').textContent, mirrors: slot.querySelectorAll('[data-part=xmirror] .iso-solid, [data-part=ymirror] .iso-solid').length,
+      beam: [...slot.querySelectorAll('[data-part^=beam]')].every(p => (p.getAttribute('d') || '').length > 4) };
+    return out; });
+  check('the Source step shows Fig 1, a framed figure with a description, a keyboard control and both mirrors', fig.slot && fig.svg && fig.stage === 'slider' && fig.mirrors === 2 && fig.beam, JSON.stringify(fig));
+  check('its caption takes the objective, field and spot from the configuration', /F254 objective \(f = 254 mm, field 175 × 175 mm\)/.test(fig.cap) && /± 9\.87°/.test(fig.cap) && /about 32 µm/.test(fig.cap), fig.cap);
+  await pg.focus('.figslot .iso-stage');
+  for (let i = 0; i < 2; i++) { await pg.keyboard.press('End'); await pg.waitForTimeout(80); }
+  const settle = () => pg.waitForFunction(() => { const t = document.querySelector('.figslot [data-readout]').textContent; const ok = t === window.__lastRo; window.__lastRo = t; return ok; }, null, { polling: 250, timeout: 4000 }).catch(() => {});
+  await settle();
+  const corner = await pg.evaluate(() => document.querySelector('.figslot [data-readout]').textContent);
+  check('at the field corner each mirror reads x / 2f — the f-theta relation — for the configured objective', corner === 'X +9.87° · Y +9.87° · spot 87.50, 87.50 mm', corner);
+  await pg.keyboard.press('Home'); await settle();
+  const home = await pg.evaluate(() => document.querySelector('.figslot [data-readout]').textContent);
+  check('Home centres the spot and both mirrors return to zero', home === 'X +0.00° · Y +0.00° · spot 0.00, 0.00 mm', home);
+  const fig2 = await pg.evaluate(async () => {
+    const out = {};
+    themeApply('dark'); out.dark = document.querySelector('.tealfig').dataset.theme; themeApply('light'); out.light = document.querySelector('.tealfig').dataset.theme;
+    restore({ plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f420', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(3);
+    out.cap420 = document.querySelector('.figslot .iso-caption').textContent.match(/± [\d.]+°/)[0];
+    restore({ plat: 'cutxt', app: 'thinmetal', src: 'fiber', pw: 500, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(3);
+    out.gantry = !!document.querySelector('.figslot');
+    return out; });
+  check('the figure follows the theme, changes with the objective, and is not shown on a gantry table', fig2.dark === 'dark' && fig2.light === 'light' && fig2.cap420 === '± 10.23°' && !fig2.gantry, JSON.stringify(fig2));
+  check('no script errors in Fig 1', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
   sec('Access passkeys');
   const shipped = (() => {
     const page = readFileSync(join(ROOT, 'app.js'), 'utf8'), file = JSON.parse(readFileSync(join(ROOT, 'access.json'), 'utf8'));
