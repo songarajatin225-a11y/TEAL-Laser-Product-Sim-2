@@ -346,7 +346,8 @@ export function mount(host, cfg) {
       if (still.matches) { camera.position.copy(pos); controls.target.copy(tgt); controls.update(); }
       workBtn.setAttribute("aria-pressed", work ? "true" : "false"); api.work = work; api.wake && api.wake();
     }
-    const workPos = () => { const f = new THREE.Vector3(); R.part.getWorldPosition(f); f.y = cfg.dims.cv + 120; return [f.clone().add(new THREE.Vector3(W * 0.36, H * 0.2, D * 0.62)), f.clone().add(new THREE.Vector3(0, 120, 0))]; };
+    const workPos = () => { const f = new THREE.Vector3(); R.part.getWorldPosition(f); f.y = cfg.dims.cv + 120; /* inside the enclosure's front zone, clear of the posts and the glazing, looking at the head and the part */
+      return [f.clone().add(new THREE.Vector3(W * 0.2, 330, D * 0.4)), f.clone().add(new THREE.Vector3(0, 130, 0))]; };
     workBtn.onclick = () => { if (api.work) flyTo(home, target, false); else { const [p, t] = workPos(); flyTo(p, t, true); } };
     wrap.querySelector('[data-a="reset"]').onclick = () => flyTo(home, target, false);
     api.flyStep = (dt) => { if (fly.t >= 1 || !fly.to) return false; fly.t = Math.min(1, fly.t + dt / 0.9); const e = fly.t * fly.t * (3 - 2 * fly.t);
