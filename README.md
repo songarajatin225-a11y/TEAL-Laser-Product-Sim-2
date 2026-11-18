@@ -10,7 +10,7 @@ sources, 4 f-theta objectives, 25 automation modules, 4 LaserSuite editions.
 ## Deploy to GitHub Pages
 
 1. Create a repository and add `index.html`, `app.js`, `boot.js`, `anatomy.js`,
-   `anatomy-ws.js` and `anatomy-ws-*.js`, `anatomy.css`, `sw.js`,
+   `anatomy-ws.js` and `anatomy-ws-*.js`, `cad3d.js`, `vendor/`, `assets/cad3d/`, `anatomy.css`, `sw.js`,
    `manifest.webmanifest`, `data.json`, `access.json`, the `assets` folder, `.nojekyll`
    and this `README.md` to the default branch.
 2. **Settings → Pages → Source:** deploy from branch, `main`, `/ (root)`.
@@ -1236,7 +1236,7 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 210 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 217 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
@@ -2222,6 +2222,74 @@ illustrative, not a measurement, and the caption says so.
 - **Not audited:** the moving poses (the robot arm, the turntable's stations, parts in
   transit) are drawn live in the page, so the audit does not see them. They were checked
   on captures.
+
+## v21.0 — The workstation in 3D, beside the anatomy figure
+
+Below the configurator, the configured galvo workstation is shown twice, side by side (stacked
+on narrow screens):
+- a realistic 3D render on the left
+- the anatomy figure (Fig 2) on the right
+
+Both run the simulation's own cycle on one clock: a preview of the computed phase list, or
+the live run, including pause, scrub and stoppages.
+
+**The 3D render** (`cad3d.js`, three.js r170, MIT, in `vendor/three`):
+- **Size:** taken from the configurator's own `machineDims()`.
+- **Materials:** a powder-coated cabinet with doors, louvres, a TEAL nameplate showing the
+  configured designation and a Class 1 laser label; an aluminium-profile frame; the worktop
+  with T-slots.
+- **Glazing:** laser-safety glazing tinted for the source's wavelength (green for near
+  infrared, clear for CO₂, amber for UV, red-orange for green and blue).
+- **Work zone:** a vertical-lift door with its rails, and the Z column with its linear rails
+  and stepper carrying the scan head, its f-theta objective and the armoured fibre. Also the
+  fixture, toggle clamps, and a brushed-steel part on which this application's own process
+  path is burned in as a texture, the newest strokes glowing.
+- **Process:** the beam, a spot that lights the plate, and sparks or smoke by process class.
+- **Machine details:** the light tower (green running, amber stopped, red emitting), the
+  operator screen showing the phase, and the control panel with emergency stop and push
+  buttons.
+- **Rendering:** soft shadows, environment reflections, rounded edges and ACES tone mapping.
+- **Controls:** drag to turn it. Work zone flies the camera to the head and the part; Turn
+  rotates it slowly; R resets.
+- **Performance:** it lowers its own resolution, then its shadows, on slow devices, and only
+  loads when a 3D view is shown.
+
+**Real component models, with credit.** These parts are real catalogue models from the
+[FreeCAD parts library](https://github.com/FreeCAD/FreeCAD-library), which is licensed
+CC-BY 3.0:
+- the 40 × 40 slot-8 frame profile
+- the MGN12 linear rails
+- the NEMA 23 Z stepper
+- the 22 mm emergency stop and green and red push buttons
+- the 50 mm cabinet fans
+
+`tools/cad3d/convert.mjs` converted them from STEP, using occt-import-js at build time only.
+Each author is credited in `assets/cad3d/CREDITS.md` and in the caption. The panels, scan head,
+objective, clamps, light tower and screen are parametric and indicative. No model from TraceParts
+or Component Search Engine is included: those downloads need an account, and their terms do
+not grant redistribution on a public site.
+
+**Views.** The switch offers four views:
+- **3D + drawing** (the default)
+- **3D**
+- **Drawing** (Fig 2 with its handling stations and effects)
+- **Standard** (the v19 drawing)
+
+The choice is remembered in the browser.
+
+**Size.** The 3D code, three.js and the seven meshes add about 1.6 MB (uncompressed), loaded
+only when a 3D view is shown and cached for offline use afterwards.
+
+**Checked.** 217 browser checks. The new ones cover:
+- the combined layout
+- the seven credited models
+- the size caption
+- both views matching the paused run phase for phase and to the hundredth of a second
+- the tint following the wavelength
+- the 3D-only and drawing-only views
+- no script errors
+
+The rest of the suite starts in the drawing view to stay fast with software WebGL.
 
 ---
 

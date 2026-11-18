@@ -25,6 +25,7 @@
 import * as THREE from "./vendor/three/three.module.min.js";
 import { OrbitControls } from "./vendor/three/OrbitControls.js";
 import { RoomEnvironment } from "./vendor/three/RoomEnvironment.js";
+import { RoundedBoxGeometry } from "./vendor/three/RoundedBoxGeometry.js";
 
 const PART_IDS = ["profile40", "mgn12", "nema23", "estop", "btn_green", "btn_red", "fan50"];
 const CACHE = {};
@@ -85,7 +86,10 @@ function materials(cfg) {
 }
 
 function box(w, h, d, mat, x, y, z, parent, opts = {}) {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  /* sheet metal and machined parts have radiused edges: r > 0 rounds them */
+  const r = opts.r || 0;
+  const geo = r > 0 ? new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2 - 0.01, h / 2 - 0.01, d / 2 - 0.01)) : new THREE.BoxGeometry(w, h, d);
+  const m = new THREE.Mesh(geo, mat);
   m.position.set(x, y, z);
   m.castShadow = opts.cast !== false; m.receiveShadow = opts.receive !== false;
   if (parent) parent.add(m);
@@ -119,18 +123,38 @@ function buildMachine(cfg, G, M) {
     cyl(10, 40, M.chrome, sx * (hw - 70), 32, sz * (hd - 70), root);
     cyl(26, 10, M.steel, sx * (hw - 70), 46, sz * (hd - 70), root, "y", 6);
   }
-  box(W - 30, 70, D - 30, M.paintDark, 0, 86, 0, root);
+  box(W - 30, 70, D - 30, M.paintDark, 0, 86, 0, root, { r: 4 });
   /* cabinet: body, two doors proud of it with a seam, handles, louvres, nameplate stripe */
   const cabH = T - 30 - 121;
-  box(W, cabH, D, M.paint, 0, 121 + cabH / 2, 0, root);
+  box(W, cabH, D, M.paint, 0, 121 + cabH / 2, 0, root, { r: 6 });
   for (const sx of [-1, 1]) {
     const dw = W / 2 - 14;
-    box(dw, cabH - 24, 6, M.paint, sx * (dw / 2 + 4), 121 + cabH / 2, hd + 3, root);
+    box(dw, cabH - 24, 8, M.paint, sx * (dw / 2 + 4), 121 + cabH / 2, hd + 3, root, { r: 3 });
     box(14, 120, 22, M.chrome, sx * 22, 121 + cabH * 0.62, hd + 14, root);
     cyl(9, 4, M.steel, sx * 60, 121 + cabH * 0.62, hd + 7, root, "z");
     for (let i = 0; i < 7; i++) box(dw - 120, 7, 3, M.paintDark, sx * (dw / 2 + 4), 160 + i * 18, hd + 7, root);
   }
   box(W + 2, 18, D + 2, M.accent, 0, T - 30 - 18, 0, root);
+  /* decals: the laser warning label on the door and on the cabinet, the nameplate with the configured designation */
+  function decal(w, h, draw, x, y, z, parent, ry = 0) {
+    const c = document.createElement("canvas"); c.width = Math.round(w * 2); c.height = Math.round(h * 2);
+    draw(c.getContext("2d"), c.width, c.height);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: t, roughness: 0.55, metalness: 0.05 }));
+    m.position.set(x, y, z); m.rotation.y = ry; m.receiveShadow = true; parent.add(m); return m;
+  }
+  const warn = (g, w, h) => {
+    g.fillStyle = "#f6c400"; g.fillRect(0, 0, w, h); g.strokeStyle = "#111"; g.lineWidth = w * 0.04; g.strokeRect(w * 0.03, h * 0.03, w * 0.94, h * 0.94);
+    g.fillStyle = "#111"; g.beginPath(); g.moveTo(w * 0.5, h * 0.12); g.lineTo(w * 0.88, h * 0.62); g.lineTo(w * 0.12, h * 0.62); g.closePath(); g.fill();
+    g.fillStyle = "#f6c400"; g.beginPath(); g.moveTo(w * 0.5, h * 0.22); g.lineTo(w * 0.78, h * 0.57); g.lineTo(w * 0.22, h * 0.57); g.closePath(); g.fill();
+    g.strokeStyle = "#111"; g.lineWidth = w * 0.025; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; g.beginPath(); g.moveTo(w * 0.5, h * 0.44); g.lineTo(w * 0.5 + Math.cos(a) * w * 0.12, h * 0.44 + Math.sin(a) * w * 0.12); g.stroke(); }
+    g.font = `700 ${Math.round(h * 0.13)}px sans-serif`; g.textAlign = "center"; g.fillText("CLASS 1 LASER PRODUCT", w * 0.5, h * 0.8); g.font = `500 ${Math.round(h * 0.09)}px sans-serif`; g.fillText("IEC 60825-1", w * 0.5, h * 0.92);
+  };
+  decal(120, 80, warn, -hw + 110, T - 30 - 70, hd + 7.2, root);
+  decal(150, 46, (g, w, h) => {
+    g.fillStyle = "#c9ced2"; g.fillRect(0, 0, w, h); g.fillStyle = "#0e1a24"; g.font = `700 ${Math.round(h * 0.34)}px sans-serif`; g.fillText("TEAL", w * 0.05, h * 0.42);
+    g.font = `500 ${Math.round(h * 0.2)}px monospace`; g.fillText(String(cfg.desig || "").slice(0, 26), w * 0.05, h * 0.78);
+  }, -hw + 330, T - 30 - 62, hd + 7.2, root);
   /* cooling fans in the right-hand side (real 50 mm fan model), behind a grille frame */
   for (const z of [-hd * 0.45, -hd * 0.15]) {
     part(G.fan50, M.paintDark, hw + 6, 121 + cabH * 0.35, z, root, { rot: [0, Math.PI / 2, 0], scale: [2.4, 2.4, 1] });
@@ -138,7 +162,7 @@ function buildMachine(cfg, G, M) {
   }
   /* control panel: a sloped box on the front right with the real E-stop and buttons */
   const cp = new THREE.Group(); cp.position.set(hw - 210, T - 30 - 120, hd + 30); root.add(cp);
-  box(320, 150, 60, M.paint, 0, 0, 0, cp);
+  box(320, 150, 60, M.paint, 0, 0, 0, cp, { r: 8 });
   box(310, 140, 2, M.paintDark, 0, 0, 31, cp);
   /* the E-stop station (yellow housing, red mushroom) stands proud of the panel; the buttons pass through it */
   part(G.estop, M.red, -95, 0, 31 + 40, cp, { rot: [Math.PI / 2, 0, 0], mats: [M.yellow, M.red] });
@@ -146,7 +170,7 @@ function buildMachine(cfg, G, M) {
   part(G.btn_red, M.red, 80, 10, 31 - 69 / 2 + 22, cp, { rot: [Math.PI / 2, 0, 0] });
   box(46, 14, 2, M.paint, 15, -34, 32, cp); box(46, 14, 2, M.paint, 80, -34, 32, cp);
   /* worktop: a 30 mm steel plate with T-slots */
-  box(W + 30, 30, D + 30, M.steel, 0, T - 15, 0, root);
+  box(W + 30, 30, D + 30, M.steel, 0, T - 15, 0, root, { r: 4 });
   for (let i = -3; i <= 3; i++) box(W - 80, 2, 14, M.paintDark, 0, T + 0.5, i * (D / 8), root, { cast: false });
   /* upper frame from the real 40 × 40 profile: four posts, the top rectangle */
   const top = H - 20, postH = top - T;
@@ -163,16 +187,16 @@ function buildMachine(cfg, G, M) {
   const lamp = new THREE.PointLight(0xf2f6ff, 900000, 2200, 2); lamp.position.set(0, top - 60, hd * 0.2); root.add(lamp);
   for (const sx of [-1, 1]) box(4, postH - 40, D - 80, M.window, sx * (hw - 20), T + postH / 2, 0, root, { cast: false, receive: false });
   /* front: header panel, fixed side panels, the lift door with its window and handle */
-  const openH = postH * 0.86, doorW = W * 0.62;
+  const openH = postH * 0.6, doorW = W * 0.62;
   box(W - 80, postH - openH - 20, 4, M.window, 0, T + openH + (postH - openH) / 2, hd - 20, root, { cast: false, receive: false });
   for (const sx of [-1, 1]) box((W - 80 - doorW) / 2, openH, 4, M.window, sx * (doorW / 2 + (W - 80 - doorW) / 4), T + openH / 2, hd - 20, root, { cast: false, receive: false });
-  const door = new THREE.Group(); door.position.set(0, T + openH / 2 + 10, hd - 2); root.add(door); R.door = door; R.doorTravel = openH * 0.66;
+  const door = new THREE.Group(); door.position.set(0, T + openH / 2 + 10, hd - 2); root.add(door); R.door = door; R.doorTravel = postH - openH - 40;   /* the door rises in front of the header, within the enclosure */
   for (const [w, h, x, y] of [[doorW, 36, 0, openH / 2 - 18], [doorW, 36, 0, -openH / 2 + 18], [36, openH, -doorW / 2 + 18, 0], [36, openH, doorW / 2 - 18, 0]]) box(w, h, 20, M.alu, x, y, 0, door);
   box(doorW - 72, openH - 72, 6, M.window, 0, 0, 0, door, { cast: false, receive: false });
   cyl(12, doorW * 0.6, M.chrome, 0, -openH / 2 + 60, 40, door, "x");
   for (const sx of [-1, 1]) box(20, 20, 30, M.aluDark, sx * doorW * 0.3, -openH / 2 + 60, 22, door);
-  /* door guide rails, extended above the roof as on a vertical-lift door */
-  for (const sx of [-1, 1]) box(24, postH + R.doorTravel, 24, M.aluDark, sx * (doorW / 2 + 14), T + (postH + R.doorTravel) / 2, hd + 16, root);
+  /* door guide rails, floor of the enclosure to the roof */
+  for (const sx of [-1, 1]) box(24, postH, 24, M.aluDark, sx * (doorW / 2 + 14), T + postH / 2, hd + 16, root, { r: 2 });
   /* Z column at the back: two real profiles side by side, real MGN12 rails, real NEMA 23 */
   const zc = new THREE.Group(); zc.position.set(0, T, -hd + 90); root.add(zc);
   const colH = Math.min(760, postH - 120);
@@ -185,10 +209,10 @@ function buildMachine(cfg, G, M) {
   /* the carriage, arm, scan head and objective move together */
   const zg = new THREE.Group(); zg.position.set(0, 0, 0); zc.add(zg); R.z = zg;
   const carY = 16 + colH * 0.52;
-  box(110, 150, 18, M.aluDark, 0, carY, 38, zg);
-  box(70, 50, 250, M.alu, 0, carY + 30, 170, zg);
+  box(110, 150, 18, M.aluDark, 0, carY, 38, zg, { r: 3 });
+  box(70, 50, 250, M.alu, 0, carY + 30, 170, zg, { r: 4 });
   const head = new THREE.Group(); head.position.set(0, carY + 10, 320); zg.add(head); R.head = head;
-  box(180, 110, 200, M.anod, 0, 0, 0, head);
+  box(180, 110, 200, M.anod, 0, 0, 0, head, { r: 8 });
   box(182, 6, 202, M.accent, 0, 40, 0, head);
   cyl(26, 70, M.anod, -60, 70, -40, head);
   cyl(28, 40, M.aluDark, 95, 0, -50, head, "x");
@@ -204,7 +228,7 @@ function buildMachine(cfg, G, M) {
   fib.castShadow = true; head.add(fib);
   /* fixture, toggle clamps and the part under the objective */
   const fx = new THREE.Group(); fx.position.set(0, T, -hd + 90 + 320 + 50); root.add(fx); R.fix = fx;
-  box(420, 22, 360, M.anod, 0, 11, 0, fx);
+  box(420, 22, 360, M.anod, 0, 11, 0, fx, { r: 3 });
   for (const [x, z] of [[-150, -130], [150, -130], [-150, 130], [150, 130]]) cyl(6, 3, M.steel, x, 23, z, fx, "y", 6);
   /* the part: a brushed steel plate whose top takes the marks as a texture */
   const can = document.createElement("canvas"); can.width = can.height = 512;
@@ -246,7 +270,7 @@ function buildMachine(cfg, G, M) {
   const hmi = new THREE.Group(); hmi.position.set(-hw - 230, T + 360, hd - 60); root.add(hmi);
   box(240, 22, 22, M.aluDark, 130, 0, -20, hmi);
   cyl(18, 60, M.paintDark, 250, 0, -20, hmi);
-  box(420, 300, 50, M.paintDark, 0, 0, 10, hmi);
+  box(420, 300, 50, M.paintDark, 0, 0, 10, hmi, { r: 10 });
   const sc = document.createElement("canvas"); sc.width = 512; sc.height = 360;
   const stex = new THREE.CanvasTexture(sc); stex.colorSpace = THREE.SRGBColorSpace;
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(380, 262), new THREE.MeshBasicMaterial({ map: stex, toneMapped: false }));
@@ -323,8 +347,8 @@ export function mount(host, cfg) {
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(9000, 9000), new THREE.ShadowMaterial({ opacity: 0.22 }));
     floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
     const camera = new THREE.PerspectiveCamera(32, 1, 20, 20000);
-    const target = new THREE.Vector3(-W * 0.06, H * 0.5, 0);
-    const home = new THREE.Vector3(W * 2.05, H * 1.12, D * 3.1);
+    const target = new THREE.Vector3(-W * 0.05, H * 0.52, 0);
+    const home = new THREE.Vector3(W * 2.0, H * 0.98, D * 3.15);
     camera.position.copy(home);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.copy(target); controls.enableDamping = true; controls.enableZoom = false; controls.enablePan = false;
@@ -346,8 +370,8 @@ export function mount(host, cfg) {
       if (still.matches) { camera.position.copy(pos); controls.target.copy(tgt); controls.update(); }
       workBtn.setAttribute("aria-pressed", work ? "true" : "false"); api.work = work; api.wake && api.wake();
     }
-    const workPos = () => { const f = new THREE.Vector3(); R.part.getWorldPosition(f); f.y = cfg.dims.cv + 120; /* inside the enclosure's front zone, clear of the posts and the glazing, looking at the head and the part */
-      return [f.clone().add(new THREE.Vector3(W * 0.2, 330, D * 0.4)), f.clone().add(new THREE.Vector3(0, 130, 0))]; };
+    const workPos = () => { const f = new THREE.Vector3(); R.part.getWorldPosition(f); f.y = cfg.dims.cv + 120; /* just inside the enclosure, clear of the posts, the glazing and the door, looking down at the part under the head */
+      return [f.clone().add(new THREE.Vector3(W * 0.24, 400, D * 0.44)), f.clone().add(new THREE.Vector3(0, 50, 0))]; };
     workBtn.onclick = () => { if (api.work) flyTo(home, target, false); else { const [p, t] = workPos(); flyTo(p, t, true); } };
     wrap.querySelector('[data-a="reset"]').onclick = () => flyTo(home, target, false);
     api.flyStep = (dt) => { if (fly.t >= 1 || !fly.to) return false; fly.t = Math.min(1, fly.t + dt / 0.9); const e = fly.t * fly.t * (3 - 2 * fly.t);
@@ -467,18 +491,35 @@ export function mount(host, cfg) {
                       : "Preview · " + ph.n + " · " + ph.real.toFixed(2) + " s of a " + real.toFixed(2) + " s cycle";
       if (readout.textContent !== text) readout.textContent = text;
     }
+    /* adaptive quality: when frames come slowly, lower the resolution, then the shadows */
+    const perf = { n: 0, sum: 0, level: 0 };
+    function adapt(ms) {
+      perf.n++; perf.sum += ms;
+      if (perf.n < 30) return;
+      const avg = perf.sum / perf.n; perf.n = 0; perf.sum = 0;
+      if (avg > 45 && perf.level < 2) {
+        perf.level++;
+        if (perf.level === 1) { renderer.setPixelRatio(1); size(); }
+        else { renderer.shadowMap.enabled = false; scene.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); }
+        api.quality = perf.level;
+      }
+    }
     function tick(now) {
       if (stopped) return;
-      const dt = last ? Math.min((now - last) / 1000, 1 / 20) : 1 / 60; last = now;
+      const raw = last ? now - last : 16, dt = last ? Math.min(raw / 1000, 1 / 20) : 1 / 60; last = now;
+      adapt(raw);
       step(dt); api.flyStep && api.flyStep(dt); controls.update(); renderer.render(scene, camera);
-      frame = visible ? requestAnimationFrame(tick) : 0;
+      frame = visible && !api.held ? requestAnimationFrame(tick) : 0;
     }
     io = new IntersectionObserver((es) => { visible = es[es.length - 1].isIntersecting; if (visible && !frame && !stopped) { last = 0; frame = requestAnimationFrame(tick); } }, { rootMargin: "120px 0px" });
     io.observe(stage);
     step(0); renderer.render(scene, camera);
     api.ready = true; api.scene = scene; api.parts = Object.keys(G).length;
     wrap.setAttribute("data-ready", "1");
-    api.wake = () => { if (!frame && visible && !stopped) { last = 0; frame = requestAnimationFrame(tick); } };
+    api.wake = () => { if (!frame && visible && !stopped && !api.held) { last = 0; frame = requestAnimationFrame(tick); } };
+    /* hold the picture still (for a print or a capture), and let it go again */
+    api.hold = () => { api.held = true; if (frame) cancelAnimationFrame(frame); frame = 0; step(0); api.flyStep && api.flyStep(9); controls.update(); renderer.render(scene, camera); };
+    api.release = () => { api.held = false; api.wake(); };
   })();
   return api;
 }

@@ -53,13 +53,14 @@ const check = (name, ok, detail = '') => results.push({ section, name, ok: !!ok,
 /* PW_CHROMIUM names a browser to use where the pinned one is not installed */
 const browser = await pw.chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {});
 async function open(hash = '', opts = {}) {
-  const { access, ...pageOpts } = opts;
+  const { access, mfig, ...pageOpts } = opts;
   const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, ...pageOpts });
   page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
-  page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) page.errors.push(m.text()); });
+  page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|WebGL|GL Driver|GPU stall/.test(m.text())) page.errors.push(m.text()); });
   page.on('dialog', d => d.accept(d.type() === 'prompt' ? 'Test configuration' : ''));   // name prompts and confirmations
-  await page.addInitScript(() => { try { localStorage.setItem('teal.seenAdvisor', 'true'); } catch (e) {} });
+  /* pages start in the drawing view: software WebGL in CI would slow every page; the 3D view has its own section */
+  await page.addInitScript((m) => { try { localStorage.setItem('teal.seenAdvisor', 'true'); if (!localStorage.getItem('teal.mfig')) localStorage.setItem('teal.mfig', JSON.stringify(m)); } catch (e) {} }, opts.mfig || 'det');
   const role = access === undefined ? 'internal' : access;                 // 'internal' | 'customer' | null (meet the passkey form)
   if (role) await page.addInitScript(t => { try { if (location.protocol !== 'about:') sessionStorage.setItem('teal.access', t); } catch (e) {} }, TOKEN(role));
   await page.goto(BASE + hash, { waitUntil: 'networkidle' });
@@ -1002,6 +1003,39 @@ try {
   const back = await pg.evaluate(() => document.querySelector('#mfig').dataset.variant);
   check('Detailed brings the station back', back === 'mag', back);
   check('no script errors in Fig 2', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
+  sec('The workstation in 3D, beside the anatomy figure');
+  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254', { mfig: 'combo' });
+  await pg.evaluate(() => { go(5); document.querySelector('#mfig').scrollIntoView(); });
+  await pg.waitForFunction(() => document.querySelector('.cad3d[data-ready]') || /cannot/.test((document.querySelector('.cad3d [data-readout]') || {}).textContent || ''), null, { timeout: 45000 }).catch(() => {});
+  const c1 = await pg.evaluate(async () => {
+    const sec = document.querySelector('#mfig'), cad = document.querySelector('.cad3d'), cap = (document.querySelector('.cad3d-cap') || {}).textContent || '';
+    const cols = getComputedStyle(sec.querySelector('.mfigviews')).gridTemplateColumns.split(' ').length;
+    const credits = await fetch('assets/cad3d/CREDITS.md').then((r) => r.ok ? r.text() : '');
+    return { mode: mfigMode(), ready: !!(cad && cad.dataset.ready), parts: MFIG.cad && MFIG.cad.parts, canvas: !!document.querySelector('.cad3d canvas'), drawing: !document.querySelector('#mfighost').hidden && !!document.querySelector('#mfighost svg'),
+      cols, cap, credits: /CC-BY 3\.0/.test(credits) && /Adrian McEwen/.test(credits) && /Charles Fox/.test(credits) && !/traceparts\.com\/.*\.(step|stp)/i.test(credits) };
+  });
+  check('the default view is the 3D render beside the anatomy figure, side by side on a wide screen', c1.mode === 'combo' && c1.ready && c1.canvas && c1.drawing && c1.cols === 2, JSON.stringify({ ...c1, cap: undefined }));
+  check('the 3D view is built from seven open-licence component models, each author credited', c1.parts === 7 && /CC-BY 3\.0/.test(c1.cap) && /Henrique Enzweiler/.test(c1.cap) && c1.credits, c1.cap.slice(0, 200));
+  check('its caption gives the machine’s size from the configuration and says it is indicative', /rendered in 3D at its (estimated|stated) size, [\d,]+ × [\d,]+ × [\d,]+ mm/.test(c1.cap) && /Indicative/.test(c1.cap), c1.cap.slice(0, 120));
+  /* seek the run to the middle of the process and pause it there */
+  await pg.evaluate(() => { SIM.faults = false; simStart(); const p = simPhaseStart('PROCESS'); SIM.rate = 0; simSeek(p.t + p.d * 0.5); });
+  await pg.waitForFunction(() => { const a = document.querySelector('.cad3d [data-readout]').textContent, b = document.querySelector('#mfighost [data-readout]').textContent; return /^MARK · /.test(a) && a === b; }, null, { timeout: 30000 }).catch(() => {});
+  const c2 = await pg.evaluate(() => { const ph = SIM.phases[SIM.ph]; return { cad: document.querySelector('.cad3d [data-readout]').textContent, fig: document.querySelector('#mfighost [data-readout]').textContent,
+    want: ph.n + ' · ' + (SIM.u * ph.real).toFixed(2) + ' of ' + ph.real.toFixed(2) + ' s · cycle ' + SIM.realS.toFixed(2) + ' s' }; });
+  await pg.evaluate(() => simStop());
+  check('during a run both views show the same phase and the same time into it as the simulation', c2.cad === c2.want && c2.fig === c2.want, JSON.stringify(c2));
+  const c3 = await pg.evaluate(() => { const keep = S.src, out = {}; out.fiber = mfigTint(); S.src = 'co2'; out.co2 = mfigTint(); S.src = 'uv'; out.uv = mfigTint(); S.src = keep; return out; });
+  check('the window tint follows the source’s wavelength (infrared, CO₂, UV differ)', c3.fiber !== c3.co2 && c3.co2 !== c3.uv && c3.fiber !== c3.uv, JSON.stringify(c3));
+  await pg.evaluate(() => document.querySelector('#mfigmode [data-mode="cad"]').click());
+  await pg.waitForFunction(() => document.querySelector('#mfighost').hidden && document.querySelector('.cad3d'), null, { timeout: 30000 }).catch(() => {});
+  const c4 = await pg.evaluate(() => ({ drawingHidden: document.querySelector('#mfighost').hidden, cad: !!document.querySelector('.cad3d'), pressed: document.querySelector('#mfigmode [data-mode="cad"]').getAttribute('aria-pressed') }));
+  await pg.evaluate(() => document.querySelector('#mfigmode [data-mode="det"]').click());
+  const c5 = await pg.evaluate(() => ({ cadGone: document.querySelector('#mfig3d').hidden && !document.querySelector('.cad3d'), drawing: !!document.querySelector('#mfighost svg') }));
+  check('3D alone and the drawing alone stay available as options', c4.drawingHidden && c4.cad && c4.pressed === 'true' && c5.cadGone && c5.drawing, JSON.stringify({ c4, c5 }));
+  check('no script errors in the 3D view', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
 
   /* ------------------------------------------------------------------ */

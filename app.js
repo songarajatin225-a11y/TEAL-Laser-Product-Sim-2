@@ -8840,7 +8840,7 @@ function mfigCad(key){
     var src=SRC[S.src];
     MFIG.cad=m.mount(h3, {
       dims:{w:dm.w, d:dm.d, h:dm.h, cv:dm.cv}, phases:pr.ph, real:pr.real, live:mfigLive, segs:segs, fx:procFX(),
-      tint:mfigTint(), beamCol: src? parseInt(String(src.col).slice(1),16) : 0xff5533, title:P().n,
+      tint:mfigTint(), beamCol: src? parseInt(String(src.col).slice(1),16) : 0xff5533, title:P().n, desig:desig(),
       caption:mfigCadCaption(pr, dm), clock:mfigClock
     });
     if(mfigMode()==='cad') $('#mfig').setAttribute('data-variant','cad');
