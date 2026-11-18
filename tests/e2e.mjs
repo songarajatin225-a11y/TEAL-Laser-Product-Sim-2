@@ -909,6 +909,69 @@ try {
   await pg.close();
 
   /* ------------------------------------------------------------------ */
+  sec('Fig 2 — the workstation through one run cycle');
+  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254&m=visfid.fume');
+  await pg.evaluate(() => { go(5); document.querySelector('#mfig').scrollIntoView(); });
+  await pg.waitForFunction(() => /^Preview · /.test((document.querySelector('#mfig [data-readout]') || {}).textContent || ''));
+  const w1 = await pg.evaluate(() => {
+    const sec = document.querySelector('#mfig'), svg = sec.querySelector('svg');
+    const vis = (sel) => { const e = svg.querySelector(sel); return !!e && e.style.display !== 'none'; };
+    return { shown: !sec.hidden, items: svg.querySelectorAll('.it').length, door: svg.querySelectorAll('[data-move="door"]').length,
+      z: svg.querySelectorAll('[data-move="z"]').length, part: svg.querySelectorAll('[data-move="part"]').length,
+      cam: vis('[data-opt="cam"]'), fume: vis('[data-opt="fume"]'), af: vis('[data-opt="af"]'),
+      cap: sec.querySelector('.iso-caption').textContent, theme: sec.querySelector('.tealws').dataset.theme === document.documentElement.dataset.theme };
+  });
+  check('a configured galvo workstation shows Fig 2: the whole machine, with its door, Z assembly and part as moving groups', w1.shown && w1.items > 150 && w1.door >= 4 && w1.z >= 8 && w1.part === 1 && w1.theme, JSON.stringify({ ...w1, cap: undefined }));
+  check('only the configured modules are drawn: camera and fume extractor, no focus sensor', w1.cam && w1.fume && !w1.af, JSON.stringify({ cam: w1.cam, fume: w1.fume, af: w1.af }));
+  check('the caption names the machine, its optics and the computed cycle', /Mark F-Series as configured/.test(w1.cap) && /F254 objective \(f = 254 mm, field 175 × 175 mm\)/.test(w1.cap) && /s cycle \(computed/.test(w1.cap) && /not to scale/.test(w1.cap), w1.cap);
+  const w2 = await pg.evaluate(() => {
+    const keep = JSON.stringify([SIM.procS, SIM.realS, SIM.animS, SIM.basis, SIM.on]);
+    const pre = mfigPhases(), after = JSON.stringify([SIM.procS, SIM.realS, SIM.animS, SIM.basis, SIM.on]);
+    SIM.faults = false; simStart();
+    const same = SIM.phases.length === pre.ph.length && SIM.phases.every((p, i) => p.k === pre.ph[i].k && Math.abs(p.real - pre.ph[i].real) < 1e-9) && Math.abs(SIM.realS - pre.real) < 1e-9;
+    return { untouched: keep === after, same };
+  });
+  check('the preview is the simulation’s own phase list, and computing it leaves the simulation untouched', w2.untouched && w2.same, JSON.stringify(w2));
+  await pg.waitForFunction(() => SIM.on && SIM.phases[SIM.ph].k === 'PROCESS' && SIM.u > 0.4, null, { timeout: 20000 });
+  await pg.evaluate(() => { SIM.rate = 0; });
+  await pg.waitForTimeout(250);
+  const w3 = await pg.evaluate(() => {
+    const ph = SIM.phases[SIM.ph], t = document.querySelector('#mfig [data-readout]').textContent, svg = document.querySelector('#mfig svg');
+    return { t, want: ph.n + ' · ' + (SIM.u * ph.real).toFixed(2) + ' of ' + ph.real.toFixed(2) + ' s · cycle ' + SIM.realS.toFixed(2) + ' s',
+      marks: (svg.querySelector('[data-part="marks"] path') || { getAttribute: () => '' }).getAttribute('d').length,
+      hmi: (svg.querySelector('[data-part="hmi"] text') || {}).textContent };
+  });
+  check('while the run is on, Fig 2 follows it: the same phase, the same time into it, the same cycle', w3.t === w3.want, w3.t + ' vs ' + w3.want);
+  check('during the process the marks grow on the part and the operator screen names the phase', w3.marks > 20 && w3.hmi === 'MARK', JSON.stringify({ marks: w3.marks, hmi: w3.hmi }));
+  await pg.evaluate(() => simStop());
+  await pg.waitForFunction(() => /^Preview · /.test(document.querySelector('#mfig [data-readout]').textContent));
+  await pg.focus('#mfig .iso-stage');
+  await pg.keyboard.press('Home');
+  const k0 = await pg.evaluate(() => document.querySelector('#mfig [data-readout]').textContent);
+  await pg.keyboard.press('ArrowRight');
+  const k1 = await pg.evaluate(() => document.querySelector('#mfig [data-readout]').textContent);
+  const names = await pg.evaluate(() => mfigPhases().ph.map((p) => p.n));
+  check('arrow keys step the preview through the phases', k0.startsWith('Preview · ' + names[0] + ' · ') && k1.startsWith('Preview · ' + names[1] + ' · '), k0 + ' → ' + k1);
+  await pg.keyboard.press('z');
+  await pg.waitForFunction(() => { const v = document.querySelector('#mfig svg').getAttribute('viewBox').split(' ').map(Number), c = TEALAnatomy.ws.geo.CLOSE; return v.every((n, i) => Math.abs(n - c[i]) < 0.05); }, null, { timeout: 4000 }).catch(() => {});
+  const z1 = await pg.evaluate(() => ({ vb: document.querySelector('#mfig svg').getAttribute('viewBox'), c: TEALAnatomy.ws.geo.CLOSE.join(' '), pressed: document.querySelector('#mfig .ws-zoom').getAttribute('aria-pressed') }));
+  check('Z eases into a close-up of the work zone, and the button says so', z1.pressed === 'true' && z1.vb.split(' ').map(Number).every((n, i) => Math.abs(n - Number(z1.c.split(' ')[i])) < 0.05), JSON.stringify(z1));
+  const w4 = await pg.evaluate(() => {
+    const out = {};
+    themeApply('dark'); out.dark = document.querySelector('.tealws').dataset.theme; themeApply('light'); out.light = document.querySelector('.tealws').dataset.theme;
+    restore({ plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: { autofoc: true }, sw: 'desktop', extra: {}, notes: '', target: null }); go(5);
+    const svg = document.querySelector('#mfig svg');
+    out.af = svg.querySelector('[data-opt="af"]').style.display !== 'none'; out.cam = svg.querySelector('[data-opt="cam"]').style.display !== 'none';
+    restore({ plat: 'cutxt', app: 'thinmetal', src: 'fiber', pw: 500, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5);
+    out.gantry = document.querySelector('#mfig').hidden;
+    restore({ plat: 'weldr', app: 'seam3d', src: 'smcw', pw: 3000, lens: 'f420', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5);
+    out.robot = document.querySelector('#mfig').hidden;
+    return out; });
+  check('Fig 2 follows the theme and the modules, and is not shown for a gantry table or a robot cell', w4.dark === 'dark' && w4.light === 'light' && w4.af && !w4.cam && w4.gantry && w4.robot, JSON.stringify(w4));
+  check('no script errors in Fig 2', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
   sec('Access passkeys');
   const shipped = (() => {
     const page = readFileSync(join(ROOT, 'app.js'), 'utf8'), file = JSON.parse(readFileSync(join(ROOT, 'access.json'), 'utf8'));

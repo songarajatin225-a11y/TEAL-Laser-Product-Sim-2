@@ -1989,6 +1989,8 @@ function mount(host, cfg) {
   mount.stop = function () { stopped = true; if (frame) cancelAnimationFrame(frame); frame = 0; io.disconnect(); clearTimeout(idle); };
   return { state: st, draw: draw, aim: aim, stop: mount.stop, maxAngle: maxT };
 }
-window.TEALAnatomy = { mount: mount, geo: GEO };
+/* the kit's runtime, shared with Fig 2 (anatomy-ws.js) */
+var KIT = { iso: iso, segment: segment, pathOf: pathOf, solidSvg: solidSvg, lineSvg: lineSvg, cylinder: cylinder, ring: ring, axisVector: axisVector, frameOf: G.frameOf, prismOf: G.prismOf };
+window.TEALAnatomy = Object.assign(window.TEALAnatomy || {}, { mount: mount, geo: GEO, kit: KIT });
 
 })();
