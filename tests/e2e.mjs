@@ -53,13 +53,14 @@ const check = (name, ok, detail = '') => results.push({ section, name, ok: !!ok,
 /* PW_CHROMIUM names a browser to use where the pinned one is not installed */
 const browser = await pw.chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {});
 async function open(hash = '', opts = {}) {
-  const { access, ...pageOpts } = opts;
+  const { access, mfig, ...pageOpts } = opts;
   const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, ...pageOpts });
   page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
-  page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) page.errors.push(m.text()); });
+  page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|WebGL|GL Driver|GPU stall/.test(m.text())) page.errors.push(m.text()); });
   page.on('dialog', d => d.accept(d.type() === 'prompt' ? 'Test configuration' : ''));   // name prompts and confirmations
-  await page.addInitScript(() => { try { localStorage.setItem('teal.seenAdvisor', 'true'); } catch (e) {} });
+  /* pages start in the drawing view: software WebGL in CI would slow every page; the 3D view has its own section */
+  await page.addInitScript((m) => { try { localStorage.setItem('teal.seenAdvisor', 'true'); if (!localStorage.getItem('teal.mfig')) localStorage.setItem('teal.mfig', JSON.stringify(m)); } catch (e) {} }, opts.mfig || 'det');
   const role = access === undefined ? 'internal' : access;                 // 'internal' | 'customer' | null (meet the passkey form)
   if (role) await page.addInitScript(t => { try { if (location.protocol !== 'about:') sessionStorage.setItem('teal.access', t); } catch (e) {} }, TOKEN(role));
   await page.goto(BASE + hash, { waitUntil: 'networkidle' });
@@ -160,7 +161,7 @@ try {
   const modes = await pg.evaluate(() => { const pn = document.getElementById('v3dlay').getBoundingClientRect();
     return [...document.querySelectorAll('#v3dlay .vmode button')].map(b => { const r = b.getBoundingClientRect();
       return { t: b.textContent, inside: r.left >= pn.left - 1 && r.right <= pn.right + 1 }; }); });
-  check('all four view modes are reachable inside the layer panel', modes.length === 4 && modes.every(m => m.inside), modes.map(m => m.t + (m.inside ? '' : '(clipped)')).join(' '));
+  check('all five view modes (with the new Realistic) are reachable inside the layer panel', modes.length === 5 && modes[4].t === 'Realistic' && modes.every(m => m.inside), modes.map(m => m.t + (m.inside ? '' : '(clipped)')).join(' '));
   const geo = await pg.evaluate(() => {
     const build = () => { const b = new B3(); b.q = 1; b.lod = 1; mmBuild(b, M3D.vp.T, null); return b; };
     const minY = id => { let m = 1e9; build().f.forEach(f => { if (f.gid === id && !f.kind) f.v.forEach(v => { m = Math.min(m, v[1]); }); }); return m; };
@@ -953,8 +954,8 @@ try {
   const names = await pg.evaluate(() => mfigPhases().ph.map((p) => p.n));
   check('arrow keys step the preview through the phases', k0.startsWith('Preview · ' + names[0] + ' · ') && k1.startsWith('Preview · ' + names[1] + ' · '), k0 + ' → ' + k1);
   await pg.keyboard.press('z');
-  await pg.waitForFunction(() => { const v = document.querySelector('#mfig svg').getAttribute('viewBox').split(' ').map(Number), c = TEALAnatomy.ws.geo.CLOSE; return v.every((n, i) => Math.abs(n - c[i]) < 0.05); }, null, { timeout: 4000 }).catch(() => {});
-  const z1 = await pg.evaluate(() => ({ vb: document.querySelector('#mfig svg').getAttribute('viewBox'), c: TEALAnatomy.ws.geo.CLOSE.join(' '), pressed: document.querySelector('#mfig .ws-zoom').getAttribute('aria-pressed') }));
+  await pg.waitForFunction(() => { const v = document.querySelector('#mfig svg').getAttribute('viewBox').split(' ').map(Number), c = TEALAnatomy.ws.current.CLOSE; return v.every((n, i) => Math.abs(n - c[i]) < 0.05); }, null, { timeout: 4000 }).catch(() => {});
+  const z1 = await pg.evaluate(() => ({ vb: document.querySelector('#mfig svg').getAttribute('viewBox'), c: TEALAnatomy.ws.current.CLOSE.join(' '), pressed: document.querySelector('#mfig .ws-zoom').getAttribute('aria-pressed') }));
   check('Z eases into a close-up of the work zone, and the button says so', z1.pressed === 'true' && z1.vb.split(' ').map(Number).every((n, i) => Math.abs(n - Number(z1.c.split(' ')[i])) < 0.05), JSON.stringify(z1));
   const w4 = await pg.evaluate(() => {
     const out = {};
@@ -963,12 +964,98 @@ try {
     const svg = document.querySelector('#mfig svg');
     out.af = svg.querySelector('[data-opt="af"]').style.display !== 'none'; out.cam = svg.querySelector('[data-opt="cam"]').style.display !== 'none';
     restore({ plat: 'cutxt', app: 'thinmetal', src: 'fiber', pw: 500, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5);
-    out.gantry = document.querySelector('#mfig').hidden;
+    out.gantry = document.querySelector('#mfighost').hidden && document.querySelector('#mfig').classList.contains('nogalvo') && !document.querySelector('#mfig').hidden;
     restore({ plat: 'weldr', app: 'seam3d', src: 'smcw', pw: 3000, lens: 'f420', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5);
-    out.robot = document.querySelector('#mfig').hidden;
+    out.robot = document.querySelector('#mfighost').hidden && document.querySelector('#mfig').classList.contains('nogalvo');
     return out; });
-  check('Fig 2 follows the theme and the modules, and is not shown for a gantry table or a robot cell', w4.dark === 'dark' && w4.light === 'light' && w4.af && !w4.cam && w4.gantry && w4.robot, JSON.stringify(w4));
+  check('Fig 2 follows the theme and the modules; a gantry table or a robot cell is shown in 3D instead of the drawing', w4.dark === 'dark' && w4.light === 'light' && w4.af && !w4.cam && w4.gantry && w4.robot, JSON.stringify(w4));
+  /* the handling station follows the configuration: the simulation's own loadKind() */
+  const variantOf = async (st) => {
+    await pg.evaluate((x) => { restore(x); go(5); document.querySelector('#mfig').scrollIntoView(); }, st);
+    await pg.waitForFunction(() => { const s = document.querySelector('#mfig'); return !s.hidden && TEALAnatomy.ws.current && s.dataset.variant === TEALAnatomy.ws.current.VAR; }, null, { timeout: 8000 }).catch(() => {});
+    return pg.evaluate(() => ({ v: document.querySelector('#mfig').dataset.variant, lk: loadKind(), cap: document.querySelector('#mfig .iso-caption').textContent, items: document.querySelectorAll('#mfig svg .it').length }));
+  };
+  const base = { sw: 'desktop', extra: {}, notes: '', target: null };
+  const vC2i = await variantOf({ ...base, plat: 'markc2i', app: 'dual', src: 'co2', pw: 30, lens: 'f254', mods: { conveyor: true } });
+  const vRoto = await variantOf({ ...base, plat: 'roto', app: 'multi', src: 'fiber', pw: 50, lens: 'f254', mods: { rotoidx: true } });
+  const vTurn = await variantOf({ ...base, plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: { turntbl: true } });
+  const vArm = await variantOf({ ...base, plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: { robot6: true } });
+  const vMag = await variantOf({ ...base, plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: { magazine: true } });
+  check('the drawing shows the configured handling: conveyor, rotary indexer, turntable, robot, magazine', vC2i.v === 'belt' && vRoto.v === 'dial4' && vTurn.v === 'dial2' && vArm.v === 'arm' && vMag.v === 'mag' && [vC2i, vRoto, vTurn, vArm, vMag].every((x) => x.items > 150),
+    JSON.stringify([vC2i, vRoto, vTurn, vArm, vMag].map((x) => x.v + '/' + x.lk + '/' + x.items)));
+  check('the caption names the station that is drawn', /SMEMA conveyor/.test(vC2i.cap) && /four-station rotary indexer/.test(vRoto.cap) && /six-axis robot/.test(vArm.cap), vArm.cap.slice(0, 160));
+  /* effects in the detailed view, none in the standard one */
+  await pg.evaluate(() => { SIM.faults = false; simStart(); });
+  await pg.waitForFunction(() => SIM.on && SIM.phases[SIM.ph].k === 'PROCESS' && SIM.u > 0.2 && document.querySelector('#mfig .ws-glow'), null, { timeout: 20000 }).catch(() => {});
+  const fxOn = await pg.evaluate(() => ({ glow: !!document.querySelector('#mfig .ws-glow'), sparks: document.querySelectorAll('#mfig .ws-spark').length }));
+  await pg.evaluate(() => simStop());
+  await pg.click('#mfigmode [data-mode="std"]');
+  await pg.waitForFunction(() => document.querySelector('#mfig').dataset.variant === 'hand', null, { timeout: 5000 }).catch(() => {});
+  await pg.evaluate(() => { SIM.faults = false; simStart(); });
+  await pg.waitForFunction(() => SIM.on && SIM.phases[SIM.ph].k === 'PROCESS' && SIM.u > 0.3, null, { timeout: 20000 }).catch(() => {});
+  const fxStd = await pg.evaluate(() => ({ v: document.querySelector('#mfig').dataset.variant, glow: !!document.querySelector('#mfig .ws-glow'), sparks: document.querySelectorAll('#mfig .ws-spark').length,
+    pressed: document.querySelector('#mfigmode [data-mode="std"]').getAttribute('aria-pressed'), stored: Store.get('teal.mfig', ''), cap: /Standard view shows hand loading; this configuration loads by magazine/.test(document.querySelector('#mfig .iso-caption').textContent) }));
+  await pg.evaluate(() => simStop());
+  check('the detailed view shows the process at the spot: a glow and sparks for a metal mark', fxOn.glow && fxOn.sparks > 0, JSON.stringify(fxOn));
+  check('Standard keeps the plain workstation, loaded by hand, with no effects, and is remembered', fxStd.v === 'hand' && !fxStd.glow && fxStd.sparks === 0 && fxStd.pressed === 'true' && fxStd.stored === 'std' && fxStd.cap, JSON.stringify(fxStd));
+  await pg.click('#mfigmode [data-mode="det"]');
+  await pg.waitForFunction(() => document.querySelector('#mfig').dataset.variant === 'mag', null, { timeout: 5000 }).catch(() => {});
+  const back = await pg.evaluate(() => document.querySelector('#mfig').dataset.variant);
+  check('Detailed brings the station back', back === 'mag', back);
   check('no script errors in Fig 2', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
+  sec('The workstation in 3D, beside the anatomy figure');
+  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254', { mfig: 'combo' });
+  await pg.evaluate(() => { go(5); document.querySelector('#mfig').scrollIntoView(); });
+  await pg.waitForFunction(() => document.querySelector('.cad3d[data-ready]') || /cannot/.test((document.querySelector('.cad3d [data-readout]') || {}).textContent || ''), null, { timeout: 45000 }).catch(() => {});
+  const c1 = await pg.evaluate(async () => {
+    const sec = document.querySelector('#mfig'), cad = document.querySelector('.cad3d'), cap = (document.querySelector('.cad3d-cap') || {}).textContent || '';
+    const cols = getComputedStyle(sec.querySelector('.mfigviews')).gridTemplateColumns.split(' ').length;
+    const credits = await fetch('assets/cad3d/CREDITS.md').then((r) => r.ok ? r.text() : '');
+    return { mode: mfigMode(), ready: !!(cad && cad.dataset.ready), parts: MFIG.cad && MFIG.cad.parts, canvas: !!document.querySelector('.cad3d canvas'), drawing: !document.querySelector('#mfighost').hidden && !!document.querySelector('#mfighost svg'),
+      cols, cap, credits: /CC-BY 3\.0/.test(credits) && /Adrian McEwen/.test(credits) && /Charles Fox/.test(credits) && !/traceparts\.com\/.*\.(step|stp)/i.test(credits) };
+  });
+  check('the default view is the 3D render beside the anatomy figure, side by side on a wide screen', c1.mode === 'combo' && c1.ready && c1.canvas && c1.drawing && c1.cols === 2, JSON.stringify({ ...c1, cap: undefined }));
+  check('the 3D view is built from seven open-licence component models, each author credited', c1.parts === 7 && /CC-BY 3\.0/.test(c1.cap) && /Henrique Enzweiler/.test(c1.cap) && c1.credits, c1.cap.slice(0, 200));
+  check('its caption gives the machine’s size from the configuration and says it is indicative', /rendered in 3D at its (estimated|stated) size, [\d,]+ × [\d,]+ × [\d,]+ mm/.test(c1.cap) && /Indicative/.test(c1.cap), c1.cap.slice(0, 120));
+  /* seek the run to the middle of the process and pause it there */
+  await pg.evaluate(() => { SIM.faults = false; simStart(); const p = simPhaseStart('PROCESS'); SIM.rate = 0; simSeek(p.t + p.d * 0.5); });
+  await pg.waitForFunction(() => { const a = document.querySelector('.cad3d [data-readout]').textContent, b = document.querySelector('#mfighost [data-readout]').textContent; return /^MARK · /.test(a) && a === b; }, null, { timeout: 30000 }).catch(() => {});
+  const c2 = await pg.evaluate(() => { const ph = SIM.phases[SIM.ph]; return { cad: document.querySelector('.cad3d [data-readout]').textContent, fig: document.querySelector('#mfighost [data-readout]').textContent,
+    want: ph.n + ' · ' + (SIM.u * ph.real).toFixed(2) + ' of ' + ph.real.toFixed(2) + ' s · cycle ' + SIM.realS.toFixed(2) + ' s' }; });
+  await pg.evaluate(() => simStop());
+  check('during a run both views show the same phase and the same time into it as the simulation', c2.cad === c2.want && c2.fig === c2.want, JSON.stringify(c2));
+  const c3 = await pg.evaluate(() => { const keep = S.src, out = {}; out.fiber = mfigTint(); S.src = 'co2'; out.co2 = mfigTint(); S.src = 'uv'; out.uv = mfigTint(); S.src = keep; return out; });
+  check('the window tint follows the source’s wavelength (infrared, CO₂, UV differ)', c3.fiber !== c3.co2 && c3.co2 !== c3.uv && c3.fiber !== c3.uv, JSON.stringify(c3));
+  await pg.evaluate(() => document.querySelector('#mfigmode [data-mode="cad"]').click());
+  await pg.waitForFunction(() => document.querySelector('#mfighost').hidden && document.querySelector('.cad3d'), null, { timeout: 30000 }).catch(() => {});
+  const c4 = await pg.evaluate(() => ({ drawingHidden: document.querySelector('#mfighost').hidden, cad: !!document.querySelector('.cad3d'), pressed: document.querySelector('#mfigmode [data-mode="cad"]').getAttribute('aria-pressed') }));
+  await pg.evaluate(() => document.querySelector('#mfigmode [data-mode="det"]').click());
+  const c5 = await pg.evaluate(() => ({ cadGone: document.querySelector('#mfig3d').hidden && !document.querySelector('.cad3d'), drawing: !!document.querySelector('#mfighost svg') }));
+  check('3D alone and the drawing alone stay available as options', c4.drawingHidden && c4.cad && c4.pressed === 'true' && c5.cadGone && c5.drawing, JSON.stringify({ c4, c5 }));
+  /* every machine type in the configurator has a 3D model: the gantry table, the robot cell, the cleaning cart */
+  const kinds = [];
+  for (const st of [
+    { plat: 'cutxt', app: 'thinmetal', src: 'fiber', pw: 500, lens: 'f254', re: /gantry cutting table/, style: 'cut' },
+    { plat: 'weldr', app: 'seam3d', src: 'smcw', pw: 3000, lens: 'f420', re: /robot cell: a six-axis arm/, style: 'weld' },
+    { plat: 'cleanp', app: 'rust', src: 'fiber', pw: 200, lens: 'f254', re: /handheld cleaning cart/, style: 'clean' }]) {
+    await pg.evaluate((x) => { restore({ plat: x.plat, app: x.app, src: x.src, pw: x.pw, lens: x.lens, mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5); }, st);
+    await pg.waitForFunction(() => document.querySelector('.cad3d[data-ready]') && MFIG.cad && MFIG.cad.ready, null, { timeout: 45000 }).catch(() => {});
+    kinds.push(await pg.evaluate((x) => ({ plat: x.plat, ready: !!(MFIG.cad && MFIG.cad.ready), drawingHidden: document.querySelector('#mfighost').hidden,
+      onlyCad: [...document.querySelectorAll('#mfigmode button')].every((b) => b.disabled === (b.dataset.mode !== 'cad')),
+      cap: new RegExp(x.re).test(document.querySelector('.cad3d-cap').textContent), style: mfigStyle() === x.style }), { ...st, re: st.re.source }));
+  }
+  check('the gantry table, the robot cell and the cleaning cart each have a running 3D model, with the marks of their own process', kinds.every((k) => k.ready && k.drawingHidden && k.onlyCad && k.cap && k.style), JSON.stringify(kinds));
+  /* the main viewer gains a Realistic view; its other presets stay and switch back to the existing renderer */
+  await pg.evaluate(() => { restore({ plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5); document.querySelector('#vrealBtn').click(); });
+  await pg.waitForFunction(() => { const h = document.querySelector('#v3dreal'); return h && h.__cad && h.__cad.ready; }, null, { timeout: 45000 }).catch(() => {});
+  const vr = await pg.evaluate(() => { const h = document.querySelector('#v3dreal'), out = { on: !!(h && h.__cad && h.__cad.ready), pressed: document.querySelector('#vrealBtn').getAttribute('aria-pressed'),
+    modes: [...document.querySelectorAll('#v3dlay .vmode button')].map((b) => b.textContent).join(','), canvasKept: !!document.querySelector('#mcanvas') };
+    document.querySelector('#v3dlay .vmode button').click(); out.offAfterSolid = !document.querySelector('#v3dreal') && document.querySelector('#vrealBtn').getAttribute('aria-pressed') === 'false'; return out; });
+  check('the main viewer has a new Realistic view mode; Solid, Cutaway, X-ray and Exploded stay and switch back to the existing view', vr.on && vr.pressed === 'true' && vr.modes === 'Solid,Cutaway,X-ray,Exploded,Realistic' && vr.canvasKept && vr.offAfterSolid, JSON.stringify(vr));
+  check('no script errors in the 3D view', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
 
   /* ------------------------------------------------------------------ */

@@ -10,7 +10,7 @@ sources, 4 f-theta objectives, 25 automation modules, 4 LaserSuite editions.
 ## Deploy to GitHub Pages
 
 1. Create a repository and add `index.html`, `app.js`, `boot.js`, `anatomy.js`,
-   `anatomy-ws.js`, `anatomy.css`, `sw.js`,
+   `anatomy-ws.js` and `anatomy-ws-*.js`, `cad3d.js`, `vendor/`, `assets/cad3d/`, `anatomy.css`, `sw.js`,
    `manifest.webmanifest`, `data.json`, `access.json`, the `assets` folder, `.nojekyll`
    and this `README.md` to the default branch.
 2. **Settings → Pages → Source:** deploy from branch, `main`, `/ (root)`.
@@ -1236,7 +1236,7 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 205 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 219 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
@@ -2176,6 +2176,129 @@ motion, follows the theme, and is left out of print.
 - **Limit of the audit:** it covers the resting pose. The door is drawn after everything
   else because it sits in front of all it can pass over, and the moving poses were checked
   on captures, not by the audit.
+
+## v20.0 — Fig 2: the handling stations, process effects, and a Standard option
+
+Fig 2 now draws the station that actually loads the configured machine, chosen by the
+simulation's own `loadKind()`.
+
+| Drawing | When | What moves |
+|---|---|---|
+| Hand | no handling module | lift door, part placed on the fixture, toggle clamps |
+| Conveyor | SMEMA conveyor | the part rides the belt in from an outside conveyor on legs; a side clamp holds it; it leaves through the far wall |
+| Magazine | magazine loader | as the conveyor, fed from a magazine elevator's carriers |
+| Tray tower | tray tower | as the conveyor, fed from the tower's top drawer |
+| Bowl feeder | bowl/flex feeder | as the conveyor, fed down the chute of a vibratory bowl |
+| Turntable | 2-station turntable | a disc straddling the open front indexes 180°; the marked part rides out with its marks and is swapped |
+| Rotary indexer | rotary indexer | the same disc with four stations, indexing 90° |
+| Robot | 6-axis robot or cobot | the arm, solved by inverse kinematics each frame, picks from a part tray, places on the fixture and takes the marked part out |
+
+**Process effects (Detailed view).** These follow the simulation's own process class for
+the material:
+- sparks thrown from the spot with gravity for metal marking
+- a smoke plume for organic material
+- a plasma glow for glass and ceramics
+
+In every case the spot glows, the newest marks are drawn hot before they cool to the mark
+tone, and the light tower's middle lamp lights while the run is stopped. The effects are
+illustrative, not a measurement, and the caption says so.
+
+**Standard option.** The Detailed / Standard switch above the figure keeps the v19 drawing
+(hand loading, no effects) as an option. The choice is remembered in this browser.
+
+**Files.**
+- `tools/anatomy/ws-figure.mjs` builds one variant per import.
+- `tools/anatomy/workstation.mjs` builds, settles and audits all eight variants. It writes
+  `anatomy-ws.js` (the live code and the hand variant) and `anatomy-ws-<variant>.js` for each
+  station.
+- The page loads a station's file only when the configuration needs it, and the offline
+  cache keeps it after first use.
+
+**Checked.**
+- **Audit:** `npm run anatomy:audit` passes in all eight variants (clearances, supports,
+  cable ends, sunk parts, depth order at rest).
+- **Line check:** no floating line end in any variant, in either theme.
+- **Browser checks:** 210.
+- **Not audited:** the moving poses (the robot arm, the turntable's stations, parts in
+  transit) are drawn live in the page, so the audit does not see them. They were checked
+  on captures.
+
+## v21.0 — The workstation in 3D, beside the anatomy figure
+
+Below the configurator, the configured galvo workstation is shown twice, side by side (stacked
+on narrow screens):
+- a realistic 3D render on the left
+- the anatomy figure (Fig 2) on the right
+
+Both run the simulation's own cycle on one clock: a preview of the computed phase list, or
+the live run, including pause, scrub and stoppages.
+
+**The 3D render** (`cad3d.js`, three.js r170, MIT, in `vendor/three`):
+- **Size:** taken from the configurator's own `machineDims()`.
+- **Materials:** a powder-coated cabinet with doors, louvres, a TEAL nameplate showing the
+  configured designation and a Class 1 laser label; an aluminium-profile frame; the worktop
+  with T-slots.
+- **Glazing:** laser-safety glazing tinted for the source's wavelength (green for near
+  infrared, clear for CO₂, amber for UV, red-orange for green and blue).
+- **Work zone:** a vertical-lift door with its rails, and the Z column with its linear rails
+  and stepper carrying the scan head, its f-theta objective and the armoured fibre. Also the
+  fixture, toggle clamps, and a brushed-steel part on which this application's own process
+  path is burned in as a texture, the newest strokes glowing.
+- **Process:** the beam, a spot that lights the plate, and sparks or smoke by process class.
+- **Machine details:** the light tower (green running, amber stopped, red emitting), the
+  operator screen showing the phase, and the control panel with emergency stop and push
+  buttons.
+- **Rendering:** soft shadows, environment reflections, rounded edges and ACES tone mapping.
+- **Controls:** drag to turn it. Work zone flies the camera to the head and the part; Turn
+  rotates it slowly; R resets.
+- **Performance:** it lowers its own resolution, then its shadows, on slow devices, and only
+  loads when a 3D view is shown.
+
+**Every machine in the configurator.** The 3D view also covers the machines the anatomy figure does not draw. For these the 3D view is shown on its own:
+- **Gantry cutting table (Cut X-T, LinCell):** the head travels the cut path on two axes over a sheet on the slat bed, behind a glazed enclosure with a lift door, beside its electrical cabinet.
+- **Robot cell (Weld R-Cell, Clean CL-A, RoboCell):** a six-axis arm, solved by inverse kinematics each frame, carries the laser head along the seam over a part on a table, inside a mesh fence with light curtains and a fume hood.
+- **Handheld cleaning cart (Clean CL-P):** the head on its hose sweeps a rusty plate on a stand.
+
+The marks follow the process: a mark, a cut kerf, a weld bead with heat tint, or a cleaned stripe through rust.
+
+**A new view in the main viewer.** The Machine Nameplate viewer's *View mode* panel gains **Realistic** beside Solid, Cutaway, X-ray and Exploded (key 5). It overlays the same 3D render inside the viewer, with the viewer's own readouts and run controls on top, for every one of the 22 platforms. The existing modes are unchanged, and choosing any of them returns to the existing view. All 22 platforms were opened in the 3D view and each built and ran without a script error.
+
+**Real component models, with credit.** These parts are real catalogue models from the
+[FreeCAD parts library](https://github.com/FreeCAD/FreeCAD-library), which is licensed
+CC-BY 3.0:
+- the 40 × 40 slot-8 frame profile
+- the MGN12 linear rails
+- the NEMA 23 Z stepper
+- the 22 mm emergency stop and green and red push buttons
+- the 50 mm cabinet fans
+
+`tools/cad3d/convert.mjs` converted them from STEP, using occt-import-js at build time only.
+Each author is credited in `assets/cad3d/CREDITS.md` and in the caption. The panels, scan head,
+objective, clamps, light tower and screen are parametric and indicative. No model from TraceParts
+or Component Search Engine is included: those downloads need an account, and their terms do
+not grant redistribution on a public site.
+
+**Views.** The switch offers four views:
+- **3D + drawing** (the default)
+- **3D**
+- **Drawing** (Fig 2 with its handling stations and effects)
+- **Standard** (the v19 drawing)
+
+The choice is remembered in the browser.
+
+**Size.** The 3D code, three.js and the seven meshes add about 1.6 MB (uncompressed), loaded
+only when a 3D view is shown and cached for offline use afterwards.
+
+**Checked.** 219 browser checks. The new ones cover:
+- the combined layout
+- the seven credited models
+- the size caption
+- both views matching the paused run phase for phase and to the hundredth of a second
+- the tint following the wavelength
+- the 3D-only and drawing-only views
+- no script errors
+
+The rest of the suite starts in the drawing view to stay fast with software WebGL.
 
 ---
 

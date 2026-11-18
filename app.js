@@ -8725,11 +8725,27 @@ function simStop(){
 /*  phases: live while the run is on, otherwise a preview of the same phase  */
 /*  list computed for this configuration. Galvo workstations only.           */
 /* ------------------------------------------------------------------------ */
-var MFIG={key:'', on:false};
-function mfigFits(){
-  var p=P();
-  return !!(p && (p.deliv==='galvo'||p.deliv==='galvo2') && S.app && S.src && S.lens && S.pw!=null);
+var MFIG={key:'', on:false, mode:null};
+/* Detailed draws the configuration's own handling station and the process effects;
+   Standard keeps the plain workstation of v19, loaded by hand, without effects. */
+var MFIG_MODES=['combo','det','std','cad'];
+function mfigMode(){ if(!MFIG.mode){ var m=Store.get('teal.mfig','combo'); MFIG.mode=MFIG_MODES.indexOf(m)>=0? m : 'combo'; } return MFIG.mode; }
+/* one preview clock for every view of the cycle */
+function mfigClock(){ if(!MFIG.t0) MFIG.t0=performance.now(); return (performance.now()-MFIG.t0)/1000; }
+/* every configured machine gets the 3D view; the anatomy figure draws the galvo workstations */
+function mfigFits(){ var p=P(); return !!(p && S.app && S.src && S.lens && S.pw!=null); }
+function mfigGalvo(){ var p=P(); return !!(p && (p.deliv==='galvo'||p.deliv==='galvo2')); }
+/* the marks look like the process: a kerf, a weld bead, a cleaned stripe, a mark */
+function mfigStyle(){ var k=procKind(); return isWeldKind(k)? 'weld' : k==='ablate'? 'clean' : k==='cut'? 'cut' : 'mark'; }
+/* which drawing: the station the simulation's own loadKind() moves the part with */
+function mfigVariant(){
+  if(mfigMode()==='std'||mfigMode()==='cad') return 'hand';
+  var lk=loadKind();
+  return {belt:'belt', mag:'mag', tray:'tray', chute:'chute', arm:'arm', dial: hasMod('rotoidx')? 'dial4' : 'dial2'}[lk] || 'hand';
 }
+var MFIG_STATION={hand:'loading by hand through the lift door', belt:'an SMEMA conveyor through the enclosure', mag:'a magazine elevator feeding the conveyor',
+  tray:'a tray tower feeding the conveyor', chute:'a vibratory bowl feeder feeding the conveyor', dial2:'a two-station servo turntable, loaded at the open front while the other station is processed',
+  dial4:'a four-station rotary indexer', arm:'a six-axis robot loading the fixture from a part tray'};
 /* The phase list for this configuration without touching a run: simPhases()
    writes a few SIM fields, so they are kept and put back. */
 function mfigPhases(){
@@ -8744,42 +8760,133 @@ function mfigPhases(){
 }
 function mfigLive(){
   if(!(SIM.on && SIM.phases && SIM.forKey===simKey())) return null;
-  return {phases:SIM.phases, i:SIM.ph||0, u:SIM.u||0, real:SIM.realS, fault:!!SIM.fault};
+  return {phases:SIM.phases, i:SIM.ph||0, u:SIM.u||0, real:SIM.realS, fault:!!SIM.fault, paused:simRate()===0};
 }
-function mfigCaption(pr){
-  var p=P(), L=LENS[S.lens], src=SRC[S.src], mods=[], lk=loadKind();
+function mfigCaption(pr, v){
+  var p=P(), L=LENS[S.lens], src=SRC[S.src], mods=[], lk=loadKind(), det=mfigMode()!=='std';
   if(hasMod('visfid')||hasMod('visver')) mods.push('the vision camera with its ring light ('+(hasMod('visfid')&&hasMod('visver')?'locate and grade':hasMod('visfid')?'locate':'grade')+')');
   if(hasMod('autofoc')) mods.push('the auto-focus sensor');
   if(hasMod('fume')) mods.push('the fume extractor and its hose');
   var proc=null; pr.ph.forEach(function(x){ if(x.k==='PROCESS') proc=x; });
+  var lkN={belt:'conveyor',web:'roll-to-roll web',tray:'tray tower',mag:'magazine',chute:'feeder',arm:'robot',dial:'turntable or indexer'}[lk]||lk;
+  var fxN={spark:'sparks', smoke:'smoke', plasma:'a plasma glow'}[procFX()]||'sparks';
   var t='The '+p.n+' as configured: '+src.n+' '+src.wl+', '+S.pw+' W, '+L.n+' objective (f = '+L.f+' mm, field '+L.fld+' × '+L.fld+' mm). '+
     'Each phase takes this configuration’s own time: '+(proc? proc.n.toLowerCase()+' '+proc.real.toFixed(2)+' s of a ' : 'a ')+pr.real.toFixed(2)+' s cycle ('+pr.basis+'). '+
     'While it emits, the spot follows this application’s process path, drawn to fill the part as the simulation does. '+
     (mods.length? 'Drawn because they are configured: '+mods.join(', ')+'. ' : 'No camera, focus sensor or extractor is configured, so none is drawn. ')+
-    (lk==='hand'? 'Loading is by hand through the lift door. ' : 'The drawing shows loading by hand; this configuration loads by '+({belt:'conveyor',web:'roll-to-roll web',tray:'tray tower',mag:'magazine',chute:'feeder',arm:'robot',dial:'turntable or indexer'}[lk]||lk)+'. ')+
-    'The top lamp of the light tower lights while the laser emits. The cabinet layout is indicative and the drawing is not to scale.';
+    'Handling: '+MFIG_STATION[v]+'. '+
+    (v==='hand' && lk!=='hand'? (det? 'This configuration loads by '+lkN+', which is not drawn; the drawing shows hand loading. ' : 'The Standard view shows hand loading; this configuration loads by '+lkN+'. ') : '')+
+    (det? 'The effects at the spot ('+fxN+') follow the material’s process class and are illustrative, not a measurement. ' : '')+
+    'The top lamp of the light tower lights while the laser emits'+(det? ', the middle one when the run is stopped' : '')+'. The cabinet and station layouts are indicative and the drawing is not to scale.';
   return t;
 }
+/* the hand variant ships with anatomy-ws.js; the others load on first use */
+function mfigLoad(v, done){
+  var A=window.TEALAnatomy;
+  if(A.ws.figs && A.ws.figs[v]) return done(true);
+  var s=document.createElement('script'); s.src='anatomy-ws-'+v+'.js';
+  s.onload=function(){ done(!!(A.ws.figs && A.ws.figs[v])); };
+  s.onerror=function(){ done(false); };
+  document.head.appendChild(s);
+}
+function mfigModeUI(){
+  var bar=$('#mfigmode'); if(!bar) return;
+  var g=mfigGalvo();
+  bar.querySelectorAll('button').forEach(function(b){ var m=b.getAttribute('data-mode'); b.disabled=!g && m!=='cad'; b.title=b.disabled? 'The anatomy figure draws the galvo workstations; this machine is shown in 3D' : ''; });
+  bar.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-mode')===(g? mfigMode() : 'cad'); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); b.onclick=function(){ mfigSetMode(this.getAttribute('data-mode')); }; });
+}
+function mfigSetMode(m){ MFIG.mode=MFIG_MODES.indexOf(m)>=0? m : 'combo'; Store.set('teal.mfig', MFIG.mode); MFIG.key=''; mfigModeUI(); mfigSync(); }
 function mfigSync(){
   var sec=$('#mfig'); if(!sec) return;
-  var A=window.TEALAnatomy, ok=mfigFits() && A && A.ws;
+  var A=window.TEALAnatomy, ok=mfigFits() && A && A.ws && A.ws.mount;
   if(!ok){
-    if(!sec.hidden){ sec.hidden=true; try{ A&&A.ws&&A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} MFIG.key=''; }
+    if(!sec.hidden){ sec.hidden=true; try{ A&&A.ws&&A.ws.mount&&A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} MFIG.key=''; }
     return;
   }
-  var key=encodeState().replace(/(^|&)t=\d+/,'');
-  sec.hidden=false;
+  var v=mfigVariant(), key=encodeState().replace(/(^|&)t=\d+/,'')+'|'+mfigMode()+'|'+v+'|'+(P()? P().deliv : '');
+  sec.hidden=false; mfigModeUI();
   if(key===MFIG.key) return;
   MFIG.key=key;
-  try{
-    var pr=mfigPhases(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
-    A.ws.mount($('#mfighost'), {
-      opts:{cam:hasMod('visfid')||hasMod('visver'), af:hasMod('autofoc'), fume:hasMod('fume')},
-      segs:segs, phases:pr.ph, real:pr.real, caption:mfigCaption(pr), live:mfigLive
-    });
-  }catch(e){ sec.hidden=true; MFIG.key=''; }
+  var mode=mfigMode(), galvo=mfigGalvo();
+  if(!galvo) mode='cad';                             /* only the 3D view draws the gantry, the robot cell and the cart */
+  var cad=mode==='cad', combo=mode==='combo', h2=$('#mfighost'), h3=$('#mfig3d');
+  sec.classList.toggle('nogalvo', !galvo);
+  h2.hidden=cad; h3.hidden=!(cad||combo); sec.classList.toggle('combo', combo);
+  MFIG.t0=performance.now();
+  if(cad){ try{ A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} mfigCad(key); return; }
+  if(combo) mfigCad(key);
+  else { try{ if(MFIG.cad){ MFIG.cad.stop(); MFIG.cad=null; } h3.innerHTML=''; }catch(e){} }
+  mfigLoad(v, function(have){
+    if(MFIG.key!==key) return;                       /* the configuration moved on while it loaded */
+    var use=have? v : 'hand';
+    try{
+      var pr=mfigPhases(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
+      A.ws.mount($('#mfighost'), {
+        variant:use, effects:mfigMode()!=='std', fx:procFX(),
+        opts:{cam:hasMod('visfid')||hasMod('visver'), af:hasMod('autofoc'), fume:hasMod('fume')},
+        segs:segs, phases:pr.ph, real:pr.real, caption:mfigCaption(pr, use), live:mfigLive, clock:mfigClock
+      });
+      sec.setAttribute('data-variant', use);
+    }catch(e){ sec.hidden=true; MFIG.key=''; }
+  });
 }
-function mfigWake(){ try{ var A=window.TEALAnatomy; if(A&&A.ws&&A.ws.mount.wake) A.ws.mount.wake(); }catch(e){} }
+/* Fig 3 mode: the same cycle as a WebGL render (cad3d.js, three.js), loaded on demand */
+function mfigTint(){
+  var wl=SRC[S.src]? SRC[S.src].wl : '', nm=parseFloat(String(wl).replace(',',''));
+  if(/µm/.test(wl)) return 0xd5dde2;            /* CO₂: clear polycarbonate stops 9–11 µm */
+  if(nm<400) return 0xe0901c;                   /* UV: amber */
+  if(nm<600) return 0xc2412c;                   /* green or blue: red-orange */
+  return 0x4d8a3b;                              /* near infrared: green */
+}
+function mfigCad(key){
+  var h3=$('#mfig3d');
+  import('./cad3d.js').then(function(m){
+    if(MFIG.key!==key) return;
+    var pr=mfigPhases(), dm=machineDims(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
+    var src=SRC[S.src];
+    MFIG.cad=m.mount(h3, {
+      dims:{w:dm.w, d:dm.d, h:dm.h, cv:dm.cv}, deliv:P().deliv, style:mfigStyle(), phases:pr.ph, real:pr.real, live:mfigLive, segs:segs, fx:procFX(),
+      tint:mfigTint(), beamCol: src? parseInt(String(src.col).slice(1),16) : 0xff5533, title:P().n, desig:desig(),
+      caption:mfigCadCaption(pr, dm), clock:mfigClock
+    });
+    if(mfigMode()==='cad' || !mfigGalvo()) $('#mfig').setAttribute('data-variant','cad');
+  }).catch(function(){ h3.textContent='The 3D view could not be loaded in this browser.'; });
+}
+function mfigCadCaption(pr, dm){
+  var p=P(), L=LENS[S.lens], src=SRC[S.src], proc=null; pr.ph.forEach(function(x){ if(x.k==='PROCESS') proc=x; });
+  var kind={gantry:'A gantry cutting table: the head travels the process path on two axes over a sheet on the slat bed. ', robot:'A robot cell: a six-axis arm, solved by inverse kinematics each frame, carries the laser head along the path over the part on the table. ', handpiece:'A handheld cleaning cart: the head on its hose is swept over a plate on a stand, as an operator would. '}[p.deliv]||'';
+  return kind+'The '+p.n+' rendered in 3D at its '+(dm.stated? 'stated' : 'estimated')+' size, '+inr(dm.w)+' × '+inr(dm.d)+' × '+inr(dm.h)+' mm, with a '+src.n+' '+src.wl+' source and the '+L.n+' objective. '+
+    'It runs the same cycle as the simulation: '+(proc? proc.n.toLowerCase()+' '+proc.real.toFixed(2)+' s of a ' : 'a ')+pr.real.toFixed(2)+' s cycle; the marks are this application’s own path. '+
+    'The frame profile, linear rails, Z stepper, emergency stop, push-buttons and fans are real component models from the FreeCAD parts library (CC-BY 3.0: profile by mathis, MGN12 rail by Adrian McEwen, NEMA 23 by Charles Fox, buttons by Henrique Enzweiler, fan by WladIMirG and obijuan). '+
+    'The panels, scan head, objective, clamps, light tower and screen are drawn to indicate their form. The window tint stands for laser-safety glazing for this wavelength; the beam is drawn although an infrared or UV beam is invisible. Indicative, not a CAD model of a TEAL machine.';
+}
+/* The main viewer's Realistic view: cad3d.js in an overlay inside the viewer, sharing the
+   simulation's cycle; the existing canvas renderer stays underneath, unchanged. */
+var VREAL={on:false, key:''};
+function vrealSet(on){
+  VREAL.on=!!on;
+  var b=$('#vrealBtn'); if(b){ b.setAttribute('aria-pressed', VREAL.on?'true':'false'); b.classList.toggle('on', VREAL.on); }
+  try{ buildLayerPanel(); }catch(e){}
+  var host=$('#v3dreal');
+  if(!VREAL.on){ if(host){ if(host.__cad) host.__cad.stop(); host.remove(); } VREAL.key=''; $('#v3d').classList.remove('real'); return; }
+  $('#v3d').classList.add('real');
+  vrealSync();
+}
+function vrealSync(){
+  if(!VREAL.on) return;
+  var v3=$('#v3d'), host=$('#v3dreal');
+  if(!host){ host=el('div','v3dreal'); host.id='v3dreal'; var cv=$('#mcanvas'); cv.parentNode.insertBefore(host, cv.nextSibling); }
+  if(!mfigFits()){ host.innerHTML='<p class="v3drealmsg">Choose a platform, application, source, power and objective to see it rendered.</p>'; VREAL.key=''; return; }
+  var key=encodeState().replace(/(^|&)t=\d+/,'')+'|'+P().deliv;
+  if(key===VREAL.key) return; VREAL.key=key;
+  import('./cad3d.js').then(function(m){
+    if(!VREAL.on || VREAL.key!==key) return;
+    var pr=mfigPhases(), dm=machineDims(), src=SRC[S.src], segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
+    m.mount(host, { bare:true, dims:{w:dm.w, d:dm.d, h:dm.h, cv:dm.cv}, deliv:P().deliv, style:mfigStyle(), phases:pr.ph, real:pr.real, live:mfigLive, segs:segs, fx:procFX(),
+      tint:mfigTint(), beamCol: src? parseInt(String(src.col).slice(1),16) : 0xff5533, title:P().n, desig:desig(), clock:mfigClock });
+  }).catch(function(){ host.innerHTML='<p class="v3drealmsg">This browser cannot show the realistic view.</p>'; });
+}
+function mfigWake(){ try{ var A=window.TEALAnatomy; if(A&&A.ws&&A.ws.mount.wake) A.ws.mount.wake(); if(MFIG.cad&&MFIG.cad.wake) MFIG.cad.wake(); var h=$('#v3dreal'); if(h&&h.__cad&&h.__cad.wake) h.__cad.wake(); }catch(e){} }
 function simPhaseAt(t){
   var acc=0, i;
   for(i=0;i<SIM.phases.length;i++){
@@ -9858,6 +9965,7 @@ function m3dInit(){
     pv.appendChild(bt);
   });
 
+
   /* tool buttons */
   var ct=$('#v3dctl');
   function tool(icon,title,fn,state){
@@ -9946,7 +10054,8 @@ function m3dInit(){
     if(e.key==='Escape' && M3D.iso){ isoSet(null); return; }
     if(e.key==='Escape' && ((M3D.sel&&M3D.sel.length)||M3D.isoSel)){ expClear(); return; }
     var k=e.key.toLowerCase(), i=['1','2','3','4'].indexOf(e.key);
-    if(i>=0){ M3D.vmode=VMODES[i][0]; buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
+    if(i>=0){ vrealSet(false); M3D.vmode=VMODES[i][0]; buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
+    if(e.key==='5'){ vrealSet(!VREAL.on); e.preventDefault(); return; }
     if(LKEY[k]){ M3D.layers[LKEY[k]]=!(M3D.layers[LKEY[k]]!==false); buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
     if(k==='l'){ M3D.tags=!M3D.tags; M3D.vp.o.tags=M3D.tags; buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); }
   });
@@ -10027,10 +10136,15 @@ function buildLayerPanel(){
   pn.appendChild(el('h5','','View mode'));
   var vm=el('div','vmode');
   VMODES.forEach(function(m){
-    var b2=el('button', M3D.vmode===m[0]?'on':'', m[1]);
-    b2.onclick=function(){ M3D.vmode=m[0]; buildLayerPanel(); M3D.vp.dirty=true; };
+    var b2=el('button', !VREAL.on && M3D.vmode===m[0]?'on':'', m[1]);
+    b2.onclick=function(){ vrealSet(false); M3D.vmode=m[0]; buildLayerPanel(); M3D.vp.dirty=true; };
     vm.appendChild(b2);
   });
+  /* a new view beside the existing ones: the realistic render of the same machine, running the same cycle */
+  var rb=el('button', VREAL.on?'on vreal':'vreal', 'Realistic'); rb.id='vrealBtn';
+  rb.title='Realistic 3D render of this machine, running the same cycle'; rb.setAttribute('aria-pressed', VREAL.on?'true':'false');
+  rb.onclick=function(){ vrealSet(!VREAL.on); buildLayerPanel(); };
+  vm.appendChild(rb);
   pn.appendChild(vm);
   if(M3D.vmode==='exploded'){
     var sp=el('div','lsep','<label for="expK">Separation <b>'+Math.round(M3D.expK*100)+' %</b></label>'+
@@ -10115,6 +10229,7 @@ function compFocus(gid, cid){
 /* build-stack list, headline and run controls */
 function m3dSync(){
   try{ mfigSync(); }catch(e){}
+  try{ vrealSync(); }catch(e){}
   if(!M3D.vp) return;
   var changed=mmSyncGroups(), p=P();
   var nm=$('#v3dname');
@@ -13686,7 +13801,7 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v19.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v21.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
