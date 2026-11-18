@@ -8725,11 +8725,23 @@ function simStop(){
 /*  phases: live while the run is on, otherwise a preview of the same phase  */
 /*  list computed for this configuration. Galvo workstations only.           */
 /* ------------------------------------------------------------------------ */
-var MFIG={key:'', on:false};
+var MFIG={key:'', on:false, mode:null};
+/* Detailed draws the configuration's own handling station and the process effects;
+   Standard keeps the plain workstation of v19, loaded by hand, without effects. */
+function mfigMode(){ if(!MFIG.mode) MFIG.mode=Store.get('teal.mfig','det')==='std'? 'std' : 'det'; return MFIG.mode; }
 function mfigFits(){
   var p=P();
   return !!(p && (p.deliv==='galvo'||p.deliv==='galvo2') && S.app && S.src && S.lens && S.pw!=null);
 }
+/* which drawing: the station the simulation's own loadKind() moves the part with */
+function mfigVariant(){
+  if(mfigMode()==='std') return 'hand';
+  var lk=loadKind();
+  return {belt:'belt', mag:'mag', tray:'tray', chute:'chute', arm:'arm', dial: hasMod('rotoidx')? 'dial4' : 'dial2'}[lk] || 'hand';
+}
+var MFIG_STATION={hand:'loading by hand through the lift door', belt:'an SMEMA conveyor through the enclosure', mag:'a magazine elevator feeding the conveyor',
+  tray:'a tray tower feeding the conveyor', chute:'a vibratory bowl feeder feeding the conveyor', dial2:'a two-station servo turntable, loaded at the open front while the other station is processed',
+  dial4:'a four-station rotary indexer', arm:'a six-axis robot loading the fixture from a part tray'};
 /* The phase list for this configuration without touching a run: simPhases()
    writes a few SIM fields, so they are kept and put back. */
 function mfigPhases(){
@@ -8744,40 +8756,64 @@ function mfigPhases(){
 }
 function mfigLive(){
   if(!(SIM.on && SIM.phases && SIM.forKey===simKey())) return null;
-  return {phases:SIM.phases, i:SIM.ph||0, u:SIM.u||0, real:SIM.realS, fault:!!SIM.fault};
+  return {phases:SIM.phases, i:SIM.ph||0, u:SIM.u||0, real:SIM.realS, fault:!!SIM.fault, paused:simRate()===0};
 }
-function mfigCaption(pr){
-  var p=P(), L=LENS[S.lens], src=SRC[S.src], mods=[], lk=loadKind();
+function mfigCaption(pr, v){
+  var p=P(), L=LENS[S.lens], src=SRC[S.src], mods=[], lk=loadKind(), det=mfigMode()==='det';
   if(hasMod('visfid')||hasMod('visver')) mods.push('the vision camera with its ring light ('+(hasMod('visfid')&&hasMod('visver')?'locate and grade':hasMod('visfid')?'locate':'grade')+')');
   if(hasMod('autofoc')) mods.push('the auto-focus sensor');
   if(hasMod('fume')) mods.push('the fume extractor and its hose');
   var proc=null; pr.ph.forEach(function(x){ if(x.k==='PROCESS') proc=x; });
+  var lkN={belt:'conveyor',web:'roll-to-roll web',tray:'tray tower',mag:'magazine',chute:'feeder',arm:'robot',dial:'turntable or indexer'}[lk]||lk;
+  var fxN={spark:'sparks', smoke:'smoke', plasma:'a plasma glow'}[procFX()]||'sparks';
   var t='The '+p.n+' as configured: '+src.n+' '+src.wl+', '+S.pw+' W, '+L.n+' objective (f = '+L.f+' mm, field '+L.fld+' × '+L.fld+' mm). '+
     'Each phase takes this configuration’s own time: '+(proc? proc.n.toLowerCase()+' '+proc.real.toFixed(2)+' s of a ' : 'a ')+pr.real.toFixed(2)+' s cycle ('+pr.basis+'). '+
     'While it emits, the spot follows this application’s process path, drawn to fill the part as the simulation does. '+
     (mods.length? 'Drawn because they are configured: '+mods.join(', ')+'. ' : 'No camera, focus sensor or extractor is configured, so none is drawn. ')+
-    (lk==='hand'? 'Loading is by hand through the lift door. ' : 'The drawing shows loading by hand; this configuration loads by '+({belt:'conveyor',web:'roll-to-roll web',tray:'tray tower',mag:'magazine',chute:'feeder',arm:'robot',dial:'turntable or indexer'}[lk]||lk)+'. ')+
-    'The top lamp of the light tower lights while the laser emits. The cabinet layout is indicative and the drawing is not to scale.';
+    'Handling: '+MFIG_STATION[v]+'. '+
+    (v==='hand' && lk!=='hand'? (det? 'This configuration loads by '+lkN+', which is not drawn; the drawing shows hand loading. ' : 'The Standard view shows hand loading; this configuration loads by '+lkN+'. ') : '')+
+    (det? 'The effects at the spot ('+fxN+') follow the material’s process class and are illustrative, not a measurement. ' : '')+
+    'The top lamp of the light tower lights while the laser emits'+(det? ', the middle one when the run is stopped' : '')+'. The cabinet and station layouts are indicative and the drawing is not to scale.';
   return t;
 }
+/* the hand variant ships with anatomy-ws.js; the others load on first use */
+function mfigLoad(v, done){
+  var A=window.TEALAnatomy;
+  if(A.ws.figs && A.ws.figs[v]) return done(true);
+  var s=document.createElement('script'); s.src='anatomy-ws-'+v+'.js';
+  s.onload=function(){ done(!!(A.ws.figs && A.ws.figs[v])); };
+  s.onerror=function(){ done(false); };
+  document.head.appendChild(s);
+}
+function mfigModeUI(){
+  var bar=$('#mfigmode'); if(!bar) return;
+  bar.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-mode')===mfigMode(); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); b.onclick=function(){ mfigSetMode(this.getAttribute('data-mode')); }; });
+}
+function mfigSetMode(m){ MFIG.mode=m==='std'? 'std' : 'det'; Store.set('teal.mfig', MFIG.mode); MFIG.key=''; mfigModeUI(); mfigSync(); }
 function mfigSync(){
   var sec=$('#mfig'); if(!sec) return;
-  var A=window.TEALAnatomy, ok=mfigFits() && A && A.ws;
+  var A=window.TEALAnatomy, ok=mfigFits() && A && A.ws && A.ws.mount;
   if(!ok){
-    if(!sec.hidden){ sec.hidden=true; try{ A&&A.ws&&A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} MFIG.key=''; }
+    if(!sec.hidden){ sec.hidden=true; try{ A&&A.ws&&A.ws.mount&&A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} MFIG.key=''; }
     return;
   }
-  var key=encodeState().replace(/(^|&)t=\d+/,'');
-  sec.hidden=false;
+  var v=mfigVariant(), key=encodeState().replace(/(^|&)t=\d+/,'')+'|'+mfigMode()+'|'+v;
+  sec.hidden=false; mfigModeUI();
   if(key===MFIG.key) return;
   MFIG.key=key;
-  try{
-    var pr=mfigPhases(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
-    A.ws.mount($('#mfighost'), {
-      opts:{cam:hasMod('visfid')||hasMod('visver'), af:hasMod('autofoc'), fume:hasMod('fume')},
-      segs:segs, phases:pr.ph, real:pr.real, caption:mfigCaption(pr), live:mfigLive
-    });
-  }catch(e){ sec.hidden=true; MFIG.key=''; }
+  mfigLoad(v, function(have){
+    if(MFIG.key!==key) return;                       /* the configuration moved on while it loaded */
+    var use=have? v : 'hand';
+    try{
+      var pr=mfigPhases(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
+      A.ws.mount($('#mfighost'), {
+        variant:use, effects:mfigMode()==='det', fx:procFX(),
+        opts:{cam:hasMod('visfid')||hasMod('visver'), af:hasMod('autofoc'), fume:hasMod('fume')},
+        segs:segs, phases:pr.ph, real:pr.real, caption:mfigCaption(pr, use), live:mfigLive
+      });
+      sec.setAttribute('data-variant', use);
+    }catch(e){ sec.hidden=true; MFIG.key=''; }
+  });
 }
 function mfigWake(){ try{ var A=window.TEALAnatomy; if(A&&A.ws&&A.ws.mount.wake) A.ws.mount.wake(); }catch(e){} }
 function simPhaseAt(t){
@@ -13686,7 +13722,7 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v19.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v20.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();

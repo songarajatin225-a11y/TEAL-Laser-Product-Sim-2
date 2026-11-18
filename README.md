@@ -10,7 +10,7 @@ sources, 4 f-theta objectives, 25 automation modules, 4 LaserSuite editions.
 ## Deploy to GitHub Pages
 
 1. Create a repository and add `index.html`, `app.js`, `boot.js`, `anatomy.js`,
-   `anatomy-ws.js`, `anatomy.css`, `sw.js`,
+   `anatomy-ws.js` and `anatomy-ws-*.js`, `anatomy.css`, `sw.js`,
    `manifest.webmanifest`, `data.json`, `access.json`, the `assets` folder, `.nojekyll`
    and this `README.md` to the default branch.
 2. **Settings → Pages → Source:** deploy from branch, `main`, `/ (root)`.
@@ -1236,7 +1236,7 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 205 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 210 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
@@ -2176,6 +2176,52 @@ motion, follows the theme, and is left out of print.
 - **Limit of the audit:** it covers the resting pose. The door is drawn after everything
   else because it sits in front of all it can pass over, and the moving poses were checked
   on captures, not by the audit.
+
+## v20.0 — Fig 2: the handling stations, process effects, and a Standard option
+
+Fig 2 now draws the station that actually loads the configured machine, chosen by the
+simulation's own `loadKind()`.
+
+| Drawing | When | What moves |
+|---|---|---|
+| Hand | no handling module | lift door, part placed on the fixture, toggle clamps |
+| Conveyor | SMEMA conveyor | the part rides the belt in from an outside conveyor on legs; a side clamp holds it; it leaves through the far wall |
+| Magazine | magazine loader | as the conveyor, fed from a magazine elevator's carriers |
+| Tray tower | tray tower | as the conveyor, fed from the tower's top drawer |
+| Bowl feeder | bowl/flex feeder | as the conveyor, fed down the chute of a vibratory bowl |
+| Turntable | 2-station turntable | a disc straddling the open front indexes 180°; the marked part rides out with its marks and is swapped |
+| Rotary indexer | rotary indexer | the same disc with four stations, indexing 90° |
+| Robot | 6-axis robot or cobot | the arm, solved by inverse kinematics each frame, picks from a part tray, places on the fixture and takes the marked part out |
+
+**Process effects (Detailed view).** These follow the simulation's own process class for
+the material:
+- sparks thrown from the spot with gravity for metal marking
+- a smoke plume for organic material
+- a plasma glow for glass and ceramics
+
+In every case the spot glows, the newest marks are drawn hot before they cool to the mark
+tone, and the light tower's middle lamp lights while the run is stopped. The effects are
+illustrative, not a measurement, and the caption says so.
+
+**Standard option.** The Detailed / Standard switch above the figure keeps the v19 drawing
+(hand loading, no effects) as an option. The choice is remembered in this browser.
+
+**Files.**
+- `tools/anatomy/ws-figure.mjs` builds one variant per import.
+- `tools/anatomy/workstation.mjs` builds, settles and audits all eight variants. It writes
+  `anatomy-ws.js` (the live code and the hand variant) and `anatomy-ws-<variant>.js` for each
+  station.
+- The page loads a station's file only when the configuration needs it, and the offline
+  cache keeps it after first use.
+
+**Checked.**
+- **Audit:** `npm run anatomy:audit` passes in all eight variants (clearances, supports,
+  cable ends, sunk parts, depth order at rest).
+- **Line check:** no floating line end in any variant, in either theme.
+- **Browser checks:** 210.
+- **Not audited:** the moving poses (the robot arm, the turntable's stations, parts in
+  transit) are drawn live in the page, so the audit does not see them. They were checked
+  on captures.
 
 ---
 

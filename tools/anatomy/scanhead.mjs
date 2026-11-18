@@ -458,7 +458,7 @@ function mount(host, cfg) {
   return { state: st, draw: draw, aim: aim, stop: mount.stop, maxAngle: maxT };
 }
 /* the kit's runtime, shared with Fig 2 (anatomy-ws.js) */
-var KIT = { iso: iso, segment: segment, pathOf: pathOf, solidSvg: solidSvg, lineSvg: lineSvg, cylinder: cylinder, ring: ring, axisVector: axisVector, frameOf: G.frameOf, prismOf: G.prismOf };
+var KIT = { iso: iso, depthOf: depthOf, segment: segment, pathOf: pathOf, solidSvg: solidSvg, lineSvg: lineSvg, cylinder: cylinder, ring: ring, axisVector: axisVector, frameOf: G.frameOf, prismOf: G.prismOf };
 window.TEALAnatomy = Object.assign(window.TEALAnatomy || {}, { mount: mount, geo: GEO, kit: KIT });
 `;
 

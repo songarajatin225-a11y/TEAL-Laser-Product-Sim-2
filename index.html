@@ -366,7 +366,12 @@ body.access-internal #accStaff{display:none}
 .tealws .ws-hmi-track{fill:var(--anatomy-faint)}.tealws .ws-hmi-bar{fill:var(--anatomy-hi)}
 .tealws .iso-stage{position:relative}
 .tealws .ws-zoom{position:absolute;top:6px;right:6px;font:600 11px/1 var(--mono,ui-monospace,monospace);letter-spacing:.08em;text-transform:uppercase;padding:7px 10px;border-radius:6px;border:1px solid var(--anatomy-faint);background:var(--anatomy-card);color:var(--anatomy-text);cursor:pointer;min-height:32px}
-.tealws .ws-zoom:hover{border-color:var(--anatomy-muted)}.tealws .ws-zoom:focus-visible{outline:2px solid var(--anatomy-muted);outline-offset:2px}
+.tealws .ws-zoom:hover{border-color:var(--anatomy-muted)}
+.tealws .ws-spark{stroke:var(--anatomy-lit);stroke-width:.7;fill:none;stroke-linecap:round}.tealws .ws-smoke{fill:var(--anatomy-muted)}.tealws .ws-glow{fill:var(--anatomy-lit)}
+.mfigmode{margin-left:auto;display:inline-flex;border:1px solid var(--line,#d5dde3);border-radius:8px;overflow:hidden}
+.mfigmode button{font:600 11px/1 var(--mono,ui-monospace,monospace);letter-spacing:.08em;text-transform:uppercase;padding:8px 12px;min-height:32px;border:0;background:transparent;color:var(--ink-2,#556);cursor:pointer}
+.mfigmode button.on{background:var(--ink,#0E1A24);color:var(--card,#fff)}
+.mfigmode button:focus-visible{outline:2px solid var(--ink-2,#556);outline-offset:-2px}.tealws .ws-zoom:focus-visible{outline:2px solid var(--anatomy-muted);outline-offset:2px}
 @media print{.mfig{display:none}}
 
 /* ---------- fields ---------- */
@@ -2041,7 +2046,8 @@ body.demo #demobar{display:flex}
     </aside>
   </div>
   <section class="mfig" id="mfig" aria-label="The workstation through one run cycle" hidden>
-    <div class="mfighead"><span class="l">Fig 2 · The workstation, drawn</span><span class="d">The configured machine through the simulation’s own run cycle. Start the simulation in the viewer to run it live.</span></div>
+    <div class="mfighead"><span class="l">Fig 2 · The workstation, drawn</span><span class="d">The configured machine through the simulation’s own run cycle. Start the simulation in the viewer to run it live.</span>
+      <span class="mfigmode" id="mfigmode" role="group" aria-label="Drawing detail"><button type="button" data-mode="det" aria-pressed="true">Detailed</button><button type="button" data-mode="std" aria-pressed="false">Standard</button></span></div>
     <div id="mfighost"></div>
   </section>
 </div>
@@ -2077,7 +2083,7 @@ body.demo #demobar{display:flex}
   </div>
   <div class="fbot">
     <span>© <span id="yr"></span> Titan Engineering &amp; Automation Ltd — A TATA Enterprise</span>
-    <span class="facc"><button type="button" class="flink" id="accStaff">Staff access</button><button type="button" class="flink" id="accLock">Lock</button><span id="stamp">Configurator v19.0</span></span>
+    <span class="facc"><button type="button" class="flink" id="accStaff">Staff access</button><button type="button" class="flink" id="accLock">Lock</button><span id="stamp">Configurator v20.0</span></span>
   </div>
 </div></footer>
 

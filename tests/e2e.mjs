@@ -953,8 +953,8 @@ try {
   const names = await pg.evaluate(() => mfigPhases().ph.map((p) => p.n));
   check('arrow keys step the preview through the phases', k0.startsWith('Preview · ' + names[0] + ' · ') && k1.startsWith('Preview · ' + names[1] + ' · '), k0 + ' → ' + k1);
   await pg.keyboard.press('z');
-  await pg.waitForFunction(() => { const v = document.querySelector('#mfig svg').getAttribute('viewBox').split(' ').map(Number), c = TEALAnatomy.ws.geo.CLOSE; return v.every((n, i) => Math.abs(n - c[i]) < 0.05); }, null, { timeout: 4000 }).catch(() => {});
-  const z1 = await pg.evaluate(() => ({ vb: document.querySelector('#mfig svg').getAttribute('viewBox'), c: TEALAnatomy.ws.geo.CLOSE.join(' '), pressed: document.querySelector('#mfig .ws-zoom').getAttribute('aria-pressed') }));
+  await pg.waitForFunction(() => { const v = document.querySelector('#mfig svg').getAttribute('viewBox').split(' ').map(Number), c = TEALAnatomy.ws.current.CLOSE; return v.every((n, i) => Math.abs(n - c[i]) < 0.05); }, null, { timeout: 4000 }).catch(() => {});
+  const z1 = await pg.evaluate(() => ({ vb: document.querySelector('#mfig svg').getAttribute('viewBox'), c: TEALAnatomy.ws.current.CLOSE.join(' '), pressed: document.querySelector('#mfig .ws-zoom').getAttribute('aria-pressed') }));
   check('Z eases into a close-up of the work zone, and the button says so', z1.pressed === 'true' && z1.vb.split(' ').map(Number).every((n, i) => Math.abs(n - Number(z1.c.split(' ')[i])) < 0.05), JSON.stringify(z1));
   const w4 = await pg.evaluate(() => {
     const out = {};
@@ -968,6 +968,39 @@ try {
     out.robot = document.querySelector('#mfig').hidden;
     return out; });
   check('Fig 2 follows the theme and the modules, and is not shown for a gantry table or a robot cell', w4.dark === 'dark' && w4.light === 'light' && w4.af && !w4.cam && w4.gantry && w4.robot, JSON.stringify(w4));
+  /* the handling station follows the configuration: the simulation's own loadKind() */
+  const variantOf = async (st) => {
+    await pg.evaluate((x) => { restore(x); go(5); document.querySelector('#mfig').scrollIntoView(); }, st);
+    await pg.waitForFunction(() => { const s = document.querySelector('#mfig'); return !s.hidden && TEALAnatomy.ws.current && s.dataset.variant === TEALAnatomy.ws.current.VAR; }, null, { timeout: 8000 }).catch(() => {});
+    return pg.evaluate(() => ({ v: document.querySelector('#mfig').dataset.variant, lk: loadKind(), cap: document.querySelector('#mfig .iso-caption').textContent, items: document.querySelectorAll('#mfig svg .it').length }));
+  };
+  const base = { sw: 'desktop', extra: {}, notes: '', target: null };
+  const vC2i = await variantOf({ ...base, plat: 'markc2i', app: 'dual', src: 'co2', pw: 30, lens: 'f254', mods: { conveyor: true } });
+  const vRoto = await variantOf({ ...base, plat: 'roto', app: 'multi', src: 'fiber', pw: 50, lens: 'f254', mods: { rotoidx: true } });
+  const vTurn = await variantOf({ ...base, plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: { turntbl: true } });
+  const vArm = await variantOf({ ...base, plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: { robot6: true } });
+  const vMag = await variantOf({ ...base, plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: { magazine: true } });
+  check('the drawing shows the configured handling: conveyor, rotary indexer, turntable, robot, magazine', vC2i.v === 'belt' && vRoto.v === 'dial4' && vTurn.v === 'dial2' && vArm.v === 'arm' && vMag.v === 'mag' && [vC2i, vRoto, vTurn, vArm, vMag].every((x) => x.items > 150),
+    JSON.stringify([vC2i, vRoto, vTurn, vArm, vMag].map((x) => x.v + '/' + x.lk + '/' + x.items)));
+  check('the caption names the station that is drawn', /SMEMA conveyor/.test(vC2i.cap) && /four-station rotary indexer/.test(vRoto.cap) && /six-axis robot/.test(vArm.cap), vArm.cap.slice(0, 160));
+  /* effects in the detailed view, none in the standard one */
+  await pg.evaluate(() => { SIM.faults = false; simStart(); });
+  await pg.waitForFunction(() => SIM.on && SIM.phases[SIM.ph].k === 'PROCESS' && SIM.u > 0.2 && document.querySelector('#mfig .ws-glow'), null, { timeout: 20000 }).catch(() => {});
+  const fxOn = await pg.evaluate(() => ({ glow: !!document.querySelector('#mfig .ws-glow'), sparks: document.querySelectorAll('#mfig .ws-spark').length }));
+  await pg.evaluate(() => simStop());
+  await pg.click('#mfigmode [data-mode="std"]');
+  await pg.waitForFunction(() => document.querySelector('#mfig').dataset.variant === 'hand', null, { timeout: 5000 }).catch(() => {});
+  await pg.evaluate(() => { SIM.faults = false; simStart(); });
+  await pg.waitForFunction(() => SIM.on && SIM.phases[SIM.ph].k === 'PROCESS' && SIM.u > 0.3, null, { timeout: 20000 }).catch(() => {});
+  const fxStd = await pg.evaluate(() => ({ v: document.querySelector('#mfig').dataset.variant, glow: !!document.querySelector('#mfig .ws-glow'), sparks: document.querySelectorAll('#mfig .ws-spark').length,
+    pressed: document.querySelector('#mfigmode [data-mode="std"]').getAttribute('aria-pressed'), stored: Store.get('teal.mfig', ''), cap: /Standard view shows hand loading; this configuration loads by magazine/.test(document.querySelector('#mfig .iso-caption').textContent) }));
+  await pg.evaluate(() => simStop());
+  check('the detailed view shows the process at the spot: a glow and sparks for a metal mark', fxOn.glow && fxOn.sparks > 0, JSON.stringify(fxOn));
+  check('Standard keeps the plain workstation, loaded by hand, with no effects, and is remembered', fxStd.v === 'hand' && !fxStd.glow && fxStd.sparks === 0 && fxStd.pressed === 'true' && fxStd.stored === 'std' && fxStd.cap, JSON.stringify(fxStd));
+  await pg.click('#mfigmode [data-mode="det"]');
+  await pg.waitForFunction(() => document.querySelector('#mfig').dataset.variant === 'mag', null, { timeout: 5000 }).catch(() => {});
+  const back = await pg.evaluate(() => document.querySelector('#mfig').dataset.variant);
+  check('Detailed brings the station back', back === 'mag', back);
   check('no script errors in Fig 2', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
 
