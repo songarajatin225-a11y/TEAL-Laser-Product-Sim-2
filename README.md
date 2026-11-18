@@ -10,7 +10,7 @@ sources, 4 f-theta objectives, 25 automation modules, 4 LaserSuite editions.
 ## Deploy to GitHub Pages
 
 1. Create a repository and add `index.html`, `app.js`, `boot.js`, `anatomy.js`,
-   `anatomy.css`, `sw.js`,
+   `anatomy-ws.js`, `anatomy.css`, `sw.js`,
    `manifest.webmanifest`, `data.json`, `access.json`, the `assets` folder, `.nojekyll`
    and this `README.md` to the default branch.
 2. **Settings → Pages → Source:** deploy from branch, `main`, `/ (root)`.
@@ -1236,7 +1236,7 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 195 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 205 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
@@ -2111,6 +2111,71 @@ ends on 78 lines), and the figure was reviewed at 1×, at 4× on the galvo block
 mid-tour, while aiming, at phone width and in both themes. The kit's depth-order
 audit (`kit/audit.mjs`) was not run: the figure records no shapes for it, so the
 painter's order is hand-set and was checked by eye on those captures.
+
+## v19.0 — Fig 2: the workstation through one run cycle
+
+Below the configurator, a full-width figure draws the configured machine: a Class 1
+galvo workstation with its right-hand side panels and roof panel off, built with the
+same Anatomy kit as Fig 1.
+
+**What it shows.** About 180 parts. In the lower cabinet:
+- the fibre laser source, with its fibre port and handles
+- the controller and power supply on a shelf, their cables running down through grommets
+- the breakers and relays on the back wall under a slotted duct
+- a cable duct in the back corner
+- when configured, the fume extractor
+
+On the worktop:
+- a lift door in its rails, with an interlock
+- a Z column with a scale and stepper, carrying the scan head, its collimator and the f-theta objective
+- a fixture with locating pins, two toggle clamps and the part
+
+Elsewhere:
+- the armoured fibre, from the source up the back wall to the head
+- a light tower on the roof frame
+- an operator screen on a swing arm
+- the front control strip: emergency stop, start, stop and key switch
+
+**It runs the simulation's own cycle.** Home, load, clamp, locate, focus, process,
+verify, unload. The door lifts and the part comes down, the clamps close, the head drops
+to focus, and the beam marks this application's own process path (the same path the
+simulation uses). Then the part leaves. The operator screen names the phase. The top lamp
+of the light tower lights while the laser emits.
+
+- **Live:** while the simulation runs, the figure follows it exactly, including pauses,
+  scrubbing and stoppages. The readout shows the phase, the time into it and the cycle,
+  for example `MARK · 0.59 of 1.03 s · cycle 7.28 s`.
+- **Preview:** otherwise it previews the same phase list, computed for this configuration
+  without touching the simulation's state.
+
+**Driven by the configuration.** The camera, the auto-focus sensor and the fume extractor
+appear only when those modules are configured. The caption gives the source, power,
+objective and computed cycle, and says when the configuration loads by something other
+than hand. It is shown for galvo platforms only, not for the gantry table, robot cells or
+the handpiece.
+
+**Interaction.** Left and right arrows step through the phases. Z, or the Close-up button,
+eases into the work zone, where the head, the objective, the beam and the marks can be
+read. The figure stops when off screen, holds still on the finished mark under reduced
+motion, follows the theme, and is left out of print.
+
+**Files.**
+- `tools/anatomy/workstation.mjs` builds `anatomy-ws.js`, which reuses the kit runtime
+  that `anatomy.js` exposes. `npm run anatomy` rebuilds both figures, and `npm test` fails
+  if either is out of date.
+- `tube.mjs` and `audit.mjs` are now copied into `tools/anatomy/kit` as well.
+- About 520 KB uncompressed; GitHub Pages serves it gzipped at about 100 KB.
+
+**Checked.**
+- **Audit:** every part is recorded with its true shape. The kit's settle pass sets the
+  drawing order by ray-casting every overlapping pair, and `npm run anatomy:audit` passes
+  with zero problems: clearances, cable ends on their mounts, supports, sunk parts and
+  depth order across 180 items.
+- **Line check:** no floating line end in either theme.
+- **Browser checks:** 205 (up from 195).
+- **Limit of the audit:** it covers the resting pose. The door is drawn after everything
+  else because it sits in front of all it can pass over, and the moving poses were checked
+  on captures, not by the audit.
 
 ---
 

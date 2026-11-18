@@ -8706,19 +8706,80 @@ function simStart(){
   simPlanCycle();
   simSay('Interlocks closed · beam enabled', 1.6);
   M3D.vp && (M3D.vp.dirty=true);
-  simCtlSync(); m3dSync(); simHud();
+  simCtlSync(); m3dSync(); simHud(); mfigWake();
   misEvent('simstart');
 }
 function simStop(){
   SIM.on=false; SIM.sparks=[]; SIM.msg=''; SIM.fault=null; SIM.pend=null;
   simCtlSync();
   M3D.vp && (M3D.vp.dirty=true);
-  m3dSync(); simHud();
+  m3dSync(); simHud(); mfigWake();
   /* simHud clears the telemetry and returns early once the run is off, so the
      throughput dimension is refreshed here — the last completed cycle stays
      the basis for the fit until the configuration changes. */
   try{ fitSync(); }catch(e){}
 }
+/* ------------------------------------------------------------------------ */
+/*  Fig 2 — the workstation drawn through one run cycle (anatomy-ws.js,      */
+/*  built by tools/anatomy/workstation.mjs). It plays the simulation's own   */
+/*  phases: live while the run is on, otherwise a preview of the same phase  */
+/*  list computed for this configuration. Galvo workstations only.           */
+/* ------------------------------------------------------------------------ */
+var MFIG={key:'', on:false};
+function mfigFits(){
+  var p=P();
+  return !!(p && (p.deliv==='galvo'||p.deliv==='galvo2') && S.app && S.src && S.lens && S.pw!=null);
+}
+/* The phase list for this configuration without touching a run: simPhases()
+   writes a few SIM fields, so they are kept and put back. */
+function mfigPhases(){
+  var ks=['procS','wait','basis','cycNote','realS','animS'], keep={}, i;
+  for(i=0;i<ks.length;i++) keep[ks[i]]=SIM[ks[i]];
+  try{
+    SIM.procS=procModel().t;
+    var ph=simPhases(), out=[];
+    for(i=0;i<ph.length;i++) out.push({k:ph[i].k, n:ph[i].n, d:ph[i].d, real:ph[i].real});
+    return {ph:out, real:SIM.realS, basis:SIM.basis, procS:SIM.procS};
+  } finally { for(i=0;i<ks.length;i++) SIM[ks[i]]=keep[ks[i]]; }
+}
+function mfigLive(){
+  if(!(SIM.on && SIM.phases && SIM.forKey===simKey())) return null;
+  return {phases:SIM.phases, i:SIM.ph||0, u:SIM.u||0, real:SIM.realS, fault:!!SIM.fault};
+}
+function mfigCaption(pr){
+  var p=P(), L=LENS[S.lens], src=SRC[S.src], mods=[], lk=loadKind();
+  if(hasMod('visfid')||hasMod('visver')) mods.push('the vision camera with its ring light ('+(hasMod('visfid')&&hasMod('visver')?'locate and grade':hasMod('visfid')?'locate':'grade')+')');
+  if(hasMod('autofoc')) mods.push('the auto-focus sensor');
+  if(hasMod('fume')) mods.push('the fume extractor and its hose');
+  var proc=null; pr.ph.forEach(function(x){ if(x.k==='PROCESS') proc=x; });
+  var t='The '+p.n+' as configured: '+src.n+' '+src.wl+', '+S.pw+' W, '+L.n+' objective (f = '+L.f+' mm, field '+L.fld+' × '+L.fld+' mm). '+
+    'Each phase takes this configuration’s own time: '+(proc? proc.n.toLowerCase()+' '+proc.real.toFixed(2)+' s of a ' : 'a ')+pr.real.toFixed(2)+' s cycle ('+pr.basis+'). '+
+    'While it emits, the spot follows this application’s process path, drawn to fill the part as the simulation does. '+
+    (mods.length? 'Drawn because they are configured: '+mods.join(', ')+'. ' : 'No camera, focus sensor or extractor is configured, so none is drawn. ')+
+    (lk==='hand'? 'Loading is by hand through the lift door. ' : 'The drawing shows loading by hand; this configuration loads by '+({belt:'conveyor',web:'roll-to-roll web',tray:'tray tower',mag:'magazine',chute:'feeder',arm:'robot',dial:'turntable or indexer'}[lk]||lk)+'. ')+
+    'The top lamp of the light tower lights while the laser emits. The cabinet layout is indicative and the drawing is not to scale.';
+  return t;
+}
+function mfigSync(){
+  var sec=$('#mfig'); if(!sec) return;
+  var A=window.TEALAnatomy, ok=mfigFits() && A && A.ws;
+  if(!ok){
+    if(!sec.hidden){ sec.hidden=true; try{ A&&A.ws&&A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} MFIG.key=''; }
+    return;
+  }
+  var key=encodeState().replace(/(^|&)t=\d+/,'');
+  sec.hidden=false;
+  if(key===MFIG.key) return;
+  MFIG.key=key;
+  try{
+    var pr=mfigPhases(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
+    A.ws.mount($('#mfighost'), {
+      opts:{cam:hasMod('visfid')||hasMod('visver'), af:hasMod('autofoc'), fume:hasMod('fume')},
+      segs:segs, phases:pr.ph, real:pr.real, caption:mfigCaption(pr), live:mfigLive
+    });
+  }catch(e){ sec.hidden=true; MFIG.key=''; }
+}
+function mfigWake(){ try{ var A=window.TEALAnatomy; if(A&&A.ws&&A.ws.mount.wake) A.ws.mount.wake(); }catch(e){} }
 function simPhaseAt(t){
   var acc=0, i;
   for(i=0;i<SIM.phases.length;i++){
@@ -10053,6 +10114,7 @@ function compFocus(gid, cid){
 
 /* build-stack list, headline and run controls */
 function m3dSync(){
+  try{ mfigSync(); }catch(e){}
   if(!M3D.vp) return;
   var changed=mmSyncGroups(), p=P();
   var nm=$('#v3dname');
@@ -13624,7 +13686,7 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v18.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v19.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
