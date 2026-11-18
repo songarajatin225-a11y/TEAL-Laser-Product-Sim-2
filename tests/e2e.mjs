@@ -883,12 +883,17 @@ try {
   check('the Source step shows Fig 1, a framed figure with a description, a keyboard control and both mirrors', fig.slot && fig.svg && fig.stage === 'slider' && fig.mirrors === 2 && fig.beam, JSON.stringify(fig));
   check('its caption takes the objective, field and spot from the configuration', /F254 objective \(f = 254 mm, field 175 × 175 mm\)/.test(fig.cap) && /± 9\.87°/.test(fig.cap) && /about 32 µm/.test(fig.cap), fig.cap);
   await pg.focus('.figslot .iso-stage');
-  for (let i = 0; i < 2; i++) { await pg.keyboard.press('End'); await pg.waitForTimeout(80); }
-  const settle = () => pg.waitForFunction(() => { const t = document.querySelector('.figslot [data-readout]').textContent; const ok = t === window.__lastRo; window.__lastRo = t; return ok; }, null, { polling: 250, timeout: 4000 }).catch(() => {});
-  await settle();
+  // Press a key, then wait until the readout has left its value from before the key and stays put for two polls in a row.
+  const roText = () => pg.evaluate(() => document.querySelector('.figslot [data-readout]').textContent);
+  const pressSettle = async (key, times = 1) => {
+    const before = await roText();
+    for (let i = 0; i < times; i++) { await pg.keyboard.press(key); await pg.waitForTimeout(80); }
+    await pg.waitForFunction((b) => { const t = document.querySelector('.figslot [data-readout]').textContent; if (t === b) { window.__ro = null; window.__roN = 0; return false; } window.__roN = t === window.__ro ? (window.__roN || 0) + 1 : 0; window.__ro = t; return window.__roN >= 2; }, before, { polling: 200, timeout: 6000 }).catch(() => {});
+  };
+  await pressSettle('End', 2);
   const corner = await pg.evaluate(() => document.querySelector('.figslot [data-readout]').textContent);
   check('at the field corner each mirror reads x / 2f — the f-theta relation — for the configured objective', corner === 'X +9.87° · Y +9.87° · spot 87.50, 87.50 mm', corner);
-  await pg.keyboard.press('Home'); await settle();
+  await pressSettle('Home');
   const home = await pg.evaluate(() => document.querySelector('.figslot [data-readout]').textContent);
   check('Home centres the spot and both mirrors return to zero', home === 'X +0.00° · Y +0.00° · spot 0.00, 0.00 mm', home);
   const fig2 = await pg.evaluate(async () => {
