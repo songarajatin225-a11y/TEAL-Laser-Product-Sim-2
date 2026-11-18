@@ -964,11 +964,11 @@ try {
     const svg = document.querySelector('#mfig svg');
     out.af = svg.querySelector('[data-opt="af"]').style.display !== 'none'; out.cam = svg.querySelector('[data-opt="cam"]').style.display !== 'none';
     restore({ plat: 'cutxt', app: 'thinmetal', src: 'fiber', pw: 500, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5);
-    out.gantry = document.querySelector('#mfig').hidden;
+    out.gantry = document.querySelector('#mfighost').hidden && document.querySelector('#mfig').classList.contains('nogalvo') && !document.querySelector('#mfig').hidden;
     restore({ plat: 'weldr', app: 'seam3d', src: 'smcw', pw: 3000, lens: 'f420', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5);
-    out.robot = document.querySelector('#mfig').hidden;
+    out.robot = document.querySelector('#mfighost').hidden && document.querySelector('#mfig').classList.contains('nogalvo');
     return out; });
-  check('Fig 2 follows the theme and the modules, and is not shown for a gantry table or a robot cell', w4.dark === 'dark' && w4.light === 'light' && w4.af && !w4.cam && w4.gantry && w4.robot, JSON.stringify(w4));
+  check('Fig 2 follows the theme and the modules; a gantry table or a robot cell is shown in 3D instead of the drawing', w4.dark === 'dark' && w4.light === 'light' && w4.af && !w4.cam && w4.gantry && w4.robot, JSON.stringify(w4));
   /* the handling station follows the configuration: the simulation's own loadKind() */
   const variantOf = async (st) => {
     await pg.evaluate((x) => { restore(x); go(5); document.querySelector('#mfig').scrollIntoView(); }, st);
@@ -1035,6 +1035,19 @@ try {
   await pg.evaluate(() => document.querySelector('#mfigmode [data-mode="det"]').click());
   const c5 = await pg.evaluate(() => ({ cadGone: document.querySelector('#mfig3d').hidden && !document.querySelector('.cad3d'), drawing: !!document.querySelector('#mfighost svg') }));
   check('3D alone and the drawing alone stay available as options', c4.drawingHidden && c4.cad && c4.pressed === 'true' && c5.cadGone && c5.drawing, JSON.stringify({ c4, c5 }));
+  /* every machine type in the configurator has a 3D model: the gantry table, the robot cell, the cleaning cart */
+  const kinds = [];
+  for (const st of [
+    { plat: 'cutxt', app: 'thinmetal', src: 'fiber', pw: 500, lens: 'f254', re: /gantry cutting table/, style: 'cut' },
+    { plat: 'weldr', app: 'seam3d', src: 'smcw', pw: 3000, lens: 'f420', re: /robot cell: a six-axis arm/, style: 'weld' },
+    { plat: 'cleanp', app: 'rust', src: 'fiber', pw: 200, lens: 'f254', re: /handheld cleaning cart/, style: 'clean' }]) {
+    await pg.evaluate((x) => { restore({ plat: x.plat, app: x.app, src: x.src, pw: x.pw, lens: x.lens, mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5); }, st);
+    await pg.waitForFunction(() => document.querySelector('.cad3d[data-ready]') && MFIG.cad && MFIG.cad.ready, null, { timeout: 45000 }).catch(() => {});
+    kinds.push(await pg.evaluate((x) => ({ plat: x.plat, ready: !!(MFIG.cad && MFIG.cad.ready), drawingHidden: document.querySelector('#mfighost').hidden,
+      onlyCad: [...document.querySelectorAll('#mfigmode button')].every((b) => b.disabled === (b.dataset.mode !== 'cad')),
+      cap: new RegExp(x.re).test(document.querySelector('.cad3d-cap').textContent), style: mfigStyle() === x.style }), { ...st, re: st.re.source }));
+  }
+  check('the gantry table, the robot cell and the cleaning cart each have a running 3D model, with the marks of their own process', kinds.every((k) => k.ready && k.drawingHidden && k.onlyCad && k.cap && k.style), JSON.stringify(kinds));
   check('no script errors in the 3D view', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
 

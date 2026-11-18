@@ -114,6 +114,12 @@ function part(geo, mat, x, y, z, parent, { rot = [0, 0, 0], scale = [1, 1, 1], m
 
 /* ---- the machine ----------------------------------------------------------------------- */
 function buildMachine(cfg, G, M) {
+  if (cfg.deliv === "gantry") return buildGantry(cfg, G, M);
+  if (cfg.deliv === "robot") return buildRobot(cfg, G, M);
+  if (cfg.deliv === "handpiece") return buildCart(cfg, G, M);
+  return buildGalvo(cfg, G, M);
+}
+function buildGalvo(cfg, G, M) {
   const W = cfg.dims.w, D = cfg.dims.d, H = cfg.dims.h, T = cfg.dims.cv;   // mm, from machineDims()
   const root = new THREE.Group(), R = {};
   const hw = W / 2, hd = D / 2;
@@ -280,6 +286,245 @@ function buildMachine(cfg, G, M) {
   return { root, R };
 }
 
+
+/* ---- shared pieces for the other machine types ------------------------------------------ */
+function markPart(parent, R, M, w, d, y, style) {
+  const can = document.createElement("canvas"); can.width = can.height = 512;
+  const hot = document.createElement("canvas"); hot.width = hot.height = 512;
+  const tex = new THREE.CanvasTexture(can), htex = new THREE.CanvasTexture(hot);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const top = new THREE.MeshStandardMaterial({ color: 0xffffff, map: tex, emissive: 0xff8a2a, emissiveMap: htex, emissiveIntensity: 1.6, metalness: style === "clean" ? 0.5 : 0.85, roughness: style === "clean" ? 0.6 : 0.32, transparent: true });
+  const side = new THREE.MeshStandardMaterial({ color: style === "clean" ? 0x7a4426 : 0xb9bec3, metalness: 0.7, roughness: 0.45, transparent: true });
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, 8, d), [side, side, top, side, side, side]);
+  m.position.set(0, y, 0); m.castShadow = true; m.receiveShadow = true; parent.add(m);
+  Object.assign(R, { part: m, partMats: [top, side], canvas: can, hot, tex, htex, partSize: [w, d], partY: y });
+  return m;
+}
+function processFx(root, R, cfg) {
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 1, 10, 1, true), new THREE.MeshBasicMaterial({ color: cfg.beamCol || 0xff5533, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }));
+  root.add(beam); R.beam = beam;
+  const spot = new THREE.Mesh(new THREE.SphereGeometry(6, 16, 12), new THREE.MeshBasicMaterial({ color: 0xfff1d6, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
+  root.add(spot); R.spot = spot;
+  const light = new THREE.PointLight(0xffa860, 0, 600, 1.6); root.add(light); R.spotLight = light;
+  const NS = 260, sp = new Float32Array(NS * 3), sv = new Float32Array(NS * 3), sl = new Float32Array(NS);
+  const sg = new THREE.BufferGeometry(); sg.setAttribute("position", new THREE.BufferAttribute(sp, 3));
+  const pts = new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffc070, size: 5, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
+  pts.frustumCulled = false; root.add(pts); R.sparks = { pts, p: sp, v: sv, l: sl, n: NS, next: 0 };
+}
+function tower(parent, R, M, x, y, z) {
+  const tw = new THREE.Group(); tw.position.set(x, y, z); parent.add(tw);
+  cyl(30, 14, M.paintDark, 0, 7, 0, tw); cyl(9, 120, M.chrome, 0, 74, 0, tw);
+  R.lamps = [0, 1, 2].map((i) => cyl(32, 52, M.lampOff[i], 0, 160 + i * 54, 0, tw));
+  cyl(32, 12, M.paintDark, 0, 160 + 3 * 54 - 21, 0, tw);
+}
+function screenOn(parent, R, M, w, h, x, y, z, ry = 0) {
+  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; parent.add(g);
+  box(w + 40, h + 40, 50, M.paintDark, 0, 0, -10, g, { r: 10 });
+  const sc = document.createElement("canvas"); sc.width = 512; sc.height = 360;
+  const stex = new THREE.CanvasTexture(sc); stex.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: stex, toneMapped: false }));
+  m.position.set(0, 0, 16); g.add(m); R.screen = { c: sc, tex: stex };
+  return g;
+}
+function controlBox(parent, G, M, x, y, z, ry = 0) {
+  const cp = new THREE.Group(); cp.position.set(x, y, z); cp.rotation.y = ry; parent.add(cp);
+  box(320, 150, 60, M.paint, 0, 0, 0, cp, { r: 8 });
+  box(310, 140, 2, M.paintDark, 0, 0, 31, cp);
+  part(G.estop, M.red, -95, 0, 31 + 40, cp, { rot: [Math.PI / 2, 0, 0], mats: [M.yellow, M.red] });
+  part(G.btn_green, M.green, 15, 10, 31 - 69 / 2 + 22, cp, { rot: [Math.PI / 2, 0, 0] });
+  part(G.btn_red, M.red, 80, 10, 31 - 69 / 2 + 22, cp, { rot: [Math.PI / 2, 0, 0] });
+  return cp;
+}
+function cabinet(parent, G, M, w, h, d, x, z, R) {
+  /* the electrical cabinet: a door with a handle, louvres, two real 50 mm fans, the tower on top */
+  const c = new THREE.Group(); c.position.set(x, 0, z); parent.add(c);
+  box(w, 80, d, M.paintDark, 0, 40, 0, c, { r: 4 });
+  box(w, h - 80, d, M.paint, 0, 80 + (h - 80) / 2, 0, c, { r: 6 });
+  box(w - 40, h - 130, 8, M.paint, 0, 80 + (h - 80) / 2, d / 2 + 3, c, { r: 3 });
+  box(14, 120, 22, M.chrome, w / 2 - 60, 80 + (h - 80) * 0.55, d / 2 + 14, c);
+  for (let i = 0; i < 6; i++) box(w - 140, 7, 3, M.paintDark, 0, 120 + i * 18, d / 2 + 8, c);
+  for (const zz of [-d * 0.2, d * 0.2]) part(G.fan50, M.paintDark, w / 2 + 6, h * 0.35, zz, c, { rot: [0, Math.PI / 2, 0], scale: [2.4, 2.4, 1] });
+  tower(c, R, M, -w / 2 + 70, h, -d / 2 + 70);
+  return c;
+}
+
+/* ---- the gantry cutting table (Cut X-T, LinCell) ---------------------------------------- */
+function buildGantry(cfg, G, M) {
+  const W = cfg.dims.w, D = cfg.dims.d, H = cfg.dims.h, root = new THREE.Group(), R = { clamps: [] };
+  const hw = W / 2, hd = D / 2, bed = 820, prof = G.profile40, pz = prof.userData.size[2];
+  /* welded frame: legs, side and end members, an extraction plenum under the bed */
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { box(90, bed - 40, 90, M.paintDark, sx * (hw - 60), (bed - 40) / 2, sz * (hd - 60), root, { r: 3 }); cyl(36, 14, M.rubber, sx * (hw - 60), 7, sz * (hd - 60), root); }
+  for (const sz of [-1, 1]) box(W - 60, 140, 90, M.paint, 0, bed - 110, sz * (hd - 60), root, { r: 4 });
+  for (const sx of [-1, 1]) box(90, 140, D - 60, M.paint, sx * (hw - 60), bed - 110, 0, root, { r: 4 });
+  box(W - 260, 300, D - 260, M.paintDark, 0, bed - 330, 0, root, { r: 6 });
+  cyl(70, 260, M.aluDark, hw - 200, bed - 430, -hd + 40, root, "z");
+  /* the slat bed: steel slats on edge, the sheet lying on their tops */
+  const nS = Math.floor((W - 300) / 70);
+  for (let i = 0; i < nS; i++) box(4, 70, D - 280, M.steel, -hw + 150 + i * 70 + 35, bed - 35, 0, root, { cast: false });
+  const sheetW = W - 420, sheetD = D - 360;
+  const sheetG = new THREE.Group(); sheetG.position.set(0, bed, 0); root.add(sheetG);
+  markPart(sheetG, R, M, sheetW, sheetD, 4, cfg.style);
+  /* rails on both side members, the gantry beam on its two carriages, the cutting head */
+  const railY = bed - 40;
+  for (const sx of [-1, 1]) part(G.mgn12, M.steel, sx * (hw - 60), railY + 4, 0, root, { scale: [1.6, 1.4, (D - 120) / G.mgn12.userData.size[2]] });
+  const gan = new THREE.Group(); root.add(gan); R.gantry = gan;
+  for (const sx of [-1, 1]) { box(120, 70, 180, M.aluDark, sx * (hw - 60), railY + 45, 0, gan, { r: 4 }); box(80, 300, 120, M.alu, sx * (hw - 60), railY + 230, 0, gan, { r: 4 }); }
+  for (const yy of [railY + 360, railY + 400]) part(prof, M.alu, 0, yy, 0, gan, { rot: [0, Math.PI / 2, 0], scale: [1, 1, (W - 40) / pz] });
+  part(G.nema23, M.anod, hw - 60, railY + 120, 120, gan, { rot: [0, 0, 0] });
+  for (let i = 0; i < 18; i++) box(40, 24, 50, M.rubber, -hw + 120 + i * ((W - 240) / 18), railY + 440, -40, gan, { cast: false });
+  const car = new THREE.Group(); car.position.set(0, railY + 380, 50); gan.add(car); R.carriage = car;
+  box(200, 220, 26, M.aluDark, 0, 0, 0, car, { r: 4 });
+  const zg = new THREE.Group(); car.add(zg); R.z = zg; R.zTravel = 60;
+  box(90, 300, 60, M.alu, 0, -90, 40, zg, { r: 4 });
+  part(G.nema23, M.anod, 0, 100, 40, zg, { rot: [-Math.PI / 2, 0, 0] });
+  const head = new THREE.Group(); head.position.set(0, -280, 60); zg.add(head); R.head = head;
+  cyl(48, 160, M.anod, 0, 0, 0, head); cyl(52, 20, M.accent, 0, 50, 0, head);
+  cyl(30, 40, M.aluDark, 0, -100, 0, head); cyl(8, 50, new THREE.MeshStandardMaterial({ color: 0xb87333, metalness: 1, roughness: 0.3 }), 0, -140, 0, head, "y", 24, 22);
+  R.lensBottom = new THREE.Vector3(0, -166, 0);
+  const fib = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[0, 80, 0], [0, 260, -20], [-200, 330, -60]].map((p) => new THREE.Vector3(...p))), 40, 9, 10), M.cable);
+  head.add(fib);
+  /* a light-tight enclosure: profile posts, glazing on four sides, a lift door at the front */
+  const top = H, postH = top - bed;
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) part(prof, M.alu, sx * (hw - 20), bed + postH / 2, sz * (hd - 20), root, { rot: [Math.PI / 2, 0, 0], scale: [1, 1, postH / pz] });
+  for (const sz of [-1, 1]) part(prof, M.alu, 0, top, sz * (hd - 20), root, { rot: [0, Math.PI / 2, 0], scale: [1, 1, (W - 80) / pz] });
+  for (const sx of [-1, 1]) part(prof, M.alu, sx * (hw - 20), top, 0, root, { scale: [1, 1, (D - 80) / pz] });
+  box(W, 6, D, M.paint, 0, top + 23, 0, root);
+  for (const sx of [-1, 1]) box(4, postH - 40, D - 80, M.window, sx * (hw - 20), bed + postH / 2, 0, root, { cast: false, receive: false });
+  box(W - 80, postH - 40, 4, M.window, 0, bed + postH / 2, -hd + 20, root, { cast: false, receive: false });
+  const doorH = postH * 0.55, door = new THREE.Group(); door.position.set(0, bed + doorH / 2 + 10, hd - 2); root.add(door); R.door = door; R.doorTravel = postH - doorH - 40;
+  for (const [w, h, x, y] of [[W - 120, 30, 0, doorH / 2 - 15], [W - 120, 30, 0, -doorH / 2 + 15], [30, doorH, -(W - 120) / 2 + 15, 0], [30, doorH, (W - 120) / 2 - 15, 0]]) box(w, h, 20, M.alu, x, y, 0, door);
+  box(W - 180, doorH - 60, 6, M.window, 0, 0, 0, door, { cast: false, receive: false });
+  cyl(12, W * 0.4, M.chrome, 0, -doorH / 2 + 50, 40, door, "x");
+  box(W - 80, postH - doorH - 40, 4, M.window, 0, bed + doorH + (postH - doorH) / 2, hd - 20, root, { cast: false, receive: false });
+  /* the electrical cabinet, the control panel, the operator screen */
+  cabinet(root, G, M, 600, 1700, 500, hw + 420, -hd + 300, R);
+  controlBox(root, G, M, hw - 220, bed - 110, hd + 30);
+  screenOn(root, R, M, 380, 262, hw + 420, 1300, -hd + 300 + 280);
+  processFx(root, R, cfg);
+  /* the axes put the head over the spot; parked at the back right */
+  R.track = (p) => {
+    const bz = p ? p.z : -sheetD / 2 + 40, bx = p ? p.x : sheetW / 2 - 60;
+    gan.position.z = bz - 50 - 60; car.position.x = bx;
+  };
+  R.partMove = (o) => { sheetG.position.z = (D * 0.75) * o.lift; };
+  R.workAt = () => new THREE.Vector3(0, bed, 0);
+  root.userData.size = [W + 300, H, D];
+  return { root, R };
+}
+
+/* ---- the robot cell (Weld R-Cell, Clean CL-A, RoboCell) --------------------------------- */
+function buildRobot(cfg, G, M) {
+  const W = cfg.dims.w, D = cfg.dims.d, H = cfg.dims.h, root = new THREE.Group(), R = { clamps: [] };
+  const hw = W / 2, hd = D / 2, prof = G.profile40, pz = prof.userData.size[2];
+  /* floor plate and a guard fence: yellow posts, mesh panels on three sides, light-curtain columns at the front */
+  box(W + 200, 12, D + 200, M.paintDark, 0, 6, 0, root, { r: 3 });
+  const mc = document.createElement("canvas"); mc.width = mc.height = 64;
+  const mg = mc.getContext("2d"); mg.clearRect(0, 0, 64, 64); mg.strokeStyle = "rgba(40,44,48,0.95)"; mg.lineWidth = 5; for (let i = 0; i <= 64; i += 32) { mg.beginPath(); mg.moveTo(i, 0); mg.lineTo(i, 64); mg.stroke(); mg.beginPath(); mg.moveTo(0, i); mg.lineTo(64, i); mg.stroke(); }
+  const mtex = new THREE.CanvasTexture(mc); mtex.wrapS = mtex.wrapT = THREE.RepeatWrapping;
+  const fenceH = Math.min(H, 2000), yellowM = new THREE.MeshStandardMaterial({ color: 0xf2c200, roughness: 0.5, metalness: 0.2 });
+  const panel = (w, x, z, ry) => { const t = mtex.clone(); t.needsUpdate = true; t.repeat.set(w / 110, fenceH / 110); t.anisotropy = 8; const m = new THREE.Mesh(new THREE.PlaneGeometry(w, fenceH - 200), new THREE.MeshStandardMaterial({ map: t, transparent: true, side: THREE.DoubleSide, metalness: 0.6, roughness: 0.5, alphaTest: 0.1 })); m.position.set(x, 100 + (fenceH - 200) / 2, z); m.rotation.y = ry; root.add(m); };
+  for (const [x, z] of [[-hw, -hd], [hw, -hd], [-hw, hd], [hw, hd], [0, -hd], [-hw, 0], [hw, 0]]) box(50, fenceH, 50, yellowM, x, fenceH / 2 + 12, z, root, { r: 3 });
+  panel(W / 2 - 50, -W / 4, -hd, 0); panel(W / 2 - 50, W / 4, -hd, 0); panel(D / 2 - 50, -hw, -D / 4, Math.PI / 2); panel(D / 2 - 50, -hw, D / 4, Math.PI / 2); panel(D / 2 - 50, hw, -D / 4, Math.PI / 2); panel(D / 2 - 50, hw, D / 4, Math.PI / 2);
+  for (const sx of [-0.25, 0.25]) { box(40, 1600, 40, M.paintDark, sx * W, 812, hd + 60, root, { r: 2 }); for (let i = 0; i < 14; i++) box(6, 6, 2, new THREE.MeshStandardMaterial({ color: 0xff3030, emissive: 0xff2020, emissiveIntensity: 1.5 }), sx * W, 120 + i * 105, hd + 81, root, { cast: false }); }
+  /* the work table with a fixture and the part */
+  const tb = new THREE.Group(); tb.position.set(0, 0, hd * 0.25); root.add(tb);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(60, 760, 60, M.paintDark, sx * 330, 392, sz * 230, tb, { r: 2 });
+  box(760, 30, 560, M.steel, 0, 787, 0, tb, { r: 3 });
+  box(520, 22, 380, M.anod, 0, 813, 0, tb, { r: 3 });
+  markPart(tb, R, M, 420, 300, 828, cfg.style);
+  for (const s of [-1, 1]) { const c = new THREE.Group(); c.position.set(s * 240, 824, 0); tb.add(c); box(40, 30, 60, M.paintDark, 0, 15, 0, c); const piv = new THREE.Group(); piv.position.set(0, 42, 0); c.add(piv); box(80, 12, 18, M.steel, -s * 40, 0, 0, piv); box(14, 70, 14, M.red, s * 18, 30, 0, piv); R.clamps.push({ piv, s }); }
+  /* the six-axis arm on its pedestal: turret, shoulder, upper arm, elbow, forearm, wrist, laser head */
+  const white = new THREE.MeshStandardMaterial({ color: 0xe9ecee, roughness: 0.35, metalness: 0.15 }), joint = new THREE.MeshStandardMaterial({ color: 0x4a525a, roughness: 0.4, metalness: 0.5 });
+  const base = new THREE.Vector3(0, 0, -hd * 0.45);
+  box(360, 520, 360, M.paintDark, base.x, 272, base.z, root, { r: 6 });
+  box(420, 20, 420, M.steel, base.x, 22, base.z, root, { r: 3 });
+  const turret = new THREE.Group(); turret.position.set(base.x, 532, base.z); root.add(turret);
+  cyl(150, 90, white, 0, 45, 0, turret); cyl(120, 40, joint, 0, 110, 0, turret);
+  const L1 = 560, L2 = 520, WR = 120, TOOL = 230;
+  const sh = new THREE.Group(); sh.position.set(60, 230, 0); turret.add(sh);
+  box(180, 220, 200, white, -40, -60, 0, turret, { r: 30 });
+  cyl(95, 230, joint, 60, 230, 0, turret, "z");
+  const up = new THREE.Group(); sh.add(up); box(L1 + 80, 150, 140, white, L1 / 2, 0, 0, up, { r: 40 });
+  const el = new THREE.Group(); el.position.set(L1, 0, 0); up.add(el); cyl(80, 190, joint, 0, 0, 0, el, "z");
+  const fo = new THREE.Group(); el.add(fo); box(L2 + 40, 110, 110, white, L2 / 2, 0, 0, fo, { r: 35 });
+  const wr = new THREE.Group(); wr.position.set(L2, 0, 0); fo.add(wr); cyl(55, 130, joint, 0, 0, 0, wr, "z");
+  const tool = new THREE.Group(); wr.add(tool);
+  box(WR, 80, 80, white, WR / 2, 0, 0, tool, { r: 20 });
+  const head = new THREE.Group(); head.position.set(WR, 0, 0); head.rotation.z = Math.PI; tool.add(head); R.head = head;   /* the head hangs straight down from the wrist block */
+  cyl(45, 120, M.anod, 0, 60, 0, head); cyl(48, 18, M.accent, 0, 100, 0, head); cyl(30, 90, M.aluDark, 0, 150, 0, head);
+  cyl(10, 40, new THREE.MeshStandardMaterial({ color: 0xb87333, metalness: 1, roughness: 0.3 }), 0, 205, 0, head, "y", 24, 24);
+  R.lensBottom = new THREE.Vector3(0, TOOL, 0);
+  /* inverse kinematics: yaw toward the target, a two-link arm to the wrist, the tool kept pointing down */
+  const tmp = new THREE.Vector3();
+  R.track = (p) => {
+    const target = p ? p.clone() : new THREE.Vector3(base.x + 380, 1250, base.z + 380);
+    const wrist = target.clone(); wrist.y += TOOL + WR * 0;          /* the head hangs below the wrist */
+    const shW = new THREE.Vector3(); turret.updateMatrixWorld(); 
+    const dx = wrist.x - base.x, dz = wrist.z - base.z, yaw = Math.atan2(-dz, dx);
+    turret.rotation.y = yaw;
+    const r = Math.hypot(dx, dz) - 60 - WR, zz = wrist.y - (532 + 230);
+    const d = Math.min(Math.hypot(r, zz), L1 + L2 - 1);
+    const e = Math.acos(Math.max(-1, Math.min(1, (d * d - L1 * L1 - L2 * L2) / (2 * L1 * L2))));
+    const a1 = Math.atan2(zz, r) + Math.atan2(L2 * Math.sin(e), L1 + L2 * Math.cos(e)), a2 = -e;
+    sh.rotation.z = a1; el.rotation.z = a2; wr.rotation.z = -a1 - a2;     /* the wrist block stays level: the head hangs straight down */
+  };
+  /* the controller outside the fence, the panel and the screen on the fence */
+  cabinet(root, G, M, 600, 1700, 500, hw + 520, -hd + 300, R);
+  controlBox(root, G, M, hw + 230, 1100, hd * 0.35, -Math.PI / 2 + 0.6);
+  screenOn(root, R, M, 380, 262, hw + 230, 1400, hd * 0.35, -Math.PI / 2 + 0.6);
+  /* a fume hood over the table for the weld or clean */
+  box(700, 60, 420, M.paint, 0, Math.min(H, 2000) - 120, hd * 0.25, root, { r: 8 });
+  cyl(70, Math.max(100, 2200 - Math.min(H, 2000)), M.aluDark, 0, Math.min(H, 2000) + 20, hd * 0.25, root);
+  processFx(root, R, cfg);
+  R.door = new THREE.Group(); R.doorTravel = 0; R.z = new THREE.Group(); R.zTravel = 0;
+  root.userData.size = [W + 500, Math.max(H, 2000), D];
+  return { root, R };
+}
+
+/* ---- the handheld cleaning cart (Clean CL-P) -------------------------------------------- */
+function buildCart(cfg, G, M) {
+  const W = cfg.dims.w, D = cfg.dims.d, H = cfg.dims.h, root = new THREE.Group(), R = { clamps: [] };
+  const cw = Math.min(W, 700), cd = Math.min(D, 560), ch = Math.min(H, 1000);
+  /* the cart: cabinet on four castors, a push handle, a hose hook, a beacon and a screen */
+  const cart = new THREE.Group(); cart.position.set(-500, 0, 0); root.add(cart);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { cyl(45, 30, M.rubber, sx * (cw / 2 - 70), 45, sz * (cd / 2 - 60), cart, "x"); box(30, 60, 30, M.chrome, sx * (cw / 2 - 70), 95, sz * (cd / 2 - 60), cart); }
+  box(cw, ch - 120, cd, M.paint, 0, 120 + (ch - 120) / 2, 0, cart, { r: 10 });
+  box(cw + 6, 16, cd + 6, M.accent, 0, ch - 60, 0, cart, { r: 4 });
+  for (let i = 0; i < 8; i++) box(cw - 160, 7, 3, M.paintDark, 0, 200 + i * 18, cd / 2 + 2, cart);
+  for (const sz of [-1, 1]) cyl(14, 300, M.chrome, -cw / 2 - 50, ch + 90, sz * (cd / 2 - 60), cart);
+  cyl(14, cd - 120 + 28, M.chrome, -cw / 2 - 50, ch + 240, 0, cart, "z");
+  box(80, 40, 80, M.paintDark, cw / 2 - 60, ch + 20, -cd / 2 + 70, cart);
+  part(G.estop, M.red, -cw / 2 + 120, ch - 120, cd / 2 + 40, cart, { rot: [Math.PI / 2, 0, 0], mats: [M.yellow, M.red] });
+  part(G.fan50, M.paintDark, cw / 2 + 6, 300, 0, cart, { rot: [0, Math.PI / 2, 0], scale: [2.4, 2.4, 1] });
+  screenOn(cart, R, M, 300, 200, 60, ch - 260, cd / 2 + 30);
+  tower(cart, R, M, cw / 2 - 70, ch, -cd / 2 + 70);
+  /* the work: a rusty steel plate on a stand */
+  const st = new THREE.Group(); st.position.set(450, 0, 0); root.add(st);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(50, 820, 50, M.paintDark, sx * 300, 410, sz * 220, st, { r: 2 });
+  box(700, 30, 520, M.steel, 0, 835, 0, st, { r: 3 });
+  markPart(st, R, M, 520, 380, 854, cfg.style || "clean");
+  /* the handheld head on its hose, swept by the operator over the plate */
+  const gun = new THREE.Group(); root.add(gun); R.head = gun;
+  cyl(36, 200, M.anod, 0, 80, 0, gun); cyl(40, 20, M.accent, 0, 160, 0, gun);
+  box(50, 160, 60, M.paintDark, 0, 140, -70, gun, { r: 12 }); cyl(24, 60, M.aluDark, 0, -50, 0, gun);
+  R.lensBottom = new THREE.Vector3(0, -80, 0);
+  const hoseM = M.cable;
+  let hose = null;
+  const hoseFrom = new THREE.Vector3(-500 + cw / 2 - 60, ch + 40, -cd / 2 + 70);
+  R.track = (p) => {
+    const at = p ? p.clone() : new THREE.Vector3(450 + 300, 1100, 300);
+    gun.position.set(at.x, at.y + 160, at.z);
+    const mid = hoseFrom.clone().lerp(gun.position, 0.5); mid.y = Math.min(hoseFrom.y, gun.position.y) - 240;
+    if (hose) { root.remove(hose); hose.geometry.dispose(); }
+    hose = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([hoseFrom, mid, gun.position.clone().add(new THREE.Vector3(0, 230, -40))]), 30, 11, 8), hoseM);
+    hose.castShadow = true; root.add(hose);
+  };
+  processFx(root, R, cfg);
+  R.door = new THREE.Group(); R.doorTravel = 0; R.z = new THREE.Group(); R.zTravel = 0;
+  root.userData.size = [1300, 1050, 800];
+  return { root, R };
+}
+
 /* ---- the phases: where everything is in phase k at share u ----------------------------- */
 const ease = (t) => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
 const span = (u, a, b) => ease((u - a) / (b - a));
@@ -392,7 +637,9 @@ export function mount(host, cfg) {
     function paintMarks(prog, on) {
       const key = on ? Math.round(prog * 400) : -2;
       if (key === lastProg && lastMarks === on) return; lastProg = key; lastMarks = on;
-      cx.fillStyle = "#c4c9ce"; cx.fillRect(0, 0, S, S);
+      const style = cfg.style || "mark";
+      cx.fillStyle = style === "clean" ? "#7b4a2c" : "#c4c9ce"; cx.fillRect(0, 0, S, S);
+      if (style === "clean") { for (let i = 0; i < 900; i++) { cx.fillStyle = `rgba(${90 + (i * 37) % 60},${40 + (i * 17) % 30},${20 + (i * 7) % 20},0.35)`; cx.fillRect((i * 97) % S, (i * 61) % S, 6 + (i % 9), 4 + (i % 7)); } }
       /* a brushed finish: fine streaks across the plate */
       cx.globalAlpha = 0.08; cx.strokeStyle = "#ffffff";
       for (let i = 0; i < 120; i++) { const y = (i * 37) % S; cx.beginPath(); cx.moveTo(0, y); cx.lineTo(S, y + ((i * 13) % 7) - 3); cx.stroke(); }
@@ -400,8 +647,9 @@ export function mount(host, cfg) {
       hx.fillStyle = "#000"; hx.fillRect(0, 0, S, S);
       if (!on) { R.tex.needsUpdate = true; R.htex.needsUpdate = true; return; }
       const cur = moveAt(prog), recent = Math.max(0, prog - 0.06);
-      cx.strokeStyle = "#2a2622"; cx.lineWidth = 4.2; cx.lineCap = "round";
-      hx.strokeStyle = "#ffb070"; hx.lineWidth = 5; hx.lineCap = "round";
+      const sty = { mark: ["#2a2622", 4.2], cut: ["#121212", 3.2], weld: ["#b9a27a", 9], clean: ["#d3d8dc", 34] }[style] || ["#2a2622", 4.2];
+      cx.strokeStyle = sty[0]; cx.lineWidth = sty[1]; cx.lineCap = "round";
+      hx.strokeStyle = style === "clean" ? "#ffd2a0" : "#ffb070"; hx.lineWidth = Math.max(5, sty[1]); hx.lineCap = "round";
       for (let i = 0; i <= Math.min(cur.i, MV.mv.length - 1); i++) {
         const m = MV.mv[i]; if (!m.on) continue;
         const b = i < cur.i ? m.b : cur.at, a = uv(m.a), bb = uv(b);
@@ -443,8 +691,8 @@ export function mount(host, cfg) {
       }
       const o = pose(ph.k, u);
       R.door.position.y = (R.door.userData.y0 ??= R.door.position.y) + R.doorTravel * o.door;
-      R.z.position.y = 70 * o.z;
-      R.part.position.y = 26 + 130 * o.lift;
+      R.z.position.y = (R.zTravel == null ? 70 : R.zTravel) * o.z;
+      if (R.partMove) R.partMove(o); else R.part.position.y = (R.partY == null ? 26 : R.partY) + 130 * o.lift;
       const fade = o.show ? (o.lift > 0.82 ? (1 - o.lift) / 0.18 : 1) : 0;
       R.partMats.forEach((m) => { m.opacity = fade; }); R.part.visible = fade > 0.01;
       R.clamps.forEach((c) => { c.piv.rotation.z = c.s * -o.clamp * 1.2; });
@@ -452,10 +700,12 @@ export function mount(host, cfg) {
       /* beam and spot */
       const mv = o.beam ? moveAt(o.prog) : null, on = !!(mv && mv.on);
       if (o.beam) {
-        R.head.localToWorld(lensW.copy(R.lensBottom));
         R.part.getWorldPosition(fixW);
         const sx = mv.at[0] / SC * 0.5 * R.partSize[0] * 0.86, sz = mv.at[1] / SC * 0.5 * R.partSize[1] * 0.86;
         tmp.set(fixW.x + sx, fixW.y + 4.5, fixW.z + sz);
+        /* gantry axes, robot joints or the operator's hand put the tool over the spot */
+        if (R.track) { R.track(tmp); R.head.updateWorldMatrix(true, false); }
+        R.head.localToWorld(lensW.copy(R.lensBottom));
         const dir = new THREE.Vector3().subVectors(tmp, lensW), L = dir.length();
         R.beam.visible = on; R.beam.scale.set(1, L, 1); R.beam.position.copy(lensW).addScaledVector(dir, 0.5);
         R.beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
@@ -472,7 +722,7 @@ export function mount(host, cfg) {
             S2.l[j] = cfg.fx === "smoke" ? 1.6 : 0.4 + Math.random() * 0.4;
           }
         }
-      } else { R.beam.visible = false; R.spot.visible = false; R.spotLight.intensity = 0; }
+      } else { R.beam.visible = false; R.spot.visible = false; R.spotLight.intensity = 0; if (R.track) R.track(null); }
       const S2 = R.sparks, gk = cfg.fx === "smoke" ? -30 : 1800;
       for (let j = 0; j < S2.n; j++) {
         if (S2.l[j] <= 0) { S2.p[j * 3 + 1] = -9999; continue; }

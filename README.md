@@ -1236,7 +1236,7 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 217 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 218 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
@@ -2254,6 +2254,13 @@ the live run, including pause, scrub and stoppages.
 - **Performance:** it lowers its own resolution, then its shadows, on slow devices, and only
   loads when a 3D view is shown.
 
+**Every machine in the configurator.** The 3D view also covers the machines the anatomy figure does not draw. For these the 3D view is shown on its own:
+- **Gantry cutting table (Cut X-T, LinCell):** the head travels the cut path on two axes over a sheet on the slat bed, behind a glazed enclosure with a lift door, beside its electrical cabinet.
+- **Robot cell (Weld R-Cell, Clean CL-A, RoboCell):** a six-axis arm, solved by inverse kinematics each frame, carries the laser head along the seam over a part on a table, inside a mesh fence with light curtains and a fume hood.
+- **Handheld cleaning cart (Clean CL-P):** the head on its hose sweeps a rusty plate on a stand.
+
+The marks follow the process: a mark, a cut kerf, a weld bead with heat tint, or a cleaned stripe through rust.
+
 **Real component models, with credit.** These parts are real catalogue models from the
 [FreeCAD parts library](https://github.com/FreeCAD/FreeCAD-library), which is licensed
 CC-BY 3.0:
@@ -2280,7 +2287,7 @@ The choice is remembered in the browser.
 **Size.** The 3D code, three.js and the seven meshes add about 1.6 MB (uncompressed), loaded
 only when a 3D view is shown and cached for offline use afterwards.
 
-**Checked.** 217 browser checks. The new ones cover:
+**Checked.** 218 browser checks. The new ones cover:
 - the combined layout
 - the seven credited models
 - the size caption

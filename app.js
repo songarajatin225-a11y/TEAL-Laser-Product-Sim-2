@@ -8732,10 +8732,11 @@ var MFIG_MODES=['combo','det','std','cad'];
 function mfigMode(){ if(!MFIG.mode){ var m=Store.get('teal.mfig','combo'); MFIG.mode=MFIG_MODES.indexOf(m)>=0? m : 'combo'; } return MFIG.mode; }
 /* one preview clock for every view of the cycle */
 function mfigClock(){ if(!MFIG.t0) MFIG.t0=performance.now(); return (performance.now()-MFIG.t0)/1000; }
-function mfigFits(){
-  var p=P();
-  return !!(p && (p.deliv==='galvo'||p.deliv==='galvo2') && S.app && S.src && S.lens && S.pw!=null);
-}
+/* every configured machine gets the 3D view; the anatomy figure draws the galvo workstations */
+function mfigFits(){ var p=P(); return !!(p && S.app && S.src && S.lens && S.pw!=null); }
+function mfigGalvo(){ var p=P(); return !!(p && (p.deliv==='galvo'||p.deliv==='galvo2')); }
+/* the marks look like the process: a kerf, a weld bead, a cleaned stripe, a mark */
+function mfigStyle(){ var k=procKind(); return isWeldKind(k)? 'weld' : k==='ablate'? 'clean' : k==='cut'? 'cut' : 'mark'; }
 /* which drawing: the station the simulation's own loadKind() moves the part with */
 function mfigVariant(){
   if(mfigMode()==='std'||mfigMode()==='cad') return 'hand';
@@ -8790,7 +8791,9 @@ function mfigLoad(v, done){
 }
 function mfigModeUI(){
   var bar=$('#mfigmode'); if(!bar) return;
-  bar.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-mode')===mfigMode(); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); b.onclick=function(){ mfigSetMode(this.getAttribute('data-mode')); }; });
+  var g=mfigGalvo();
+  bar.querySelectorAll('button').forEach(function(b){ var m=b.getAttribute('data-mode'); b.disabled=!g && m!=='cad'; b.title=b.disabled? 'The anatomy figure draws the galvo workstations; this machine is shown in 3D' : ''; });
+  bar.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-mode')===(g? mfigMode() : 'cad'); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); b.onclick=function(){ mfigSetMode(this.getAttribute('data-mode')); }; });
 }
 function mfigSetMode(m){ MFIG.mode=MFIG_MODES.indexOf(m)>=0? m : 'combo'; Store.set('teal.mfig', MFIG.mode); MFIG.key=''; mfigModeUI(); mfigSync(); }
 function mfigSync(){
@@ -8800,11 +8803,14 @@ function mfigSync(){
     if(!sec.hidden){ sec.hidden=true; try{ A&&A.ws&&A.ws.mount&&A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} MFIG.key=''; }
     return;
   }
-  var v=mfigVariant(), key=encodeState().replace(/(^|&)t=\d+/,'')+'|'+mfigMode()+'|'+v;
+  var v=mfigVariant(), key=encodeState().replace(/(^|&)t=\d+/,'')+'|'+mfigMode()+'|'+v+'|'+(P()? P().deliv : '');
   sec.hidden=false; mfigModeUI();
   if(key===MFIG.key) return;
   MFIG.key=key;
-  var mode=mfigMode(), cad=mode==='cad', combo=mode==='combo', h2=$('#mfighost'), h3=$('#mfig3d');
+  var mode=mfigMode(), galvo=mfigGalvo();
+  if(!galvo) mode='cad';                             /* only the 3D view draws the gantry, the robot cell and the cart */
+  var cad=mode==='cad', combo=mode==='combo', h2=$('#mfighost'), h3=$('#mfig3d');
+  sec.classList.toggle('nogalvo', !galvo);
   h2.hidden=cad; h3.hidden=!(cad||combo); sec.classList.toggle('combo', combo);
   MFIG.t0=performance.now();
   if(cad){ try{ A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} mfigCad(key); return; }
@@ -8839,16 +8845,17 @@ function mfigCad(key){
     var pr=mfigPhases(), dm=machineDims(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
     var src=SRC[S.src];
     MFIG.cad=m.mount(h3, {
-      dims:{w:dm.w, d:dm.d, h:dm.h, cv:dm.cv}, phases:pr.ph, real:pr.real, live:mfigLive, segs:segs, fx:procFX(),
+      dims:{w:dm.w, d:dm.d, h:dm.h, cv:dm.cv}, deliv:P().deliv, style:mfigStyle(), phases:pr.ph, real:pr.real, live:mfigLive, segs:segs, fx:procFX(),
       tint:mfigTint(), beamCol: src? parseInt(String(src.col).slice(1),16) : 0xff5533, title:P().n, desig:desig(),
       caption:mfigCadCaption(pr, dm), clock:mfigClock
     });
-    if(mfigMode()==='cad') $('#mfig').setAttribute('data-variant','cad');
+    if(mfigMode()==='cad' || !mfigGalvo()) $('#mfig').setAttribute('data-variant','cad');
   }).catch(function(){ h3.textContent='The 3D view could not be loaded in this browser.'; });
 }
 function mfigCadCaption(pr, dm){
   var p=P(), L=LENS[S.lens], src=SRC[S.src], proc=null; pr.ph.forEach(function(x){ if(x.k==='PROCESS') proc=x; });
-  return 'The '+p.n+' rendered in 3D at its '+(dm.stated? 'stated' : 'estimated')+' size, '+inr(dm.w)+' × '+inr(dm.d)+' × '+inr(dm.h)+' mm, with a '+src.n+' '+src.wl+' source and the '+L.n+' objective. '+
+  var kind={gantry:'A gantry cutting table: the head travels the process path on two axes over a sheet on the slat bed. ', robot:'A robot cell: a six-axis arm, solved by inverse kinematics each frame, carries the laser head along the path over the part on the table. ', handpiece:'A handheld cleaning cart: the head on its hose is swept over a plate on a stand, as an operator would. '}[p.deliv]||'';
+  return kind+'The '+p.n+' rendered in 3D at its '+(dm.stated? 'stated' : 'estimated')+' size, '+inr(dm.w)+' × '+inr(dm.d)+' × '+inr(dm.h)+' mm, with a '+src.n+' '+src.wl+' source and the '+L.n+' objective. '+
     'It runs the same cycle as the simulation: '+(proc? proc.n.toLowerCase()+' '+proc.real.toFixed(2)+' s of a ' : 'a ')+pr.real.toFixed(2)+' s cycle; the marks are this application’s own path. '+
     'The frame profile, linear rails, Z stepper, emergency stop, push-buttons and fans are real component models from the FreeCAD parts library (CC-BY 3.0: profile by mathis, MGN12 rail by Adrian McEwen, NEMA 23 by Charles Fox, buttons by Henrique Enzweiler, fan by WladIMirG and obijuan). '+
     'The panels, scan head, objective, clamps, light tower and screen are drawn to indicate their form. The window tint stands for laser-safety glazing for this wavelength; the beam is drawn although an infrared or UV beam is invisible. Indicative, not a CAD model of a TEAL machine.';
