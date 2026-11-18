@@ -13,6 +13,7 @@
 <meta property="og:url" content="https://songarajatin225-a11y.github.io/TEAL-Laser-Product-Sim-2/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="anatomy.css">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <script src="boot.js"></script>
@@ -354,6 +355,8 @@ body.access-internal #accStaff{display:none}
 .flinkb{background:none;border:0;padding:0;font:inherit;font-size:12px;color:var(--teal-deep);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .flinkb:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:2px}
 .fmtrow{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+
+@media print{.figslot{display:none}}
 
 /* ---------- fields ---------- */
 .field{margin-bottom:26px}
@@ -2059,7 +2062,7 @@ body.demo #demobar{display:flex}
   </div>
   <div class="fbot">
     <span>© <span id="yr"></span> Titan Engineering &amp; Automation Ltd — A TATA Enterprise</span>
-    <span class="facc"><button type="button" class="flink" id="accStaff">Staff access</button><button type="button" class="flink" id="accLock">Lock</button><span id="stamp">Configurator v17.0</span></span>
+    <span class="facc"><button type="button" class="flink" id="accStaff">Staff access</button><button type="button" class="flink" id="accLock">Lock</button><span id="stamp">Configurator v18.0</span></span>
   </div>
 </div></footer>
 
@@ -2147,6 +2150,7 @@ body.demo #demobar{display:flex}
 
 <div id="sheet"></div>
 
+<script src="anatomy.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -870,6 +870,45 @@ try {
   await pg.close();
 
   /* ------------------------------------------------------------------ */
+  sec('Fig 1 — the galvo scan head');
+  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254');
+  const fig = await pg.evaluate(async () => {
+    reach = 5; go(3); const slot = document.querySelector('.figslot'); if (!slot) return { slot: false };
+    slot.scrollIntoView(); await new Promise(r => setTimeout(r, 400));
+    const ro = () => slot.querySelector('[data-readout]').textContent;
+    const out = { slot: true, svg: !!slot.querySelector('svg.iso-svg[role=img][aria-label]'), stage: slot.querySelector('.iso-stage').getAttribute('role'),
+      cap: slot.querySelector('.iso-caption').textContent, mirrors: slot.querySelectorAll('[data-part=xmirror] .iso-solid, [data-part=ymirror] .iso-solid').length,
+      beam: [...slot.querySelectorAll('[data-part^=beam]')].every(p => (p.getAttribute('d') || '').length > 4) };
+    return out; });
+  check('the Source step shows Fig 1, a framed figure with a description, a keyboard control and both mirrors', fig.slot && fig.svg && fig.stage === 'slider' && fig.mirrors === 2 && fig.beam, JSON.stringify(fig));
+  check('its caption takes the objective, field and spot from the configuration', /F254 objective \(f = 254 mm, field 175 × 175 mm\)/.test(fig.cap) && /± 9\.87°/.test(fig.cap) && /about 32 µm/.test(fig.cap), fig.cap);
+  await pg.focus('.figslot .iso-stage');
+  // Press a key, then wait until the readout has left its value from before the key and stays put for two polls in a row.
+  const roText = () => pg.evaluate(() => document.querySelector('.figslot [data-readout]').textContent);
+  const pressSettle = async (key, times = 1) => {
+    const before = await roText();
+    for (let i = 0; i < times; i++) { await pg.keyboard.press(key); await pg.waitForTimeout(80); }
+    await pg.waitForFunction((b) => { const t = document.querySelector('.figslot [data-readout]').textContent; if (t === b) { window.__ro = null; window.__roN = 0; return false; } window.__roN = t === window.__ro ? (window.__roN || 0) + 1 : 0; window.__ro = t; return window.__roN >= 2; }, before, { polling: 200, timeout: 6000 }).catch(() => {});
+  };
+  await pressSettle('End', 2);
+  const corner = await pg.evaluate(() => document.querySelector('.figslot [data-readout]').textContent);
+  check('at the field corner each mirror reads x / 2f — the f-theta relation — for the configured objective', corner === 'X +9.87° · Y +9.87° · spot 87.50, 87.50 mm', corner);
+  await pressSettle('Home');
+  const home = await pg.evaluate(() => document.querySelector('.figslot [data-readout]').textContent);
+  check('Home centres the spot and both mirrors return to zero', home === 'X +0.00° · Y +0.00° · spot 0.00, 0.00 mm', home);
+  const fig2 = await pg.evaluate(async () => {
+    const out = {};
+    themeApply('dark'); out.dark = document.querySelector('.tealfig').dataset.theme; themeApply('light'); out.light = document.querySelector('.tealfig').dataset.theme;
+    restore({ plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f420', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(3);
+    out.cap420 = document.querySelector('.figslot .iso-caption').textContent.match(/± [\d.]+°/)[0];
+    restore({ plat: 'cutxt', app: 'thinmetal', src: 'fiber', pw: 500, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(3);
+    out.gantry = !!document.querySelector('.figslot');
+    return out; });
+  check('the figure follows the theme, changes with the objective, and is not shown on a gantry table', fig2.dark === 'dark' && fig2.light === 'light' && fig2.cap420 === '± 10.23°' && !fig2.gantry, JSON.stringify(fig2));
+  check('no script errors in Fig 1', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
   sec('Access passkeys');
   const shipped = (() => {
     const page = readFileSync(join(ROOT, 'app.js'), 'utf8'), file = JSON.parse(readFileSync(join(ROOT, 'access.json'), 'utf8'));
