@@ -373,6 +373,17 @@ body.access-internal #accStaff{display:none}
 .mfigmode button.on{background:var(--ink,#0E1A24);color:var(--card,#fff)}
 .mfigmode button:focus-visible{outline:2px solid var(--ink-2,#556);outline-offset:-2px}.tealws .ws-zoom:focus-visible{outline:2px solid var(--anatomy-muted);outline-offset:2px}
 @media print{.mfig{display:none}}
+.mfig.combo .mfigviews{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:1100px){.mfig.combo .mfigviews{grid-template-columns:1fr}}
+.cad3d{margin-top:10px;border:1px solid var(--line,#d5dde3);border-radius:12px;overflow:hidden;background:radial-gradient(120% 90% at 50% 35%,#f7f9fa 0%,#e3e8ec 70%,#d5dce1 100%)}
+:root[data-theme="dark"] .cad3d{background:radial-gradient(120% 90% at 50% 35%,#2a3540 0%,#141b22 72%,#0d1218 100%);border-color:#24303a}
+.cad3d-stage{width:100%;touch-action:pan-y;outline:none;cursor:grab}.cad3d-stage canvas{display:block;width:100%}
+.cad3d-stage:focus-visible{outline:2px solid var(--ink-2,#556);outline-offset:-2px}
+.cad3d-bar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:10px 14px;border-top:1px solid var(--line,#d5dde3);font:500 11px/1.4 var(--mono,ui-monospace,monospace);letter-spacing:.06em;color:var(--ink-2,#556);background:var(--card,#fff)}
+.cad3d-btns{display:inline-flex;gap:6px}.cad3d-btns button{font:600 11px/1 var(--mono,ui-monospace,monospace);text-transform:uppercase;letter-spacing:.08em;padding:7px 10px;min-height:32px;border:1px solid var(--line,#d5dde3);border-radius:6px;background:transparent;color:inherit;cursor:pointer}
+.cad3d-btns button[aria-pressed="true"]{background:var(--ink,#0E1A24);color:var(--card,#fff)}
+.cad3d-readout{margin-left:auto;color:var(--ink,#0E1A24)}
+.cad3d-cap{margin:0;padding:10px 14px 14px;font-size:13px;line-height:1.5;color:var(--ink-3,#64748B);background:var(--card,#fff)}
 
 /* ---------- fields ---------- */
 .field{margin-bottom:26px}
@@ -2046,9 +2057,9 @@ body.demo #demobar{display:flex}
     </aside>
   </div>
   <section class="mfig" id="mfig" aria-label="The workstation through one run cycle" hidden>
-    <div class="mfighead"><span class="l">Fig 2 · The workstation, drawn</span><span class="d">The configured machine through the simulation’s own run cycle. Start the simulation in the viewer to run it live.</span>
-      <span class="mfigmode" id="mfigmode" role="group" aria-label="Drawing detail"><button type="button" data-mode="det" aria-pressed="true">Detailed</button><button type="button" data-mode="std" aria-pressed="false">Standard</button></span></div>
-    <div id="mfighost"></div>
+    <div class="mfighead"><span class="l">The workstation · 3D and anatomy</span><span class="d">The configured machine, rendered in 3D and drawn as an anatomy figure, both running the simulation’s own cycle on one clock. Start the simulation in the viewer to run them live.</span>
+      <span class="mfigmode" id="mfigmode" role="group" aria-label="View"><button type="button" data-mode="combo" aria-pressed="true">3D + drawing</button><button type="button" data-mode="cad" aria-pressed="false">3D</button><button type="button" data-mode="det" aria-pressed="false">Drawing</button><button type="button" data-mode="std" aria-pressed="false">Standard</button></span></div>
+    <div class="mfigviews"><div id="mfig3d" hidden></div><div id="mfighost"></div></div>
   </section>
 </div>
 <section class="wrap ws" id="ws" aria-label="Internal workspace" hidden></section>
@@ -2083,7 +2094,7 @@ body.demo #demobar{display:flex}
   </div>
   <div class="fbot">
     <span>© <span id="yr"></span> Titan Engineering &amp; Automation Ltd — A TATA Enterprise</span>
-    <span class="facc"><button type="button" class="flink" id="accStaff">Staff access</button><button type="button" class="flink" id="accLock">Lock</button><span id="stamp">Configurator v20.0</span></span>
+    <span class="facc"><button type="button" class="flink" id="accStaff">Staff access</button><button type="button" class="flink" id="accLock">Lock</button><span id="stamp">Configurator v21.0</span></span>
   </div>
 </div></footer>
 

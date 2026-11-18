@@ -327,7 +327,8 @@ function mountWS(host, cfg) {
     if (lv) { var ph = lv.phases[lv.i]; draw(ph.k, lv.u, ph, lv.real, lv, lv.fault || lv.paused ? 0 : dt); return; }
     var P0 = cfg.phases; if (!P0 || !P0.length) return;
     if (still.matches) { var pi = 0; for (var j = 0; j < P0.length; j++) if (P0[j].k === "PROCESS") pi = j; draw("PROCESS", 1, P0[pi], cfg.real, null, 0); return; }
-    if (st.paused > 0) st.paused -= dt; else st.t += dt;
+    /* a shared clock keeps this figure and the 3D view on the same moment */
+    if (st.paused > 0) st.paused -= dt; else if (cfg.clock) st.t = cfg.clock(); else st.t += dt;
     var tot = 0, i; for (i = 0; i < P0.length; i++) tot += P0[i].d;
     st.t = ((st.t % tot) + tot) % tot;
     var acc = 0; for (i = 0; i < P0.length; i++) { if (st.t < acc + P0[i].d) break; acc += P0[i].d; }

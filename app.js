@@ -8728,14 +8728,17 @@ function simStop(){
 var MFIG={key:'', on:false, mode:null};
 /* Detailed draws the configuration's own handling station and the process effects;
    Standard keeps the plain workstation of v19, loaded by hand, without effects. */
-function mfigMode(){ if(!MFIG.mode) MFIG.mode=Store.get('teal.mfig','det')==='std'? 'std' : 'det'; return MFIG.mode; }
+var MFIG_MODES=['combo','det','std','cad'];
+function mfigMode(){ if(!MFIG.mode){ var m=Store.get('teal.mfig','combo'); MFIG.mode=MFIG_MODES.indexOf(m)>=0? m : 'combo'; } return MFIG.mode; }
+/* one preview clock for every view of the cycle */
+function mfigClock(){ if(!MFIG.t0) MFIG.t0=performance.now(); return (performance.now()-MFIG.t0)/1000; }
 function mfigFits(){
   var p=P();
   return !!(p && (p.deliv==='galvo'||p.deliv==='galvo2') && S.app && S.src && S.lens && S.pw!=null);
 }
 /* which drawing: the station the simulation's own loadKind() moves the part with */
 function mfigVariant(){
-  if(mfigMode()==='std') return 'hand';
+  if(mfigMode()==='std'||mfigMode()==='cad') return 'hand';
   var lk=loadKind();
   return {belt:'belt', mag:'mag', tray:'tray', chute:'chute', arm:'arm', dial: hasMod('rotoidx')? 'dial4' : 'dial2'}[lk] || 'hand';
 }
@@ -8759,7 +8762,7 @@ function mfigLive(){
   return {phases:SIM.phases, i:SIM.ph||0, u:SIM.u||0, real:SIM.realS, fault:!!SIM.fault, paused:simRate()===0};
 }
 function mfigCaption(pr, v){
-  var p=P(), L=LENS[S.lens], src=SRC[S.src], mods=[], lk=loadKind(), det=mfigMode()==='det';
+  var p=P(), L=LENS[S.lens], src=SRC[S.src], mods=[], lk=loadKind(), det=mfigMode()!=='std';
   if(hasMod('visfid')||hasMod('visver')) mods.push('the vision camera with its ring light ('+(hasMod('visfid')&&hasMod('visver')?'locate and grade':hasMod('visfid')?'locate':'grade')+')');
   if(hasMod('autofoc')) mods.push('the auto-focus sensor');
   if(hasMod('fume')) mods.push('the fume extractor and its hose');
@@ -8789,7 +8792,7 @@ function mfigModeUI(){
   var bar=$('#mfigmode'); if(!bar) return;
   bar.querySelectorAll('button').forEach(function(b){ var on=b.getAttribute('data-mode')===mfigMode(); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); b.onclick=function(){ mfigSetMode(this.getAttribute('data-mode')); }; });
 }
-function mfigSetMode(m){ MFIG.mode=m==='std'? 'std' : 'det'; Store.set('teal.mfig', MFIG.mode); MFIG.key=''; mfigModeUI(); mfigSync(); }
+function mfigSetMode(m){ MFIG.mode=MFIG_MODES.indexOf(m)>=0? m : 'combo'; Store.set('teal.mfig', MFIG.mode); MFIG.key=''; mfigModeUI(); mfigSync(); }
 function mfigSync(){
   var sec=$('#mfig'); if(!sec) return;
   var A=window.TEALAnatomy, ok=mfigFits() && A && A.ws && A.ws.mount;
@@ -8801,21 +8804,56 @@ function mfigSync(){
   sec.hidden=false; mfigModeUI();
   if(key===MFIG.key) return;
   MFIG.key=key;
+  var mode=mfigMode(), cad=mode==='cad', combo=mode==='combo', h2=$('#mfighost'), h3=$('#mfig3d');
+  h2.hidden=cad; h3.hidden=!(cad||combo); sec.classList.toggle('combo', combo);
+  MFIG.t0=performance.now();
+  if(cad){ try{ A.ws.mount.stop&&A.ws.mount.stop(); }catch(e){} mfigCad(key); return; }
+  if(combo) mfigCad(key);
+  else { try{ if(MFIG.cad){ MFIG.cad.stop(); MFIG.cad=null; } h3.innerHTML=''; }catch(e){} }
   mfigLoad(v, function(have){
     if(MFIG.key!==key) return;                       /* the configuration moved on while it loaded */
     var use=have? v : 'hand';
     try{
       var pr=mfigPhases(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
       A.ws.mount($('#mfighost'), {
-        variant:use, effects:mfigMode()==='det', fx:procFX(),
+        variant:use, effects:mfigMode()!=='std', fx:procFX(),
         opts:{cam:hasMod('visfid')||hasMod('visver'), af:hasMod('autofoc'), fume:hasMod('fume')},
-        segs:segs, phases:pr.ph, real:pr.real, caption:mfigCaption(pr, use), live:mfigLive
+        segs:segs, phases:pr.ph, real:pr.real, caption:mfigCaption(pr, use), live:mfigLive, clock:mfigClock
       });
       sec.setAttribute('data-variant', use);
     }catch(e){ sec.hidden=true; MFIG.key=''; }
   });
 }
-function mfigWake(){ try{ var A=window.TEALAnatomy; if(A&&A.ws&&A.ws.mount.wake) A.ws.mount.wake(); }catch(e){} }
+/* Fig 3 mode: the same cycle as a WebGL render (cad3d.js, three.js), loaded on demand */
+function mfigTint(){
+  var wl=SRC[S.src]? SRC[S.src].wl : '', nm=parseFloat(String(wl).replace(',',''));
+  if(/µm/.test(wl)) return 0xd5dde2;            /* CO₂: clear polycarbonate stops 9–11 µm */
+  if(nm<400) return 0xe0901c;                   /* UV: amber */
+  if(nm<600) return 0xc2412c;                   /* green or blue: red-orange */
+  return 0x4d8a3b;                              /* near infrared: green */
+}
+function mfigCad(key){
+  var h3=$('#mfig3d');
+  import('./cad3d.js').then(function(m){
+    if(MFIG.key!==key) return;
+    var pr=mfigPhases(), dm=machineDims(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
+    var src=SRC[S.src];
+    MFIG.cad=m.mount(h3, {
+      dims:{w:dm.w, d:dm.d, h:dm.h, cv:dm.cv}, phases:pr.ph, real:pr.real, live:mfigLive, segs:segs, fx:procFX(),
+      tint:mfigTint(), beamCol: src? parseInt(String(src.col).slice(1),16) : 0xff5533, title:P().n,
+      caption:mfigCadCaption(pr, dm), clock:mfigClock
+    });
+    if(mfigMode()==='cad') $('#mfig').setAttribute('data-variant','cad');
+  }).catch(function(){ h3.textContent='The 3D view could not be loaded in this browser.'; });
+}
+function mfigCadCaption(pr, dm){
+  var p=P(), L=LENS[S.lens], src=SRC[S.src], proc=null; pr.ph.forEach(function(x){ if(x.k==='PROCESS') proc=x; });
+  return 'The '+p.n+' rendered in 3D at its '+(dm.stated? 'stated' : 'estimated')+' size, '+inr(dm.w)+' × '+inr(dm.d)+' × '+inr(dm.h)+' mm, with a '+src.n+' '+src.wl+' source and the '+L.n+' objective. '+
+    'It runs the same cycle as the simulation: '+(proc? proc.n.toLowerCase()+' '+proc.real.toFixed(2)+' s of a ' : 'a ')+pr.real.toFixed(2)+' s cycle; the marks are this application’s own path. '+
+    'The frame profile, linear rails, Z stepper, emergency stop, push-buttons and fans are real component models from the FreeCAD parts library (CC-BY 3.0: profile by mathis, MGN12 rail by Adrian McEwen, NEMA 23 by Charles Fox, buttons by Henrique Enzweiler, fan by WladIMirG and obijuan). '+
+    'The panels, scan head, objective, clamps, light tower and screen are drawn to indicate their form. The window tint stands for laser-safety glazing for this wavelength; the beam is drawn although an infrared or UV beam is invisible. Indicative, not a CAD model of a TEAL machine.';
+}
+function mfigWake(){ try{ var A=window.TEALAnatomy; if(A&&A.ws&&A.ws.mount.wake) A.ws.mount.wake(); if(MFIG.cad&&MFIG.cad.wake) MFIG.cad.wake(); }catch(e){} }
 function simPhaseAt(t){
   var acc=0, i;
   for(i=0;i<SIM.phases.length;i++){
@@ -13722,7 +13760,7 @@ function storyInit(){
 }
 
 /* ---- init -------------------------------------------------------------- */
-$('#stamp').textContent='Configurator v20.0 · '+new Date().getFullYear();
+$('#stamp').textContent='Configurator v21.0 · '+new Date().getFullYear();
 loadData(function(){
   var wantAdmin = /(^|[#&])admin(=|&|$)/.test(location.hash);
   var hadHash = readHash();
