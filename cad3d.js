@@ -546,9 +546,9 @@ function movesOf(segs) {
   return { mv, tot: tot || 1 };
 }
 
-let current = null;
+/* one render per container: the figure section and the main viewer can each hold one */
 export function mount(host, cfg) {
-  if (current) current.stop();
+  if (host.__cad) host.__cad.stop();
   host.innerHTML = "";
   const wrap = document.createElement("div"); wrap.className = "cad3d";
   wrap.innerHTML = '<div class="cad3d-stage" tabindex="0" role="img" aria-label="The configured workstation rendered in 3D, running the simulation’s cycle. Drag to turn it."></div>' +
@@ -559,7 +559,8 @@ export function mount(host, cfg) {
   if (cfg.caption) capEl.textContent = cfg.caption;
   let stopped = false, frame = 0, visible = false, renderer = null;
   const api = { stop() { stopped = true; if (frame) cancelAnimationFrame(frame); frame = 0; if (io) io.disconnect(); if (renderer) { renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); } }, ready: false };
-  current = api;
+  host.__cad = api;
+  if (cfg.bare) wrap.classList.add('cad3d-bare');
   let io = null;
   (async () => {
     let G;
@@ -594,6 +595,7 @@ export function mount(host, cfg) {
     const camera = new THREE.PerspectiveCamera(32, 1, 20, 20000);
     const target = new THREE.Vector3(-W * 0.05, H * 0.52, 0);
     const home = new THREE.Vector3(W * 2.0, H * 0.98, D * 3.15);
+    if (cfg.bare) home.sub(target).multiplyScalar(1.3).add(target);   /* the viewer is small and carries its own readouts */
     camera.position.copy(home);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.copy(target); controls.enableDamping = true; controls.enableZoom = false; controls.enablePan = false;
@@ -603,7 +605,7 @@ export function mount(host, cfg) {
     controls.update();
     const still = matchMedia("(prefers-reduced-motion: reduce)");
     function size() {
-      const w = stage.clientWidth || 800, h = Math.round(Math.min(Math.max(w * 0.62, 320), window.innerHeight * 0.82));
+      const w = stage.clientWidth || 800, h = cfg.bare ? (host.clientHeight || 455) : Math.round(Math.min(Math.max(w * 0.62, 320), window.innerHeight * 0.82));
       renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
     }
     size(); addEventListener("resize", size);

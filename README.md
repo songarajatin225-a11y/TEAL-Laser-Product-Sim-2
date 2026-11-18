@@ -1236,7 +1236,7 @@ manifest, if a component in the 3D model has no manifest record (or the reverse)
 record names a GLB that is missing or claims an exact match without a part number.
 
 `tests/e2e.mjs` serves the repository on a free local port and drives the page in
-headless Chromium: 218 checks across navigation, pricing reconciliation, the BOM,
+headless Chromium: 219 checks across navigation, pricing reconciliation, the BOM,
 fit and considerations, the 3D view, the component explorer, CAD loading,
 kinematics, mechanisms, the 3D comparison, the engineering assistant, the guided
 missions, the run cycle and its scrubbing, the presentation, the machine story,
@@ -2261,6 +2261,8 @@ the live run, including pause, scrub and stoppages.
 
 The marks follow the process: a mark, a cut kerf, a weld bead with heat tint, or a cleaned stripe through rust.
 
+**A new view in the main viewer.** The Machine Nameplate viewer's *View mode* panel gains **Realistic** beside Solid, Cutaway, X-ray and Exploded (key 5). It overlays the same 3D render inside the viewer, with the viewer's own readouts and run controls on top, for every one of the 22 platforms. The existing modes are unchanged, and choosing any of them returns to the existing view. All 22 platforms were opened in the 3D view and each built and ran without a script error.
+
 **Real component models, with credit.** These parts are real catalogue models from the
 [FreeCAD parts library](https://github.com/FreeCAD/FreeCAD-library), which is licensed
 CC-BY 3.0:
@@ -2287,7 +2289,7 @@ The choice is remembered in the browser.
 **Size.** The 3D code, three.js and the seven meshes add about 1.6 MB (uncompressed), loaded
 only when a 3D view is shown and cached for offline use afterwards.
 
-**Checked.** 218 browser checks. The new ones cover:
+**Checked.** 219 browser checks. The new ones cover:
 - the combined layout
 - the seven credited models
 - the size caption

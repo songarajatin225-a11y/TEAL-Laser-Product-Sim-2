@@ -8860,7 +8860,33 @@ function mfigCadCaption(pr, dm){
     'The frame profile, linear rails, Z stepper, emergency stop, push-buttons and fans are real component models from the FreeCAD parts library (CC-BY 3.0: profile by mathis, MGN12 rail by Adrian McEwen, NEMA 23 by Charles Fox, buttons by Henrique Enzweiler, fan by WladIMirG and obijuan). '+
     'The panels, scan head, objective, clamps, light tower and screen are drawn to indicate their form. The window tint stands for laser-safety glazing for this wavelength; the beam is drawn although an infrared or UV beam is invisible. Indicative, not a CAD model of a TEAL machine.';
 }
-function mfigWake(){ try{ var A=window.TEALAnatomy; if(A&&A.ws&&A.ws.mount.wake) A.ws.mount.wake(); if(MFIG.cad&&MFIG.cad.wake) MFIG.cad.wake(); }catch(e){} }
+/* The main viewer's Realistic view: cad3d.js in an overlay inside the viewer, sharing the
+   simulation's cycle; the existing canvas renderer stays underneath, unchanged. */
+var VREAL={on:false, key:''};
+function vrealSet(on){
+  VREAL.on=!!on;
+  var b=$('#vrealBtn'); if(b){ b.setAttribute('aria-pressed', VREAL.on?'true':'false'); b.classList.toggle('on', VREAL.on); }
+  try{ buildLayerPanel(); }catch(e){}
+  var host=$('#v3dreal');
+  if(!VREAL.on){ if(host){ if(host.__cad) host.__cad.stop(); host.remove(); } VREAL.key=''; $('#v3d').classList.remove('real'); return; }
+  $('#v3d').classList.add('real');
+  vrealSync();
+}
+function vrealSync(){
+  if(!VREAL.on) return;
+  var v3=$('#v3d'), host=$('#v3dreal');
+  if(!host){ host=el('div','v3dreal'); host.id='v3dreal'; var cv=$('#mcanvas'); cv.parentNode.insertBefore(host, cv.nextSibling); }
+  if(!mfigFits()){ host.innerHTML='<p class="v3drealmsg">Choose a platform, application, source, power and objective to see it rendered.</p>'; VREAL.key=''; return; }
+  var key=encodeState().replace(/(^|&)t=\d+/,'')+'|'+P().deliv;
+  if(key===VREAL.key) return; VREAL.key=key;
+  import('./cad3d.js').then(function(m){
+    if(!VREAL.on || VREAL.key!==key) return;
+    var pr=mfigPhases(), dm=machineDims(), src=SRC[S.src], segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
+    m.mount(host, { bare:true, dims:{w:dm.w, d:dm.d, h:dm.h, cv:dm.cv}, deliv:P().deliv, style:mfigStyle(), phases:pr.ph, real:pr.real, live:mfigLive, segs:segs, fx:procFX(),
+      tint:mfigTint(), beamCol: src? parseInt(String(src.col).slice(1),16) : 0xff5533, title:P().n, desig:desig(), clock:mfigClock });
+  }).catch(function(){ host.innerHTML='<p class="v3drealmsg">This browser cannot show the realistic view.</p>'; });
+}
+function mfigWake(){ try{ var A=window.TEALAnatomy; if(A&&A.ws&&A.ws.mount.wake) A.ws.mount.wake(); if(MFIG.cad&&MFIG.cad.wake) MFIG.cad.wake(); var h=$('#v3dreal'); if(h&&h.__cad&&h.__cad.wake) h.__cad.wake(); }catch(e){} }
 function simPhaseAt(t){
   var acc=0, i;
   for(i=0;i<SIM.phases.length;i++){
@@ -9939,6 +9965,7 @@ function m3dInit(){
     pv.appendChild(bt);
   });
 
+
   /* tool buttons */
   var ct=$('#v3dctl');
   function tool(icon,title,fn,state){
@@ -10027,7 +10054,8 @@ function m3dInit(){
     if(e.key==='Escape' && M3D.iso){ isoSet(null); return; }
     if(e.key==='Escape' && ((M3D.sel&&M3D.sel.length)||M3D.isoSel)){ expClear(); return; }
     var k=e.key.toLowerCase(), i=['1','2','3','4'].indexOf(e.key);
-    if(i>=0){ M3D.vmode=VMODES[i][0]; buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
+    if(i>=0){ vrealSet(false); M3D.vmode=VMODES[i][0]; buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
+    if(e.key==='5'){ vrealSet(!VREAL.on); e.preventDefault(); return; }
     if(LKEY[k]){ M3D.layers[LKEY[k]]=!(M3D.layers[LKEY[k]]!==false); buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); return; }
     if(k==='l'){ M3D.tags=!M3D.tags; M3D.vp.o.tags=M3D.tags; buildLayerPanel(); M3D.vp.dirty=true; e.preventDefault(); }
   });
@@ -10108,10 +10136,15 @@ function buildLayerPanel(){
   pn.appendChild(el('h5','','View mode'));
   var vm=el('div','vmode');
   VMODES.forEach(function(m){
-    var b2=el('button', M3D.vmode===m[0]?'on':'', m[1]);
-    b2.onclick=function(){ M3D.vmode=m[0]; buildLayerPanel(); M3D.vp.dirty=true; };
+    var b2=el('button', !VREAL.on && M3D.vmode===m[0]?'on':'', m[1]);
+    b2.onclick=function(){ vrealSet(false); M3D.vmode=m[0]; buildLayerPanel(); M3D.vp.dirty=true; };
     vm.appendChild(b2);
   });
+  /* a new view beside the existing ones: the realistic render of the same machine, running the same cycle */
+  var rb=el('button', VREAL.on?'on vreal':'vreal', 'Realistic'); rb.id='vrealBtn';
+  rb.title='Realistic 3D render of this machine, running the same cycle'; rb.setAttribute('aria-pressed', VREAL.on?'true':'false');
+  rb.onclick=function(){ vrealSet(!VREAL.on); buildLayerPanel(); };
+  vm.appendChild(rb);
   pn.appendChild(vm);
   if(M3D.vmode==='exploded'){
     var sp=el('div','lsep','<label for="expK">Separation <b>'+Math.round(M3D.expK*100)+' %</b></label>'+
@@ -10196,6 +10229,7 @@ function compFocus(gid, cid){
 /* build-stack list, headline and run controls */
 function m3dSync(){
   try{ mfigSync(); }catch(e){}
+  try{ vrealSync(); }catch(e){}
   if(!M3D.vp) return;
   var changed=mmSyncGroups(), p=P();
   var nm=$('#v3dname');

@@ -161,7 +161,7 @@ try {
   const modes = await pg.evaluate(() => { const pn = document.getElementById('v3dlay').getBoundingClientRect();
     return [...document.querySelectorAll('#v3dlay .vmode button')].map(b => { const r = b.getBoundingClientRect();
       return { t: b.textContent, inside: r.left >= pn.left - 1 && r.right <= pn.right + 1 }; }); });
-  check('all four view modes are reachable inside the layer panel', modes.length === 4 && modes.every(m => m.inside), modes.map(m => m.t + (m.inside ? '' : '(clipped)')).join(' '));
+  check('all five view modes (with the new Realistic) are reachable inside the layer panel', modes.length === 5 && modes[4].t === 'Realistic' && modes.every(m => m.inside), modes.map(m => m.t + (m.inside ? '' : '(clipped)')).join(' '));
   const geo = await pg.evaluate(() => {
     const build = () => { const b = new B3(); b.q = 1; b.lod = 1; mmBuild(b, M3D.vp.T, null); return b; };
     const minY = id => { let m = 1e9; build().f.forEach(f => { if (f.gid === id && !f.kind) f.v.forEach(v => { m = Math.min(m, v[1]); }); }); return m; };
@@ -1048,6 +1048,13 @@ try {
       cap: new RegExp(x.re).test(document.querySelector('.cad3d-cap').textContent), style: mfigStyle() === x.style }), { ...st, re: st.re.source }));
   }
   check('the gantry table, the robot cell and the cleaning cart each have a running 3D model, with the marks of their own process', kinds.every((k) => k.ready && k.drawingHidden && k.onlyCad && k.cap && k.style), JSON.stringify(kinds));
+  /* the main viewer gains a Realistic view; its other presets stay and switch back to the existing renderer */
+  await pg.evaluate(() => { restore({ plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5); document.querySelector('#vrealBtn').click(); });
+  await pg.waitForFunction(() => { const h = document.querySelector('#v3dreal'); return h && h.__cad && h.__cad.ready; }, null, { timeout: 45000 }).catch(() => {});
+  const vr = await pg.evaluate(() => { const h = document.querySelector('#v3dreal'), out = { on: !!(h && h.__cad && h.__cad.ready), pressed: document.querySelector('#vrealBtn').getAttribute('aria-pressed'),
+    modes: [...document.querySelectorAll('#v3dlay .vmode button')].map((b) => b.textContent).join(','), canvasKept: !!document.querySelector('#mcanvas') };
+    document.querySelector('#v3dlay .vmode button').click(); out.offAfterSolid = !document.querySelector('#v3dreal') && document.querySelector('#vrealBtn').getAttribute('aria-pressed') === 'false'; return out; });
+  check('the main viewer has a new Realistic view mode; Solid, Cutaway, X-ray and Exploded stay and switch back to the existing view', vr.on && vr.pressed === 'true' && vr.modes === 'Solid,Cutaway,X-ray,Exploded,Realistic' && vr.canvasKept && vr.offAfterSolid, JSON.stringify(vr));
   check('no script errors in the 3D view', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
 

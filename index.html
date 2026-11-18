@@ -376,6 +376,12 @@ body.access-internal #accStaff{display:none}
 .mfig.combo .mfigviews{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
 @media(max-width:1100px){.mfig.combo .mfigviews{grid-template-columns:1fr}}
 .mfigmode button:disabled{opacity:.4;cursor:not-allowed}
+.v3dreal{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 35%,#2a3540 0%,#141b22 72%,#0d1218 100%)}
+.v3dreal .cad3d{margin:0;border:0;border-radius:0;height:100%;background:transparent}
+.v3dreal .cad3d-bar,.v3dreal .cad3d-cap{display:none}
+.v3dreal .cad3d-stage{height:100%}
+.v3drealmsg{position:absolute;inset:auto 0 45% 0;text-align:center;color:#a8b9c5;font-size:13px;margin:0}
+#v3dview .vreal{border-left:1px solid rgba(255,255,255,.18)}
 .cad3d{margin-top:10px;border:1px solid var(--line,#d5dde3);border-radius:12px;overflow:hidden;background:radial-gradient(120% 90% at 50% 35%,#f7f9fa 0%,#e3e8ec 70%,#d5dce1 100%)}
 :root[data-theme="dark"] .cad3d{background:radial-gradient(120% 90% at 50% 35%,#2a3540 0%,#141b22 72%,#0d1218 100%);border-color:#24303a}
 .cad3d-stage{width:100%;touch-action:pan-y;outline:none;cursor:grab}.cad3d-stage canvas{display:block;width:100%}
