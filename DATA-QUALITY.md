@@ -158,3 +158,52 @@ None was filled with an estimate.
 | `LENS.*.wd` | 5 objectives | The working distance, which the DFM report and the assistant say is missing |
 | A `Speed` specification row | 19 of 22 platforms | Process time from the platform's own speed, not a class estimate |
 | `PLAT.weldh.pwBasis` | 1 platform | Whether 150–450 W is peak or average power: a factor of ten in every energy figure |
+
+## Standards editions and machinery standards (2026-11-19)
+
+### Fixed or added, each with a published source (`STD.*.edref` in `data.json`)
+
+| Standard | Edition recorded | Source |
+|---|---|---|
+| ISO/IEC 15415 | 2024 (third edition, replaces 2011) | iso.org/standard/76876 |
+| IEC 61340-5-1 | 2024 (edition 3.0, replaces 2016) | webstore.iec.ch/publication/74748 |
+| IPC-SMEMA-9851 | 2007 | ANSI webstore, IPC/SMEMA 9851-2007 |
+| SEMI T7 | 0516 (reapproved 2022) | SEMI store, T7-0516 |
+| ISO 13919-2 | 2021 (second edition, replaces 2001) | iso.org/standard/75515 |
+| ISO 9013 | 2017/Amd 1:2024 | iso.org/standard/60321; ISO 9013:2017/Amd 1:2024 |
+| ISO 14644-1 | 2015 (confirmed 2021) | iso.org/standard/53394 |
+| IEC 60825-1 | 2014 kept: still current; edition 4 is in development, not published | webstore.iec.ch/publication/3587 |
+
+New entries, applied by scope (the configurator labels them "applies by scope; not named
+in the catalogue", which is not a statement of certification):
+
+| Standard | Edition | Applies to |
+|---|---|---|
+| IEC 60204-1 | 2016/Amd 1:2021 | Every machine: electrical equipment and the electrical emergency stop |
+| ISO 13850 | 2015 | Every machine: the emergency-stop function |
+| ISO 14119 | 2024 (replaces 2013) | Every guarded machine, all but the hand-held cart: the interlocks that hold Class 1 |
+
+`SRC.co293` was renamed "Sealed RF CO₂, short-wave": it shared its display name with
+`SRC.co2`, so the two sources read as the same in lists and documents.
+
+### Left empty on purpose: sources disagree or could not be confirmed
+
+| Standard | Why |
+|---|---|
+| ISO 11553-2 | ISO lists the 2007 edition (confirmed 2020) as current; a 2026 second edition appears in a reseller preview. Not settled. |
+| SEMI M12, SEMI M13 | Store listings disagree (0523 vs 0706 R0318); a 2020 plan folds M12 into M13. |
+| IPC-HERMES-9852 | Versioned (1.6, 2024; 1.7 listed 2026 with inconsistent dates). |
+| SEMI E30 / E37 / E40 | One record names three standards with separate revisions. |
+| 21 CFR Part 11 | The 1997 final rule was not confirmed against the Federal Register in this pass. |
+
+### Checked and found consistent
+
+- Thermal properties of the metals and ceramics match the cited Incropera tables (for example carbon steel 60.5 W/m·K, 7854 kg/m³, 434 J/kg·K, iron melting at 1537 °C; Al₂O₃ 36 W/m·K, 3970 kg/m³, 765 J/kg·K).
+- Objective fields are in line with catalogue f-theta pairs (F100/70, F163/110, F254/175, F420/300 mm).
+- The MOPA's 2–500 ns and 1–4000 kHz ranges are those of current MOPA fibre sources.
+- Power by source: the multi-source platforms whose powers differ by source carry per-source lists (`pwBySrc`), for example `weldb` offers green only up to 2000 W. No platform pairs a source with a power outside its own list.
+
+### Needs a TEAL decision (not changed)
+
+- `SRC.blue`, `SRC.femto`, `SRC.diode` and `MAT.sic` are defined but offered by no platform or application. Either offer them where TEAL sells them, or remove them.
+- `SRC.uv.wpe` = 0.03: ns UV DPSS sources often draw several hundred watts for a few watts of output, which is nearer 1 %. Confirm against the source TEAL fits.
