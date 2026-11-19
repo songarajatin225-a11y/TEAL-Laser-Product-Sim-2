@@ -650,12 +650,6 @@
       "ed": "2015",
       "edref": "https://www.iso.org/standard/53394.html"
     },
-    "cfr11": {
-      "n": "21 CFR Part 11",
-      "d": "Electronic records and electronic signatures",
-      "s": "Validated sites using audit-trailed software",
-      "b": "cat"
-    },
     "iec60204_1": {
       "n": "IEC 60204-1",
       "d": "Safety of machinery — Electrical equipment of machines — Part 1: General requirements",
@@ -679,6 +673,12 @@
       "b": "scope",
       "ed": "2024",
       "edref": "https://fortress-safety.com/?p=8835"
+    },
+    "cfr11": {
+      "n": "21 CFR Part 11",
+      "d": "Electronic records and electronic signatures",
+      "s": "Validated sites using audit-trailed software",
+      "b": "cat"
     }
   },
   "LEX": {
