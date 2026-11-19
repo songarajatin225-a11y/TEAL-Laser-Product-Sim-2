@@ -2322,3 +2322,18 @@ A design review of the interface's motion, then every finding applied. Nothing a
 - **Reduced motion.** A global rule stops looping and moving animations and keeps colour and opacity changes. Smooth scrolling is off.
 
 The service-worker cache moved to `teal-cfg-v6`. `npm test`: 219 passed, 0 failed.
+
+## v22.1 — Feeling native on phones and tablets
+
+Platform fixes that make the configurator behave like an app on a phone rather than a website. They come from the `mobile-native` skill (Emil Kowalski's design-engineering skills).
+
+- **Hover only where there is a mouse.** All 64 hover rules are inside `@media (hover:hover) and (pointer:fine)`, in place, so the cascade order is unchanged. A tap no longer leaves a card, button or chip highlighted. Press feedback from v22 (`:active`) still works on touch.
+- **No grey flash on tap.** `-webkit-tap-highlight-color: transparent`, and text size is no longer inflated in landscape.
+- **No zoom into fields.** On touch screens every input, select and textarea is 16 px, so iOS does not zoom in and leave the page cropped. Pinch zoom is still allowed.
+- **Faster taps.** Controls have `touch-action: manipulation`, so there is no double-tap wait. A long press no longer selects a button's label.
+- **Viewport height.** Full-screen dialogs on phones use `dvh`. The scroll story and the sticky panel use `svh`, which stays steady while the URL bar moves. `vh` remains as the fallback.
+- **Notch and home indicator.** `viewport-fit=cover` with `env(safe-area-inset-*)` keeps the toasts, the floating buttons, and the bottom of the drawer and dialogs clear of them. Page content clears a landscape notch.
+- **Scroll stays in its container.** Scrolling a drawer or dialog to its end no longer moves the page behind it.
+- **Status bar colour.** The status bar matches the header (white or dark) for each colour scheme, and follows the in-app theme switch. On-screen keyboards resize the layout on Android (`interactive-widget=resizes-content`).
+
+Checked: `npm test` (219 passed). In an emulated iPhone 13, fields are 16 px, there is no sideways scroll and the tap highlight is transparent. Sticky hover, tap delay, safe areas and keyboard behaviour can only be confirmed on a real device. Service-worker cache: `teal-cfg-v7`.
