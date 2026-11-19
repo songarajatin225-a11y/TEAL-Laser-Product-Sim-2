@@ -17,7 +17,7 @@ var SRC = {
   green:{n:'Green DPSS (SHG)',   wl:'532 nm',  um:0.532, col:'#28C36A', m2:1.2, dia:10, mode:'pulsed', tau:15,  tauU:'ns', frep:[10,100], wpe:0.07, prem:1.40},
   blue :{n:'Blue diode',         wl:'450 nm',  um:0.450, col:'#2E7CE4', m2:2.0, dia:10, mode:'cw', wpe:0.38, prem:1.45},
   co2  :{n:'Sealed RF CO₂',      wl:'10.6 µm', um:10.60, col:'#C0392B', m2:1.1, dia:20, mode:'cw', wpe:0.10, prem:1.00},
-  co293:{n:'Sealed RF CO₂',      wl:'9.3 µm',  um:9.300, col:'#AF3527', m2:1.1, dia:20, mode:'cw', wpe:0.09, prem:1.16},
+  co293:{n:'Sealed RF CO₂, short-wave', wl:'9.3 µm',  um:9.300, col:'#AF3527', m2:1.1, dia:20, mode:'cw', wpe:0.09, prem:1.16},
   pico :{n:'Picosecond',         wl:'1030 nm', um:1.030, col:'#F0A32E', m2:1.2, dia:12, mode:'pulsed', tau:0.010, tauU:'ns', frep:[200,2000], wpe:0.10, prem:1.85},
   femto:{n:'Femtosecond',        wl:'1030 nm', um:1.030, col:'#F5C542', m2:1.2, dia:12, mode:'pulsed', tau:0.0003,tauU:'ns', frep:[200,1000], wpe:0.08, prem:2.40},
   diode:{n:'Direct diode',       wl:'915–980 nm',um:0.940,col:'#D4483C',m2:18,  dia:12, mode:'cw', wpe:0.45, prem:0.92}
@@ -113,26 +113,29 @@ var IND = {
    by hand, so it stays correct as the catalogue changes.
    ================================================================= */
 var STD = {
-  iec60825_1:{n:'IEC 60825-1', d:'Safety of laser products — equipment classification and requirements', s:'Every enclosed system; defines the Class 1 condition', b:'cat', ed:'2014'},
+  iec60825_1:{n:'IEC 60825-1', d:'Safety of laser products — equipment classification and requirements', s:'Every enclosed system; defines the Class 1 condition', b:'cat', ed:'2014', edref:'https://webstore.iec.ch/publication/3587'},
   iec60825_4:{n:'IEC 60825-4', d:'Safety of laser products — laser guards', s:'Cabins and guarding around robot and gantry cells', b:'cat', ed:'2022'},
   iso11553_1:{n:'ISO 11553-1', d:'Safety of machinery — Laser processing machines — Part 1: Laser safety requirements', s:'Laser hazards of a machine that processes material with a laser', b:'scope', ed:'2020'},
   iso11553_2:{n:'ISO 11553-2', d:'Safety of machinery — Laser processing machines — Part 2: Safety requirements for hand-held laser processing devices', s:'Hand-held laser processing — the open-beam hand-piece', b:'scope'},
   iso12100  :{n:'ISO 12100',   d:'Safety of machinery — risk assessment and risk reduction', s:'Cell-level risk assessment and residual-risk file', b:'cat', ed:'2010'},
   iso13849  :{n:'ISO 13849-1', d:'Safety-related parts of control systems', s:'Performance level of interlock and E-stop circuits', b:'cat', ed:'2023'},
   iso29158  :{n:'ISO/IEC 29158', d:'Direct part mark quality guideline', s:'Grading of marked 2D codes (AIM DPM)', b:'cat', ed:'2025'},
-  iso15415  :{n:'ISO/IEC 15415', d:'2D symbol print quality test specification', s:'Grading of printed and label 2D codes', b:'cat'},
+  iso15415  :{n:'ISO/IEC 15415', d:'2D symbol print quality test specification', s:'Grading of printed and label 2D codes', b:'cat', ed:'2024', edref:'https://www.iso.org/standard/76876.html'},
   iso16022  :{n:'ISO/IEC 16022', d:'Data Matrix bar code symbology specification', s:'The Data Matrix (ECC 200) symbol that is marked and graded', b:'scope', ed:'2024'},
   iso13919_1:{n:'ISO 13919-1', d:'Electron and laser-beam welded joints — quality levels for imperfections — Part 1: Steel, nickel, titanium and their alloys', s:'Acceptance levels B, C and D for laser-welded seams', b:'scope', ed:'2019'},
-  iso13919_2:{n:'ISO 13919-2', d:'Electron and laser-beam welded joints — quality levels for imperfections — Part 2: Aluminium, magnesium and their alloys and pure copper', s:'Acceptance levels for laser welds in aluminium and copper', b:'scope'},
-  iso9013   :{n:'ISO 9013',    d:'Thermal cutting — classification of thermal cuts — geometrical product specification and quality tolerances', s:'Cut-edge quality and tolerances of laser-cut profiles', b:'scope'},
-  semi_t7   :{n:'SEMI T7',     d:'Back-surface marking of double-side polished wafers', s:'Wafer back-side identity', b:'cat'},
+  iso13919_2:{n:'ISO 13919-2', d:'Electron and laser-beam welded joints — quality levels for imperfections — Part 2: Aluminium, magnesium and their alloys and pure copper', s:'Acceptance levels for laser welds in aluminium and copper', b:'scope', ed:'2021', edref:'https://www.iso.org/standard/75515.html'},
+  iso9013   :{n:'ISO 9013',    d:'Thermal cutting — classification of thermal cuts — geometrical product specification and quality tolerances', s:'Cut-edge quality and tolerances of laser-cut profiles', b:'scope', ed:'2017/Amd 1:2024', edref:'https://www.iso.org/standard/60321.html'},
+  semi_t7   :{n:'SEMI T7',     d:'Back-surface marking of double-side polished wafers', s:'Wafer back-side identity', b:'cat', ed:'0516', edref:'https://store-us.semi.org/products/t00700-semi-t7-specification-for-back-surface-marking-of-double-side-polished-wafers-with-a-two-dimensional-matrix-code-symbol'},
   semi_m12  :{n:'SEMI M12',    d:'Serial alphanumeric marking of the front surface of wafers', s:'Wafer front-side identity', b:'cat'},
   semi_m13  :{n:'SEMI M13',    d:'Alphanumeric marking of silicon wafers', s:'Wafer character set and placement', b:'cat'},
   semi_e30  :{n:'SEMI E30 / E37 / E40', d:'GEM, HSMS and processing management', s:'Fab and OSAT host communication', b:'cat'},
-  smema     :{n:'IPC-SMEMA-9851', d:'Mechanical equipment interface standard', s:'Board handshake between inline machines', b:'cat'},
+  smema     :{n:'IPC-SMEMA-9851', d:'Mechanical equipment interface standard', s:'Board handshake between inline machines', b:'cat', ed:'2007', edref:'https://webstore.ansi.org/standards/ipc/ipcsmema98512007'},
   hermes    :{n:'IPC-HERMES-9852', d:'Machine-to-machine communication in SMT', s:'Digital successor to SMEMA on SMT lines', b:'cat'},
-  iec61340  :{n:'IEC 61340-5-1', d:'Protection of electronic devices from electrostatic phenomena', s:'ESD-safe build and dry-room handling', b:'cat'},
-  iso14644  :{n:'ISO 14644-1', d:'Cleanrooms — classification of air cleanliness by particle concentration', s:'Cleanroom-compatible construction', b:'cat'},
+  iec61340  :{n:'IEC 61340-5-1', d:'Protection of electronic devices from electrostatic phenomena', s:'ESD-safe build and dry-room handling', b:'cat', ed:'2024', edref:'https://webstore.iec.ch/publication/74748'},
+  iso14644  :{n:'ISO 14644-1', d:'Cleanrooms — classification of air cleanliness by particle concentration', s:'Cleanroom-compatible construction', b:'cat', ed:'2015', edref:'https://www.iso.org/standard/53394.html'},
+  iec60204_1:{n:'IEC 60204-1', d:'Safety of machinery — Electrical equipment of machines — Part 1: General requirements', s:'Wiring, control circuits and the electrical emergency stop of every machine', b:'scope', ed:'2016/Amd 1:2021', edref:'https://webstore.iec.ch/en/publication/71256'},
+  iso13850:{n:'ISO 13850', d:'Safety of machinery — Emergency stop function — Principles for design', s:'The emergency-stop function and its actuators', b:'scope', ed:'2015', edref:'https://webstore.ansi.org/Standards/ISO/ISO138502015'},
+  iso14119:{n:'ISO 14119', d:'Safety of machinery — Interlocking devices associated with guards — Principles for design and selection', s:'The door and guard interlocks that hold the Class 1 condition', b:'scope', ed:'2024', edref:'https://fortress-safety.com/?p=8835'},
   cfr11     :{n:'21 CFR Part 11', d:'Electronic records and electronic signatures', s:'Validated sites using audit-trailed software', b:'cat'}
 };
 function stdLabel(k){ var x=STD[k]; return x? x.n+(x.ed? ':'+x.ed : '') : k; }
@@ -140,6 +143,9 @@ function standardsFor(){
   var p=P(); if(!p) return [];
   var out=['iec60825_1'], kind=S.src? procKind() : null, a=A();
   out.push(p.deliv==='handpiece'? 'iso11553_2' : 'iso11553_1');
+  /* every machine has electrical equipment and an emergency stop; every guarded one has interlocks */
+  out.push('iec60204_1','iso13850');
+  if(p.deliv!=='handpiece') out.push('iso14119');
   if(p.deliv==='robot'||p.deliv==='gantry') out.push('iec60825_4','iso12100','iso13849');
   if(p.fam==='mark'||p.fam==='volt'||p.fam==='semi') out.push('iso29158','iso15415','iso16022');
   if(p.fam==='weld') out.push(a && (a.mat==='al'||a.mat==='cu')? 'iso13919_2' : 'iso13919_1');
