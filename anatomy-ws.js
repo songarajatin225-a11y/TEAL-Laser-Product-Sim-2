@@ -137,15 +137,16 @@ function mountWS(host, cfg) {
   var parts = [];                                      /* particles, in world units */
   var st = { t: 0, i: 0, paused: 0 }, frame = 0, last = 0, visible = false, stopped = false, lastKey = "";
   /* close-up: ease the view box between the whole machine and the work zone */
-  var zoom = { on: false, k: 0, to: 0 }, zbtn = document.createElement("button");
+  var zoom = { on: false, k: 0, to: 0, dur: 0.6 }, zbtn = document.createElement("button");
   zbtn.type = "button"; zbtn.className = "ws-zoom"; zbtn.setAttribute("aria-pressed", "false"); zbtn.textContent = "Close-up";
   stage.appendChild(zbtn);
   function viewBox() {
     var e = zoom.k * zoom.k * (3 - 2 * zoom.k), F = g.FULL, Cz = g.CLOSE, v = [0, 1, 2, 3].map(function (i) { return F[i] + (Cz[i] - F[i]) * e; });
     svg.setAttribute("viewBox", v.map(function (n) { return n.toFixed(2); }).join(" "));
   }
-  function setZoom(on) {
-    zoom.on = on; zoom.to = on ? 1 : 0; zbtn.setAttribute("aria-pressed", on ? "true" : "false"); zbtn.textContent = on ? "Whole machine" : "Close-up";
+  /* the button eases over 600ms; the Z key, used repeatedly, is near-instant */
+  function setZoom(on, key) {
+    zoom.dur = key ? 0.12 : 0.6; zoom.on = on; zoom.to = on ? 1 : 0; zbtn.setAttribute("aria-pressed", on ? "true" : "false"); zbtn.textContent = on ? "Whole machine" : "Close-up";
     plate.classList.toggle("ws-close", on);
     if (still.matches) { zoom.k = zoom.to; viewBox(); }
     run(true);
@@ -295,7 +296,7 @@ function mountWS(host, cfg) {
   function tick(now) {
     if (stopped) return;
     var dt = last ? Math.min((now - last) / 1000, 1 / 20) : 1 / 60; last = now;
-    if (zoom.k !== zoom.to) { var dk = dt / 0.6; zoom.k = zoom.to > zoom.k ? Math.min(zoom.to, zoom.k + dk) : Math.max(zoom.to, zoom.k - dk); viewBox(); }
+    if (zoom.k !== zoom.to) { var dk = dt / zoom.dur; zoom.k = zoom.to > zoom.k ? Math.min(zoom.to, zoom.k + dk) : Math.max(zoom.to, zoom.k - dk); viewBox(); }
     step(dt);
     var moving = zoom.k !== zoom.to;
     frame = (visible && !(still.matches && !phasesNow())) || moving ? requestAnimationFrame(tick) : 0;
@@ -303,7 +304,7 @@ function mountWS(host, cfg) {
   function run(force) { if (!frame && (visible || force) && !stopped) { last = 0; frame = requestAnimationFrame(tick); } }
   /* keyboard: step through the phases of the preview; Z for the close-up */
   stage.addEventListener("keydown", function (e) {
-    if (e.key === "z" || e.key === "Z") { e.preventDefault(); setZoom(!zoom.on); return; }
+    if (e.key === "z" || e.key === "Z") { e.preventDefault(); setZoom(!zoom.on, true); return; }
     var P0 = cfg.phases; if (!P0 || phasesNow()) return;
     var acc = 0, i, starts = []; for (i = 0; i < P0.length; i++) { starts.push(acc); acc += P0[i].d; }
     if (e.key === "ArrowRight") st.i = (st.i + 1) % P0.length; else if (e.key === "ArrowLeft") st.i = (st.i - 1 + P0.length) % P0.length;

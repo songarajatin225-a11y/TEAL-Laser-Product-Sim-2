@@ -2,7 +2,7 @@
    Network first, always: a visitor who is online gets the current release and
    the cache is refreshed behind them. The cache answers only when the network
    does not, so the site can be shown with no connection after one visit. */
-var CACHE = 'teal-cfg-v5';
+var CACHE = 'teal-cfg-v6';
 var CORE = ['./', 'index.html', 'app.js', 'boot.js', 'anatomy.js', 'anatomy-ws.js', 'cad3d.js', 'anatomy.css', 'data.json', 'access.json', 'manifest.webmanifest',
             'assets/logo.webp', 'assets/icon-192.png', 'assets/icon-512.png', 'assets/cad/manifest.json'];
 self.addEventListener('install', function (e) {

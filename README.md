@@ -2303,3 +2303,22 @@ The rest of the suite starts in the drawing view to stay fast with software WebG
 ---
 
 © Titan Engineering & Automation Limited — A TATA Enterprise.
+
+## v22.0 — Motion and interaction polish
+
+A design review of the interface's motion, then every finding applied. Nothing about the data, the configuration or the simulation changed.
+
+- **Easing tokens.** `--ease-out`, `--ease-in-out` and `--ease-drawer` sit beside the old `--ease`. Entrances and exits use the strong ease-out; hover and colour changes use `ease`.
+- **No `transition: all`.** All 28 rules now name what they animate: transform, colours, border, background, shadow and opacity. The form's floating label still moves its position and size.
+- **Press feedback.** Buttons, segments, tabs, chips and the viewer and figure controls scale to 0.97 while pressed. Option, feature and document cards scale to 0.98.
+- **Hover on touch screens.** Under `(hover: none)` a tap no longer leaves a card or button lifted. The hover lift on option and feature cards dropped from 3 px to 1 px, and on buttons from 2 px to 1 px.
+- **Overlays as transitions.** The drawer, the inquiry and advisor modals, the toasts and the viewer's layers and info popovers now use CSS transitions with `@starting-style`, so they can be reversed mid-way.
+  - Exits are faster than entrances: the drawer takes 320 ms in and 220 ms out on a drawer curve.
+  - Modals take 240 ms in and 180 ms out, from scale 0.98 at the centre.
+  - Popovers take 150 ms and grow from the corner nearest their button.
+- **Assembly stack.** Only the newest row animates in (180 ms, 4 px). Before, every row replayed whenever the stack was rebuilt.
+- **Other timings.** The header entrance is 300 ms. The scroll cue reveals with a clip instead of growing from scale 0.
+- **Fig 2 close-up.** The button still eases over 600 ms; the Z key, which is pressed repeatedly, takes 120 ms. The figure files were rebuilt from `tools/anatomy/workstation.mjs`.
+- **Reduced motion.** A global rule stops looping and moving animations and keeps colour and opacity changes. Smooth scrolling is off.
+
+The service-worker cache moved to `teal-cfg-v6`. `npm test`: 219 passed, 0 failed.
