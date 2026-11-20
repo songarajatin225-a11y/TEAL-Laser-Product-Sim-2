@@ -1961,7 +1961,7 @@ function themeApply(pref){
   var dark = pref==='dark' || (pref==='system' && !!(THEME.mq && THEME.mq.matches)), r=document.documentElement;
   r.setAttribute('data-theme', dark? 'dark' : 'light');
   r.setAttribute('data-theme-pref', pref);
-  var m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute('content', dark? '#0D141B' : '#00B7BA');
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){ m.setAttribute('content', dark? '#141E28' : '#FFFFFF'); });
   document.querySelectorAll('.tealfig').forEach(function(f){ f.setAttribute('data-theme', dark? 'dark' : 'light'); });
   Store.set('teal.theme', pref);
   hdrSync();
