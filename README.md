@@ -2337,3 +2337,16 @@ Platform fixes that make the configurator behave like an app on a phone rather t
 - **Status bar colour.** The status bar matches the header (white or dark) for each colour scheme, and follows the in-app theme switch. On-screen keyboards resize the layout on Android (`interactive-widget=resizes-content`).
 
 Checked: `npm test` (219 passed). In an emulated iPhone 13, fields are 16 px, there is no sideways scroll and the tap highlight is transparent. Sticky hover, tap delay, safe areas and keyboard behaviour can only be confirmed on a real device. Service-worker cache: `teal-cfg-v7`.
+
+## v22.2 — Help me choose, in the corner
+
+The requirement advisor now behaves like a chat widget.
+
+- **Opens once by itself.** On a first visit it opens once, when the visitor reaches the workspace. It does not open for someone arriving on a shared configuration link. Opening it any other way also counts as seen.
+- **Then lives bottom-right.** A teal "Help me choose" launcher sits in the bottom-right corner. On phones it is a round chat icon. It opens the advisor and turns into a close button while the advisor is open. The header button still works too.
+- **Docked panel.** On screens wider than 640 px the advisor opens as a panel docked bottom-right above the launcher: 560 px wide, growing from the corner, with the page only lightly dimmed. On phones it stays full screen.
+- **Floating buttons.**
+  - Values (internal view only) and Back to top stack above the launcher, so the three never overlap.
+  - The launcher hides while another panel (Saved, enquiry, compare, Values editor) is open, during the phone story, in demo mode and in print.
+
+Tests: 223 browser checks (was 219). They check the launcher's corner position, the docked panel, closing again, and that no floating buttons overlap. Service-worker cache: `teal-cfg-v8`.

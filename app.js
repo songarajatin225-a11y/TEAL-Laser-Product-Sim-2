@@ -969,6 +969,7 @@ function advance(){
 
 /* ---- unified icon set (Lucide geometry, 1.75 stroke) ------------------ */
 var IC={
+ chat:'<path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.2 0-2.3-.2-3.3-.6L4 20l1.3-3.7C4.5 15 4 13.3 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/>',
  print:'<path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
  copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
@@ -3929,15 +3930,20 @@ function reqRecord(f){
 var ADV={turns:[], facts:null, asked:{}, res:null, qn:0};
 
 function advReset(){ ADV={turns:[], facts:null, asked:{}, res:null, qn:0}; }
+function advFab(open){
+  var f=$('#helpFab'); if(f) f.setAttribute('aria-expanded', open? 'true':'false');
+  document.body.classList.toggle('adv-open', !!open);
+}
 function openAdvisor(){
   $('#advisor').classList.add('open'); document.body.style.overflow='hidden';
+  Store.set('teal.seenAdvisor', true); advFab(true);
   if(!ADV.turns.length){
     ADV.turns.push({who:'bot', text:'Tell me what you need to do — the part, the material, the process, and anything that matters like volume, accuracy or heat sensitivity. Plain sentences are fine.'});
   }
   renderAdvisor();
   setTimeout(function(){ var t=$('#advText'); if(t) t.focus(); }, 90);
 }
-function closeAdvisor(){ closeOverlay('#advisor'); }
+function closeAdvisor(){ closeOverlay('#advisor'); advFab(false); }
 
 function advSay(text){ ADV.turns.push({who:'user', text:text}); }
 function advBot(text, chips, kind){ ADV.turns.push({who:'bot', text:text, chips:chips, kind:kind}); }
@@ -5615,6 +5621,11 @@ window.addEventListener('hashchange', function(){
 });
 
 $('#openAdvisor').onclick=openAdvisor;
+/* the corner launcher opens the chat, and closes it again */
+(function(){ var f=$('#helpFab'); if(!f) return;
+  f.innerHTML='<span class="fc">'+ico('chat')+'</span><span class="fx">'+ico('x')+'</span><span class="ft">Help me choose</span>';
+  f.onclick=function(){ if($('#advisor').classList.contains('open')) closeAdvisor(); else openAdvisor(); };
+})();
 $('#advX').onclick=closeAdvisor;
 $('#advisor').onclick=function(e){ if(e.target===this) closeAdvisor(); };
 $('#openSaved').onclick=function(){ openDrawer('saved'); };
