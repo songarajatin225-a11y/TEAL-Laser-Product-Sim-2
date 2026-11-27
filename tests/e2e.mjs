@@ -100,6 +100,28 @@ try {
   }
   await pg.close();
 
+  {
+    /* the advisor's corner launcher: bottom-right, opens the chat docked there, closes it again */
+    const pf = await open(C2I);
+    await pf.setViewportSize({ width: 1280, height: 860 }); await pf.waitForTimeout(150);
+    const fb = await pf.$eval('#helpFab', e => { const r = e.getBoundingClientRect(); return { r: innerWidth - r.right, b: innerHeight - r.bottom, vis: getComputedStyle(e).display !== 'none' }; });
+    check('the Help me choose launcher sits in the bottom-right corner', fb.vis && fb.r <= 40 && fb.b <= 40, JSON.stringify(fb));
+    await pf.click('#helpFab'); await pf.waitForTimeout(400);
+    const dk = await pf.evaluate(() => { const w = document.querySelector('.advwin').getBoundingClientRect();
+      return { open: document.querySelector('#advisor').classList.contains('open'), exp: document.querySelector('#helpFab').getAttribute('aria-expanded'), r: innerWidth - w.right, b: innerHeight - w.bottom }; });
+    check('the launcher opens the advisor as a chat docked bottom-right', dk.open && dk.exp === 'true' && dk.r <= 40 && dk.b < 120, JSON.stringify(dk));
+    await pf.click('#helpFab'); await pf.waitForTimeout(300);
+    check('the launcher closes the chat again', await pf.evaluate(() => !document.querySelector('#advisor').classList.contains('open') && document.querySelector('#helpFab').getAttribute('aria-expanded') === 'false'));
+    await pf.evaluate(() => { viewSet('internal', 'cfg'); scrollTo(0, 2400); }); await pf.waitForTimeout(500);
+    const ov = await pf.evaluate(() => { const ids = ['#helpFab', '#adminBtn', '#toTop'], R = {}, o = [];
+      for (const id of ids) { const e = document.querySelector(id); if (e && getComputedStyle(e).display !== 'none' && getComputedStyle(e).opacity !== '0') R[id] = e.getBoundingClientRect(); }
+      const k = Object.keys(R); for (let x = 0; x < k.length; x++) for (let y = x + 1; y < k.length; y++) { const a = R[k[x]], b = R[k[y]];
+        if (a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) o.push(k[x] + '/' + k[y]); }
+      return o.length ? o : (k.length === 3 ? [] : ['only ' + k.join()]); });
+    check('the launcher, Values and Back to top never overlap (internal view, scrolled)', !ov.length, ov.join());
+    await pf.close();
+  }
+
   /* ------------------------------------------------------------------ */
   sec('Configuration and pricing');
   pg = await open(C2I);
