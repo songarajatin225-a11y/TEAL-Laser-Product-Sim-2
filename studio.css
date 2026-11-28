@@ -1,0 +1,10 @@
+/* TEAL Engineering Studio — the configurator's additions to the V8 page */
+html.locked body>*:not(#gatemsg){visibility:hidden}
+html.denied body>*:not(#gatemsg){display:none}
+#gatemsg{position:fixed;inset:0;display:grid;place-items:center;padding:24px;background:#f0f4f5;font:15px/1.55 Inter,system-ui,sans-serif;color:#1d2226}
+#gatemsg[hidden]{display:none}
+#gatemsg>div{max-width:440px;background:#fff;border:1px solid #d7dee2;border-radius:12px;padding:28px;box-shadow:0 12px 40px rgba(11,26,42,.12)}
+#gatemsg h1{font-size:20px;margin:0 0 8px}
+#gatemsg a.btn{display:inline-block;margin-top:6px;padding:10px 16px;border-radius:999px;background:#0e8a86;color:#fff;text-decoration:none;font-weight:600}
+.backcfg{font-size:13px;font-weight:600;color:#0e8a86;text-decoration:none;padding:6px 10px;border:1px solid #cfe3e2;border-radius:999px;white-space:nowrap}
+.backcfg:hover{background:#e7f4f3}

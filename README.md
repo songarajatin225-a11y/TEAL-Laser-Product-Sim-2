@@ -2350,3 +2350,46 @@ The requirement advisor now behaves like a chat widget.
   - The launcher hides while another panel (Saved, enquiry, compare, Values editor) is open, during the phone story, in demo mode and in print.
 
 Tests: 223 browser checks (was 219). They check the launcher's corner position, the docked panel, closing again, and that no floating buttons overlap. Service-worker cache: `teal-cfg-v8`.
+
+## v23.0 — The V8 Engineering OS, combined
+
+The configurator and the TEAL Laser Engineering OS V8 now ship as one site.
+
+### Digital twins in the configurator
+
+The four V8 machines are hand-built 3D CAD simulations, and each one now runs inside the configurator for its matching platform:
+
+| V8 machine | Configurator platform |
+|---|---|
+| LMS-SEMI | Semi SPM |
+| LMS-PCB | Mark PCB C2i |
+| FLM-25 | Mark F-Series |
+| µWELD | Weld P-Series |
+
+- **Where they appear:** in the Fig 2 3D view and in the viewer's Realistic mode. Each twin is set from the configuration: source, handling (door, rotary, inline, tray, magazine) and part.
+- **Full CAD simulation:** opens over the configurator with the complete V8 page: toolbar, model tree, axis readouts, step bar, measuring, Precision review and Concept DFM.
+- **Files:** the simulations live in `twin/`, unpacked from the V8 page by `tools/twin/extract.mjs`. They load one at a time under a strict CSP (see `twin/README.md`).
+
+### The V8 look for every machine
+
+The other 18 platforms keep their own 3D models (cad3d.js) but now render in the V8 studio finish:
+- eggshell-white powder coat with an orange-peel texture, brushed aluminium and teal accents;
+- thin CAD edges, room lighting with a sun and soft shadows, and a light studio background (dark in the dark theme);
+- an epoxy factory floor with a 100 mm grid and safety tape round the footprint.
+
+The laser-safety glazing is lighter but still tinted for the source's wavelength. `look: "classic"` keeps the v21 render.
+
+### Engineering Studio (`studio.html`)
+
+The rest of V8 is a separate page, built from the V8 file by `tools/twin/studio.mjs`:
+- the overview;
+- the four machines with the ten-tab digital-twin panel: twin, process, sequence, vision, monitoring, production, maintenance, safety, engineering and docs;
+- the platform comparison;
+- the Engineering Studio;
+- the Custom Machine Builder.
+
+It opens only for an internal-passkey session (`studio-gate.js`, checked against `access.json` as the configurator does), and is linked from the Internal view's navigation. Like the configurator's gate, this is not a security boundary. V8's records (Studio, Custom Builder) stay in that browser's storage, as they did in V8.
+
+### Content to review
+
+V8's vendor lists name candidate suppliers, and one entry mentions a future indigenous source (Deeplase). The site is public, so TEAL should confirm that this text is fine to publish.

@@ -82,7 +82,76 @@ function materials(cfg) {
     yellow: new THREE.MeshStandardMaterial({ color: 0xf2c200, roughness: 0.45 }),
     green: new THREE.MeshStandardMaterial({ color: 0x1f9d3a, roughness: 0.4 }),
   };
+  if (cfg.look !== "classic") v8Finish(M);
   return M;
+}
+
+/* ---- the V8 studio finish ------------------------------------------------------------
+   The look of the TEAL Laser Engineering OS V8 simulations (twin/): eggshell-white
+   powder coat with an orange-peel texture, brushed aluminium, teal accents, thin CAD
+   edges, an epoxy factory floor with a 100 mm grid and safety tape round the footprint. */
+function canvasTex(w, h, fn) {
+  const c = document.createElement("canvas"); c.width = w; c.height = h; fn(c.getContext("2d"), w, h);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+}
+let V8TEX = null;
+function v8Tex() {
+  if (V8TEX) return V8TEX;
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);   /* repeatable, so captures match */
+  const peel = canvasTex(256, 256, (x, w, h) => { x.fillStyle = "#808080"; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 2600; i++) { const r = 1 + rnd() * 3.2, v = 110 + rnd() * 40 | 0; x.fillStyle = `rgba(${v},${v},${v},0.35)`; x.beginPath(); x.arc(rnd() * w, rnd() * h, r, 0, 7); x.fill(); } });
+  const brush = canvasTex(512, 64, (x, w, h) => { x.fillStyle = "#8a8a8a"; x.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y += 0.5) { const v = 110 + rnd() * 60 | 0; x.fillStyle = `rgba(${v},${v},${v},0.5)`; x.fillRect(0, y, w, 0.5); }
+    for (let i = 0; i < 260; i++) { const v = 90 + rnd() * 90 | 0; x.fillStyle = `rgba(${v},${v},${v},0.35)`; x.fillRect(rnd() * w, rnd() * h, 20 + rnd() * 160, 0.6); } });
+  const epoxy = canvasTex(512, 512, (x, w, h) => { x.fillStyle = "#b9bec1"; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) { const v = 160 + rnd() * 60 | 0; x.fillStyle = `rgba(${v},${v},${v + 4},0.5)`; x.fillRect(rnd() * w, rnd() * h, 1.2, 1.2); }
+    x.strokeStyle = "rgba(120,126,130,0.35)"; x.lineWidth = 2; x.strokeRect(0, 0, w, h); });
+  epoxy.colorSpace = THREE.SRGBColorSpace;
+  const fade = canvasTex(256, 256, (x, w, h) => { const g = x.createRadialGradient(w / 2, h / 2, w * 0.18, w / 2, h / 2, w * 0.5); g.addColorStop(0, "#fff"); g.addColorStop(1, "#000"); x.fillStyle = g; x.fillRect(0, 0, w, h); });
+  fade.wrapS = fade.wrapT = THREE.ClampToEdgeWrapping;
+  const tape = canvasTex(128, 32, (x, w, h) => { x.fillStyle = "#f2c200"; x.fillRect(0, 0, w, h); x.fillStyle = "#1d1f22";
+    for (let i = -2; i < 6; i++) { x.beginPath(); x.moveTo(i * 32, h); x.lineTo(i * 32 + 16, h); x.lineTo(i * 32 + 32, 0); x.lineTo(i * 32 + 16, 0); x.fill(); } });
+  tape.colorSpace = THREE.SRGBColorSpace;
+  const grad = (a, b) => { const t = canvasTex(4, 256, (x) => { const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, a); g.addColorStop(1, b); x.fillStyle = g; x.fillRect(0, 0, 4, 256); }); t.colorSpace = THREE.SRGBColorSpace; return t; };
+  return (V8TEX = { peel, brush, epoxy, fade, tape, bg: { light: grad("#fbfcfd", "#cfd8de"), dark: grad("#222a2f", "#0b0e10") } });
+}
+function v8Finish(M) {
+  const T = v8Tex();
+  const set = (m, c, r, mt) => { m.color.setHex(c); m.roughness = r; m.metalness = mt; m.needsUpdate = true; };
+  set(M.paint, 0xf3f4f5, 0.7, 0.0); M.paint.bumpMap = T.peel; M.paint.bumpScale = 0.35; M.paint.roughnessMap = T.peel;
+  set(M.paintDark, 0x24272b, 0.55, 0.2); M.paintDark.roughnessMap = T.peel;
+  set(M.accent, 0x0e8a86, 0.4, 0.15);
+  if (M.window) { M.window.opacity = 0.14; M.window.roughness = 0.06; }   /* V8 glazing reads as clear; the tint still says which wavelength it stops */
+  for (const [m, c, r, mt] of [[M.alu, 0xc9ced3, 0.32, 0.75], [M.aluDark, 0x8e969d, 0.38, 0.7], [M.steel, 0xb4bac0, 0.25, 0.9]]) {
+    set(m, c, r, mt); m.roughnessMap = T.brush; m.bumpMap = T.brush; m.bumpScale = 0.12;
+  }
+  M.v8 = true;
+}
+/* thin dark edges on the drawn primitives, as the CAD view draws them */
+const EDGE_MAT = new THREE.LineBasicMaterial({ color: 0x2a2f34, transparent: true, opacity: 0.4 });
+function v8Edges(root) {
+  const geoEdges = new Map(), list = [];
+  root.traverse((o) => { if (o.isMesh && !o.userData.noEdges && /^(Box|RoundedBox|Cylinder)Geometry$/.test(o.geometry.type) && o.material && !o.material.transparent) list.push(o); });
+  for (const o of list) {
+    let e = geoEdges.get(o.geometry);
+    if (!e) { e = new THREE.EdgesGeometry(o.geometry, 32); geoEdges.set(o.geometry, e); }
+    const l = new THREE.LineSegments(e, EDGE_MAT); l.raycast = () => {}; l.userData.edge = true; o.add(l);
+  }
+}
+/* the factory floor: epoxy fading out, a 100 mm grid, safety tape round the footprint */
+function v8Floor(scene, W, D) {
+  const T = v8Tex(), g = new THREE.Group();
+  const ep = T.epoxy.clone(); ep.needsUpdate = true; ep.repeat.set(9, 9);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(9000, 9000), new THREE.MeshStandardMaterial({ map: ep, alphaMap: T.fade, transparent: true, roughness: 0.55, metalness: 0, depthWrite: false }));
+  fl.rotation.x = -Math.PI / 2; fl.position.y = -0.8; fl.receiveShadow = true; g.add(fl);
+  const grid = new THREE.GridHelper(6000, 60, 0x9aa4ab, 0xd3d9dd); grid.material.transparent = true; grid.material.opacity = 0.4; grid.position.y = -0.4; g.add(grid);
+  const pad = 260, x0 = -W / 2 - pad, x1 = W / 2 + pad, z0 = -D / 2 - pad, z1 = D / 2 + pad, tw = 50;
+  for (const [ax, az, bx, bz] of [[x0, z0, x1, z0], [x0, z1, x1, z1], [x0, z0, x0, z1], [x1, z0, x1, z1]]) {
+    const len = Math.hypot(bx - ax, bz - az) + tw, t = T.tape.clone(); t.needsUpdate = true; t.repeat.set(len / 400, 1);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(len, tw), new THREE.MeshStandardMaterial({ map: t, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -1 }));
+    m.rotation.x = -Math.PI / 2; if (ax === bx) m.rotation.z = Math.PI / 2; m.position.set((ax + bx) / 2, -0.2, (az + bz) / 2); m.receiveShadow = true; g.add(m);
+  }
+  scene.add(g); return { grid, g };
 }
 
 function box(w, h, d, mat, x, y, z, parent, opts = {}) {
@@ -558,7 +627,7 @@ export function mount(host, cfg) {
   const stage = wrap.querySelector(".cad3d-stage"), readout = wrap.querySelector("[data-readout]"), capEl = wrap.querySelector(".cad3d-cap");
   if (cfg.caption) capEl.textContent = cfg.caption;
   let stopped = false, frame = 0, visible = false, renderer = null;
-  const api = { stop() { stopped = true; if (frame) cancelAnimationFrame(frame); frame = 0; if (io) io.disconnect(); if (renderer) { renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); } }, ready: false };
+  const api = { stop() { stopped = true; if (frame) cancelAnimationFrame(frame); frame = 0; if (io) io.disconnect(); if (api.mo) api.mo.disconnect(); if (renderer) { renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); } }, ready: false };
   host.__cad = api;
   if (cfg.bare) wrap.classList.add('cad3d-bare');
   let io = null;
@@ -572,7 +641,8 @@ export function mount(host, cfg) {
     } catch (e) { readout.textContent = "This browser cannot show the 3D view (no WebGL)."; api.noGL = true; return; }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+    const v8 = cfg.look !== "classic";
+    renderer.toneMapping = v8 ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     stage.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
@@ -583,14 +653,24 @@ export function mount(host, cfg) {
     scene.add(root);
     const [W, H, D] = root.userData.size;
     /* studio lighting: a key light with soft shadows, a cool fill, a floor that only takes shadows */
-    const key = new THREE.DirectionalLight(0xffffff, 2.4);
+    const key = new THREE.DirectionalLight(0xffffff, v8 ? 3.9 : 2.4);   /* V8: r147's 1.25 in today's physical light units */
     key.position.set(W * 1.1, H * 1.6, D * 1.4); key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 5; key.shadow.bias = -0.0004;
     const sc = Math.max(W, D) * 1.1;
     Object.assign(key.shadow.camera, { left: -sc, right: sc, top: sc * 1.2, bottom: -sc, near: 10, far: 9000 });
     scene.add(key);
-    scene.add(new THREE.HemisphereLight(0xdfe9f3, 0x30343a, 0.55));
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(9000, 9000), new THREE.ShadowMaterial({ opacity: 0.22 }));
+    if (v8) {
+      scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c0c6, 1.7));
+      const fill = new THREE.DirectionalLight(0xffffff, 1.1); fill.position.set(-W * 1.6, H * 1.2, -D * 1.0); scene.add(fill);
+      const T = v8Tex(), fl = v8Floor(scene, W, D);
+      const theme = () => { const dark = document.documentElement.getAttribute("data-theme") === "dark";
+        scene.background = dark ? T.bg.dark : T.bg.light; fl.grid.material.opacity = dark ? 0.18 : 0.4; };
+      theme(); api.theme = theme;
+      api.mo = new MutationObserver(() => { theme(); api.wake && api.wake(); });
+      api.mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+      v8Edges(root);
+    } else scene.add(new THREE.HemisphereLight(0xdfe9f3, 0x30343a, 0.55));
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(9000, 9000), new THREE.ShadowMaterial({ opacity: v8 ? 0.16 : 0.22 }));
     floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
     const camera = new THREE.PerspectiveCamera(32, 1, 20, 20000);
     const target = new THREE.Vector3(-W * 0.05, H * 0.52, 0);

@@ -2192,7 +2192,9 @@ function wsShow(){
 function wsNav(){
   var n=$('#wsnav'); if(!n) return;
   n.innerHTML=WSEC.filter(function(x){ return canSee(x[0]); }).map(function(x){
-    return '<button type="button" data-sec="'+x[0]+'"'+(VIEW.sec===x[0]?' aria-current="page"':'')+'>'+esc(x[1])+'</button>'; }).join('');
+    return '<button type="button" data-sec="'+x[0]+'"'+(VIEW.sec===x[0]?' aria-current="page"':'')+'>'+esc(x[1])+'</button>'; }).join('')+
+    /* the V8 workspaces: digital twins, Engineering Studio, Custom Machine Builder (studio.html) */
+    '<a class="wsstudio" href="studio.html">Engineering Studio ↗</a>';
   var rs=$('#wsrole');
   if(rs && !rs.options.length){
     rs.innerHTML=Object.keys(ROLES).map(function(k){ return '<option value="'+k+'">'+esc(ROLES[k].n)+'</option>'; }).join('');
@@ -8876,7 +8878,7 @@ function twinFull(){
     var t=m.twinParams(twinCfg(false)), info=m.TWIN_INFO[t.key];
     ov.setAttribute('aria-label', info.name+' — full CAD simulation');
     ov.innerHTML='<div class="twinbar"><b>'+info.code+'</b><span>'+info.name+' · full CAD simulation from the TEAL Laser Engineering OS V8</span>'+
-      '<button type="button" class="dx" id="twinX" aria-label="Close the CAD simulation">'+ico('x')+'</button></div><div class="twinhost"></div>';
+      (ACC.role==='internal'? '<a class="twinstudio" href="studio.html">Twin panel in the Engineering Studio ↗</a>' : '')+'<button type="button" class="dx" id="twinX" aria-label="Close the CAD simulation">'+ico('x')+'</button></div><div class="twinhost"></div>';
     m.mount(ov.querySelector('.twinhost'), twinCfg(false));
     ov.classList.add('open'); document.body.style.overflow='hidden';
     $('#twinX').onclick=twinFullClose; setTimeout(function(){ var x=$('#twinX'); if(x) x.focus(); }, 60);

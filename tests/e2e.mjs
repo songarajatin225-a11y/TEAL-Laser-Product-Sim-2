@@ -1029,7 +1029,7 @@ try {
 
   /* ------------------------------------------------------------------ */
   sec('The workstation in 3D, beside the anatomy figure');
-  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254', { mfig: 'combo' });
+  pg = await open('#p=markm&a=colour&s=mopa&w=20&l=f254', { mfig: 'combo' });   /* Mark F-Series has the V8 twin instead (next section) */
   await pg.evaluate(() => { go(5); document.querySelector('#mfig').scrollIntoView(); });
   await pg.waitForFunction(() => document.querySelector('.cad3d[data-ready]') || /cannot/.test((document.querySelector('.cad3d [data-readout]') || {}).textContent || ''), null, { timeout: 45000 }).catch(() => {});
   const c1 = await pg.evaluate(async () => {
@@ -1071,7 +1071,7 @@ try {
   }
   check('the gantry table, the robot cell and the cleaning cart each have a running 3D model, with the marks of their own process', kinds.every((k) => k.ready && k.drawingHidden && k.onlyCad && k.cap && k.style), JSON.stringify(kinds));
   /* the main viewer gains a Realistic view; its other presets stay and switch back to the existing renderer */
-  await pg.evaluate(() => { restore({ plat: 'markf', app: 'metal', src: 'fiber', pw: 30, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5); document.querySelector('#vrealBtn').click(); });
+  await pg.evaluate(() => { restore({ plat: 'markm', app: 'colour', src: 'mopa', pw: 20, lens: 'f254', mods: {}, sw: 'desktop', extra: {}, notes: '', target: null }); go(5); document.querySelector('#vrealBtn').click(); });
   await pg.waitForFunction(() => { const h = document.querySelector('#v3dreal'); return h && h.__cad && h.__cad.ready; }, null, { timeout: 45000 }).catch(() => {});
   const vr = await pg.evaluate(() => { const h = document.querySelector('#v3dreal'), out = { on: !!(h && h.__cad && h.__cad.ready), pressed: document.querySelector('#vrealBtn').getAttribute('aria-pressed'),
     modes: [...document.querySelectorAll('#v3dlay .vmode button')].map((b) => b.textContent).join(','), canvasKept: !!document.querySelector('#mcanvas') };
@@ -1079,6 +1079,73 @@ try {
   check('the main viewer has a new Realistic view mode; Solid, Cutaway, X-ray and Exploded stay and switch back to the existing view', vr.on && vr.pressed === 'true' && vr.modes === 'Solid,Cutaway,X-ray,Exploded,Realistic' && vr.canvasKept && vr.offAfterSolid, JSON.stringify(vr));
   check('no script errors in the 3D view', pg.errors.length === 0, pg.errors.join(' | '));
   await pg.close();
+
+  /* ------------------------------------------------------------------ */
+  sec('V8 digital twins');
+  pg = await open('#p=markf&a=metal&s=fiber&w=30&l=f254', { mfig: 'combo' });
+  await pg.evaluate(() => { go(5); document.querySelector('#mfig').scrollIntoView(); });
+  await pg.waitForSelector('#mfig3d .twinframe', { timeout: 30000 }).catch(() => {});
+  const tf = await pg.$('#mfig3d .twinframe');
+  const tfr = tf && await tf.contentFrame();
+  if (tfr) await tfr.waitForSelector('html[data-twin-ready]', { timeout: 45000 }).catch(() => {});
+  const t1 = await pg.evaluate(() => { const f = document.querySelector('#mfig3d .twinframe'); let ready = false, embed = false, src = '';
+    try { const d = f.contentDocument.documentElement; ready = d.getAttribute('data-twin-ready') === '1'; embed = d.classList.contains('embed');
+      src = (f.contentDocument.querySelector('[data-src][aria-pressed="true"]') || {}).dataset.src; } catch (e) {}
+    return { url: f && f.getAttribute('src'), ready, embed, src, cap: /V8 digital twin/.test((document.querySelector('.twincap') || {}).textContent || '') }; });
+  check('Mark F-Series shows the V8 CAD simulation in the 3D view, embedded and set to the configuration', t1.ready && t1.embed && t1.src === 'qs' && /^twin\/fiber\.html\?/.test(t1.url) && /cfg=door/.test(t1.url) && t1.cap, JSON.stringify(t1));
+  await pg.evaluate(() => document.querySelector('#twinOpen').click());
+  await pg.waitForSelector('#twinfull.open .twinframe', { timeout: 15000 }).catch(() => {});
+  const t2 = await pg.evaluate(() => { const f = document.querySelector('#twinfull.open .twinframe'); return { open: !!f, full: !!f && !/embed=1/.test(f.getAttribute('src')), modal: document.querySelector('#twinfull').getAttribute('aria-modal') }; });
+  await pg.keyboard.press('Escape'); await pg.waitForTimeout(200);
+  const t3 = await pg.evaluate(() => !document.querySelector('#twinfull.open') && !document.querySelector('#twinfull .twinframe'));
+  check('the full CAD simulation opens over the configurator and closes again with Escape', t2.open && t2.full && t2.modal === 'true' && t3, JSON.stringify(t2));
+  const t4 = await pg.evaluate(async () => { const m = await import('./twin.js'); const has = (l) => ({ has: (k) => l.includes(k) });
+    return [m.twinUrl({ plat: 'semispm', src: 'uv', mods: has(['traytwr']) }, true), m.twinUrl({ plat: 'markc2i', src: 'co293', mods: has(['conveyor']) }), m.twinUrl({ plat: 'weldp', src: 'smcw', app: 'seam', mods: has(['wobble']) }),
+      m.twinUrl({ plat: 'markf', src: 'mopa', load: 'dial', app: 'anod', mods: has([]) }), m.twinUrl({ plat: 'weldb', src: 'green', mods: has([]) })]; });
+  check('each twin is set from the configuration: source, handling and part, in the simulation’s own terms', /semi\.html\?src=uv&cfg=A&embed=1$/.test(t4[0]) && /pcb\.html\?src=co2&cfg=inline$/.test(t4[1]) && /mw\.html\?src=wob&prod=can$/.test(t4[2]) && /fiber\.html\?src=mopa&cfg=rotary&prod=housing$/.test(t4[3]) && t4[4] === '', JSON.stringify(t4));
+  await pg.evaluate(() => { document.querySelector('#vrealBtn') ? vrealSet(true) : null; });
+  await pg.waitForSelector('#v3dreal .twinframe', { timeout: 15000 }).catch(() => {});
+  check('the viewer’s Realistic mode shows the twin for these platforms, with a way to open the full simulation', await pg.evaluate(() => !!document.querySelector('#v3dreal .twinframe') && !!document.querySelector('#v3dreal .twinopen')));
+  await pg.evaluate(() => vrealSet(false));
+  const t5 = [];
+  for (const k of ['semi', 'pcb', 'fiber', 'mw']) {
+    const tp = await browser.newPage(); const errs = []; tp.on('pageerror', (e) => errs.push(e.message));
+    await tp.goto(BASE.replace(/[^/]*$/, '') + 'twin/' + k + '.html?embed=1', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    const ok = await tp.waitForSelector('html[data-twin-ready]', { timeout: 45000 }).then(() => true).catch(() => false);
+    const csp = await tp.evaluate(() => /script-src 'self'/.test((document.querySelector('meta[http-equiv="Content-Security-Policy"]') || {}).content || '') && !document.querySelector('script:not([src])'));
+    t5.push({ k, ok, csp, errs: errs.length }); await tp.close();
+  }
+  check('all four V8 simulations load on their own under a strict CSP, with no inline script and no errors', t5.every((x) => x.ok && x.csp && !x.errs), JSON.stringify(t5));
+  check('no script errors with the twins', pg.errors.length === 0, pg.errors.join(' | '));
+  await pg.close();
+
+  /* ------------------------------------------------------------------ */
+  sec('Engineering Studio (V8 workspaces)');
+  {
+    const studioAt = BASE.replace(/[^/]*$/, '') + 'studio.html';
+    const sp = await open('', {}); await sp.goto(studioAt, { waitUntil: 'domcontentloaded' });
+    await sp.waitForFunction(() => document.documentElement.classList.contains('unlocked') || document.documentElement.classList.contains('denied'), null, { timeout: 20000 }).catch(() => {});
+    const s1 = await sp.evaluate(() => ({ unlocked: document.documentElement.classList.contains('unlocked'), nav: [...document.querySelectorAll('#nav button')].map((b) => b.textContent).join('|'),
+      csp: /script-src 'self'/.test((document.querySelector('meta[http-equiv="Content-Security-Policy"]') || {}).content || '') && !document.querySelector('script:not([src])'),
+      thumbs: [...document.querySelectorAll('#cards img')].every((i) => /^twin\/thumbs\/[a-z]+\.jpg$/.test(i.getAttribute('src'))), back: !!document.querySelector('a.backcfg[href="index.html"]') }));
+    check('the Engineering Studio opens for an internal session, with the four V8 machines, Compare, Studio and Custom Machine Builder', s1.unlocked && /LMS-SEMI\|LMS-PCB\|FLM-25\|µWELD\|Compare/.test(s1.nav) && /Engineering Studio/.test(s1.nav) && /Custom Machine Builder/.test(s1.nav) && s1.back, JSON.stringify(s1));
+    check('it keeps a strict CSP: no inline script, thumbnails and simulations load from twin/', s1.csp && s1.thumbs, JSON.stringify(s1));
+    await sp.evaluate(() => document.querySelector('#nav button[data-go="fiber"]').click());
+    await sp.waitForFunction(() => getComputedStyle(document.getElementById('loading')).display === 'none', null, { timeout: 60000 }).catch(() => {});
+    const s2 = await sp.evaluate(() => ({ src: document.getElementById('sim').getAttribute('src'), tabs: document.querySelectorAll('#tabs button').length, ready: getComputedStyle(document.getElementById('loading')).display === 'none' }));
+    check('a machine opens its digital twin from twin/ with the ten-tab twin panel', s2.src === 'twin/fiber.html' && s2.tabs === 10 && s2.ready, JSON.stringify(s2));
+    for (const name of ['Engineering Studio', 'Custom Machine Builder']) {
+      await sp.evaluate((n) => [...document.querySelectorAll('#nav button')].find((b) => b.textContent === n).click(), name); await sp.waitForTimeout(600);
+    }
+    const s3 = await sp.evaluate(() => ({ studio: (document.getElementById('studio') || {}).textContent.length || 0 }));
+    check('the Engineering Studio and the Custom Machine Builder render', s3.studio > 500, JSON.stringify(s3));
+    check('no script errors in the Engineering Studio', sp.errors.length === 0, sp.errors.slice(0, 3).join(' | '));
+    await sp.close();
+    const cp = await open('', { access: 'customer' }); await cp.goto(studioAt, { waitUntil: 'domcontentloaded' });
+    await cp.waitForFunction(() => document.documentElement.classList.contains('denied'), null, { timeout: 20000 }).catch(() => {});
+    check('a customer session is shown the passkey notice, not the Studio', await cp.evaluate(() => document.documentElement.classList.contains('denied') && !document.getElementById('gatemsg').hidden));
+    await cp.close();
+  }
 
   /* ------------------------------------------------------------------ */
   sec('Access passkeys');
