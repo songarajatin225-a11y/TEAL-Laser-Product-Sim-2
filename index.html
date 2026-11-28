@@ -1985,6 +1985,22 @@ body:has(#drawer.open) #helpFab,body:has(#inquiry.open) #helpFab,body:has(#compa
   .advbody{padding:18px 20px 20px}
 }
 @media(max-width:640px){body.adv-open #helpFab{display:none}}
+
+/* ---------- V8 digital twins (twin.js) ---------- */
+.twinframe{display:block;width:100%;height:100%;border:0;background:#eef1f3}
+#mfig3d .twinframe{height:min(62vh,560px);min-height:340px;border-radius:var(--r-lg);border:1px solid var(--rule)}
+.twincap{margin:10px 2px 0;font-size:12.5px;line-height:1.55;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.twincap .btn{margin-left:auto}
+.v3dreal .twinframe{position:absolute;inset:0}
+.v3dreal .twinopen{position:absolute;right:12px;top:12px;z-index:3}
+#twinfull{position:fixed;inset:0;z-index:99;background:var(--page);display:none;flex-direction:column}
+#twinfull.open{display:flex}
+#twinfull .twinbar{display:flex;align-items:center;gap:12px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:var(--navy);color:#fff}
+#twinfull .twinbar b{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#7fe3e5}
+#twinfull .twinbar span{font-size:13px;color:#C6D6E0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#twinfull .twinhost{flex:1;min-height:0;position:relative}
+#twinfull .twinframe{position:absolute;inset:0}
+body:has(#twinfull.open) #helpFab{display:none}
 </style>
 </head>
 <body>

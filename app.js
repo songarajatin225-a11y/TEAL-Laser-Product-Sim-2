@@ -5643,6 +5643,7 @@ $('#dfoot').textContent = Store.ok
   : 'Storage is unavailable here, so these last for this session only. Use the shareable link to keep one.';
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape') return;
+  if(twinFullClose()) return;
   if($('#advisor').classList.contains('open')) closeAdvisor();
   else if($('#inquiry').classList.contains('open')) closeOverlay('#inquiry');
   else if($('#compare').classList.contains('open')) closeOverlay('#compare');
@@ -8855,8 +8856,48 @@ function mfigTint(){
   if(nm<600) return 0xc2412c;                   /* green or blue: red-orange */
   return 0x4d8a3b;                              /* near infrared: green */
 }
+/* V8 digital twins: four platforms have a hand-built CAD simulation (twin.js, twin/) */
+var TWIN_PLAT={semispm:1, markc2i:1, markf:1, weldp:1};
+function hasTwin(){ return !!(S.plat && TWIN_PLAT[S.plat]); }
+function twinCfg(embed){
+  var mods={has:function(k){ return hasMod(k); }};
+  return {plat:S.plat, src:S.src, app:S.app, load:loadKind(), mods:mods, embed:embed!==false,
+          theme: document.documentElement.getAttribute('data-theme')==='dark'? 'dark' : 'light'};
+}
+function twinMount(host, done){
+  import('./twin.js').then(function(m){ var api=m.mount(host, twinCfg(true)); if(done) done(api, m); })
+    .catch(function(){ host.innerHTML='<p class="v3drealmsg">The CAD simulation could not be loaded in this browser.</p>'; });
+}
+/* the full V8 page — toolbar, model tree, readouts, steps — over the configurator */
+function twinFull(){
+  if(!hasTwin()) return;
+  import('./twin.js').then(function(m){
+    var ov=$('#twinfull'); if(!ov){ ov=el('div'); ov.id='twinfull'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); document.body.appendChild(ov); }
+    var t=m.twinParams(twinCfg(false)), info=m.TWIN_INFO[t.key];
+    ov.setAttribute('aria-label', info.name+' — full CAD simulation');
+    ov.innerHTML='<div class="twinbar"><b>'+info.code+'</b><span>'+info.name+' · full CAD simulation from the TEAL Laser Engineering OS V8</span>'+
+      '<button type="button" class="dx" id="twinX" aria-label="Close the CAD simulation">'+ico('x')+'</button></div><div class="twinhost"></div>';
+    m.mount(ov.querySelector('.twinhost'), twinCfg(false));
+    ov.classList.add('open'); document.body.style.overflow='hidden';
+    $('#twinX').onclick=twinFullClose; setTimeout(function(){ var x=$('#twinX'); if(x) x.focus(); }, 60);
+  });
+}
+function twinFullClose(){ var ov=$('#twinfull'); if(!ov||!ov.classList.contains('open')) return false;
+  var h=ov.querySelector('.twinhost'); if(h&&h.__cad) h.__cad.stop(); ov.classList.remove('open'); document.body.style.overflow=''; return true; }
 function mfigCad(key){
   var h3=$('#mfig3d');
+  if(hasTwin()){
+    twinMount(h3, function(api){
+      if(MFIG.key!==key){ if(api) api.stop(); return; }
+      MFIG.cad=api;
+      var cap=document.createElement('p'); cap.className='twincap';
+      cap.innerHTML='The V8 digital twin of this platform: a hand-built 3D CAD simulation running its own process cycle, set to this configuration’s source and handling. Concept model at proportional scale; dimensions, travels and cycle times are TBD pending engineering. '+
+        '<button type="button" class="btn sm" id="twinOpen">Open the full CAD simulation</button>';
+      h3.appendChild(cap); $('#twinOpen').onclick=twinFull;
+      if(mfigMode()==='cad' || !mfigGalvo()) $('#mfig').setAttribute('data-variant','cad');
+    });
+    return;
+  }
   import('./cad3d.js').then(function(m){
     if(MFIG.key!==key) return;
     var pr=mfigPhases(), dm=machineDims(), segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });
@@ -8896,6 +8937,11 @@ function vrealSync(){
   if(!mfigFits()){ host.innerHTML='<p class="v3drealmsg">Choose a platform, application, source, power and objective to see it rendered.</p>'; VREAL.key=''; return; }
   var key=encodeState().replace(/(^|&)t=\d+/,'')+'|'+P().deliv;
   if(key===VREAL.key) return; VREAL.key=key;
+  if(hasTwin()){
+    twinMount(host, function(api){ if(!VREAL.on || VREAL.key!==key){ if(api) api.stop(); return; }
+      var b=el('button','btn sm twinopen'); b.type='button'; b.textContent='Full CAD simulation'; b.onclick=twinFull; host.appendChild(b); });
+    return;
+  }
   import('./cad3d.js').then(function(m){
     if(!VREAL.on || VREAL.key!==key) return;
     var pr=mfigPhases(), dm=machineDims(), src=SRC[S.src], segs=markPath().map(function(sg){ return sg.map(function(q){ return [q[0]*0.92, q[1]*0.92]; }); });

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEAL laser micro-welding workstation — 3D CAD simulation</title>
+<style>
+/* VOICE: engineering CAD workstation, calm and exact
+   IDEA: a 3D CAD viewer with a live process simulation (model tree, view cube buttons, DRO)
+   PICTURE: the machine itself, solid-shaded with edges, filling the viewport
+   COLOUR and TYPE: TEAL teal + greys, Inter + JetBrains Mono for readouts
+   LAYOUT: toolbar on top, model tree left, viewport centre, DRO right, steps + note below */
+:root{color-scheme:light dark;--bg:light-dark(#f6f7f8,#0f1214);--panel:light-dark(#ffffff,#171b1e);--ink:light-dark(#1d2226,#e3e7ea);--mute:light-dark(#68737b,#8d989f);--line:light-dark(#dde2e5,#2a3135);--teal:light-dark(#0e8a86,#3cc4bd);--teal-bg:light-dark(#e3f3f2,#16302e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif;overflow-x:clip}
+.app{display:grid;grid-template-columns:240px minmax(0,1fr) 250px;grid-template-rows:auto minmax(0,1fr) auto;height:100vh;min-height:640px}
+header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+header h1{font-size:15px;font-weight:600;margin:0 10px 0 0;white-space:nowrap}
+header h1 span{color:var(--teal)}
+.grp{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.grp>em{font-style:normal;color:var(--mute);font-size:12px;margin-right:2px}
+button{font:inherit;font-size:12.5px;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:4px;padding:6px 10px;min-height:32px;cursor:pointer}
+button:hover{border-color:var(--mute)}
+button[aria-pressed=true]{border-color:var(--teal);color:var(--teal);background:var(--teal-bg)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:12px;overflow:auto}
+aside.right{border-right:0;border-left:1px solid var(--line)}
+h2{font-size:11.5px;font-weight:600;color:var(--mute);margin:14px 0 8px;letter-spacing:.02em}
+h2:first-child{margin-top:0}
+.tree-row{display:flex;align-items:center;gap:8px;padding:5px 2px;font-size:13px;cursor:pointer;border-bottom:1px dashed var(--line)}
+.tree-row.off{opacity:.38}
+.tree-row input{accent-color:var(--teal);width:16px;height:16px;margin:0}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center;font-size:13px;margin-bottom:8px}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--teal)}
+.ctl output{font:12px "JetBrains Mono",ui-monospace,monospace;color:var(--mute)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;padding:3px 0}
+.chk input{accent-color:var(--teal);width:16px;height:16px;margin:0}
+#view{position:relative;overflow:hidden;background:#eef1f3}
+#view canvas{display:block;width:100%;height:100%;touch-action:none}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;left:0;top:0;font-size:11.5px;background:color-mix(in srgb,var(--panel) 88%,transparent);border:1px solid var(--line);border-left:2px solid var(--teal);padding:2px 6px;border-radius:2px;white-space:nowrap}
+.lbl.dim{border-left-color:var(--teal);color:var(--teal);font-family:"JetBrains Mono",ui-monospace,monospace}
+.readout{position:absolute;left:12px;bottom:10px;right:12px;font:12.5px "JetBrains Mono",ui-monospace,monospace;background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--line);padding:6px 10px;border-radius:4px}
+.badge{position:absolute;left:12px;top:10px;font-size:11.5px;color:var(--mute);background:color-mix(in srgb,var(--panel) 85%,transparent);padding:3px 8px;border-radius:3px}
+#dro div{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;padding:6px 0;border-bottom:1px dashed var(--line)}
+#dro span{font-size:12px;color:var(--mute)}
+#dro b{font:600 15px "JetBrains Mono",ui-monospace,monospace;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+#dro i{grid-column:1/-1;font-style:normal;font-size:11px;color:var(--mute);text-align:right}
+#lamp{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mute);margin-bottom:6px}
+#lamp i{width:10px;height:10px;border-radius:50%;background:#36c46b}
+#lamp[data-lamp=amber] i{background:#f5a623}
+footer{grid-column:1/-1;background:var(--panel);border-top:1px solid var(--line);padding:10px 14px}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;margin:0;padding:0}
+.steps li{border-top:3px solid var(--line);padding:6px 2px 0;cursor:pointer;font-size:12.5px;color:var(--mute)}
+.steps li span{display:block;font:11px "JetBrains Mono",ui-monospace,monospace}
+.steps li b{font-weight:500}
+.steps li[data-now]{border-top-color:var(--teal);color:var(--ink)}
+.note{margin:8px 0 0;font-size:12.5px;color:var(--ink)}
+.note small{display:block;color:var(--mute);margin-top:4px}
+@media(max-width:1000px){.app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 62vh auto auto auto;height:auto}aside{border:0;border-top:1px solid var(--line)}aside.left{order:3}#view{order:2}aside.right{order:4}footer{order:5}.steps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tip{position:absolute;left:0;top:0;display:none;pointer-events:none;font-size:12px;background:var(--panel);border:1px solid var(--line);border-left:2px solid var(--teal);padding:3px 7px;border-radius:3px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+#sel{font-size:12.5px;margin-bottom:6px}
+#sel .muted{color:var(--mute);margin:0 0 6px}
+.sel-t{font-weight:600;margin-bottom:6px}
+#sel dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0 0 8px}
+#sel dt{color:var(--mute)}#sel dd{margin:0;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;text-align:right}
+.sel-b{display:flex;gap:6px;flex-wrap:wrap}
+#perf{color:var(--teal)}
+</style>
+<link rel="stylesheet" href="embed.css">
+</head>
+<body>
+<div class="app">
+<header>
+  <h1><span>TEAL</span> laser micro-welding · 3D CAD</h1>
+  <div class="grp" role="group" aria-label="Part"><em>Joint</em><button data-prod="tab" aria-pressed="true">Ni tab → Cu busbar</button><button data-prod="can" aria-pressed="false">SS sensor can seam</button></div>
+  <div class="grp" role="group" aria-label="Laser"><em>Mode</em><button data-src="qcw" aria-pressed="true">QCW spot</button><button data-src="cw" aria-pressed="false">CW seam</button><button data-src="wob" aria-pressed="false">CW + wobble</button></div>
+  <div class="grp" role="group" aria-label="Views"><em>View</em><button data-view="iso" aria-pressed="true">Iso</button><button data-view="front">Front</button><button data-view="top">Top</button><button data-view="right">Right</button><button data-view="process">Process</button><button data-view="weld">Weld zone</button><button data-view="cabinet">Gas panel</button><button id="ortho" aria-pressed="false">Perspective</button></div>
+  <div class="grp"><button id="play" aria-pressed="false">Pause</button></div>
+</header>
+<aside class="left">
+  <h2>Model tree</h2>
+  <div id="tree"></div>
+  <h2>Display</h2>
+  <label class="chk"><input type="checkbox" id="t-edges" checked>Edges</label>
+  <label class="chk"><input type="checkbox" id="t-ao" checked>Ambient occlusion</label>
+  <label class="chk"><input type="checkbox" id="t-xray">X-ray panels</label>
+  <label class="chk"><input type="checkbox" id="t-labels" checked>Callouts &amp; overall dims</label>
+  <label class="chk"><input type="checkbox" id="t-fov" checked>Camera frusta</label>
+  <label class="chk"><input type="checkbox" id="t-grid" checked>Floor grid (100 mm)</label>
+  <label class="chk"><input type="checkbox" id="follow">Camera follows weld point</label>
+  <h2>Tools</h2>
+  <div class="ctl"><label for="section">Section cut</label><output id="section-v">off</output><input type="range" id="section" min="-330" max="330" step="10" value="330"></div>
+  <div class="ctl"><label for="explode">Exploded view</label><output></output><input type="range" id="explode" min="0" max="100" value="0"></div>
+  <div class="ctl"><label for="speed">Sim speed</label><output id="speed-v">1×</output><input type="range" id="speed" min="0" max="4" step="1" value="2"></div>
+</aside>
+<main id="view" aria-label="3D model viewport. Drag to orbit, right-drag to pan, scroll to zoom."><div id="labels"></div><div class="readout" id="readout"></div><div class="badge"><span id="perf"></span> Drag orbit · right-drag pan · scroll zoom · keys I F T R P W G · C joint</div></main>
+<aside class="right">
+  <h2>Selection</h2>
+  <div id="sel"></div>
+  <h2>Axis readout (DRO)</h2>
+  <div id="lamp"><i></i>Stack light</div>
+  <div id="dro"></div>
+</aside>
+<footer>
+  <ol class="steps"><li data-step="0"><span>01</span><b>Load & clamp</b></li><li data-step="1"><span>02</span><b>Recipe select</b></li><li data-step="2"><span>03</span><b>Pre-weld seam find</b></li><li data-step="3"><span>04</span><b>Height & focus</b></li><li data-step="4"><span>05</span><b>Interlock & gas purge</b></li><li data-step="5"><span>06</span><b>Laser weld</b></li><li data-step="6"><span>07</span><b>Post-weld inspect</b></li><li data-step="7"><span>08</span><b>OK/NG · log · unload</b></li></ol>
+  <p class="note" id="note"></p>
+  <p class="note"><small>Concept model at proportional scale, readouts in mm. Concept based on the TEAL compact workstation reference image. Laser source, power, spot size, dimensions, cycle time, weld windows and tolerances are TBD pending customer inputs and engineering validation. Grades are simulated; motion is slowed for reading.</small></p>
+</footer>
+</div>
+<script src="lib/three.js"></script>
+<script src="lib/orbit.js"></script>
+<script src="lib/room.js"></script>
+<script src="lib/extra.js"></script>
+<script src="mw.js"></script>
+<script src="embed.js"></script>
+</body>
+</html>
